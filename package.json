@@ -11,7 +11,7 @@
     "report": "nyc report --reporter=html && open coverage/index.html",
     "build": "tsc",
     "development": "concurrently -k npm:server:*",
-    "development:server": "nodemon ts-node ./app/servers/index.ts",
+    "development:server": "nodemon ts-node ./app/servers/index.dev.ts",
     "development:gateway": "wait-on tcp:4001 && ts-node ./app/index",
     "start": "concurrently -k npm:server:*",
     "server:server": "ts-node ./app/servers/index.ts",
