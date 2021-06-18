@@ -3,30 +3,705 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
-type Mutation {
-  createVersion(data: VersionInput!): Version!
-  updateVersion(data: VersionInput!, id: String!): Version!
-}
-
-type Query {
-  getAllVersions: [Version!]!
-  getVersion(id: String!): Version
-}
-
-"""The Version model"""
-type Version {
+"""The AuditLogin model"""
+type AuditLogin implements IModelData {
   active: Boolean
+  auth: Boolean
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  id: ID!
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  user: User
+  userAgent: String
+  userId: String
+  userIp: String
+  userPort: String
+  username: String
+  version: Float
+}
+
+type AuditLoginConnection {
+  edges: [AuditLoginEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type AuditLoginEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: AuditLogin!
+}
+
+"""
+The javascript `Date` as string. Type represents date and time as the ISO Date string.
+"""
+scalar DateTime
+
+"""The Document Type model"""
+type DocumentType implements IModelData {
+  active: Boolean
+  code: String
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
   description: String
   id: ID!
   name: String
-  number: Float
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
 }
 
-input VersionInput {
+type DocumentTypeConnection {
+  edges: [DocumentTypeEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type DocumentTypeEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: DocumentType!
+}
+
+"""The Email model"""
+type Email implements IModelData {
   active: Boolean
-  description: String
-  id: String
-  name: String
-  number: Float
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  dateSend: DateTime
+  email: String
+  id: ID!
+  message: String
+  title: String
+  to: User
+  toId: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
   version: Float
+}
+
+type EmailConnection {
+  edges: [EmailEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type EmailEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: Email!
+}
+
+"""The Gender model"""
+type Gender implements IModelData {
+  active: Boolean
+  code: String
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  description: String
+  id: ID!
+  name: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type GenderConnection {
+  edges: [GenderEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type GenderEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: Gender!
+}
+
+interface IModelData {
+  active: Boolean
+  createdAt: DateTime
+  createdByUserId: String
+  id: ID!
+  updatedAt: DateTime
+  updatedByUserId: String
+  version: Float
+}
+
+"""The Inbox model"""
+type Inbox implements IModelData {
+  active: Boolean
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  dateRead: DateTime
+  dateSend: DateTime
+  from: User
+  fromId: String
+  id: ID!
+  message: String
+  title: String
+  to: User
+  toId: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type InboxConnection {
+  edges: [InboxEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type InboxEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: Inbox!
+}
+
+"""The User model"""
+type Jwt {
+  jwt: String
+  name: String
+  role: Role
+  roleMenus: [RoleMenu!]
+  user_id: String
+}
+
+"""The Menu model"""
+type Menu implements IModelData {
+  active: Boolean
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  icon: String
+  id: ID!
+  module: Module
+  moduleId: String
+  name: String
+  parent: Menu
+  parentId: String
+  sorting: Float
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type MenuConnection {
+  edges: [MenuEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type MenuEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: Menu!
+}
+
+"""The Module model"""
+type Module implements IModelData {
+  active: Boolean
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  id: ID!
+  name: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  url: String
+  version: Float
+}
+
+type ModuleConnection {
+  edges: [ModuleEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type ModuleEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: Module!
+}
+
+type Mutation {
+  changeActiveAuditLogin(active: Boolean!, id: String!): Boolean!
+  changeActiveDocumentType(active: Boolean!, id: String!): Boolean!
+  changeActiveEmail(active: Boolean!, id: String!): Boolean!
+  changeActiveGender(active: Boolean!, id: String!): Boolean!
+  changeActiveInbox(active: Boolean!, id: String!): Boolean!
+  changeActiveMenu(active: Boolean!, id: String!): Boolean!
+  changeActiveModule(active: Boolean!, id: String!): Boolean!
+  changeActiveNotification(active: Boolean!, id: String!): Boolean!
+  changeActiveRole(active: Boolean!, id: String!): Boolean!
+  changeActiveRoleMenu(active: Boolean!, id: String!): Boolean!
+  changeActiveUser(active: Boolean!, id: String!): Boolean!
+  createAuditLogin(data: NewAuditLogin!): AuditLogin!
+  createDocumentType(data: NewDocumentType!): DocumentType!
+  createEmail(data: NewEmail!): Email!
+  createGender(data: NewGender!): Gender!
+  createInbox(data: NewInbox!): Inbox!
+  createMenu(data: NewMenu!): Menu!
+  createModule(data: NewModule!): Module!
+  createNotification(data: NewNotification!): Notification!
+  createRole(data: NewRole!): Role!
+  createRoleMenu(data: NewRoleMenu!): RoleMenu!
+  createUser(data: NewUser!): User!
+  login(password: String!, username: String!): Jwt!
+  updateAuditLogin(data: NewAuditLogin!, id: String!): AuditLogin!
+  updateDocumentType(data: NewDocumentType!, id: String!): DocumentType!
+  updateEmail(data: NewEmail!, id: String!): Email!
+  updateGender(data: NewGender!, id: String!): Gender!
+  updateInbox(data: NewInbox!, id: String!): Inbox!
+  updateMenu(data: NewMenu!, id: String!): Menu!
+  updateModule(data: NewModule!, id: String!): Module!
+  updateNotification(data: NewNotification!, id: String!): Notification!
+  updateRole(data: NewRole!, id: String!): Role!
+  updateRoleMenu(data: NewRoleMenu!, id: String!): RoleMenu!
+  updateUser(data: NewUser!, id: String!): User!
+}
+
+input NewAuditLogin {
+  auth: Boolean
+  userAgent: String
+  userId: String
+  userIp: String
+  userPort: String
+  username: String
+}
+
+input NewDocumentType {
+  code: String
+  description: String
+  name: String
+}
+
+input NewEmail {
+  dateSend: DateTime
+  email: String
+  message: String
+  title: String
+  toId: String
+}
+
+input NewGender {
+  code: String
+  description: String
+  name: String
+}
+
+input NewInbox {
+  dateRead: DateTime
+  dateSend: DateTime
+  fromId: String
+  message: String
+  title: String
+  toId: String
+}
+
+input NewMenu {
+  icon: String
+  moduleId: String
+  name: String
+  parentId: String
+  sorting: Float
+}
+
+input NewModule {
+  name: String
+  url: String
+}
+
+input NewNotification {
+  dateRead: DateTime
+  dateSend: DateTime
+  message: String
+  title: String
+  toId: String
+}
+
+input NewRole {
+  name: String
+}
+
+input NewRoleMenu {
+  activateAction: Boolean
+  createAction: Boolean
+  deleteAction: Boolean
+  fullAccess: Boolean
+  inactiveAction: Boolean
+  menuId: String
+  readAction: Boolean
+  roleId: String
+  updateAction: Boolean
+}
+
+input NewUser {
+  birthdate: DateTime
+  documentNumber: String
+  documentTypeId: String
+  email: String
+  genderId: String
+  lastName: String
+  name: String
+  password: String
+  phone: String
+  profilePhoto: String
+  roleId: String
+  username: String
+}
+
+"""The Notification model"""
+type Notification implements IModelData {
+  active: Boolean
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  dateRead: DateTime
+  dateSend: DateTime
+  id: ID!
+  message: String
+  title: String
+  to: User
+  toId: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type NotificationConnection {
+  edges: [NotificationEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type NotificationEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: Notification!
+}
+
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+}
+
+type Query {
+  getAllAuditLogin(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): AuditLoginConnection!
+  getAllDocumentType(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): DocumentTypeConnection!
+  getAllEmail(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): EmailConnection!
+  getAllGender(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): GenderConnection!
+  getAllInbox(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): InboxConnection!
+  getAllMenu(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): MenuConnection!
+  getAllModule(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): ModuleConnection!
+  getAllNotification(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): NotificationConnection!
+  getAllRole(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): RoleConnection!
+  getAllRoleMenu(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): RoleMenuConnection!
+  getAllUser(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): UserConnection!
+  getAuditLogin(id: String!): AuditLogin
+  getDocumentType(id: String!): DocumentType
+  getEmail(id: String!): Email
+  getGender(id: String!): Gender
+  getInbox(id: String!): Inbox
+  getMenu(id: String!): Menu
+  getModule(id: String!): Module
+  getNotification(id: String!): Notification
+  getRole(id: String!): Role
+  getRoleMenu(id: String!): RoleMenu
+  getUser(id: String!): User
+}
+
+"""The Role model"""
+type Role implements IModelData {
+  active: Boolean
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  id: ID!
+  name: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type RoleConnection {
+  edges: [RoleEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type RoleEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: Role!
+}
+
+"""The RoleMenu model"""
+type RoleMenu implements IModelData {
+  activateAction: Boolean
+  active: Boolean
+  createAction: Boolean
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  deleteAction: Boolean
+  fullAccess: Boolean
+  id: ID!
+  inactiveAction: Boolean
+  menu: Menu
+  menuId: String
+  readAction: Boolean
+  role: Role
+  roleId: String
+  updateAction: Boolean
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type RoleMenuConnection {
+  edges: [RoleMenuEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type RoleMenuEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: RoleMenu!
+}
+
+"""The User model"""
+type User {
+  active: Boolean
+  birthdate: DateTime
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  documentNumber: String
+  documentType: DocumentType
+  documentTypeId: String
+  email: String
+  gender: Gender
+  genderId: String
+  id: ID!
+  lastName: String
+  name: String
+  password: String
+  phone: String
+  profilePhoto: String
+  role: Role
+  roleId: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  username: String
+  version: Float
+}
+
+type UserConnection {
+  edges: [UserEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type UserEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: User!
 }
