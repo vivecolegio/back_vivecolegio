@@ -67,7 +67,7 @@ export class InboxResolver {
   @Mutation(() => Inbox)
   async createInbox(@Arg('data') data: NewInbox, @Ctx() context: IContext): Promise<Inbox> {
     let dataProcess: NewInbox = removeEmptyStringElements(data);
-    let createdByUserId = context.user.authorization.id;
+    let createdByUserId = context?.user?.authorization?.id;
     const model = await this.repository.create({
       ...dataProcess,
       active: true,
@@ -85,7 +85,7 @@ export class InboxResolver {
     @Ctx() context: IContext
   ): Promise<Inbox | undefined> {
     let dataProcess = removeEmptyStringElements(data);
-    let updatedByUserid = context.user.authorization.id;
+    let updatedByUserid = context?.user?.authorization?.id;
     let result = await this.repository.findOne(id);
     result = await this.repository.save({
       _id: new ObjectID(id),
@@ -103,7 +103,7 @@ export class InboxResolver {
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
   ): Promise<Boolean | undefined> {
-    let updatedByUserid = context.user.authorization.id;
+    let updatedByUserid = context?.user?.authorization?.id;
     let result = await this.repository.findOne(id);
     result = await this.repository.save({
       _id: new ObjectID(id),

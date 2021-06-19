@@ -84,7 +84,7 @@ export class UserResolver {
   @Mutation(() => User)
   async createUser(@Arg('data') data: NewUser, @Ctx() context: IContext): Promise<User> {
     let dataProcess: NewUser = removeEmptyStringElements(data);
-    let createdByUserId = context.user.authorization.id;
+    let createdByUserId = context?.user?.authorization?.id;
     if (data.password != null) {
       let passwordHash = await bcrypt
         .hash(data.password, BCRYPT_SALT_ROUNDS)
@@ -110,7 +110,7 @@ export class UserResolver {
     @Ctx() context: IContext
   ): Promise<User | undefined> {
     let dataProcess = removeEmptyStringElements(data);
-    let updatedByUserid = context.user.authorization.id;
+    let updatedByUserid = context?.user?.authorization?.id;
     let result = await this.repository.findOne(id);
     result = await this.repository.save({
       _id: new ObjectID(id),
@@ -128,7 +128,7 @@ export class UserResolver {
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
   ): Promise<Boolean | undefined> {
-    let updatedByUserid = context.user.authorization.id;
+    let updatedByUserid = context?.user?.authorization?.id;
     let result = await this.repository.findOne(id);
     result = await this.repository.save({
       _id: new ObjectID(id),

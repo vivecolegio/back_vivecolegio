@@ -10,9 +10,7 @@ import { port } from './config/index';
 async function app() {
   try {
     const gateway = new ApolloGateway({
-      serviceList: [
-        { name: 'servers', url: 'http://backendcolegio.vhmsoluciones.com:4001/graphql' },
-      ],
+      serviceList: [{ name: 'servers', url: 'http://localhost:4001/graphql' }],
       buildService({ url }: any) {
         return new RemoteGraphQLDataSource({
           url,
