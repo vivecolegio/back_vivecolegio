@@ -29,7 +29,6 @@ import { NotificationResolver } from './../graphql/resolvers/NotificationResolve
 import { RoleMenuResolver } from './../graphql/resolvers/RoleMenuResolver';
 import { RoleResolver } from './../graphql/resolvers/RoleResolver';
 import { UserResolver } from './../graphql/resolvers/UserResolver';
-import { permissions } from './permissions';
 
 const port = 4001;
 
@@ -92,7 +91,8 @@ const federatedSchema = buildFederatedSchema({
 });
 
 const server = new ApolloServer({
-  schema: applyMiddleware(federatedSchema, permissions),
+  //schema: applyMiddleware(federatedSchema, permissions),
+  schema: applyMiddleware(federatedSchema),
   context: ({ req }: any) => {
     const user = req.headers.user ? JSON.parse(req.headers.user) : null;
     return { user };
