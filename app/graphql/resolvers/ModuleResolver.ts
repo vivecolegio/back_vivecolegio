@@ -67,7 +67,7 @@ export class ModuleResolver {
   @Mutation(() => Module)
   async createModule(@Arg('data') data: NewModule, @Ctx() context: IContext): Promise<Module> {
     let dataProcess: NewModule = removeEmptyStringElements(data);
-    let createdByUserId = context.user.authorization.id;
+    let createdByUserId = context?.user?.authorization?.id;
     const model = await this.repository.create({
       ...dataProcess,
       active: true,
@@ -85,7 +85,7 @@ export class ModuleResolver {
     @Ctx() context: IContext
   ): Promise<Module | undefined> {
     let dataProcess = removeEmptyStringElements(data);
-    let updatedByUserid = context.user.authorization.id;
+    let updatedByUserid = context?.user?.authorization?.id;
     let result = await this.repository.findOne(id);
     result = await this.repository.save({
       _id: new ObjectID(id),
@@ -103,7 +103,7 @@ export class ModuleResolver {
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
   ): Promise<Boolean | undefined> {
-    let updatedByUserid = context.user.authorization.id;
+    let updatedByUserid = context?.user?.authorization?.id;
     let result = await this.repository.findOne(id);
     result = await this.repository.save({
       _id: new ObjectID(id),
