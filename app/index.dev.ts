@@ -48,7 +48,7 @@ async function app() {
     server.applyMiddleware({ app });
     app.listen({ port: port }, () =>
       console.log(
-        `🚀 Server ready and listening at ==> http://backendcolegio.vhmsoluciones.com:${port}${server.graphqlPath}`
+        `🚀 Server ready and listening at ==> http://localhost:${port}${server.graphqlPath}`
       )
     );
   } catch (err) {

@@ -19,10 +19,12 @@ import { RoleMenu } from '../graphql/models/RoleMenu';
 import { User } from '../graphql/models/User';
 import { GenderResolver } from '../graphql/resolvers/GenderResolver';
 import { AuditLogin } from './../graphql/models/AuditLogin';
+import { MenuItem } from './../graphql/models/MenuItem';
 import { AuditLoginResolver } from './../graphql/resolvers/AuditLoginResolver';
 import { DocumentTypeResolver } from './../graphql/resolvers/DocumentTypeResolver';
 import { EmailResolver } from './../graphql/resolvers/EmailResolver';
 import { InboxResolver } from './../graphql/resolvers/InboxResolver';
+import { MenuItemResolver } from './../graphql/resolvers/MenuItemResolver';
 import { MenuResolver } from './../graphql/resolvers/MenuResolver';
 import { ModuleResolver } from './../graphql/resolvers/ModuleResolver';
 import { NotificationResolver } from './../graphql/resolvers/NotificationResolver';
@@ -49,6 +51,7 @@ const schema = buildSchemaSync({
     RoleResolver,
     RoleMenuResolver,
     UserResolver,
+    MenuItemResolver,
   ],
   emitSchemaFile: true,
   validate: false,
@@ -72,6 +75,7 @@ createConnections([
       Role,
       RoleMenu,
       User,
+      MenuItem,
     ],
     synchronize: true,
     logger: 'advanced-console',
