@@ -3,12 +3,12 @@ import { Column, Entity, ManyToOne } from 'typeorm';
 import { Lazy } from '../../types';
 import { IModelData } from '../interfaces/IModelData';
 import { ConnectionType, EdgeType } from '../pagination/relaySpecs';
-import { MenuItem } from './MenuItem';
+import { Menu } from './Menu';
 import { Module } from './Module';
 
-@ObjectType({ description: 'The Menu model', implements: IModelData })
+@ObjectType({ description: 'The MenuItem model', implements: IModelData })
 @Entity()
-export class Menu extends IModelData {
+export class MenuItem extends IModelData {
   @Field({ nullable: true })
   @Column({ nullable: true })
   name?: string;
@@ -21,6 +21,14 @@ export class Menu extends IModelData {
   @Column({ nullable: true })
   sorting?: Number;
 
+  @ManyToOne(() => Menu, (data) => data.id, { lazy: true })
+  @Field(() => Menu, { nullable: true })
+  menu?: Lazy<Menu>;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  menuId?: string;
+
   @ManyToOne(() => Module, (data) => data.id, { lazy: true })
   @Field(() => Module, { nullable: true })
   module?: Lazy<Module>;
@@ -28,13 +36,10 @@ export class Menu extends IModelData {
   @Field({ nullable: true })
   @Column({ nullable: true })
   moduleId?: string;
-
-  @Field(() => [MenuItem], { nullable: true })
-  menuItems?: [MenuItem];
 }
 
 @ObjectType()
-export class MenuEdge extends EdgeType('Menu', Menu) {}
+export class MenuItemEdge extends EdgeType('MenuItem', MenuItem) {}
 
 @ObjectType()
-export class MenuConnection extends ConnectionType<MenuEdge>('Menu', MenuEdge) {}
+export class MenuItemConnection extends ConnectionType<MenuItemEdge>('MenuItem', MenuItemEdge) {}

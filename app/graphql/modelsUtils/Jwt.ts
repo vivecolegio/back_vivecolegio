@@ -1,4 +1,4 @@
-import { ObjectType, Field } from 'type-graphql';
+import { Field, ObjectType } from 'type-graphql';
 import { Role } from '../models/Role';
 import { RoleMenu } from '../models/RoleMenu';
 
@@ -11,7 +11,7 @@ export class Jwt {
   name?: string;
 
   @Field({ nullable: true })
-  user_id?: string;
+  userId?: string;
 
   @Field({ nullable: true })
   role?: Role;

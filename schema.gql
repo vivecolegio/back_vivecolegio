@@ -186,7 +186,7 @@ type Jwt {
   name: String
   role: Role
   roleMenus: [RoleMenu!]
-  user_id: String
+  userId: String
 }
 
 """The Menu model"""
@@ -197,11 +197,10 @@ type Menu implements IModelData {
   createdByUserId: String
   icon: String
   id: ID!
+  menuItems: [MenuItem!]
   module: Module
   moduleId: String
   name: String
-  parent: Menu
-  parentId: String
   sorting: Float
   updatedAt: DateTime
   updatedByUser: User
@@ -221,6 +220,40 @@ type MenuEdge {
   """Used in `before` and `after` args"""
   cursor: String!
   node: Menu!
+}
+
+"""The MenuItem model"""
+type MenuItem implements IModelData {
+  active: Boolean
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  icon: String
+  id: ID!
+  menu: Menu
+  menuId: String
+  module: Module
+  moduleId: String
+  name: String
+  sorting: Float
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type MenuItemConnection {
+  edges: [MenuItemEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type MenuItemEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: MenuItem!
 }
 
 """The Module model"""
@@ -259,6 +292,7 @@ type Mutation {
   changeActiveGender(active: Boolean!, id: String!): Boolean!
   changeActiveInbox(active: Boolean!, id: String!): Boolean!
   changeActiveMenu(active: Boolean!, id: String!): Boolean!
+  changeActiveMenuItem(active: Boolean!, id: String!): Boolean!
   changeActiveModule(active: Boolean!, id: String!): Boolean!
   changeActiveNotification(active: Boolean!, id: String!): Boolean!
   changeActiveRole(active: Boolean!, id: String!): Boolean!
@@ -270,6 +304,7 @@ type Mutation {
   createGender(data: NewGender!): Gender!
   createInbox(data: NewInbox!): Inbox!
   createMenu(data: NewMenu!): Menu!
+  createMenuItem(data: NewMenuItem!): MenuItem!
   createModule(data: NewModule!): Module!
   createNotification(data: NewNotification!): Notification!
   createRole(data: NewRole!): Role!
@@ -282,6 +317,7 @@ type Mutation {
   updateGender(data: NewGender!, id: String!): Gender!
   updateInbox(data: NewInbox!, id: String!): Inbox!
   updateMenu(data: NewMenu!, id: String!): Menu!
+  updateMenuItem(data: NewMenuItem!, id: String!): MenuItem!
   updateModule(data: NewModule!, id: String!): Module!
   updateNotification(data: NewNotification!, id: String!): Notification!
   updateRole(data: NewRole!, id: String!): Role!
@@ -332,6 +368,14 @@ input NewMenu {
   moduleId: String
   name: String
   parentId: String
+  sorting: Float
+}
+
+input NewMenuItem {
+  icon: String
+  menuId: String
+  moduleId: String
+  name: String
   sorting: Float
 }
 
@@ -510,6 +554,21 @@ type Query {
     last: Float
     orderCreated: Boolean!
   ): MenuConnection!
+  getAllMenuItem(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): MenuItemConnection!
   getAllModule(
     """Paginate after opaque cursor"""
     after: String
@@ -591,6 +650,7 @@ type Query {
   getGender(id: String!): Gender
   getInbox(id: String!): Inbox
   getMenu(id: String!): Menu
+  getMenuItem(id: String!): MenuItem
   getModule(id: String!): Module
   getNotification(id: String!): Notification
   getRole(id: String!): Role
