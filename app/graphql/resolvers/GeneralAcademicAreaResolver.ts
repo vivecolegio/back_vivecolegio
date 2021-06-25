@@ -4,40 +4,32 @@ import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from '
 import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { removeEmptyStringElements } from '../../types';
-import { NewMenu } from '../inputs/NewMenu';
+import { NewGeneralAcademicArea } from '../inputs/NewGeneralAcademicArea';
 import { IContext } from '../interfaces/IContext';
-import { Menu, MenuConnection } from '../models/Menu';
-import { MenuItem } from '../models/MenuItem';
-import { Module } from '../models/Module';
+import { GeneralAcademicArea, GeneralAcademicAreaConnection } from '../models/GeneralAcademicArea';
 import { User } from '../models/User';
 import { ConnectionArgs } from '../pagination/relaySpecs';
 
-@Resolver(Menu)
-export class MenuResolver {
-  @InjectRepository(Menu)
-  private repository = getMongoRepository(Menu);
+@Resolver(GeneralAcademicArea)
+export class GeneralAcademicAreaResolver {
+  @InjectRepository(GeneralAcademicArea)
+  private repository = getMongoRepository(GeneralAcademicArea);
 
   @InjectRepository(User)
   private repositoryUser = getMongoRepository(User);
 
-  @InjectRepository(Module)
-  private repositoryModule = getMongoRepository(Module);
-
-  @InjectRepository(MenuItem)
-  private repositoryMenuItem = getMongoRepository(MenuItem);
-
-  @Query(() => Menu, { nullable: true })
-  async getMenu(@Arg('id', () => String) id: string) {
+  @Query(() => GeneralAcademicArea, { nullable: true })
+  async getGeneralAcademicArea(@Arg('id', () => String) id: string) {
     const result = await this.repository.findOne(id);
     return result;
   }
 
-  @Query(() => MenuConnection)
-  async getAllMenu(
+  @Query(() => GeneralAcademicAreaConnection)
+  async getAllGeneralAcademicArea(
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean
-  ): Promise<MenuConnection> {
+  ): Promise<GeneralAcademicAreaConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
@@ -63,7 +55,7 @@ export class MenuResolver {
         });
       }
     }
-    let resultConn = new MenuConnection();
+    let resultConn = new GeneralAcademicAreaConnection();
     let resultConnection = connectionFromArraySlice(result, args, {
       sliceStart: 0,
       arrayLength: result.length,
@@ -72,9 +64,12 @@ export class MenuResolver {
     return resultConn;
   }
 
-  @Mutation(() => Menu)
-  async createMenu(@Arg('data') data: NewMenu, @Ctx() context: IContext): Promise<Menu> {
-    let dataProcess: NewMenu = removeEmptyStringElements(data);
+  @Mutation(() => GeneralAcademicArea)
+  async createGeneralAcademicArea(
+    @Arg('data') data: NewGeneralAcademicArea,
+    @Ctx() context: IContext
+  ): Promise<GeneralAcademicArea> {
+    let dataProcess: NewGeneralAcademicArea = removeEmptyStringElements(data);
     let createdByUserId = context?.user?.authorization?.id;
     const model = await this.repository.create({
       ...dataProcess,
@@ -86,12 +81,12 @@ export class MenuResolver {
     return result;
   }
 
-  @Mutation(() => Menu)
-  async updateMenu(
-    @Arg('data') data: NewMenu,
+  @Mutation(() => GeneralAcademicArea)
+  async updateGeneralAcademicArea(
+    @Arg('data') data: NewGeneralAcademicArea,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Menu | undefined> {
+  ): Promise<GeneralAcademicArea | undefined> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserid = context?.user?.authorization?.id;
     let result = await this.repository.findOne(id);
@@ -106,7 +101,7 @@ export class MenuResolver {
   }
 
   @Mutation(() => Boolean)
-  async changeActiveMenu(
+  async changeActiveGeneralAcademicArea(
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
@@ -128,7 +123,7 @@ export class MenuResolver {
   }
 
   @FieldResolver((_type) => User, { nullable: true })
-  async createdByUser(@Root() data: Menu) {
+  async createdByUser(@Root() data: GeneralAcademicArea) {
     let id = data.createdByUserId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryUser.findOne(id);
@@ -138,30 +133,10 @@ export class MenuResolver {
   }
 
   @FieldResolver((_type) => User, { nullable: true })
-  async updatedByUser(@Root() data: Menu) {
+  async updatedByUser(@Root() data: GeneralAcademicArea) {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryUser.findOne(id);
-      return result;
-    }
-    return null;
-  }
-
-  @FieldResolver((_type) => Menu, { nullable: true })
-  async module(@Root() data: Menu) {
-    let id = data.moduleId;
-    if (id !== null && id !== undefined) {
-      const result = await this.repositoryModule.findOne(id);
-      return result;
-    }
-    return null;
-  }
-
-  @FieldResolver((_type) => [MenuItem], { nullable: true })
-  async menuItems(@Root() data: Menu) {
-    let id = data.id;
-    if (id !== null && id !== undefined) {
-      const result = await this.repositoryMenuItem.find({ where: { menuid: id } });
       return result;
     }
     return null;

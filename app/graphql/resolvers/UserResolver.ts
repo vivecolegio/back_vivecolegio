@@ -207,13 +207,13 @@ export class UserResolver {
       });
       if (user) {
         jwtUtil.name = user.name + ' ' + user.lastName;
-        jwtUtil.user_id = user.id;
+        jwtUtil.userId = user.id;
         user.roleId
           ? (jwtUtil.role = (await this.repositoryRole.findOne(user.roleId)) as Role)
           : null;
         if (user.roleId) {
           let roleMenus = await this.repositoryRoleMenu.find({
-            where: { role_id: user.roleId, active: true },
+            where: { roleId: user.roleId, active: true },
           });
           jwtUtil.roleMenus = roleMenus as [RoleMenu];
         }

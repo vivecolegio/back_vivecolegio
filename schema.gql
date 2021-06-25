@@ -37,6 +37,36 @@ type AuditLoginEdge {
   node: AuditLogin!
 }
 
+"""The Campus model"""
+type Campus implements IModelData {
+  active: Boolean
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  id: ID!
+  name: String
+  school: School
+  schoolId: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type CampusConnection {
+  edges: [CampusEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type CampusEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: Campus!
+}
+
 """
 The javascript `Date` as string. Type represents date and time as the ISO Date string.
 """
@@ -135,6 +165,154 @@ type GenderEdge {
   node: Gender!
 }
 
+"""The GeneralAcademicArea model"""
+type GeneralAcademicArea implements IModelData {
+  active: Boolean
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  id: ID!
+  name: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type GeneralAcademicAreaConnection {
+  edges: [GeneralAcademicAreaEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type GeneralAcademicAreaEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: GeneralAcademicArea!
+}
+
+"""The GeneralAcademicAsignature model"""
+type GeneralAcademicAsignature implements IModelData {
+  active: Boolean
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  generalAcademicArea: GeneralAcademicArea
+  generalAcademicAreaId: String
+  id: ID!
+  name: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type GeneralAcademicAsignatureConnection {
+  edges: [GeneralAcademicAsignatureEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type GeneralAcademicAsignatureEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: GeneralAcademicAsignature!
+}
+
+"""The GeneralAcademicCycle model"""
+type GeneralAcademicCycle implements IModelData {
+  active: Boolean
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  id: ID!
+  name: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type GeneralAcademicCycleConnection {
+  edges: [GeneralAcademicCycleEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type GeneralAcademicCycleEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: GeneralAcademicCycle!
+}
+
+"""The GeneralAcademicStandard model"""
+type GeneralAcademicStandard implements IModelData {
+  active: Boolean
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  generalAcademicAsignature: GeneralAcademicAsignature
+  generalAcademicAsignatureId: String
+  generalAcademicCycle: GeneralAcademicCycle
+  generalAcademicCycleId: String
+  id: ID!
+  standard: String
+  subtype: String
+  type: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type GeneralAcademicStandardConnection {
+  edges: [GeneralAcademicStandardEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type GeneralAcademicStandardEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: GeneralAcademicStandard!
+}
+
+"""The GeneralPerformanceLevel model"""
+type GeneralPerformanceLevel implements IModelData {
+  active: Boolean
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  id: ID!
+  name: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type GeneralPerformanceLevelConnection {
+  edges: [GeneralPerformanceLevelEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type GeneralPerformanceLevelEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: GeneralPerformanceLevel!
+}
+
 interface IModelData {
   active: Boolean
   createdAt: DateTime
@@ -186,7 +364,7 @@ type Jwt {
   name: String
   role: Role
   roleMenus: [RoleMenu!]
-  user_id: String
+  userId: String
 }
 
 """The Menu model"""
@@ -197,11 +375,10 @@ type Menu implements IModelData {
   createdByUserId: String
   icon: String
   id: ID!
+  menuItems: [MenuItem!]
   module: Module
   moduleId: String
   name: String
-  parent: Menu
-  parentId: String
   sorting: Float
   updatedAt: DateTime
   updatedByUser: User
@@ -221,6 +398,40 @@ type MenuEdge {
   """Used in `before` and `after` args"""
   cursor: String!
   node: Menu!
+}
+
+"""The MenuItem model"""
+type MenuItem implements IModelData {
+  active: Boolean
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  icon: String
+  id: ID!
+  menu: Menu
+  menuId: String
+  module: Module
+  moduleId: String
+  name: String
+  sorting: Float
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type MenuItemConnection {
+  edges: [MenuItemEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type MenuItemEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: MenuItem!
 }
 
 """The Module model"""
@@ -252,40 +463,101 @@ type ModuleEdge {
   node: Module!
 }
 
+"""The Municipality model"""
+type Municipality implements IModelData {
+  active: Boolean
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  id: ID!
+  name: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type MunicipalityConnection {
+  edges: [MunicipalityEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type MunicipalityEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: Municipality!
+}
+
 type Mutation {
   changeActiveAuditLogin(active: Boolean!, id: String!): Boolean!
+  changeActiveCampus(active: Boolean!, id: String!): Boolean!
   changeActiveDocumentType(active: Boolean!, id: String!): Boolean!
   changeActiveEmail(active: Boolean!, id: String!): Boolean!
   changeActiveGender(active: Boolean!, id: String!): Boolean!
+  changeActiveGeneralAcademicArea(active: Boolean!, id: String!): Boolean!
+  changeActiveGeneralAcademicAsignature(active: Boolean!, id: String!): Boolean!
+  changeActiveGeneralAcademicCycle(active: Boolean!, id: String!): Boolean!
+  changeActiveGeneralAcademicStandard(active: Boolean!, id: String!): Boolean!
+  changeActiveGeneralPerformanceLevel(active: Boolean!, id: String!): Boolean!
   changeActiveInbox(active: Boolean!, id: String!): Boolean!
   changeActiveMenu(active: Boolean!, id: String!): Boolean!
+  changeActiveMenuItem(active: Boolean!, id: String!): Boolean!
   changeActiveModule(active: Boolean!, id: String!): Boolean!
+  changeActiveMunicipality(active: Boolean!, id: String!): Boolean!
   changeActiveNotification(active: Boolean!, id: String!): Boolean!
   changeActiveRole(active: Boolean!, id: String!): Boolean!
   changeActiveRoleMenu(active: Boolean!, id: String!): Boolean!
+  changeActiveSchool(active: Boolean!, id: String!): Boolean!
+  changeActiveSchoolAdministrator(active: Boolean!, id: String!): Boolean!
+  changeActiveStudent(active: Boolean!, id: String!): Boolean!
   changeActiveUser(active: Boolean!, id: String!): Boolean!
   createAuditLogin(data: NewAuditLogin!): AuditLogin!
+  createCampus(data: NewCampus!): Campus!
   createDocumentType(data: NewDocumentType!): DocumentType!
   createEmail(data: NewEmail!): Email!
   createGender(data: NewGender!): Gender!
+  createGeneralAcademicArea(data: NewGeneralAcademicArea!): GeneralAcademicArea!
+  createGeneralAcademicAsignature(data: NewGeneralAcademicAsignature!): GeneralAcademicAsignature!
+  createGeneralAcademicCycle(data: NewGeneralAcademicCycle!): GeneralAcademicCycle!
+  createGeneralAcademicStandard(data: NewGeneralAcademicStandard!): GeneralAcademicStandard!
+  createGeneralPerformanceLevel(data: NewGeneralPerformanceLevel!): GeneralPerformanceLevel!
   createInbox(data: NewInbox!): Inbox!
   createMenu(data: NewMenu!): Menu!
+  createMenuItem(data: NewMenuItem!): MenuItem!
   createModule(data: NewModule!): Module!
+  createMunicipality(data: NewMunicipality!): Municipality!
   createNotification(data: NewNotification!): Notification!
   createRole(data: NewRole!): Role!
   createRoleMenu(data: NewRoleMenu!): RoleMenu!
+  createSchool(data: NewSchool!): School!
+  createSchoolAdministrator(data: NewSchoolAdministrator!): SchoolAdministrator!
+  createStudent(data: NewStudent!): Student!
   createUser(data: NewUser!): User!
   login(password: String!, username: String!): Jwt!
   updateAuditLogin(data: NewAuditLogin!, id: String!): AuditLogin!
+  updateCampus(data: NewCampus!, id: String!): Campus!
   updateDocumentType(data: NewDocumentType!, id: String!): DocumentType!
   updateEmail(data: NewEmail!, id: String!): Email!
   updateGender(data: NewGender!, id: String!): Gender!
+  updateGeneralAcademicArea(data: NewGeneralAcademicArea!, id: String!): GeneralAcademicArea!
+  updateGeneralAcademicAsignature(data: NewGeneralAcademicAsignature!, id: String!): GeneralAcademicAsignature!
+  updateGeneralAcademicCycle(data: NewGeneralAcademicCycle!, id: String!): GeneralAcademicCycle!
+  updateGeneralAcademicStandard(data: NewGeneralAcademicStandard!, id: String!): GeneralAcademicStandard!
+  updateGeneralPerformanceLevel(data: NewGeneralPerformanceLevel!, id: String!): GeneralPerformanceLevel!
   updateInbox(data: NewInbox!, id: String!): Inbox!
   updateMenu(data: NewMenu!, id: String!): Menu!
+  updateMenuItem(data: NewMenuItem!, id: String!): MenuItem!
   updateModule(data: NewModule!, id: String!): Module!
+  updateMunicipality(data: NewMunicipality!, id: String!): Municipality!
   updateNotification(data: NewNotification!, id: String!): Notification!
   updateRole(data: NewRole!, id: String!): Role!
   updateRoleMenu(data: NewRoleMenu!, id: String!): RoleMenu!
+  updateSchool(data: NewSchool!, id: String!): School!
+  updateSchoolAdministrator(data: NewSchoolAdministrator!, id: String!): SchoolAdministrator!
+  updateStudent(data: NewStudent!, id: String!): Student!
   updateUser(data: NewUser!, id: String!): User!
 }
 
@@ -296,6 +568,11 @@ input NewAuditLogin {
   userIp: String
   userPort: String
   username: String
+}
+
+input NewCampus {
+  name: String
+  schoolId: String
 }
 
 input NewDocumentType {
@@ -318,6 +595,31 @@ input NewGender {
   name: String
 }
 
+input NewGeneralAcademicArea {
+  name: String
+}
+
+input NewGeneralAcademicAsignature {
+  generalAcademicAreaId: String
+  name: String
+}
+
+input NewGeneralAcademicCycle {
+  name: String
+}
+
+input NewGeneralAcademicStandard {
+  generalAcademicAsignatureId: String
+  generalAcademicCycleId: String
+  standard: String
+  subtype: String
+  type: String
+}
+
+input NewGeneralPerformanceLevel {
+  name: String
+}
+
 input NewInbox {
   dateRead: DateTime
   dateSend: DateTime
@@ -335,9 +637,21 @@ input NewMenu {
   sorting: Float
 }
 
+input NewMenuItem {
+  icon: String
+  menuId: String
+  moduleId: String
+  name: String
+  sorting: Float
+}
+
 input NewModule {
   name: String
   url: String
+}
+
+input NewMunicipality {
+  name: String
 }
 
 input NewNotification {
@@ -362,6 +676,22 @@ input NewRoleMenu {
   readAction: Boolean
   roleId: String
   updateAction: Boolean
+}
+
+input NewSchool {
+  daneCode: String
+  name: String
+}
+
+input NewSchoolAdministrator {
+  schoolId: String
+  userId: String
+}
+
+input NewStudent {
+  campusId: String
+  schoolId: String
+  userId: String
 }
 
 input NewUser {
@@ -435,6 +765,21 @@ type Query {
     last: Float
     orderCreated: Boolean!
   ): AuditLoginConnection!
+  getAllCampus(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): CampusConnection!
   getAllDocumentType(
     """Paginate after opaque cursor"""
     after: String
@@ -480,6 +825,81 @@ type Query {
     last: Float
     orderCreated: Boolean!
   ): GenderConnection!
+  getAllGeneralAcademicArea(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): GeneralAcademicAreaConnection!
+  getAllGeneralAcademicAsignature(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): GeneralAcademicAsignatureConnection!
+  getAllGeneralAcademicCycle(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): GeneralAcademicCycleConnection!
+  getAllGeneralAcademicStandard(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): GeneralAcademicStandardConnection!
+  getAllGeneralPerformanceLevel(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): GeneralPerformanceLevelConnection!
   getAllInbox(
     """Paginate after opaque cursor"""
     after: String
@@ -510,6 +930,21 @@ type Query {
     last: Float
     orderCreated: Boolean!
   ): MenuConnection!
+  getAllMenuItem(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): MenuItemConnection!
   getAllModule(
     """Paginate after opaque cursor"""
     after: String
@@ -525,6 +960,21 @@ type Query {
     last: Float
     orderCreated: Boolean!
   ): ModuleConnection!
+  getAllMunicipality(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): MunicipalityConnection!
   getAllNotification(
     """Paginate after opaque cursor"""
     after: String
@@ -570,6 +1020,51 @@ type Query {
     last: Float
     orderCreated: Boolean!
   ): RoleMenuConnection!
+  getAllSchool(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): SchoolConnection!
+  getAllSchoolAdministrator(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): SchoolAdministratorConnection!
+  getAllStudent(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): StudentConnection!
   getAllUser(
     """Paginate after opaque cursor"""
     after: String
@@ -586,15 +1081,26 @@ type Query {
     orderCreated: Boolean!
   ): UserConnection!
   getAuditLogin(id: String!): AuditLogin
+  getCampus(id: String!): Campus
   getDocumentType(id: String!): DocumentType
   getEmail(id: String!): Email
   getGender(id: String!): Gender
+  getGeneralAcademicArea(id: String!): GeneralAcademicArea
+  getGeneralAcademicAsignature(id: String!): GeneralAcademicAsignature
+  getGeneralAcademicCycle(id: String!): GeneralAcademicCycle
+  getGeneralAcademicStandard(id: String!): GeneralAcademicStandard
+  getGeneralPerformanceLevel(id: String!): GeneralPerformanceLevel
   getInbox(id: String!): Inbox
   getMenu(id: String!): Menu
+  getMenuItem(id: String!): MenuItem
   getModule(id: String!): Module
+  getMunicipality(id: String!): Municipality
   getNotification(id: String!): Notification
   getRole(id: String!): Role
   getRoleMenu(id: String!): RoleMenu
+  getSchool(id: String!): School
+  getSchoolAdministrator(id: String!): SchoolAdministrator
+  getStudent(id: String!): Student
   getUser(id: String!): User
 }
 
@@ -662,6 +1168,99 @@ type RoleMenuEdge {
   """Used in `before` and `after` args"""
   cursor: String!
   node: RoleMenu!
+}
+
+"""The School model"""
+type School implements IModelData {
+  active: Boolean
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  daneCode: String
+  id: ID!
+  name: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+"""The SchoolAdministrator model"""
+type SchoolAdministrator implements IModelData {
+  active: Boolean
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  id: ID!
+  school: School
+  schoolId: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  user: User
+  userId: String
+  version: Float
+}
+
+type SchoolAdministratorConnection {
+  edges: [SchoolAdministratorEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type SchoolAdministratorEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: SchoolAdministrator!
+}
+
+type SchoolConnection {
+  edges: [SchoolEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type SchoolEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: School!
+}
+
+"""The Student model"""
+type Student implements IModelData {
+  active: Boolean
+  campus: Campus
+  campusId: String
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  id: ID!
+  school: School
+  schoolId: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  user: User
+  userId: String
+  version: Float
+}
+
+type StudentConnection {
+  edges: [StudentEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type StudentEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: Student!
 }
 
 """The User model"""
