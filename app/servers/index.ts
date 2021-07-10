@@ -38,6 +38,7 @@ import { DocumentTypeResolver } from './../graphql/resolvers/DocumentTypeResolve
 import { EmailResolver } from './../graphql/resolvers/EmailResolver';
 import { GeneralAcademicAreaResolver } from './../graphql/resolvers/GeneralAcademicAreaResolver';
 import { GeneralAcademicCycleResolver } from './../graphql/resolvers/GeneralAcademicCycleResolver';
+import { GeneralAcademicGradeResolver } from './../graphql/resolvers/GeneralAcademicGradeResolver';
 import { GeneralAcademicStandardResolver } from './../graphql/resolvers/GeneralAcademicStandardResolver';
 import { GeneralPerformanceLevelResolver } from './../graphql/resolvers/GeneralPerformanceLevelResolver';
 import { InboxResolver } from './../graphql/resolvers/InboxResolver';
@@ -77,6 +78,7 @@ const schema = buildSchemaSync({
     GeneralAcademicAreaResolver,
     GeneralAcademicAsignatureResolver,
     GeneralAcademicCycleResolver,
+    GeneralAcademicGradeResolver,
     GeneralAcademicStandardResolver,
     GeneralPerformanceLevelResolver,
     MunicipalityResolver,
