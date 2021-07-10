@@ -13,10 +13,10 @@ export class GeneralAcademicGrade extends IModelData {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  cycleId?: string;
+  generalAcademicCycleId?: string;
 
   @Field({ nullable: true })
-  cycle?: GeneralAcademicCycle;
+  generalAcademicCycle?: GeneralAcademicCycle;
 }
 
 @ObjectType()

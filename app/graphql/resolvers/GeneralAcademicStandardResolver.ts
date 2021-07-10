@@ -6,6 +6,8 @@ import { InjectRepository } from 'typeorm-typedi-extensions';
 import { removeEmptyStringElements } from '../../types';
 import { NewGeneralAcademicStandard } from '../inputs/NewGeneralAcademicStandard';
 import { IContext } from '../interfaces/IContext';
+import { GeneralAcademicAsignature } from '../models/GeneralAcademicAsignature';
+import { GeneralAcademicCycle } from '../models/GeneralAcademicCycle';
 import {
   GeneralAcademicStandard,
   GeneralAcademicStandardConnection,
@@ -20,6 +22,12 @@ export class GeneralAcademicStandardResolver {
 
   @InjectRepository(User)
   private repositoryUser = getMongoRepository(User);
+
+  @InjectRepository(GeneralAcademicAsignature)
+  private repositoryGeneralAcademicAsignature = getMongoRepository(GeneralAcademicAsignature);
+
+  @InjectRepository(GeneralAcademicCycle)
+  private repositoryGeneralAcademicCycle = getMongoRepository(GeneralAcademicCycle);
 
   @Query(() => GeneralAcademicStandard, { nullable: true })
   async getGeneralAcademicStandard(@Arg('id', () => String) id: string) {
@@ -140,6 +148,26 @@ export class GeneralAcademicStandardResolver {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryUser.findOne(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => GeneralAcademicAsignature, { nullable: true })
+  async generalAcademicAsignature(@Root() data: GeneralAcademicStandard) {
+    let id = data.generalAcademicAsignatureId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryGeneralAcademicAsignature.findOne(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => GeneralAcademicCycle, { nullable: true })
+  async generalAcademicCycle(@Root() data: GeneralAcademicStandard) {
+    let id = data.generalAcademicCycleId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryGeneralAcademicCycle.findOne(id);
       return result;
     }
     return null;

@@ -6,6 +6,7 @@ import { InjectRepository } from 'typeorm-typedi-extensions';
 import { removeEmptyStringElements } from '../../types';
 import { NewGeneralAcademicGrade } from '../inputs/NewGeneralAcademicGrade';
 import { IContext } from '../interfaces/IContext';
+import { GeneralAcademicCycle } from '../models/GeneralAcademicCycle';
 import {
   GeneralAcademicGrade,
   GeneralAcademicGradeConnection,
@@ -20,6 +21,9 @@ export class GeneralAcademicGradeResolver {
 
   @InjectRepository(User)
   private repositoryUser = getMongoRepository(User);
+
+  @InjectRepository(GeneralAcademicCycle)
+  private repositoryGeneralAcademicCycle = getMongoRepository(GeneralAcademicCycle);
 
   @Query(() => GeneralAcademicGrade, { nullable: true })
   async getGeneralAcademicGrade(@Arg('id', () => String) id: string) {
@@ -140,6 +144,16 @@ export class GeneralAcademicGradeResolver {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryUser.findOne(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => GeneralAcademicCycle, { nullable: true })
+  async generalAcademicCycle(@Root() data: GeneralAcademicGrade) {
+    let id = data.generalAcademicCycleId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryGeneralAcademicCycle.findOne(id);
       return result;
     }
     return null;
