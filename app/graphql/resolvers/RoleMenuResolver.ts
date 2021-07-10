@@ -154,7 +154,7 @@ export class RoleMenuResolver {
   async role(@Root() data: RoleMenu) {
     let id = data.roleId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryRole.findOne(id);
       return result;
     }
     return null;
@@ -164,7 +164,7 @@ export class RoleMenuResolver {
   async menu(@Root() data: RoleMenu) {
     let id = data.menuId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryMenu.findOne(id);
       return result;
     }
     return null;

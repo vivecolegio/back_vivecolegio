@@ -6,6 +6,7 @@ import { InjectRepository } from 'typeorm-typedi-extensions';
 import { removeEmptyStringElements } from '../../types';
 import { NewGeneralAcademicAsignature } from '../inputs/NewGeneralAcademicAsignature';
 import { IContext } from '../interfaces/IContext';
+import { GeneralAcademicArea } from '../models/GeneralAcademicArea';
 import {
   GeneralAcademicAsignature,
   GeneralAcademicAsignatureConnection,
@@ -20,6 +21,9 @@ export class GeneralAcademicAsignatureResolver {
 
   @InjectRepository(User)
   private repositoryUser = getMongoRepository(User);
+
+  @InjectRepository(GeneralAcademicArea)
+  private repositoryGeneralAcademicArea = getMongoRepository(GeneralAcademicArea);
 
   @Query(() => GeneralAcademicAsignature, { nullable: true })
   async getGeneralAcademicAsignature(@Arg('id', () => String) id: string) {
@@ -140,6 +144,16 @@ export class GeneralAcademicAsignatureResolver {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryUser.findOne(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => GeneralAcademicArea, { nullable: true })
+  async generalAcademicArea(@Root() data: GeneralAcademicAsignature) {
+    let id = data.generalAcademicAreaId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryGeneralAcademicArea.findOne(id);
       return result;
     }
     return null;

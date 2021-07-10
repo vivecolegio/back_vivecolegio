@@ -7,5 +7,5 @@ export class NewGeneralAcademicGrade implements Partial<GeneralAcademicGrade> {
   name?: string;
 
   @Field({ nullable: true })
-  cycleId?: string;
+  generalAcademicCycleId?: string;
 }

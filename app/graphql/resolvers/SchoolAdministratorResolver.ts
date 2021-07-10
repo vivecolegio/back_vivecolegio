@@ -6,6 +6,7 @@ import { InjectRepository } from 'typeorm-typedi-extensions';
 import { removeEmptyStringElements } from '../../types';
 import { NewSchoolAdministrator } from '../inputs/NewSchoolAdministrator';
 import { IContext } from '../interfaces/IContext';
+import { School } from '../models/School';
 import { SchoolAdministrator, SchoolAdministratorConnection } from '../models/SchoolAdministrator';
 import { User } from '../models/User';
 import { ConnectionArgs } from '../pagination/relaySpecs';
@@ -17,6 +18,9 @@ export class SchoolAdministratorResolver {
 
   @InjectRepository(User)
   private repositoryUser = getMongoRepository(User);
+
+  @InjectRepository(School)
+  private repositorySchool = getMongoRepository(School);
 
   @Query(() => SchoolAdministrator, { nullable: true })
   async getSchoolAdministrator(@Arg('id', () => String) id: string) {
@@ -135,6 +139,26 @@ export class SchoolAdministratorResolver {
   @FieldResolver((_type) => User, { nullable: true })
   async updatedByUser(@Root() data: SchoolAdministrator) {
     let id = data.updatedByUserId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryUser.findOne(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => School, { nullable: true })
+  async school(@Root() data: SchoolAdministrator) {
+    let id = data.schoolId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositorySchool.findOne(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => User, { nullable: true })
+  async user(@Root() data: SchoolAdministrator) {
+    let id = data.userId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryUser.findOne(id);
       return result;

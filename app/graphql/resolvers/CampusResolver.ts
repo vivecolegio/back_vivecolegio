@@ -7,6 +7,7 @@ import { removeEmptyStringElements } from '../../types';
 import { NewCampus } from '../inputs/NewCampus';
 import { IContext } from '../interfaces/IContext';
 import { Campus, CampusConnection } from '../models/Campus';
+import { School } from '../models/School';
 import { User } from '../models/User';
 import { ConnectionArgs } from '../pagination/relaySpecs';
 
@@ -17,6 +18,9 @@ export class CampusResolver {
 
   @InjectRepository(User)
   private repositoryUser = getMongoRepository(User);
+
+  @InjectRepository(School)
+  private repositorySchool = getMongoRepository(School);
 
   @Query(() => Campus, { nullable: true })
   async getCampus(@Arg('id', () => String) id: string) {
@@ -134,6 +138,16 @@ export class CampusResolver {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryUser.findOne(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => School, { nullable: true })
+  async school(@Root() data: Campus) {
+    let id = data.schoolId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositorySchool.findOne(id);
       return result;
     }
     return null;

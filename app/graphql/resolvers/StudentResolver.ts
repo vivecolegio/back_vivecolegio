@@ -6,9 +6,11 @@ import { InjectRepository } from 'typeorm-typedi-extensions';
 import { removeEmptyStringElements } from '../../types';
 import { NewStudent } from '../inputs/NewStudent';
 import { IContext } from '../interfaces/IContext';
+import { Campus } from '../models/Campus';
 import { Student, StudentConnection } from '../models/Student';
 import { User } from '../models/User';
 import { ConnectionArgs } from '../pagination/relaySpecs';
+import { School } from './../models/School';
 
 @Resolver(Student)
 export class StudentResolver {
@@ -17,6 +19,12 @@ export class StudentResolver {
 
   @InjectRepository(User)
   private repositoryUser = getMongoRepository(User);
+
+  @InjectRepository(School)
+  private repositorySchool = getMongoRepository(School);
+
+  @InjectRepository(Campus)
+  private repositoryCampus = getMongoRepository(Campus);
 
   @Query(() => Student, { nullable: true })
   async getStudent(@Arg('id', () => String) id: string) {
@@ -132,6 +140,36 @@ export class StudentResolver {
   @FieldResolver((_type) => User, { nullable: true })
   async updatedByUser(@Root() data: Student) {
     let id = data.updatedByUserId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryUser.findOne(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => School, { nullable: true })
+  async school(@Root() data: Student) {
+    let id = data.schoolId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositorySchool.findOne(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => Campus, { nullable: true })
+  async campus(@Root() data: Student) {
+    let id = data.campusId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryCampus.findOne(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => User, { nullable: true })
+  async user(@Root() data: Student) {
+    let id = data.userId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryUser.findOne(id);
       return result;
