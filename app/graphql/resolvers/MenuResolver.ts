@@ -161,7 +161,7 @@ export class MenuResolver {
   async menuItems(@Root() data: Menu) {
     let id = data.id;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryMenuItem.find({ where: { menuid: id } });
+      const result = await this.repositoryMenuItem.find({ where: { menuId: id } });
       return result;
     }
     return null;

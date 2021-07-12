@@ -6,6 +6,7 @@ import { InjectRepository } from 'typeorm-typedi-extensions';
 import { removeEmptyStringElements } from '../../types';
 import { NewMenuItem } from '../inputs/NewMenuItem';
 import { IContext } from '../interfaces/IContext';
+import { Menu } from '../models/Menu';
 import { MenuItem, MenuItemConnection } from '../models/MenuItem';
 import { Module } from '../models/Module';
 import { User } from '../models/User';
@@ -21,6 +22,9 @@ export class MenuItemResolver {
 
   @InjectRepository(Module)
   private repositoryModule = getMongoRepository(Module);
+
+  @InjectRepository(Menu)
+  private repositoryMenu = getMongoRepository(Menu);
 
   @Query(() => MenuItem, { nullable: true })
   async getMenuItem(@Arg('id', () => String) id: string) {
@@ -146,17 +150,17 @@ export class MenuItemResolver {
     return null;
   }
 
-  @FieldResolver((_type) => MenuItem, { nullable: true })
+  @FieldResolver((_type) => Menu, { nullable: true })
   async menu(@Root() data: MenuItem) {
     let id = data.menuId;
     if (id !== null && id !== undefined) {
-      const result = await this.repository.findOne(id);
+      const result = await this.repositoryMenu.findOne(id);
       return result;
     }
     return null;
   }
 
-  @FieldResolver((_type) => MenuItem, { nullable: true })
+  @FieldResolver((_type) => Module, { nullable: true })
   async module(@Root() data: MenuItem) {
     let id = data.moduleId;
     if (id !== null && id !== undefined) {
