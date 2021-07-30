@@ -1,5 +1,5 @@
 import { connectionFromArraySlice } from 'graphql-relay';
-import { ObjectID } from 'mongodb';
+import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
@@ -96,7 +96,7 @@ export class StudentResolver {
     let updatedByUserid = context?.user?.authorization?.id;
     let result = await this.repository.findOne(id);
     result = await this.repository.save({
-      _id: new ObjectID(id),
+      _id: new ObjectId(id),
       ...result,
       ...dataProcess,
       version: (result?.version as number) + 1,
@@ -114,7 +114,7 @@ export class StudentResolver {
     let updatedByUserid = context?.user?.authorization?.id;
     let result = await this.repository.findOne(id);
     result = await this.repository.save({
-      _id: new ObjectID(id),
+      _id: new ObjectId(id),
       ...result,
       active: active,
       version: (result?.version as number) + 1,
