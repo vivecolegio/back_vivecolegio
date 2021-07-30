@@ -1,4 +1,5 @@
 import { buildFederatedSchema, printSchema } from '@apollo/federation';
+import { ApolloServerPluginInlineTraceDisabled } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import express from 'express';
 import { applyMiddleware } from 'graphql-middleware';
@@ -146,17 +147,21 @@ const server = new ApolloServer({
     return { user };
   },
   introspection: true,
-  playground: {
-    endpoint: '/graphql',
-  },
-  uploads: false,
+  plugins: [
+    // ApolloServerPluginLandingPageGraphQLPlayground(),
+    // ApolloServerPluginUsageReporting({
+    //   sendVariableValues: { all: true },
+    // }),
+    ApolloServerPluginInlineTraceDisabled(),
+  ],
 });
 
 const app = express();
 
 //app.use(graphqlUploadExpress({max}))
-
-server.applyMiddleware({ app });
+server.start().then(() => {
+  server.applyMiddleware({ app });
+});
 
 app.listen({ port }, () => {
   console.log('Server service ready -V2');
