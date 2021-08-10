@@ -1,4 +1,5 @@
 import { ApolloGateway, RemoteGraphQLDataSource } from '@apollo/gateway';
+import { ApolloServerPluginInlineTraceDisabled } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import Cors from 'cors';
 import Express from 'express';
@@ -24,8 +25,14 @@ async function app() {
     });
     const server = new ApolloServer({
       gateway,
-      subscriptions: false,
-      playground: true,
+      // playground: true,
+      plugins: [
+        // ApolloServerPluginLandingPageGraphQLPlayground(),
+        // ApolloServerPluginUsageReporting({
+        //   sendVariableValues: { all: true },
+        // }),
+        ApolloServerPluginInlineTraceDisabled(),
+      ],
       introspection: true,
       context: ({ req }: any) => {
         const user = req.user || null;
@@ -47,7 +54,9 @@ async function app() {
         credentialsRequired: false,
       })
     );
-    server.applyMiddleware({ app });
+    server.start().then(() => {
+      server.applyMiddleware({ app });
+    });
     app.listen({ port: port }, () =>
       console.log(
         `🚀 Server ready and listening at ==> http://backendcolegio.vhmsoluciones.com:${port}${server.graphqlPath}`
