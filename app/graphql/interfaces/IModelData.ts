@@ -1,6 +1,6 @@
 import { Field, ID, InterfaceType } from 'type-graphql';
 import { Column, CreateDateColumn, ObjectIdColumn, UpdateDateColumn } from 'typeorm';
-import User = require('../models/User');
+import User = require('../models/GeneralAdministrator/User');
 
 @InterfaceType()
 export abstract class IModelData {
