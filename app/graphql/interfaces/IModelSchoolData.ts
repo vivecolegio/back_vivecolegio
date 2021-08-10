@@ -1,11 +1,19 @@
 import { Field, ID, InterfaceType } from 'type-graphql';
 import { Column, CreateDateColumn, ObjectIdColumn, UpdateDateColumn } from 'typeorm';
+import { School } from '../models/GeneralAdministrator/School';
 
 @InterfaceType()
-export abstract class IModelData {
+export abstract class IModelSchoolData {
   @Field(() => ID)
   @ObjectIdColumn()
   id!: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  schoolId?: string;
+
+  @Field({ nullable: true })
+  school?: School;
 
   @Field({ nullable: true })
   @Column({ nullable: true })

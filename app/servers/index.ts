@@ -20,6 +20,21 @@ import { Notification } from '../graphql/models/GeneralAdministrator/Notificatio
 import { Role } from '../graphql/models/GeneralAdministrator/Role';
 import { RoleMenu } from '../graphql/models/GeneralAdministrator/RoleMenu';
 import { User } from '../graphql/models/GeneralAdministrator/User';
+import { AcademicArea } from '../graphql/models/SchoolAdministrator/AcademicArea';
+import { AcademicAsignature } from '../graphql/models/SchoolAdministrator/AcademicAsignature';
+import { AcademicGrade } from '../graphql/models/SchoolAdministrator/AcademicGrade';
+import { AcademicIndicator } from '../graphql/models/SchoolAdministrator/AcademicIndicator';
+import { AcademicPeriod } from '../graphql/models/SchoolAdministrator/AcademicPeriod';
+import { AcademicStandard } from '../graphql/models/SchoolAdministrator/AcademicStandard';
+import { CampusAdministrator } from '../graphql/models/SchoolAdministrator/CampusAdministrator';
+import { CampusCoordinator } from '../graphql/models/SchoolAdministrator/CampusCoordinator';
+import { EducationLevel } from '../graphql/models/SchoolAdministrator/EducationLevel';
+import { EvaluativeComponent } from '../graphql/models/SchoolAdministrator/EvaluativeComponent';
+import { GradeAssignment } from '../graphql/models/SchoolAdministrator/GradeAssignment';
+import { Modality } from '../graphql/models/SchoolAdministrator/Modality';
+import { PerformanceLevel } from '../graphql/models/SchoolAdministrator/PerformanceLevel';
+import { SchoolYear } from '../graphql/models/SchoolAdministrator/SchoolYear';
+import { Specialty } from '../graphql/models/SchoolAdministrator/Specialty';
 import { AuditLoginResolver } from '../graphql/resolvers/GeneralAdministrator/AuditLoginResolver';
 import { GenderResolver } from '../graphql/resolvers/GeneralAdministrator/GenderResolver';
 import { GeneralAcademicAsignatureResolver } from '../graphql/resolvers/GeneralAdministrator/GeneralAcademicAsignatureResolver';
@@ -54,6 +69,21 @@ import { SchoolAdministratorResolver } from './../graphql/resolvers/GeneralAdmin
 import { SchoolResolver } from './../graphql/resolvers/GeneralAdministrator/SchoolResolver';
 import { StudentResolver } from './../graphql/resolvers/GeneralAdministrator/StudentResolver';
 import { UserResolver } from './../graphql/resolvers/GeneralAdministrator/UserResolver';
+import { AcademicAreaResolver } from './../graphql/resolvers/SchoolAdministrator/AcademicAreaResolver';
+import { AcademicAsignatureResolver } from './../graphql/resolvers/SchoolAdministrator/AcademicAsignatureResolver';
+import { AcademicGradeResolver } from './../graphql/resolvers/SchoolAdministrator/AcademicGradeResolver';
+import { AcademicIndicatorResolver } from './../graphql/resolvers/SchoolAdministrator/AcademicIndicatorResolver';
+import { AcademicPeriodResolver } from './../graphql/resolvers/SchoolAdministrator/AcademicPeriodResolver';
+import { AcademicStandardResolver } from './../graphql/resolvers/SchoolAdministrator/AcademicStandardResolver';
+import { CampusAdministratorResolver } from './../graphql/resolvers/SchoolAdministrator/CampusAdministratorResolver';
+import { CampusCoordinatorResolver } from './../graphql/resolvers/SchoolAdministrator/CampusCoordinatorResolver';
+import { EducationLevelResolver } from './../graphql/resolvers/SchoolAdministrator/EducationLevelResolver';
+import { EvaluativeComponentResolver } from './../graphql/resolvers/SchoolAdministrator/EvaluativeComponentResolver';
+import { GradeAssignmentResolver } from './../graphql/resolvers/SchoolAdministrator/GradeAssignmentResolver';
+import { ModalityResolver } from './../graphql/resolvers/SchoolAdministrator/ModalityResolver';
+import { PerformanceLevelResolver } from './../graphql/resolvers/SchoolAdministrator/PerformanceLevelResolver';
+import { SchoolYearResolver } from './../graphql/resolvers/SchoolAdministrator/SchoolYearResolver';
+import { SpecialtyResolver } from './../graphql/resolvers/SchoolAdministrator/SpecialtyResolver';
 
 const port = 4001;
 
@@ -86,6 +116,21 @@ const schema = buildSchemaSync({
     SchoolAdministratorResolver,
     SchoolResolver,
     StudentResolver,
+    AcademicAreaResolver,
+    AcademicAsignatureResolver,
+    AcademicGradeResolver,
+    AcademicIndicatorResolver,
+    AcademicPeriodResolver,
+    AcademicStandardResolver,
+    CampusAdministratorResolver,
+    CampusCoordinatorResolver,
+    EducationLevelResolver,
+    EvaluativeComponentResolver,
+    GradeAssignmentResolver,
+    ModalityResolver,
+    PerformanceLevelResolver,
+    SchoolYearResolver,
+    SpecialtyResolver,
   ],
   emitSchemaFile: true,
   validate: false,
@@ -121,6 +166,21 @@ createConnections([
       School,
       SchoolAdministrator,
       Student,
+      AcademicArea,
+      AcademicAsignature,
+      AcademicGrade,
+      AcademicIndicator,
+      AcademicPeriod,
+      AcademicStandard,
+      CampusAdministrator,
+      CampusCoordinator,
+      EducationLevel,
+      EvaluativeComponent,
+      GradeAssignment,
+      Modality,
+      PerformanceLevel,
+      SchoolYear,
+      Specialty,
     ],
     synchronize: true,
     logger: 'advanced-console',
