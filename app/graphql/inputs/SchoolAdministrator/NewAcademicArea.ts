@@ -1,0 +1,17 @@
+import { Field, InputType } from 'type-graphql';
+import { AcademicArea } from '../../models/SchoolAdministrator/AcademicArea';
+
+@InputType()
+export class NewAcademicArea implements Partial<AcademicArea> {
+  @Field({ nullable: true })
+  name?: string;
+
+  @Field({ nullable: true })
+  abbreviation?: string;
+
+  @Field({ nullable: true })
+  generalAcademicAreaId?: string;
+
+  @Field({ nullable: true })
+  schoolId?: string;
+}

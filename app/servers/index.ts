@@ -1,4 +1,5 @@
 import { buildFederatedSchema, printSchema } from '@apollo/federation';
+import { ApolloServerPluginInlineTraceDisabled } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import express from 'express';
 import { applyMiddleware } from 'graphql-middleware';
@@ -7,52 +8,82 @@ import 'reflect-metadata';
 import { buildSchemaSync, createResolversMap } from 'type-graphql';
 import { createConnections } from 'typeorm';
 import { dbHost, dbName, dbPassword, dbPort, dbUser } from '../config';
-import { DocumentType } from '../graphql/models/DocumentType';
-import { Email } from '../graphql/models/Email';
-import { Gender } from '../graphql/models/Gender';
-import { GeneralAcademicArea } from '../graphql/models/GeneralAcademicArea';
-import { Inbox } from '../graphql/models/Inbox';
-import { Menu } from '../graphql/models/Menu';
-import { Module } from '../graphql/models/Module';
-import { Notification } from '../graphql/models/Notification';
-import { Role } from '../graphql/models/Role';
-import { RoleMenu } from '../graphql/models/RoleMenu';
-import { User } from '../graphql/models/User';
-import { GenderResolver } from '../graphql/resolvers/GenderResolver';
-import { GeneralAcademicAsignatureResolver } from '../graphql/resolvers/GeneralAcademicAsignatureResolver';
-import { AuditLogin } from './../graphql/models/AuditLogin';
-import { Campus } from './../graphql/models/Campus';
-import { GeneralAcademicAsignature } from './../graphql/models/GeneralAcademicAsignature';
-import { GeneralAcademicCycle } from './../graphql/models/GeneralAcademicCycle';
-import { GeneralAcademicGrade } from './../graphql/models/GeneralAcademicGrade';
-import { GeneralAcademicStandard } from './../graphql/models/GeneralAcademicStandard';
-import { GeneralPerformanceLevel } from './../graphql/models/GeneralPerformanceLevel';
-import { MenuItem } from './../graphql/models/MenuItem';
-import { Municipality } from './../graphql/models/Municipality';
-import { School } from './../graphql/models/School';
-import { SchoolAdministrator } from './../graphql/models/SchoolAdministrator';
-import { Student } from './../graphql/models/Student';
-import { AuditLoginResolver } from './../graphql/resolvers/AuditLoginResolver';
-import { CampusResolver } from './../graphql/resolvers/CampusResolver';
-import { DocumentTypeResolver } from './../graphql/resolvers/DocumentTypeResolver';
-import { EmailResolver } from './../graphql/resolvers/EmailResolver';
-import { GeneralAcademicAreaResolver } from './../graphql/resolvers/GeneralAcademicAreaResolver';
-import { GeneralAcademicCycleResolver } from './../graphql/resolvers/GeneralAcademicCycleResolver';
-import { GeneralAcademicGradeResolver } from './../graphql/resolvers/GeneralAcademicGradeResolver';
-import { GeneralAcademicStandardResolver } from './../graphql/resolvers/GeneralAcademicStandardResolver';
-import { GeneralPerformanceLevelResolver } from './../graphql/resolvers/GeneralPerformanceLevelResolver';
-import { InboxResolver } from './../graphql/resolvers/InboxResolver';
-import { MenuItemResolver } from './../graphql/resolvers/MenuItemResolver';
-import { MenuResolver } from './../graphql/resolvers/MenuResolver';
-import { ModuleResolver } from './../graphql/resolvers/ModuleResolver';
-import { MunicipalityResolver } from './../graphql/resolvers/MunicipalityResolver';
-import { NotificationResolver } from './../graphql/resolvers/NotificationResolver';
-import { RoleMenuResolver } from './../graphql/resolvers/RoleMenuResolver';
-import { RoleResolver } from './../graphql/resolvers/RoleResolver';
-import { SchoolAdministratorResolver } from './../graphql/resolvers/SchoolAdministratorResolver';
-import { SchoolResolver } from './../graphql/resolvers/SchoolResolver';
-import { StudentResolver } from './../graphql/resolvers/StudentResolver';
-import { UserResolver } from './../graphql/resolvers/UserResolver';
+import { AuditLogin } from '../graphql/models/GeneralAdministrator/AuditLogin';
+import { DocumentType } from '../graphql/models/GeneralAdministrator/DocumentType';
+import { Email } from '../graphql/models/GeneralAdministrator/Email';
+import { Gender } from '../graphql/models/GeneralAdministrator/Gender';
+import { GeneralAcademicArea } from '../graphql/models/GeneralAdministrator/GeneralAcademicArea';
+import { Inbox } from '../graphql/models/GeneralAdministrator/Inbox';
+import { Menu } from '../graphql/models/GeneralAdministrator/Menu';
+import { Module } from '../graphql/models/GeneralAdministrator/Module';
+import { Notification } from '../graphql/models/GeneralAdministrator/Notification';
+import { Role } from '../graphql/models/GeneralAdministrator/Role';
+import { RoleMenu } from '../graphql/models/GeneralAdministrator/RoleMenu';
+import { User } from '../graphql/models/GeneralAdministrator/User';
+import { AcademicArea } from '../graphql/models/SchoolAdministrator/AcademicArea';
+import { AcademicAsignature } from '../graphql/models/SchoolAdministrator/AcademicAsignature';
+import { AcademicGrade } from '../graphql/models/SchoolAdministrator/AcademicGrade';
+import { AcademicIndicator } from '../graphql/models/SchoolAdministrator/AcademicIndicator';
+import { AcademicPeriod } from '../graphql/models/SchoolAdministrator/AcademicPeriod';
+import { AcademicStandard } from '../graphql/models/SchoolAdministrator/AcademicStandard';
+import { CampusAdministrator } from '../graphql/models/SchoolAdministrator/CampusAdministrator';
+import { CampusCoordinator } from '../graphql/models/SchoolAdministrator/CampusCoordinator';
+import { EducationLevel } from '../graphql/models/SchoolAdministrator/EducationLevel';
+import { EvaluativeComponent } from '../graphql/models/SchoolAdministrator/EvaluativeComponent';
+import { GradeAssignment } from '../graphql/models/SchoolAdministrator/GradeAssignment';
+import { Modality } from '../graphql/models/SchoolAdministrator/Modality';
+import { PerformanceLevel } from '../graphql/models/SchoolAdministrator/PerformanceLevel';
+import { SchoolYear } from '../graphql/models/SchoolAdministrator/SchoolYear';
+import { Specialty } from '../graphql/models/SchoolAdministrator/Specialty';
+import { AuditLoginResolver } from '../graphql/resolvers/GeneralAdministrator/AuditLoginResolver';
+import { GenderResolver } from '../graphql/resolvers/GeneralAdministrator/GenderResolver';
+import { GeneralAcademicAsignatureResolver } from '../graphql/resolvers/GeneralAdministrator/GeneralAcademicAsignatureResolver';
+import { Campus } from './../graphql/models/GeneralAdministrator/Campus';
+import { GeneralAcademicAsignature } from './../graphql/models/GeneralAdministrator/GeneralAcademicAsignature';
+import { GeneralAcademicCycle } from './../graphql/models/GeneralAdministrator/GeneralAcademicCycle';
+import { GeneralAcademicGrade } from './../graphql/models/GeneralAdministrator/GeneralAcademicGrade';
+import { GeneralAcademicStandard } from './../graphql/models/GeneralAdministrator/GeneralAcademicStandard';
+import { GeneralPerformanceLevel } from './../graphql/models/GeneralAdministrator/GeneralPerformanceLevel';
+import { MenuItem } from './../graphql/models/GeneralAdministrator/MenuItem';
+import { Municipality } from './../graphql/models/GeneralAdministrator/Municipality';
+import { School } from './../graphql/models/GeneralAdministrator/School';
+import { SchoolAdministrator } from './../graphql/models/GeneralAdministrator/SchoolAdministrator';
+import { Student } from './../graphql/models/GeneralAdministrator/Student';
+import { CampusResolver } from './../graphql/resolvers/GeneralAdministrator/CampusResolver';
+import { DocumentTypeResolver } from './../graphql/resolvers/GeneralAdministrator/DocumentTypeResolver';
+import { EmailResolver } from './../graphql/resolvers/GeneralAdministrator/EmailResolver';
+import { GeneralAcademicAreaResolver } from './../graphql/resolvers/GeneralAdministrator/GeneralAcademicAreaResolver';
+import { GeneralAcademicCycleResolver } from './../graphql/resolvers/GeneralAdministrator/GeneralAcademicCycleResolver';
+import { GeneralAcademicGradeResolver } from './../graphql/resolvers/GeneralAdministrator/GeneralAcademicGradeResolver';
+import { GeneralAcademicStandardResolver } from './../graphql/resolvers/GeneralAdministrator/GeneralAcademicStandardResolver';
+import { GeneralPerformanceLevelResolver } from './../graphql/resolvers/GeneralAdministrator/GeneralPerformanceLevelResolver';
+import { InboxResolver } from './../graphql/resolvers/GeneralAdministrator/InboxResolver';
+import { MenuItemResolver } from './../graphql/resolvers/GeneralAdministrator/MenuItemResolver';
+import { MenuResolver } from './../graphql/resolvers/GeneralAdministrator/MenuResolver';
+import { ModuleResolver } from './../graphql/resolvers/GeneralAdministrator/ModuleResolver';
+import { MunicipalityResolver } from './../graphql/resolvers/GeneralAdministrator/MunicipalityResolver';
+import { NotificationResolver } from './../graphql/resolvers/GeneralAdministrator/NotificationResolver';
+import { RoleMenuResolver } from './../graphql/resolvers/GeneralAdministrator/RoleMenuResolver';
+import { RoleResolver } from './../graphql/resolvers/GeneralAdministrator/RoleResolver';
+import { SchoolAdministratorResolver } from './../graphql/resolvers/GeneralAdministrator/SchoolAdministratorResolver';
+import { SchoolResolver } from './../graphql/resolvers/GeneralAdministrator/SchoolResolver';
+import { StudentResolver } from './../graphql/resolvers/GeneralAdministrator/StudentResolver';
+import { UserResolver } from './../graphql/resolvers/GeneralAdministrator/UserResolver';
+import { AcademicAreaResolver } from './../graphql/resolvers/SchoolAdministrator/AcademicAreaResolver';
+import { AcademicAsignatureResolver } from './../graphql/resolvers/SchoolAdministrator/AcademicAsignatureResolver';
+import { AcademicGradeResolver } from './../graphql/resolvers/SchoolAdministrator/AcademicGradeResolver';
+import { AcademicIndicatorResolver } from './../graphql/resolvers/SchoolAdministrator/AcademicIndicatorResolver';
+import { AcademicPeriodResolver } from './../graphql/resolvers/SchoolAdministrator/AcademicPeriodResolver';
+import { AcademicStandardResolver } from './../graphql/resolvers/SchoolAdministrator/AcademicStandardResolver';
+import { CampusAdministratorResolver } from './../graphql/resolvers/SchoolAdministrator/CampusAdministratorResolver';
+import { CampusCoordinatorResolver } from './../graphql/resolvers/SchoolAdministrator/CampusCoordinatorResolver';
+import { EducationLevelResolver } from './../graphql/resolvers/SchoolAdministrator/EducationLevelResolver';
+import { EvaluativeComponentResolver } from './../graphql/resolvers/SchoolAdministrator/EvaluativeComponentResolver';
+import { GradeAssignmentResolver } from './../graphql/resolvers/SchoolAdministrator/GradeAssignmentResolver';
+import { ModalityResolver } from './../graphql/resolvers/SchoolAdministrator/ModalityResolver';
+import { PerformanceLevelResolver } from './../graphql/resolvers/SchoolAdministrator/PerformanceLevelResolver';
+import { SchoolYearResolver } from './../graphql/resolvers/SchoolAdministrator/SchoolYearResolver';
+import { SpecialtyResolver } from './../graphql/resolvers/SchoolAdministrator/SpecialtyResolver';
 
 const port = 4001;
 
@@ -85,6 +116,21 @@ const schema = buildSchemaSync({
     SchoolAdministratorResolver,
     SchoolResolver,
     StudentResolver,
+    AcademicAreaResolver,
+    AcademicAsignatureResolver,
+    AcademicGradeResolver,
+    AcademicIndicatorResolver,
+    AcademicPeriodResolver,
+    AcademicStandardResolver,
+    CampusAdministratorResolver,
+    CampusCoordinatorResolver,
+    EducationLevelResolver,
+    EvaluativeComponentResolver,
+    GradeAssignmentResolver,
+    ModalityResolver,
+    PerformanceLevelResolver,
+    SchoolYearResolver,
+    SpecialtyResolver,
   ],
   emitSchemaFile: true,
   validate: false,
@@ -120,6 +166,21 @@ createConnections([
       School,
       SchoolAdministrator,
       Student,
+      AcademicArea,
+      AcademicAsignature,
+      AcademicGrade,
+      AcademicIndicator,
+      AcademicPeriod,
+      AcademicStandard,
+      CampusAdministrator,
+      CampusCoordinator,
+      EducationLevel,
+      EvaluativeComponent,
+      GradeAssignment,
+      Modality,
+      PerformanceLevel,
+      SchoolYear,
+      Specialty,
     ],
     synchronize: true,
     logger: 'advanced-console',
@@ -146,17 +207,21 @@ const server = new ApolloServer({
     return { user };
   },
   introspection: true,
-  playground: {
-    endpoint: '/graphql',
-  },
-  uploads: false,
+  plugins: [
+    // ApolloServerPluginLandingPageGraphQLPlayground(),
+    // ApolloServerPluginUsageReporting({
+    //   sendVariableValues: { all: true },
+    // }),
+    ApolloServerPluginInlineTraceDisabled(),
+  ],
 });
 
 const app = express();
 
 //app.use(graphqlUploadExpress({max}))
-
-server.applyMiddleware({ app });
+server.start().then(() => {
+  server.applyMiddleware({ app });
+});
 
 app.listen({ port }, () => {
   console.log('Server service ready -V2');

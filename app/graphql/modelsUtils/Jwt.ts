@@ -1,6 +1,6 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Role } from '../models/Role';
-import { RoleMenu } from '../models/RoleMenu';
+import { Role } from '../models/GeneralAdministrator/Role';
+import { RoleMenu } from '../models/GeneralAdministrator/RoleMenu';
 
 @ObjectType({ description: 'The User model' })
 export class Jwt {
