@@ -11,7 +11,7 @@ import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import {
   CampusAdministrator,
-  CampusAdministratorConnection,
+  CampusAdministratorConnection
 } from '../../models/SchoolAdministrator/CampusAdministrator';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
@@ -168,6 +168,16 @@ export class CampusAdministratorResolver {
     let id = data.schoolId;
     if (id !== null && id !== undefined) {
       const result = await this.repositorySchool.findOne(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => User, { nullable: true })
+  async user(@Root() data: CampusAdministrator) {
+    let id = data.userId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryUser.findOne(id);
       return result;
     }
     return null;
