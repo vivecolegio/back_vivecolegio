@@ -7,6 +7,7 @@ import { removeEmptyStringElements } from '../../../types';
 import { NewRole } from '../../inputs/GeneralAdministrator/NewRole';
 import { IContext } from '../../interfaces/IContext';
 import { Role, RoleConnection } from '../../models/GeneralAdministrator/Role';
+import { RoleMenu } from '../../models/GeneralAdministrator/RoleMenu';
 import { User } from '../../models/GeneralAdministrator/User';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
@@ -17,6 +18,9 @@ export class RoleResolver {
 
   @InjectRepository(User)
   private repositoryUser = getMongoRepository(User);
+
+  @InjectRepository(RoleMenu)
+  private repositoryRoleMenu = getMongoRepository(RoleMenu);
 
   @Query(() => Role, { nullable: true })
   async getRole(@Arg('id', () => String) id: string) {
@@ -134,6 +138,16 @@ export class RoleResolver {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryUser.findOne(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => [RoleMenu], { nullable: true })
+  async roleMenus(@Root() data: Role) {
+    let id = data.id;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryRoleMenu.find({ where: { roleId: id.toString() } });
       return result;
     }
     return null;
