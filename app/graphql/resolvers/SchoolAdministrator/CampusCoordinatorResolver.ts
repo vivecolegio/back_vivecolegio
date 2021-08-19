@@ -172,4 +172,14 @@ export class CampusCoordinatorResolver {
     }
     return null;
   }
+
+  @FieldResolver((_type) => User, { nullable: true })
+  async user(@Root() data: CampusCoordinator) {
+    let id = data.userId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryUser.findOne(id);
+      return result;
+    }
+    return null;
+  }
 }
