@@ -8,4 +8,7 @@ export class NewModality implements Partial<Modality> {
 
   @Field({ nullable: true })
   name?: string;
+
+  @Field({ nullable: true })
+  schoolId?: string;
 }

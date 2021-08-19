@@ -8,4 +8,7 @@ export class NewCampusCoordinator implements Partial<CampusCoordinator> {
 
   @Field({ nullable: true })
   userId?: string;
+
+  @Field({ nullable: true })
+  schoolId?: string;
 }

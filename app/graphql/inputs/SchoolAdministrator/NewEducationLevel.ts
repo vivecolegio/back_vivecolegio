@@ -8,4 +8,7 @@ export class NewEducationLevel implements Partial<EducationLevel> {
 
   @Field({ nullable: true })
   description?: string;
+
+  @Field({ nullable: true })
+  schoolId?: string;
 }

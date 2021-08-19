@@ -8,4 +8,7 @@ export class NewEvaluativeComponent implements Partial<EvaluativeComponent> {
 
   @Field({ nullable: true })
   weight?: number;
+
+  @Field({ nullable: true })
+  schoolId?: string;
 }

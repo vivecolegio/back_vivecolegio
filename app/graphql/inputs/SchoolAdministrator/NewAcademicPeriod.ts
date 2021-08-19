@@ -14,4 +14,7 @@ export class NewAcademicPeriod implements Partial<AcademicPeriod> {
 
   @Field({ nullable: true })
   weight?: number;
+
+  @Field({ nullable: true })
+  schoolId?: string;
 }

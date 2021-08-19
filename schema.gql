@@ -1066,6 +1066,7 @@ input NewAcademicAsignature {
   academicAreaId: String
   code: String
   name: String
+  schoolId: String
   weight: Float
 }
 
@@ -1073,6 +1074,7 @@ input NewAcademicGrade {
   educationLevelId: String
   generalAcademicCycleId: String
   name: String
+  schoolId: String
   specialtyId: String
 }
 
@@ -1081,10 +1083,12 @@ input NewAcademicIndicator {
   academicGradeId: String
   academicStandardId: String
   indicator: String
+  schoolId: String
 }
 
 input NewAcademicPeriod {
   endDate: DateTime
+  schoolId: String
   schoolYearId: String
   startDate: DateTime
   weight: Float
@@ -1094,6 +1098,7 @@ input NewAcademicStandard {
   academicAsignatureId: String
   generalAcademicCycleId: String
   generalAcademicStandardId: String
+  schoolId: String
   standard: String
 }
 
@@ -1113,11 +1118,13 @@ input NewCampus {
 
 input NewCampusAdministrator {
   campusId: String
+  schoolId: String
   userId: String
 }
 
 input NewCampusCoordinator {
   campusId: String
+  schoolId: String
   userId: String
 }
 
@@ -1130,6 +1137,7 @@ input NewDocumentType {
 input NewEducationLevel {
   description: String
   name: String
+  schoolId: String
 }
 
 input NewEmail {
@@ -1142,6 +1150,7 @@ input NewEmail {
 
 input NewEvaluativeComponent {
   name: String
+  schoolId: String
   weight: Float
 }
 
@@ -1185,6 +1194,7 @@ input NewGradeAssignment {
   academicAsignatureId: String
   academicGradeId: String
   hourlyintensity: Float
+  schoolId: String
 }
 
 input NewInbox {
@@ -1215,6 +1225,7 @@ input NewMenuItem {
 input NewModality {
   code: String
   name: String
+  schoolId: String
 }
 
 input NewModule {
@@ -1238,6 +1249,7 @@ input NewPerformanceLevel {
   generalPerformanceLevelId: String
   minimumScore: Float
   name: String
+  schoolId: String
   topScore: Float
 }
 
@@ -1270,6 +1282,7 @@ input NewSchoolAdministrator {
 input NewSchoolYear {
   endDate: DateTime
   folioNumber: Float
+  schoolId: String
   schoolYear: Float
   startDate: DateTime
 }
@@ -1278,6 +1291,7 @@ input NewSpecialty {
   code: String
   modalityId: String
   name: String
+  schoolId: String
 }
 
 input NewStudent {
@@ -1984,6 +1998,7 @@ type Query {
   getSpecialty(id: String!): Specialty
   getStudent(id: String!): Student
   getUser(id: String!): User
+  me: Jwt!
 }
 
 """The Role model"""
