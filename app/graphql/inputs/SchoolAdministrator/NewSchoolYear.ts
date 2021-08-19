@@ -14,4 +14,7 @@ export class NewSchoolYear implements Partial<SchoolYear> {
 
   @Field({ nullable: true })
   folioNumber?: number;
+
+  @Field({ nullable: true })
+  schoolId?: string;
 }

@@ -14,4 +14,7 @@ export class NewPerformanceLevel implements Partial<PerformanceLevel> {
 
   @Field({ nullable: true })
   generalPerformanceLevelId?: string;
+
+  @Field({ nullable: true })
+  schoolId?: string;
 }

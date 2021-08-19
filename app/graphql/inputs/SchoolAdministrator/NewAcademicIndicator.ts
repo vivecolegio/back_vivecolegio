@@ -14,4 +14,7 @@ export class NewAcademicIndicator implements Partial<AcademicIndicator> {
 
   @Field({ nullable: true })
   academicGradeId?: string;
+
+  @Field({ nullable: true })
+  schoolId?: string;
 }

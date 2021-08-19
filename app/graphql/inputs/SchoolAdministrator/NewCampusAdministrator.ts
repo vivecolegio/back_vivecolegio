@@ -8,4 +8,7 @@ export class NewCampusAdministrator implements Partial<CampusAdministrator> {
 
   @Field({ nullable: true })
   userId?: string;
+
+  @Field({ nullable: true })
+  schoolId?: string;
 }

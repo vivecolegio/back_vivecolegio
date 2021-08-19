@@ -11,4 +11,7 @@ export class NewSpecialty implements Partial<Specialty> {
 
   @Field({ nullable: true })
   modalityId?: string;
+
+  @Field({ nullable: true })
+  schoolId?: string;
 }

@@ -222,4 +222,25 @@ export class UserResolver {
     }
     return jwtUtil;
   }
+
+  @Query(() => Jwt)
+  async me(@Ctx() context: IContext) {
+    let userId = context?.user?.authorization?.id;
+    let user = await this.repository.findOne(userId);
+    let jwtUtil = new Jwt();
+    if (user) {
+      jwtUtil.name = user.name + ' ' + user.lastName;
+      jwtUtil.userId = user.id;
+      user.roleId
+        ? (jwtUtil.role = (await this.repositoryRole.findOne(user.roleId)) as Role)
+        : null;
+      if (user.roleId) {
+        let roleMenus = await this.repositoryRoleMenu.find({
+          where: { roleId: user.roleId, active: true },
+        });
+        jwtUtil.roleMenus = roleMenus as [RoleMenu];
+      }
+    }
+    return jwtUtil;
+  }
 }

@@ -14,4 +14,7 @@ export class NewAcademicStandard implements Partial<AcademicStandard> {
 
   @Field({ nullable: true })
   generalAcademicCycleId?: string;
+
+  @Field({ nullable: true })
+  schoolId?: string;
 }

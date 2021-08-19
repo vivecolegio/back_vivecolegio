@@ -17,4 +17,7 @@ export class NewAcademicAsignature implements Partial<AcademicAsignature> {
 
   @Field({ nullable: true })
   academicAreaId?: string;
+
+  @Field({ nullable: true })
+  schoolId?: string;
 }
