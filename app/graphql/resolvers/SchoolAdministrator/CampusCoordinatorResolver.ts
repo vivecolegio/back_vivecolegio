@@ -99,14 +99,14 @@ export class CampusCoordinatorResolver {
     @Ctx() context: IContext
   ): Promise<CampusCoordinator | undefined> {
     let dataProcess = removeEmptyStringElements(data);
-    let updatedByUserid = context?.user?.authorization?.id;
+    let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOne(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
       ...dataProcess,
       version: (result?.version as number) + 1,
-      updatedByUserid,
+      updatedByUserId,
     });
     return result;
   }
@@ -117,20 +117,30 @@ export class CampusCoordinatorResolver {
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
   ): Promise<Boolean | undefined> {
-    let updatedByUserid = context?.user?.authorization?.id;
+    let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOne(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
       active: active,
       version: (result?.version as number) + 1,
-      updatedByUserid,
+      updatedByUserId,
     });
     if (result.id) {
       return true;
     } else {
       return false;
     }
+  }
+
+  @Mutation(() => Boolean)
+  async deleteCampusCoordinator(
+    @Arg('id', () => String) id: string,
+    @Ctx() context: IContext
+  ): Promise<Boolean | undefined> {
+    let data = await this.repository.findOne(id);
+    let result = await this.repository.deleteOne({ _id: ObjectId(id) });
+    return result?.result?.ok === 1 ?? true;
   }
 
   @FieldResolver((_type) => User, { nullable: true })

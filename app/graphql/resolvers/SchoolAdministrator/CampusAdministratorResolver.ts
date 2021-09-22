@@ -11,7 +11,7 @@ import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import {
   CampusAdministrator,
-  CampusAdministratorConnection
+  CampusAdministratorConnection,
 } from '../../models/SchoolAdministrator/CampusAdministrator';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
@@ -99,14 +99,14 @@ export class CampusAdministratorResolver {
     @Ctx() context: IContext
   ): Promise<CampusAdministrator | undefined> {
     let dataProcess = removeEmptyStringElements(data);
-    let updatedByUserid = context?.user?.authorization?.id;
+    let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOne(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
       ...dataProcess,
       version: (result?.version as number) + 1,
-      updatedByUserid,
+      updatedByUserId,
     });
     return result;
   }
@@ -117,20 +117,30 @@ export class CampusAdministratorResolver {
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
   ): Promise<Boolean | undefined> {
-    let updatedByUserid = context?.user?.authorization?.id;
+    let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOne(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
       active: active,
       version: (result?.version as number) + 1,
-      updatedByUserid,
+      updatedByUserId,
     });
     if (result.id) {
       return true;
     } else {
       return false;
     }
+  }
+
+  @Mutation(() => Boolean)
+  async deleteCampusAdministrator(
+    @Arg('id', () => String) id: string,
+    @Ctx() context: IContext
+  ): Promise<Boolean | undefined> {
+    let data = await this.repository.findOne(id);
+    let result = await this.repository.deleteOne({ _id: ObjectId(id) });
+    return result?.result?.ok === 1 ?? true;
   }
 
   @FieldResolver((_type) => User, { nullable: true })

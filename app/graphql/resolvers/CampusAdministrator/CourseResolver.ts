@@ -4,51 +4,32 @@ import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from '
 import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { removeEmptyStringElements } from '../../../types';
-import { NewAcademicGrade } from '../../inputs/SchoolAdministrator/NewAcademicGrade';
+import { NewCourse } from '../../inputs/CampusAdministrator/NewCourse';
 import { IContext } from '../../interfaces/IContext';
-import { GeneralAcademicCycle } from '../../models/GeneralAdministrator/GeneralAcademicCycle';
-import { School } from '../../models/GeneralAdministrator/School';
+import { Course, CourseConnection } from '../../models/CampusAdministrator/Course';
 import { User } from '../../models/GeneralAdministrator/User';
-import {
-  AcademicGrade,
-  AcademicGradeConnection,
-} from '../../models/SchoolAdministrator/AcademicGrade';
-import { EducationLevel } from '../../models/SchoolAdministrator/EducationLevel';
-import { Specialty } from '../../models/SchoolAdministrator/Specialty';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
-@Resolver(AcademicGrade)
-export class AcademicGradeResolver {
-  @InjectRepository(AcademicGrade)
-  private repository = getMongoRepository(AcademicGrade);
+@Resolver(Course)
+export class CourseResolver {
+  @InjectRepository(Course)
+  private repository = getMongoRepository(Course);
 
   @InjectRepository(User)
   private repositoryUser = getMongoRepository(User);
 
-  @InjectRepository(EducationLevel)
-  private repositoryEducationLevel = getMongoRepository(EducationLevel);
-
-  @InjectRepository(Specialty)
-  private repositorySpecialty = getMongoRepository(Specialty);
-
-  @InjectRepository(GeneralAcademicCycle)
-  private repositoryGeneralAcademicCycle = getMongoRepository(GeneralAcademicCycle);
-
-  @InjectRepository(School)
-  private repositorySchool = getMongoRepository(School);
-
-  @Query(() => AcademicGrade, { nullable: true })
-  async getAcademicGrade(@Arg('id', () => String) id: string) {
+  @Query(() => Course, { nullable: true })
+  async getCourse(@Arg('id', () => String) id: string) {
     const result = await this.repository.findOne(id);
     return result;
   }
 
-  @Query(() => AcademicGradeConnection)
-  async getAllAcademicGrade(
+  @Query(() => CourseConnection)
+  async getAllCourse(
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean
-  ): Promise<AcademicGradeConnection> {
+  ): Promise<CourseConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
@@ -74,7 +55,7 @@ export class AcademicGradeResolver {
         });
       }
     }
-    let resultConn = new AcademicGradeConnection();
+    let resultConn = new CourseConnection();
     let resultConnection = connectionFromArraySlice(result, args, {
       sliceStart: 0,
       arrayLength: result.length,
@@ -83,12 +64,9 @@ export class AcademicGradeResolver {
     return resultConn;
   }
 
-  @Mutation(() => AcademicGrade)
-  async createAcademicGrade(
-    @Arg('data') data: NewAcademicGrade,
-    @Ctx() context: IContext
-  ): Promise<AcademicGrade> {
-    let dataProcess: NewAcademicGrade = removeEmptyStringElements(data);
+  @Mutation(() => Course)
+  async createCourse(@Arg('data') data: NewCourse, @Ctx() context: IContext): Promise<Course> {
+    let dataProcess: NewCourse = removeEmptyStringElements(data);
     let createdByUserId = context?.user?.authorization?.id;
     const model = await this.repository.create({
       ...dataProcess,
@@ -100,12 +78,12 @@ export class AcademicGradeResolver {
     return result;
   }
 
-  @Mutation(() => AcademicGrade)
-  async updateAcademicGrade(
-    @Arg('data') data: NewAcademicGrade,
+  @Mutation(() => Course)
+  async updateCourse(
+    @Arg('data') data: NewCourse,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<AcademicGrade | undefined> {
+  ): Promise<Course | undefined> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOne(id);
@@ -120,7 +98,7 @@ export class AcademicGradeResolver {
   }
 
   @Mutation(() => Boolean)
-  async changeActiveAcademicGrade(
+  async changeActiveCourse(
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
@@ -142,7 +120,7 @@ export class AcademicGradeResolver {
   }
 
   @Mutation(() => Boolean)
-  async deleteAcademicGrade(
+  async deleteCourse(
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
   ): Promise<Boolean | undefined> {
@@ -152,7 +130,7 @@ export class AcademicGradeResolver {
   }
 
   @FieldResolver((_type) => User, { nullable: true })
-  async createdByUser(@Root() data: AcademicGrade) {
+  async createdByUser(@Root() data: Course) {
     let id = data.createdByUserId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryUser.findOne(id);
@@ -162,50 +140,10 @@ export class AcademicGradeResolver {
   }
 
   @FieldResolver((_type) => User, { nullable: true })
-  async updatedByUser(@Root() data: AcademicGrade) {
+  async updatedByUser(@Root() data: Course) {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryUser.findOne(id);
-      return result;
-    }
-    return null;
-  }
-
-  @FieldResolver((_type) => EducationLevel, { nullable: true })
-  async educationLevel(@Root() data: AcademicGrade) {
-    let id = data.educationLevelId;
-    if (id !== null && id !== undefined) {
-      const result = await this.repositoryEducationLevel.findOne(id);
-      return result;
-    }
-    return null;
-  }
-
-  @FieldResolver((_type) => Specialty, { nullable: true })
-  async specialty(@Root() data: AcademicGrade) {
-    let id = data.specialtyId;
-    if (id !== null && id !== undefined) {
-      const result = await this.repositorySpecialty.findOne(id);
-      return result;
-    }
-    return null;
-  }
-
-  @FieldResolver((_type) => GeneralAcademicCycle, { nullable: true })
-  async generalAcademicCycle(@Root() data: AcademicGrade) {
-    let id = data.generalAcademicCycleId;
-    if (id !== null && id !== undefined) {
-      const result = await this.repositoryGeneralAcademicCycle.findOne(id);
-      return result;
-    }
-    return null;
-  }
-
-  @FieldResolver((_type) => School, { nullable: true })
-  async school(@Root() data: AcademicGrade) {
-    let id = data.schoolId;
-    if (id !== null && id !== undefined) {
-      const result = await this.repositorySchool.findOne(id);
       return result;
     }
     return null;
