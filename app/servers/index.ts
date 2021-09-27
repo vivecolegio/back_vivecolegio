@@ -8,6 +8,11 @@ import 'reflect-metadata';
 import { buildSchemaSync, createResolversMap } from 'type-graphql';
 import { createConnections } from 'typeorm';
 import { dbHost, dbName, dbPassword, dbPort, dbUser } from '../config';
+import { AcademicDay } from '../graphql/models/CampusAdministrator/AcademicDay';
+import { AcademicHour } from '../graphql/models/CampusAdministrator/AcademicHour';
+import { Course } from '../graphql/models/CampusAdministrator/Course';
+import { Guardian } from '../graphql/models/CampusAdministrator/Guardian';
+import { Teacher } from '../graphql/models/CampusAdministrator/Teacher';
 import { AuditLogin } from '../graphql/models/GeneralAdministrator/AuditLogin';
 import { DocumentType } from '../graphql/models/GeneralAdministrator/DocumentType';
 import { Email } from '../graphql/models/GeneralAdministrator/Email';
@@ -35,6 +40,7 @@ import { Modality } from '../graphql/models/SchoolAdministrator/Modality';
 import { PerformanceLevel } from '../graphql/models/SchoolAdministrator/PerformanceLevel';
 import { SchoolYear } from '../graphql/models/SchoolAdministrator/SchoolYear';
 import { Specialty } from '../graphql/models/SchoolAdministrator/Specialty';
+import { AcademicHourResolver } from '../graphql/resolvers/CampusAdministrator/ACademicHourResolver';
 import { AuditLoginResolver } from '../graphql/resolvers/GeneralAdministrator/AuditLoginResolver';
 import { GenderResolver } from '../graphql/resolvers/GeneralAdministrator/GenderResolver';
 import { GeneralAcademicAsignatureResolver } from '../graphql/resolvers/GeneralAdministrator/GeneralAcademicAsignatureResolver';
@@ -49,6 +55,10 @@ import { Municipality } from './../graphql/models/GeneralAdministrator/Municipal
 import { School } from './../graphql/models/GeneralAdministrator/School';
 import { SchoolAdministrator } from './../graphql/models/GeneralAdministrator/SchoolAdministrator';
 import { Student } from './../graphql/models/GeneralAdministrator/Student';
+import { AcademicDayResolver } from './../graphql/resolvers/CampusAdministrator/AcademicDayResolver';
+import { CourseResolver } from './../graphql/resolvers/CampusAdministrator/CourseResolver';
+import { GuardianResolver } from './../graphql/resolvers/CampusAdministrator/GuardianResolver';
+import { TeacherResolver } from './../graphql/resolvers/CampusAdministrator/TeacherResolver';
 import { CampusResolver } from './../graphql/resolvers/GeneralAdministrator/CampusResolver';
 import { DocumentTypeResolver } from './../graphql/resolvers/GeneralAdministrator/DocumentTypeResolver';
 import { EmailResolver } from './../graphql/resolvers/GeneralAdministrator/EmailResolver';
@@ -131,6 +141,11 @@ const schema = buildSchemaSync({
     PerformanceLevelResolver,
     SchoolYearResolver,
     SpecialtyResolver,
+    AcademicDayResolver,
+    AcademicHourResolver,
+    CourseResolver,
+    GuardianResolver,
+    TeacherResolver,
   ],
   emitSchemaFile: true,
   validate: false,
@@ -181,6 +196,11 @@ createConnections([
       PerformanceLevel,
       SchoolYear,
       Specialty,
+      AcademicDay,
+      AcademicHour,
+      Course,
+      Guardian,
+      Teacher,
     ],
     synchronize: true,
     logger: 'advanced-console',
@@ -204,6 +224,7 @@ const server = new ApolloServer({
   schema: applyMiddleware(federatedSchema),
   context: ({ req }: any) => {
     const user = req.headers.user ? JSON.parse(req.headers.user) : null;
+    console.log(req.headers);
     return { user };
   },
   introspection: true,
