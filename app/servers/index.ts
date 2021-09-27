@@ -40,7 +40,7 @@ import { Modality } from '../graphql/models/SchoolAdministrator/Modality';
 import { PerformanceLevel } from '../graphql/models/SchoolAdministrator/PerformanceLevel';
 import { SchoolYear } from '../graphql/models/SchoolAdministrator/SchoolYear';
 import { Specialty } from '../graphql/models/SchoolAdministrator/Specialty';
-import { AcademicHourResolver } from '../graphql/resolvers/CampusAdministrator/ACademicHourResolver';
+import { AcademicHourResolver } from '../graphql/resolvers/CampusAdministrator/AcademicHourResolver';
 import { AuditLoginResolver } from '../graphql/resolvers/GeneralAdministrator/AuditLoginResolver';
 import { GenderResolver } from '../graphql/resolvers/GeneralAdministrator/GenderResolver';
 import { GeneralAcademicAsignatureResolver } from '../graphql/resolvers/GeneralAdministrator/GeneralAcademicAsignatureResolver';
