@@ -1,4 +1,5 @@
-import { buildFederatedSchema, printSchema } from '@apollo/federation';
+import { buildSubgraphSchema } from '@apollo/federation';
+import { printSubgraphSchema } from '@apollo/subgraph';
 import { ApolloServerPluginInlineTraceDisabled } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import express from 'express';
@@ -23,7 +24,6 @@ import { Menu } from '../graphql/models/GeneralAdministrator/Menu';
 import { Module } from '../graphql/models/GeneralAdministrator/Module';
 import { Notification } from '../graphql/models/GeneralAdministrator/Notification';
 import { Role } from '../graphql/models/GeneralAdministrator/Role';
-import { RoleMenu } from '../graphql/models/GeneralAdministrator/RoleMenu';
 import { User } from '../graphql/models/GeneralAdministrator/User';
 import { AcademicArea } from '../graphql/models/SchoolAdministrator/AcademicArea';
 import { AcademicAsignature } from '../graphql/models/SchoolAdministrator/AcademicAsignature';
@@ -73,7 +73,6 @@ import { MenuResolver } from './../graphql/resolvers/GeneralAdministrator/MenuRe
 import { ModuleResolver } from './../graphql/resolvers/GeneralAdministrator/ModuleResolver';
 import { MunicipalityResolver } from './../graphql/resolvers/GeneralAdministrator/MunicipalityResolver';
 import { NotificationResolver } from './../graphql/resolvers/GeneralAdministrator/NotificationResolver';
-import { RoleMenuResolver } from './../graphql/resolvers/GeneralAdministrator/RoleMenuResolver';
 import { RoleResolver } from './../graphql/resolvers/GeneralAdministrator/RoleResolver';
 import { SchoolAdministratorResolver } from './../graphql/resolvers/GeneralAdministrator/SchoolAdministratorResolver';
 import { SchoolResolver } from './../graphql/resolvers/GeneralAdministrator/SchoolResolver';
@@ -112,7 +111,6 @@ const schema = buildSchemaSync({
     ModuleResolver,
     NotificationResolver,
     RoleResolver,
-    RoleMenuResolver,
     UserResolver,
     MenuItemResolver,
     CampusResolver,
@@ -167,7 +165,6 @@ createConnections([
       Module,
       Notification,
       Role,
-      RoleMenu,
       User,
       MenuItem,
       Campus,
@@ -214,8 +211,8 @@ createConnections([
   console.log(error);
 });
 
-const federatedSchema = buildFederatedSchema({
-  typeDefs: gql(printSchema(schema)),
+const federatedSchema = buildSubgraphSchema({
+  typeDefs: gql(printSubgraphSchema(schema)),
   resolvers: createResolversMap(schema) as any,
 });
 

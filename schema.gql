@@ -901,26 +901,38 @@ type InboxEdge {
 
 """The User model"""
 type Jwt {
+  campus: [Campus!]
   jwt: String
   name: String
   role: Role
-  roleMenus: [RoleMenu!]
+  roleMenus: [Menu!]
+  schools: [School!]
   userId: String
 }
 
 """The Menu model"""
 type Menu implements IModelData {
+  activateAction: Boolean
   active: Boolean
+  createAction: Boolean
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  deleteAction: Boolean
+  fullAccess: Boolean
   icon: String
   id: ID!
+  inactiveAction: Boolean
   menuItems: [MenuItem!]
+  menuItemsLogin: [MenuItem!]
   module: Module
   moduleId: String
   name: String
-  sorting: Float
+  order: Float
+  readAction: Boolean
+  roles: [Role!]
+  rolesId: [String!]
+  updateAction: Boolean
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -943,18 +955,27 @@ type MenuEdge {
 
 """The MenuItem model"""
 type MenuItem implements IModelData {
+  activateAction: Boolean
   active: Boolean
+  createAction: Boolean
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  deleteAction: Boolean
+  fullAccess: Boolean
   icon: String
   id: ID!
+  inactiveAction: Boolean
   menu: Menu
   menuId: String
   module: Module
   moduleId: String
   name: String
-  sorting: Float
+  order: Float
+  readAction: Boolean
+  roles: [Role!]
+  rolesId: [String!]
+  updateAction: Boolean
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -1099,7 +1120,6 @@ type Mutation {
   changeActiveNotification(active: Boolean!, id: String!): Boolean!
   changeActivePerformanceLevel(active: Boolean!, id: String!): Boolean!
   changeActiveRole(active: Boolean!, id: String!): Boolean!
-  changeActiveRoleMenu(active: Boolean!, id: String!): Boolean!
   changeActiveSchool(active: Boolean!, id: String!): Boolean!
   changeActiveSchoolAdministrator(active: Boolean!, id: String!): Boolean!
   changeActiveSchoolYear(active: Boolean!, id: String!): Boolean!
@@ -1142,7 +1162,6 @@ type Mutation {
   createNotification(data: NewNotification!): Notification!
   createPerformanceLevel(data: NewPerformanceLevel!): PerformanceLevel!
   createRole(data: NewRole!): Role!
-  createRoleMenu(data: NewRoleMenu!): RoleMenu!
   createSchool(data: NewSchool!): School!
   createSchoolAdministrator(data: NewSchoolAdministrator!): SchoolAdministrator!
   createSchoolYear(data: NewSchoolYear!): SchoolYear!
@@ -1150,7 +1169,47 @@ type Mutation {
   createStudent(data: NewStudent!): Student!
   createTeacher(data: NewTeacher!): Teacher!
   createUser(data: NewUser!): User!
-  deleteCampus(id: String!): Campus!
+  deleteAcademicArea(id: String!): Boolean!
+  deleteAcademicAsignature(id: String!): Boolean!
+  deleteAcademicDay(id: String!): Boolean!
+  deleteAcademicGrade(id: String!): Boolean!
+  deleteAcademicHour(id: String!): Boolean!
+  deleteAcademicIndicator(id: String!): Boolean!
+  deleteAcademicPeriod(id: String!): Boolean!
+  deleteAcademicStandard(id: String!): Boolean!
+  deleteCampus(id: String!): Boolean!
+  deleteCampusAdministrator(id: String!): Boolean!
+  deleteCampusCoordinator(id: String!): Boolean!
+  deleteCourse(id: String!): Boolean!
+  deleteDocumentType(id: String!): Boolean!
+  deleteEducationLevel(id: String!): Boolean!
+  deleteEmail(id: String!): Boolean!
+  deleteEvaluativeComponent(id: String!): Boolean!
+  deleteGender(id: String!): Boolean!
+  deleteGeneralAcademicArea(id: String!): Boolean!
+  deleteGeneralAcademicAsignature(id: String!): Boolean!
+  deleteGeneralAcademicCycle(id: String!): Boolean!
+  deleteGeneralAcademicGrade(id: String!): Boolean!
+  deleteGeneralAcademicStandard(id: String!): Boolean!
+  deleteGeneralPerformanceLevel(id: String!): Boolean!
+  deleteGradeAssignment(id: String!): Boolean!
+  deleteGuardian(id: String!): Boolean!
+  deleteInbox(id: String!): Boolean!
+  deleteMenu(id: String!): Boolean!
+  deleteMenuItem(id: String!): Boolean!
+  deleteModality(id: String!): Boolean!
+  deleteModule(id: String!): Boolean!
+  deleteMunicipality(id: String!): Boolean!
+  deleteNotification(id: String!): Boolean!
+  deletePerformanceLevel(id: String!): Boolean!
+  deleteRole(id: String!): Boolean!
+  deleteSchool(id: String!): Boolean!
+  deleteSchoolAdministrator(id: String!): Boolean!
+  deleteSchoolYear(id: String!): Boolean!
+  deleteSpecialty(id: String!): Boolean!
+  deleteStudent(id: String!): Boolean!
+  deleteTeacher(id: String!): Boolean!
+  deleteUser(id: String!): Boolean!
   login(password: String!, username: String!): Jwt!
   updateAcademicArea(data: NewAcademicArea!, id: String!): AcademicArea!
   updateAcademicAsignature(data: NewAcademicAsignature!, id: String!): AcademicAsignature!
@@ -1187,7 +1246,6 @@ type Mutation {
   updateNotification(data: NewNotification!, id: String!): Notification!
   updatePerformanceLevel(data: NewPerformanceLevel!, id: String!): PerformanceLevel!
   updateRole(data: NewRole!, id: String!): Role!
-  updateRoleMenu(data: NewRoleMenu!, id: String!): RoleMenu!
   updateSchool(data: NewSchool!, id: String!): School!
   updateSchoolAdministrator(data: NewSchoolAdministrator!, id: String!): SchoolAdministrator!
   updateSchoolYear(data: NewSchoolYear!, id: String!): SchoolYear!
@@ -1374,19 +1432,35 @@ input NewInbox {
 }
 
 input NewMenu {
+  activateAction: Boolean
+  createAction: Boolean
+  deleteAction: Boolean
+  fullAccess: Boolean
   icon: String
+  inactiveAction: Boolean
   moduleId: String
   name: String
   parentId: String
+  readAction: Boolean
+  rolesId: [String!]
   sorting: Float
+  updateAction: Boolean
 }
 
 input NewMenuItem {
+  activateAction: Boolean
+  createAction: Boolean
+  deleteAction: Boolean
+  fullAccess: Boolean
   icon: String
+  inactiveAction: Boolean
   menuId: String
   moduleId: String
   name: String
+  readAction: Boolean
+  rolesId: [String!]
   sorting: Float
+  updateAction: Boolean
 }
 
 input NewModality {
@@ -1422,18 +1496,6 @@ input NewPerformanceLevel {
 
 input NewRole {
   name: String
-}
-
-input NewRoleMenu {
-  activateAction: Boolean
-  createAction: Boolean
-  deleteAction: Boolean
-  fullAccess: Boolean
-  inactiveAction: Boolean
-  menuId: String
-  readAction: Boolean
-  roleId: String
-  updateAction: Boolean
 }
 
 input NewSchool {
@@ -2098,21 +2160,6 @@ type Query {
     last: Float
     orderCreated: Boolean!
   ): RoleConnection!
-  getAllRoleMenu(
-    """Paginate after opaque cursor"""
-    after: String
-    allData: Boolean!
-
-    """Paginate before opaque cursor"""
-    before: String
-
-    """Paginate first"""
-    first: Float
-
-    """Paginate last"""
-    last: Float
-    orderCreated: Boolean!
-  ): RoleMenuConnection!
   getAllSchool(
     """Paginate after opaque cursor"""
     after: String
@@ -2245,7 +2292,6 @@ type Query {
   getNotification(id: String!): Notification
   getPerformanceLevel(id: String!): PerformanceLevel
   getRole(id: String!): Role
-  getRoleMenu(id: String!): RoleMenu
   getSchool(id: String!): School
   getSchoolAdministrator(id: String!): SchoolAdministrator
   getSchoolYear(id: String!): SchoolYear
@@ -2264,7 +2310,6 @@ type Role implements IModelData {
   createdByUserId: String
   id: ID!
   name: String
-  roleMenus: [RoleMenu!]
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -2283,44 +2328,6 @@ type RoleEdge {
   """Used in `before` and `after` args"""
   cursor: String!
   node: Role!
-}
-
-"""The RoleMenu model"""
-type RoleMenu implements IModelData {
-  activateAction: Boolean
-  active: Boolean
-  createAction: Boolean
-  createdAt: DateTime
-  createdByUser: User
-  createdByUserId: String
-  deleteAction: Boolean
-  fullAccess: Boolean
-  id: ID!
-  inactiveAction: Boolean
-  menu: Menu
-  menuId: String
-  readAction: Boolean
-  role: Role
-  roleId: String
-  updateAction: Boolean
-  updatedAt: DateTime
-  updatedByUser: User
-  updatedByUserId: String
-  version: Float
-}
-
-type RoleMenuConnection {
-  edges: [RoleMenuEdge!]!
-  pageInfo: PageInfo!
-
-  """Total Count"""
-  totalCount: Float
-}
-
-type RoleMenuEdge {
-  """Used in `before` and `after` args"""
-  cursor: String!
-  node: RoleMenu!
 }
 
 """The School model"""

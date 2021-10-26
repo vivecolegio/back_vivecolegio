@@ -1,7 +1,7 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Campus } from '../models/GeneralAdministrator/Campus';
+import { Menu } from '../models/GeneralAdministrator/Menu';
 import { Role } from '../models/GeneralAdministrator/Role';
-import { RoleMenu } from '../models/GeneralAdministrator/RoleMenu';
 import { School } from '../models/GeneralAdministrator/School';
 
 @ObjectType({ description: 'The User model' })
@@ -24,6 +24,6 @@ export class Jwt {
   @Field({ nullable: true })
   role?: Role;
 
-  @Field((_type) => [RoleMenu], { nullable: true })
-  roleMenus?: [RoleMenu];
+  @Field((_type) => [Menu], { nullable: true })
+  roleMenus?: [Menu];
 }
