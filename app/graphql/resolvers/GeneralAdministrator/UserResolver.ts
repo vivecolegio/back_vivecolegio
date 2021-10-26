@@ -10,8 +10,8 @@ import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
 import { IContext } from '../../interfaces/IContext';
 import { DocumentType } from '../../models/GeneralAdministrator/DocumentType';
 import { Gender } from '../../models/GeneralAdministrator/Gender';
+import { Menu } from '../../models/GeneralAdministrator/Menu';
 import { Role } from '../../models/GeneralAdministrator/Role';
-import { RoleMenu } from '../../models/GeneralAdministrator/RoleMenu';
 import { User, UserConnection } from '../../models/GeneralAdministrator/User';
 import { Jwt } from '../../modelsUtils/Jwt';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
@@ -32,8 +32,8 @@ export class UserResolver {
   @InjectRepository(Role)
   private repositoryRole = getMongoRepository(Role);
 
-  @InjectRepository(RoleMenu)
-  private repositoryRoleMenu = getMongoRepository(RoleMenu);
+  @InjectRepository(Menu)
+  private repositoryMenu = getMongoRepository(Menu);
 
   @Query(() => User, { nullable: true })
   async getUser(@Arg('id', () => String) id: string) {
@@ -222,10 +222,10 @@ export class UserResolver {
           ? (jwtUtil.role = (await this.repositoryRole.findOne(user.roleId)) as Role)
           : null;
         if (user.roleId) {
-          let roleMenus = await this.repositoryRoleMenu.find({
-            where: { roleId: user.roleId, active: true },
+          let menus = await this.repositoryMenu.find({
+            where: { roleId: { $in: [user.roleId] }, active: true },
           });
-          jwtUtil.roleMenus = roleMenus as [RoleMenu];
+          jwtUtil.roleMenus = menus as [Menu];
         }
         jwtUtil.jwt = jwtS;
       }
@@ -245,10 +245,10 @@ export class UserResolver {
         ? (jwtUtil.role = (await this.repositoryRole.findOne(user.roleId)) as Role)
         : null;
       if (user.roleId) {
-        let roleMenus = await this.repositoryRoleMenu.find({
-          where: { roleId: user.roleId, active: true },
+        let menus = await this.repositoryMenu.find({
+          where: { roleId: { $in: [user.roleId] }, active: true },
         });
-        jwtUtil.roleMenus = roleMenus as [RoleMenu];
+        jwtUtil.roleMenus = menus as [Menu];
       }
     }
     return jwtUtil;

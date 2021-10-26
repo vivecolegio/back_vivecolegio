@@ -5,6 +5,7 @@ import { IModelData } from '../../interfaces/IModelData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { MenuItem } from './MenuItem';
 import { Module } from './Module';
+import { Role } from './Role';
 
 @ObjectType({ description: 'The Menu model', implements: IModelData })
 @Entity()
@@ -19,7 +20,7 @@ export class Menu extends IModelData {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  sorting?: Number;
+  order?: number;
 
   @ManyToOne(() => Module, (data) => data.id, { lazy: true })
   @Field(() => Module, { nullable: true })
@@ -29,8 +30,46 @@ export class Menu extends IModelData {
   @Column({ nullable: true })
   moduleId?: string;
 
+  @Field(() => [String], { nullable: true })
+  @Column({ nullable: true })
+  rolesId?: String[];
+
+  @Field(() => [Role], { nullable: true })
+  roles?: Role[];
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  createAction?: Boolean;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  deleteAction?: Boolean;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  updateAction?: Boolean;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  readAction?: Boolean;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  fullAccess?: Boolean;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  activateAction?: Boolean;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  inactiveAction?: Boolean;
+
   @Field(() => [MenuItem], { nullable: true })
   menuItems?: [MenuItem];
+
+  @Field(() => [MenuItem], { nullable: true })
+  menuItemsLogin?: [MenuItem];
 }
 
 @ObjectType()

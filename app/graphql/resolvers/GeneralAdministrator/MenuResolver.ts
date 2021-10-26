@@ -9,6 +9,7 @@ import { IContext } from '../../interfaces/IContext';
 import { Menu, MenuConnection } from '../../models/GeneralAdministrator/Menu';
 import { MenuItem } from '../../models/GeneralAdministrator/MenuItem';
 import { Module } from '../../models/GeneralAdministrator/Module';
+import { Role } from '../../models/GeneralAdministrator/Role';
 import { User } from '../../models/GeneralAdministrator/User';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
@@ -16,6 +17,9 @@ import { ConnectionArgs } from '../../pagination/relaySpecs';
 export class MenuResolver {
   @InjectRepository(Menu)
   private repository = getMongoRepository(Menu);
+
+  @InjectRepository(Role)
+  private repositoryRole = getMongoRepository(Role);
 
   @InjectRepository(User)
   private repositoryUser = getMongoRepository(User);
@@ -172,6 +176,20 @@ export class MenuResolver {
     let id = data.id;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryMenuItem.find({ where: { menuId: id.toString() } });
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => [Role], { nullable: true })
+  async roles(@Root() data: Menu) {
+    let ids = data.rolesId;
+    if (ids !== null && ids !== undefined) {
+      let dataIds: any[] = [];
+      ids.forEach(async (id: any) => {
+        dataIds.push(new ObjectId(id));
+      });
+      const result = await this.repositoryRole.find({ where: { _id: { $in: dataIds } } });
       return result;
     }
     return null;
