@@ -223,7 +223,7 @@ export class UserResolver {
           : null;
         if (user.roleId) {
           let menus = await this.repositoryMenu.find({
-            where: { roleId: { $in: [user.roleId] }, active: true },
+            where: { rolesId: { $in: [user.roleId] }, active: true },
           });
           jwtUtil.roleMenus = menus as [Menu];
         }
