@@ -11,6 +11,7 @@ import { IContext } from '../../interfaces/IContext';
 import { DocumentType } from '../../models/GeneralAdministrator/DocumentType';
 import { Gender } from '../../models/GeneralAdministrator/Gender';
 import { Menu } from '../../models/GeneralAdministrator/Menu';
+import { MenuItem } from '../../models/GeneralAdministrator/MenuItem';
 import { Role } from '../../models/GeneralAdministrator/Role';
 import { User, UserConnection } from '../../models/GeneralAdministrator/User';
 import { Jwt } from '../../modelsUtils/Jwt';
@@ -34,6 +35,9 @@ export class UserResolver {
 
   @InjectRepository(Menu)
   private repositoryMenu = getMongoRepository(Menu);
+
+  @InjectRepository(MenuItem)
+  private repositoryMenuItem = getMongoRepository(MenuItem);
 
   @Query(() => User, { nullable: true })
   async getUser(@Arg('id', () => String) id: string) {
@@ -224,7 +228,19 @@ export class UserResolver {
         if (user.roleId) {
           let menus = await this.repositoryMenu.find({
             where: { rolesId: { $in: [user.roleId] }, active: true },
+            order: { order: 'ASC' },
           });
+          for (let index = 0; index < menus.length; index++) {
+            let menusItems = await this.repositoryMenuItem.find({
+              where: {
+                menuId: menus[index].id.toString(),
+                rolesId: { $in: [user?.roleId] },
+                active: true,
+              },
+              order: { order: 'ASC' },
+            });
+            menus[index].menuItemsLogin = menusItems as [MenuItem];
+          }
           jwtUtil.roleMenus = menus as [Menu];
         }
         jwtUtil.jwt = jwtS;
@@ -246,8 +262,20 @@ export class UserResolver {
         : null;
       if (user.roleId) {
         let menus = await this.repositoryMenu.find({
-          where: { roleId: { $in: [user.roleId] }, active: true },
+          where: { rolesId: { $in: [user.roleId] }, active: true },
+          order: { order: 'ASC' },
         });
+        for (let index = 0; index < menus.length; index++) {
+          let menusItems = await this.repositoryMenuItem.find({
+            where: {
+              menuId: menus[index].id.toString(),
+              rolesId: { $in: [user?.roleId] },
+              active: true,
+            },
+            order: { order: 'ASC' },
+          });
+          menus[index].menuItemsLogin = menusItems as [MenuItem];
+        }
         jwtUtil.roleMenus = menus as [Menu];
       }
     }

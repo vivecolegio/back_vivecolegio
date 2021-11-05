@@ -6,10 +6,12 @@ import { InjectRepository } from 'typeorm-typedi-extensions';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicHour } from '../../inputs/CampusAdministrator/NewAcademicHour';
 import { IContext } from '../../interfaces/IContext';
+import { AcademicDay } from '../../models/CampusAdministrator/AcademicDay';
 import {
   AcademicHour,
   AcademicHourConnection,
 } from '../../models/CampusAdministrator/AcademicHour';
+import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { User } from '../../models/GeneralAdministrator/User';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
@@ -20,6 +22,12 @@ export class AcademicHourResolver {
 
   @InjectRepository(User)
   private repositoryUser = getMongoRepository(User);
+
+  @InjectRepository(Campus)
+  private repositoryCampus = getMongoRepository(Campus);
+
+  @InjectRepository(AcademicDay)
+  private repositoryAcademicDay = getMongoRepository(AcademicDay);
 
   @Query(() => AcademicHour, { nullable: true })
   async getAcademicHour(@Arg('id', () => String) id: string) {
@@ -150,6 +158,26 @@ export class AcademicHourResolver {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryUser.findOne(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => Campus, { nullable: true })
+  async campus(@Root() data: AcademicHour) {
+    let id = data.campusId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryCampus.findOne(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => AcademicDay, { nullable: true })
+  async academicDay(@Root() data: AcademicHour) {
+    let id = data.academicDayId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryAcademicDay.findOne(id);
       return result;
     }
     return null;

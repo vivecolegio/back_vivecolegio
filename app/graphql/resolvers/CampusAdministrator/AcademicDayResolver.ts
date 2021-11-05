@@ -7,6 +7,7 @@ import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicDay } from '../../inputs/CampusAdministrator/NewAcademicDay';
 import { IContext } from '../../interfaces/IContext';
 import { AcademicDay, AcademicDayConnection } from '../../models/CampusAdministrator/AcademicDay';
+import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { User } from '../../models/GeneralAdministrator/User';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
@@ -17,6 +18,9 @@ export class AcademicDayResolver {
 
   @InjectRepository(User)
   private repositoryUser = getMongoRepository(User);
+
+  @InjectRepository(Campus)
+  private repositoryCampus = getMongoRepository(Campus);
 
   @Query(() => AcademicDay, { nullable: true })
   async getAcademicDay(@Arg('id', () => String) id: string) {
@@ -147,6 +151,16 @@ export class AcademicDayResolver {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryUser.findOne(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => Campus, { nullable: true })
+  async campus(@Root() data: AcademicDay) {
+    let id = data.campusId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryCampus.findOne(id);
       return result;
     }
     return null;

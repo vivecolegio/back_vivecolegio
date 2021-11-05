@@ -10,7 +10,7 @@ export class NewMenuItem implements Partial<MenuItem> {
   icon?: string;
 
   @Field({ nullable: true })
-  sorting?: Number;
+  order?: Number;
 
   @Field({ nullable: true })
   menuId?: string;

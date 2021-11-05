@@ -7,6 +7,8 @@ import { removeEmptyStringElements } from '../../../types';
 import { NewTeacher } from '../../inputs/CampusAdministrator/NewTeacher';
 import { IContext } from '../../interfaces/IContext';
 import { Teacher, TeacherConnection } from '../../models/CampusAdministrator/Teacher';
+import { Campus } from '../../models/GeneralAdministrator/Campus';
+import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
@@ -17,6 +19,12 @@ export class TeacherResolver {
 
   @InjectRepository(User)
   private repositoryUser = getMongoRepository(User);
+
+  @InjectRepository(School)
+  private repositorySchool = getMongoRepository(School);
+
+  @InjectRepository(Campus)
+  private repositoryCampus = getMongoRepository(Campus);
 
   @Query(() => Teacher, { nullable: true })
   async getTeacher(@Arg('id', () => String) id: string) {
@@ -144,6 +152,36 @@ export class TeacherResolver {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryUser.findOne(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => User, { nullable: true })
+  async user(@Root() data: Teacher) {
+    let id = data.schoolId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryUser.findOne(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => School, { nullable: true })
+  async school(@Root() data: Teacher) {
+    let id = data.schoolId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositorySchool.findOne(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => Campus, { nullable: true })
+  async campus(@Root() data: Teacher) {
+    let id = data.schoolId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryCampus.findOne(id);
       return result;
     }
     return null;
