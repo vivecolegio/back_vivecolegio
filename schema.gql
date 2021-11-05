@@ -1440,10 +1440,10 @@ input NewMenu {
   inactiveAction: Boolean
   moduleId: String
   name: String
+  order: Float
   parentId: String
   readAction: Boolean
   rolesId: [String!]
-  sorting: Float
   updateAction: Boolean
 }
 
@@ -1457,9 +1457,9 @@ input NewMenuItem {
   menuId: String
   moduleId: String
   name: String
+  order: Float
   readAction: Boolean
   rolesId: [String!]
-  sorting: Float
   updateAction: Boolean
 }
 
