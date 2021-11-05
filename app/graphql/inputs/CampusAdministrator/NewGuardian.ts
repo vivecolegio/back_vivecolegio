@@ -1,5 +1,6 @@
 import { Field, InputType } from 'type-graphql';
 import { Guardian } from '../../models/CampusAdministrator/Guardian';
+import { NewUser } from '../GeneralAdministrator/NewUser';
 
 @InputType()
 export class NewGuardian implements Partial<Guardian> {
@@ -14,4 +15,7 @@ export class NewGuardian implements Partial<Guardian> {
 
   @Field({ nullable: true })
   studentsId?: string;
+
+  @Field({ nullable: true })
+  newUser?: NewUser;
 }

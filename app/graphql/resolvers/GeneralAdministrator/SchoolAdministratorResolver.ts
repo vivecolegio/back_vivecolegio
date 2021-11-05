@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
@@ -5,6 +6,7 @@ import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { removeEmptyStringElements } from '../../../types';
 import { NewSchoolAdministrator } from '../../inputs/GeneralAdministrator/NewSchoolAdministrator';
+import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
 import { IContext } from '../../interfaces/IContext';
 import { School } from '../../models/GeneralAdministrator/School';
 import {
@@ -13,6 +15,8 @@ import {
 } from '../../models/GeneralAdministrator/SchoolAdministrator';
 import { User } from '../../models/GeneralAdministrator/User';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
+
+const BCRYPT_SALT_ROUNDS = 12;
 
 @Resolver(SchoolAdministrator)
 export class SchoolAdministratorResolver {
@@ -77,9 +81,27 @@ export class SchoolAdministratorResolver {
     @Ctx() context: IContext
   ): Promise<SchoolAdministrator> {
     let dataProcess: NewSchoolAdministrator = removeEmptyStringElements(data);
+    let dataUserProcess: NewUser = removeEmptyStringElements(dataProcess.newUser);
     let createdByUserId = context?.user?.authorization?.id;
+    delete dataProcess.newUser;
+    if (dataUserProcess.password != null) {
+      let passwordHash = await bcrypt
+        .hash(dataUserProcess.password, BCRYPT_SALT_ROUNDS)
+        .then(function (hashedPassword: any) {
+          return hashedPassword;
+        });
+      dataUserProcess.password = passwordHash;
+    }
+    const modelUser = await this.repositoryUser.create({
+      ...dataUserProcess,
+      active: true,
+      version: 0,
+      createdByUserId,
+    });
+    let resultUser = await this.repositoryUser.save(modelUser);
     const model = await this.repository.create({
       ...dataProcess,
+      userId: resultUser.id,
       active: true,
       version: 0,
       createdByUserId,
@@ -97,6 +119,16 @@ export class SchoolAdministratorResolver {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOne(id);
+    let dataUserProcess: NewUser = removeEmptyStringElements(dataProcess?.newUser);
+    let resultUser = await this.repositoryUser.findOne(result?.userId?.toString());
+    resultUser = await this.repositoryUser.save({
+      _id: new ObjectId(result?.userId?.toString()),
+      ...resultUser,
+      ...dataUserProcess,
+      version: (result?.version as number) + 1,
+      updatedByUserId,
+    });
+    delete dataProcess?.newUser;
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -115,6 +147,14 @@ export class SchoolAdministratorResolver {
   ): Promise<Boolean | undefined> {
     let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOne(id);
+    let resultUser = await this.repositoryUser.findOne(result?.userId?.toString());
+    resultUser = await this.repositoryUser.save({
+      _id: new ObjectId(result?.userId?.toString()),
+      ...resultUser,
+      active: active,
+      version: (result?.version as number) + 1,
+      updatedByUserId,
+    });
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,

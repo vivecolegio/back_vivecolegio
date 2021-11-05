@@ -1,5 +1,6 @@
 import { Field, InputType } from 'type-graphql';
 import { Student } from '../../models/GeneralAdministrator/Student';
+import { NewUser } from './NewUser';
 
 @InputType()
 export class NewStudent implements Partial<Student> {
@@ -11,4 +12,7 @@ export class NewStudent implements Partial<Student> {
 
   @Field({ nullable: true })
   userId?: string;
+
+  @Field({ nullable: true })
+  newUser?: NewUser;
 }
