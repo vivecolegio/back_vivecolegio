@@ -1332,12 +1332,14 @@ input NewCampus {
 
 input NewCampusAdministrator {
   campusId: String
+  newUser: NewUser
   schoolId: String
   userId: String
 }
 
 input NewCampusCoordinator {
   campusId: String
+  newUser: NewUser
   schoolId: String
   userId: String
 }
@@ -1417,6 +1419,7 @@ input NewGradeAssignment {
 
 input NewGuardian {
   campusId: String
+  newUser: NewUser
   schoolId: String
   studentsId: String
   userId: String
@@ -1495,6 +1498,12 @@ input NewPerformanceLevel {
 }
 
 input NewRole {
+  isCampusAdministrator: Boolean
+  isCampusCoordinator: Boolean
+  isGuardian: Boolean
+  isSchoolAdministrator: Boolean
+  isStudent: Boolean
+  isTeacher: Boolean
   name: String
 }
 
@@ -1504,6 +1513,7 @@ input NewSchool {
 }
 
 input NewSchoolAdministrator {
+  newUser: NewUser
   schoolId: String
   userId: String
 }
@@ -1525,6 +1535,7 @@ input NewSpecialty {
 
 input NewStudent {
   campusId: String
+  newUser: NewUser
   schoolId: String
   userId: String
 }
@@ -1533,6 +1544,7 @@ input NewTeacher {
   assignaturesId: String
   attentionSchedule: String
   campusId: String
+  newUser: NewUser
   schoolId: String
   userId: String
 }
@@ -2160,6 +2172,20 @@ type Query {
     last: Float
     orderCreated: Boolean!
   ): RoleConnection!
+  getAllRoleType(
+    """Paginate after opaque cursor"""
+    after: String
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    type: String!
+  ): RoleConnection!
   getAllSchool(
     """Paginate after opaque cursor"""
     after: String
@@ -2309,6 +2335,12 @@ type Role implements IModelData {
   createdByUser: User
   createdByUserId: String
   id: ID!
+  isCampusAdministrator: Boolean
+  isCampusCoordinator: Boolean
+  isGuardian: Boolean
+  isSchoolAdministrator: Boolean
+  isStudent: Boolean
+  isTeacher: Boolean
   name: String
   updatedAt: DateTime
   updatedByUser: User

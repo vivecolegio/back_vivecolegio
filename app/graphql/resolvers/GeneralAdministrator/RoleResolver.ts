@@ -64,6 +64,80 @@ export class RoleResolver {
     return resultConn;
   }
 
+  @Query(() => RoleConnection)
+  async getAllRoleType(
+    @Args() args: ConnectionArgs,
+    @Arg('type', () => String) type: String
+  ): Promise<RoleConnection> {
+    let result;
+    switch (type) {
+      case 'SchoolAdministrator':
+        result = await this.repository.find({
+          where: {
+            active: true,
+            isSchoolAdministrator: true,
+          },
+          order: { createdAt: 'DESC' },
+        });
+        break;
+      case 'CampusAdministrator':
+        result = await this.repository.find({
+          where: {
+            active: true,
+            isCampusAdministrator: true,
+          },
+          order: { createdAt: 'DESC' },
+        });
+        break;
+      case 'CampusCoordinator':
+        result = await this.repository.find({
+          where: {
+            active: true,
+            isCampusCoordinator: true,
+          },
+          order: { createdAt: 'DESC' },
+        });
+        break;
+      case 'Student':
+        result = await this.repository.find({
+          where: {
+            active: true,
+            isStudent: true,
+          },
+          order: { createdAt: 'DESC' },
+        });
+        break;
+      case 'Teacher':
+        result = await this.repository.find({
+          where: {
+            active: true,
+            isTeacher: true,
+          },
+          order: { createdAt: 'DESC' },
+        });
+        break;
+      case 'Guardian':
+        result = await this.repository.find({
+          where: {
+            active: true,
+            isGuardian: true,
+          },
+          order: { createdAt: 'DESC' },
+        });
+        break;
+    }
+    let resultConn = new RoleConnection();
+    if (result) {
+      let resultConnection = connectionFromArraySlice(result, args, {
+        sliceStart: 0,
+        arrayLength: result.length,
+      });
+      resultConn = { ...resultConnection, totalCount: result.length };
+      return resultConn;
+    }
+    return resultConn;
+  }
+
   @Mutation(() => Role)
   async createRole(@Arg('data') data: NewRole, @Ctx() context: IContext): Promise<Role> {
     let dataProcess: NewRole = removeEmptyStringElements(data);

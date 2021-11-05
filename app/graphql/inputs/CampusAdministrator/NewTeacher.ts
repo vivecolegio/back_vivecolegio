@@ -1,5 +1,6 @@
 import { Field, InputType } from 'type-graphql';
 import { Teacher } from '../../models/CampusAdministrator/Teacher';
+import { NewUser } from '../GeneralAdministrator/NewUser';
 
 @InputType()
 export class NewTeacher implements Partial<Teacher> {
@@ -17,4 +18,7 @@ export class NewTeacher implements Partial<Teacher> {
 
   @Field({ nullable: true })
   attentionSchedule?: string;
+
+  @Field({ nullable: true })
+  newUser?: NewUser;
 }

@@ -1,5 +1,6 @@
 import { Field, InputType } from 'type-graphql';
 import { CampusCoordinator } from '../../models/SchoolAdministrator/CampusCoordinator';
+import { NewUser } from '../GeneralAdministrator/NewUser';
 
 @InputType()
 export class NewCampusCoordinator implements Partial<CampusCoordinator> {
@@ -11,4 +12,7 @@ export class NewCampusCoordinator implements Partial<CampusCoordinator> {
 
   @Field({ nullable: true })
   schoolId?: string;
+
+  @Field({ nullable: true })
+  newUser?: NewUser;
 }
