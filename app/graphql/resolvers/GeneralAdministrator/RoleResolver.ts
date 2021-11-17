@@ -125,6 +125,9 @@ export class RoleResolver {
           order: { createdAt: 'DESC' },
         });
         break;
+      default:
+        result = new Array();
+        break;
     }
     let resultConn = new RoleConnection();
     if (result) {
