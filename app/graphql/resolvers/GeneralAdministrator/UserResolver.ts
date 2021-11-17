@@ -8,14 +8,22 @@ import { InjectRepository } from 'typeorm-typedi-extensions';
 import { removeEmptyStringElements } from '../../../types';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
 import { IContext } from '../../interfaces/IContext';
+import { Guardian } from '../../models/CampusAdministrator/Guardian';
+import { Teacher } from '../../models/CampusAdministrator/Teacher';
 import { DocumentType } from '../../models/GeneralAdministrator/DocumentType';
 import { Gender } from '../../models/GeneralAdministrator/Gender';
 import { Menu } from '../../models/GeneralAdministrator/Menu';
 import { MenuItem } from '../../models/GeneralAdministrator/MenuItem';
 import { Role } from '../../models/GeneralAdministrator/Role';
+import { School } from '../../models/GeneralAdministrator/School';
+import { SchoolAdministrator } from '../../models/GeneralAdministrator/SchoolAdministrator';
+import { Student } from '../../models/GeneralAdministrator/Student';
 import { User, UserConnection } from '../../models/GeneralAdministrator/User';
+import { CampusAdministrator } from '../../models/SchoolAdministrator/CampusAdministrator';
+import { CampusCoordinator } from '../../models/SchoolAdministrator/CampusCoordinator';
 import { Jwt } from '../../modelsUtils/Jwt';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
+import { Campus } from './../../models/GeneralAdministrator/Campus';
 
 const BCRYPT_SALT_ROUNDS = 12;
 
@@ -38,6 +46,30 @@ export class UserResolver {
 
   @InjectRepository(MenuItem)
   private repositoryMenuItem = getMongoRepository(MenuItem);
+
+  @InjectRepository(SchoolAdministrator)
+  private repositorySchoolAdministrator = getMongoRepository(SchoolAdministrator);
+
+  @InjectRepository(CampusAdministrator)
+  private repositoryCampusAdministrator = getMongoRepository(CampusAdministrator);
+
+  @InjectRepository(CampusCoordinator)
+  private repositoryCampusCoordinator = getMongoRepository(CampusCoordinator);
+
+  @InjectRepository(Student)
+  private repositoryStudent = getMongoRepository(Student);
+
+  @InjectRepository(Teacher)
+  private repositoryTeacher = getMongoRepository(Teacher);
+
+  @InjectRepository(Guardian)
+  private repositoryGuardian = getMongoRepository(Guardian);
+
+  @InjectRepository(Campus)
+  private repositoryCampus = getMongoRepository(Campus);
+
+  @InjectRepository(School)
+  private repositorySchool = getMongoRepository(School);
 
   @Query(() => User, { nullable: true })
   async getUser(@Arg('id', () => String) id: string) {
@@ -222,9 +254,71 @@ export class UserResolver {
       if (user) {
         jwtUtil.name = user.name + ' ' + user.lastName;
         jwtUtil.userId = user.id;
-        user.roleId
-          ? (jwtUtil.role = (await this.repositoryRole.findOne(user.roleId)) as Role)
-          : null;
+        let role = (await this.repositoryRole.findOne(user.roleId)) as Role;
+        user.roleId ? (jwtUtil.role = role) : null;
+        let campusId;
+        let schoolId;
+        if (role.isSchoolAdministrator) {
+          let userRole = await this.repositorySchoolAdministrator.find({
+            where: { userId: user.id.toString() },
+          });
+          if (userRole && userRole.length > 0) {
+            schoolId = userRole[0].schoolId;
+          }
+        }
+        if (role.isCampusAdministrator) {
+          let userRole = await this.repositoryCampusAdministrator.find({
+            where: { userId: user.id.toString() },
+          });
+          if (userRole && userRole.length > 0) {
+            schoolId = userRole[0].schoolId;
+            campusId = userRole[0].campusId;
+          }
+        }
+        if (role.isCampusCoordinator) {
+          let userRole = await this.repositoryCampusCoordinator.find({
+            where: { userId: user.id.toString() },
+          });
+          if (userRole && userRole.length > 0) {
+            schoolId = userRole[0].schoolId;
+            campusId = userRole[0].campusId;
+          }
+        }
+        if (role.isStudent) {
+          let userRole = await this.repositoryStudent.find({
+            where: { userId: user.id.toString() },
+          });
+          if (userRole && userRole.length > 0) {
+            schoolId = userRole[0].schoolId;
+            campusId = userRole[0].campusId;
+          }
+        }
+        if (role.isTeacher) {
+          let userRole = await this.repositoryTeacher.find({
+            where: { userId: user.id.toString() },
+          });
+          if (userRole && userRole.length > 0) {
+            schoolId = userRole[0].schoolId;
+            campusId = userRole[0].campusId;
+          }
+        }
+        if (role.isGuardian) {
+          let userRole = await this.repositoryGuardian.find({
+            where: { userId: user.id.toString() },
+          });
+          if (userRole && userRole.length > 0) {
+            schoolId = userRole[0].schoolId;
+            campusId = userRole[0].campusId;
+          }
+        }
+        let campus = await this.repositoryCampus.findOne(campusId);
+        let school = await this.repositorySchool.findOne(schoolId);
+        if (campus) {
+          jwtUtil.campus = [campus];
+        }
+        if (school) {
+          jwtUtil.schools = [school];
+        }
         if (user.roleId) {
           let menus = await this.repositoryMenu.find({
             where: { rolesId: { $in: [user.roleId] }, active: true },
@@ -257,9 +351,71 @@ export class UserResolver {
     if (user) {
       jwtUtil.name = user.name + ' ' + user.lastName;
       jwtUtil.userId = user.id;
-      user.roleId
-        ? (jwtUtil.role = (await this.repositoryRole.findOne(user.roleId)) as Role)
-        : null;
+      let role = (await this.repositoryRole.findOne(user.roleId)) as Role;
+      user.roleId ? (jwtUtil.role = role) : null;
+      let campusId;
+      let schoolId;
+      if (role.isSchoolAdministrator) {
+        let userRole = await this.repositorySchoolAdministrator.find({
+          where: { userId: user.id.toString() },
+        });
+        if (userRole && userRole.length > 0) {
+          schoolId = userRole[0].schoolId;
+        }
+      }
+      if (role.isCampusAdministrator) {
+        let userRole = await this.repositoryCampusAdministrator.find({
+          where: { userId: user.id.toString() },
+        });
+        if (userRole && userRole.length > 0) {
+          schoolId = userRole[0].schoolId;
+          campusId = userRole[0].campusId;
+        }
+      }
+      if (role.isCampusCoordinator) {
+        let userRole = await this.repositoryCampusCoordinator.find({
+          where: { userId: user.id.toString() },
+        });
+        if (userRole && userRole.length > 0) {
+          schoolId = userRole[0].schoolId;
+          campusId = userRole[0].campusId;
+        }
+      }
+      if (role.isStudent) {
+        let userRole = await this.repositoryStudent.find({
+          where: { userId: user.id.toString() },
+        });
+        if (userRole && userRole.length > 0) {
+          schoolId = userRole[0].schoolId;
+          campusId = userRole[0].campusId;
+        }
+      }
+      if (role.isTeacher) {
+        let userRole = await this.repositoryTeacher.find({
+          where: { userId: user.id.toString() },
+        });
+        if (userRole && userRole.length > 0) {
+          schoolId = userRole[0].schoolId;
+          campusId = userRole[0].campusId;
+        }
+      }
+      if (role.isGuardian) {
+        let userRole = await this.repositoryGuardian.find({
+          where: { userId: user.id.toString() },
+        });
+        if (userRole && userRole.length > 0) {
+          schoolId = userRole[0].schoolId;
+          campusId = userRole[0].campusId;
+        }
+      }
+      let campus = await this.repositoryCampus.findOne(campusId);
+      let school = await this.repositorySchool.findOne(schoolId);
+      if (campus) {
+        jwtUtil.campus = [campus];
+      }
+      if (school) {
+        jwtUtil.schools = [school];
+      }
       if (user.roleId) {
         let menus = await this.repositoryMenu.find({
           where: { rolesId: { $in: [user.roleId] }, active: true },
