@@ -5,6 +5,7 @@ import { ApolloServer } from 'apollo-server-express';
 import express from 'express';
 import { applyMiddleware } from 'graphql-middleware';
 import gql from 'graphql-tag';
+import { graphqlUploadExpress } from 'graphql-upload';
 import 'reflect-metadata';
 import { buildSchemaSync, createResolversMap } from 'type-graphql';
 import { createConnections } from 'typeorm';
@@ -236,7 +237,8 @@ const server = new ApolloServer({
 
 const app = express();
 
-//app.use(graphqlUploadExpress({max}))
+app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }))
+
 server.start().then(() => {
   server.applyMiddleware({ app });
 });

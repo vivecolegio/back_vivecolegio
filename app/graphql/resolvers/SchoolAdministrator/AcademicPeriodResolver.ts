@@ -10,7 +10,7 @@ import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import {
   AcademicPeriod,
-  AcademicPeriodConnection,
+  AcademicPeriodConnection
 } from '../../models/SchoolAdministrator/AcademicPeriod';
 import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
@@ -39,21 +39,24 @@ export class AcademicPeriodResolver {
   async getAllAcademicPeriod(
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
-    @Arg('orderCreated', () => Boolean) orderCreated: Boolean
+    @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
+    @Arg('schoolId', () => String) schoolId: String,
   ): Promise<AcademicPeriodConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
         result = await this.repository.find({
+          where: { schoolId },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find();
+        result = await this.repository.find({ where: { schoolId } });
       }
     } else {
       if (orderCreated) {
         result = await this.repository.find({
           where: {
+            schoolId,
             active: true,
           },
           order: { createdAt: 'DESC' },
@@ -61,6 +64,7 @@ export class AcademicPeriodResolver {
       } else {
         result = await this.repository.find({
           where: {
+            schoolId,
             active: true,
           },
         });

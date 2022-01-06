@@ -8,6 +8,8 @@ import Helmet from 'helmet';
 import 'reflect-metadata';
 import { port } from './config/index';
 
+const expressHealthApi = require('express-health-api');
+
 async function app() {
   try {
     const gateway = new ApolloGateway({
@@ -40,6 +42,7 @@ async function app() {
       },
     });
     const app = Express();
+    app.use(expressHealthApi({ apiPath: '/health' }))
     app.use(
       Helmet({
         contentSecurityPolicy: false,

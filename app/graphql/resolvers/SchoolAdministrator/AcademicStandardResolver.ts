@@ -13,7 +13,7 @@ import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicAsignature } from '../../models/SchoolAdministrator/AcademicAsignature';
 import {
   AcademicStandard,
-  AcademicStandardConnection,
+  AcademicStandardConnection
 } from '../../models/SchoolAdministrator/AcademicStandard';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
@@ -47,21 +47,24 @@ export class AcademicStandardResolver {
   async getAllAcademicStandard(
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
-    @Arg('orderCreated', () => Boolean) orderCreated: Boolean
+    @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
+    @Arg('schoolId', () => String) schoolId: String,
   ): Promise<AcademicStandardConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
         result = await this.repository.find({
+          where: { schoolId },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find();
+        result = await this.repository.find({ where: { schoolId } });
       }
     } else {
       if (orderCreated) {
         result = await this.repository.find({
           where: {
+            schoolId,
             active: true,
           },
           order: { createdAt: 'DESC' },
@@ -69,6 +72,7 @@ export class AcademicStandardResolver {
       } else {
         result = await this.repository.find({
           where: {
+            schoolId,
             active: true,
           },
         });

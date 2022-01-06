@@ -10,7 +10,7 @@ import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import {
   EvaluativeComponent,
-  EvaluativeComponentConnection,
+  EvaluativeComponentConnection
 } from '../../models/SchoolAdministrator/EvaluativeComponent';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
@@ -35,21 +35,24 @@ export class EvaluativeComponentResolver {
   async getAllEvaluativeComponent(
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
-    @Arg('orderCreated', () => Boolean) orderCreated: Boolean
+    @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
+    @Arg('schoolId', () => String) schoolId: String,
   ): Promise<EvaluativeComponentConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
         result = await this.repository.find({
+          where: { schoolId },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find();
+        result = await this.repository.find({ where: { schoolId } });
       }
     } else {
       if (orderCreated) {
         result = await this.repository.find({
           where: {
+            schoolId,
             active: true,
           },
           order: { createdAt: 'DESC' },
@@ -57,6 +60,7 @@ export class EvaluativeComponentResolver {
       } else {
         result = await this.repository.find({
           where: {
+            schoolId,
             active: true,
           },
         });

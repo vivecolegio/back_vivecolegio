@@ -202,7 +202,7 @@ export class GuardianResolver {
 
   @FieldResolver((_type) => User, { nullable: true })
   async user(@Root() data: Guardian) {
-    let id = data.schoolId;
+    let id = data.userId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryUser.findOne(id);
       return result;
@@ -222,7 +222,7 @@ export class GuardianResolver {
 
   @FieldResolver((_type) => Campus, { nullable: true })
   async campus(@Root() data: Guardian) {
-    let id = data.schoolId;
+    let id = data.campusId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryCampus.findOne(id);
       return result;

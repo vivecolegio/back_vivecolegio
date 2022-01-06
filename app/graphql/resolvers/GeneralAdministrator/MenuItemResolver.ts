@@ -40,21 +40,24 @@ export class MenuItemResolver {
   async getAllMenuItem(
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
-    @Arg('orderCreated', () => Boolean) orderCreated: Boolean
+    @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
+    @Arg('menuId', () => String) menuId: String,
   ): Promise<MenuItemConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
         result = await this.repository.find({
+          where: { menuId },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find();
+        result = await this.repository.find({ where: { menuId } });
       }
     } else {
       if (orderCreated) {
         result = await this.repository.find({
           where: {
+            menuId,
             active: true,
           },
           order: { createdAt: 'DESC' },
@@ -62,6 +65,7 @@ export class MenuItemResolver {
       } else {
         result = await this.repository.find({
           where: {
+            menuId,
             active: true,
           },
         });

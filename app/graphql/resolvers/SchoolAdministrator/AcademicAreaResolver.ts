@@ -11,7 +11,7 @@ import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import {
   AcademicArea,
-  AcademicAreaConnection,
+  AcademicAreaConnection
 } from '../../models/SchoolAdministrator/AcademicArea';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
@@ -39,21 +39,26 @@ export class AcademicAreaResolver {
   async getAllAcademicArea(
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
-    @Arg('orderCreated', () => Boolean) orderCreated: Boolean
+    @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
+    @Arg('schoolId', () => String) schoolId: String,
   ): Promise<AcademicAreaConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
         result = await this.repository.find({
+          where: {
+            schoolId,
+          },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find();
+        result = await this.repository.find({ where: { schoolId } });
       }
     } else {
       if (orderCreated) {
         result = await this.repository.find({
           where: {
+            schoolId,
             active: true,
           },
           order: { createdAt: 'DESC' },
@@ -61,6 +66,7 @@ export class AcademicAreaResolver {
       } else {
         result = await this.repository.find({
           where: {
+            schoolId,
             active: true,
           },
         });

@@ -1,7 +1,9 @@
 import bcrypt from 'bcrypt';
 import { connectionFromArraySlice } from 'graphql-relay';
+import { FileUpload, GraphQLUpload } from 'graphql-upload';
 import jsonwebtoken from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
+import { finished } from 'stream/promises';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
@@ -26,6 +28,7 @@ import { ConnectionArgs } from '../../pagination/relaySpecs';
 import { Campus } from './../../models/GeneralAdministrator/Campus';
 
 const BCRYPT_SALT_ROUNDS = 12;
+
 
 @Resolver(User)
 export class UserResolver {
@@ -436,5 +439,24 @@ export class UserResolver {
       }
     }
     return jwtUtil;
+  }
+
+  @Mutation(() => Boolean)
+  async singleUpload(@Arg('id', () => String) id: string, @Arg("file", () => GraphQLUpload, { nullable: true }) file: FileUpload) {
+    if (file?.filename) {
+      var fs = require('fs');
+      var dir = './uploads/users/profile/' + id;
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      const stream = file?.createReadStream();
+      const out = fs.createWriteStream(dir + file?.filename);
+      stream.pipe(out);
+      await finished(out);
+      // return { filename, mimetype, encoding };
+      return true;
+    } else {
+      return false;
+    }
   }
 }

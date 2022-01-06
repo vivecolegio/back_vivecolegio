@@ -12,7 +12,7 @@ import { AcademicAsignature } from '../../models/SchoolAdministrator/AcademicAsi
 import { AcademicGrade } from '../../models/SchoolAdministrator/AcademicGrade';
 import {
   AcademicIndicator,
-  AcademicIndicatorConnection,
+  AcademicIndicatorConnection
 } from '../../models/SchoolAdministrator/AcademicIndicator';
 import { AcademicStandard } from '../../models/SchoolAdministrator/AcademicStandard';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
@@ -47,21 +47,24 @@ export class AcademicIndicatorResolver {
   async getAllAcademicIndicator(
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
-    @Arg('orderCreated', () => Boolean) orderCreated: Boolean
+    @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
+    @Arg('schoolId', () => String) schoolId: String,
   ): Promise<AcademicIndicatorConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
         result = await this.repository.find({
+          where: { schoolId },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find();
+        result = await this.repository.find({ where: { schoolId } });
       }
     } else {
       if (orderCreated) {
         result = await this.repository.find({
           where: {
+            schoolId,
             active: true,
           },
           order: { createdAt: 'DESC' },
@@ -69,6 +72,7 @@ export class AcademicIndicatorResolver {
       } else {
         result = await this.repository.find({
           where: {
+            schoolId,
             active: true,
           },
         });

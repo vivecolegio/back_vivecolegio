@@ -12,7 +12,7 @@ import { AcademicAsignature } from '../../models/SchoolAdministrator/AcademicAsi
 import { AcademicGrade } from '../../models/SchoolAdministrator/AcademicGrade';
 import {
   GradeAssignment,
-  GradeAssignmentConnection,
+  GradeAssignmentConnection
 } from '../../models/SchoolAdministrator/GradeAssignment';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
@@ -43,21 +43,24 @@ export class GradeAssignmentResolver {
   async getAllGradeAssignment(
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
-    @Arg('orderCreated', () => Boolean) orderCreated: Boolean
+    @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
+    @Arg('schoolId', () => String) schoolId: String,
   ): Promise<GradeAssignmentConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
         result = await this.repository.find({
+          where: { schoolId },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find();
+        result = await this.repository.find({ where: { schoolId } });
       }
     } else {
       if (orderCreated) {
         result = await this.repository.find({
           where: {
+            schoolId,
             active: true,
           },
           order: { createdAt: 'DESC' },
@@ -65,6 +68,7 @@ export class GradeAssignmentResolver {
       } else {
         result = await this.repository.find({
           where: {
+            schoolId,
             active: true,
           },
         });

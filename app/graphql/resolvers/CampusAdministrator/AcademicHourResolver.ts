@@ -9,7 +9,7 @@ import { IContext } from '../../interfaces/IContext';
 import { AcademicDay } from '../../models/CampusAdministrator/AcademicDay';
 import {
   AcademicHour,
-  AcademicHourConnection,
+  AcademicHourConnection
 } from '../../models/CampusAdministrator/AcademicHour';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { User } from '../../models/GeneralAdministrator/User';
@@ -39,21 +39,30 @@ export class AcademicHourResolver {
   async getAllAcademicHour(
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
-    @Arg('orderCreated', () => Boolean) orderCreated: Boolean
+    @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
+    @Arg('campusId', () => String) campusId: String,
   ): Promise<AcademicHourConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
         result = await this.repository.find({
+          where: {
+            campusId
+          },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find();
+        result = await this.repository.find({
+          where: {
+            campusId
+          },
+        });
       }
     } else {
       if (orderCreated) {
         result = await this.repository.find({
           where: {
+            campusId,
             active: true,
           },
           order: { createdAt: 'DESC' },
@@ -61,6 +70,7 @@ export class AcademicHourResolver {
       } else {
         result = await this.repository.find({
           where: {
+            campusId,
             active: true,
           },
         });

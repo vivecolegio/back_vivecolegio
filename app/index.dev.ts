@@ -1,19 +1,23 @@
-import { ApolloGateway, RemoteGraphQLDataSource } from '@apollo/gateway';
+import { ApolloGateway } from '@apollo/gateway';
+import FileUploadDataSource from '@profusion/apollo-federation-upload';
 import { ApolloServerPluginInlineTraceDisabled } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import Cors from 'cors';
 import Express from 'express';
 import expressJwt from 'express-jwt';
+import { graphqlUploadExpress } from 'graphql-upload';
 import Helmet from 'helmet';
 import 'reflect-metadata';
 import { port } from './config/index';
+
+const expressHealthApi = require('express-health-api');
 
 async function app() {
   try {
     const gateway = new ApolloGateway({
       serviceList: [{ name: 'servers', url: 'http://localhost:4001/graphql' }],
       buildService({ url }: any) {
-        return new RemoteGraphQLDataSource({
+        return new FileUploadDataSource({
           url,
           willSendRequest({ request, context }: any) {
             request.http.headers.set('user', context.user ? JSON.stringify(context.user) : null);
@@ -39,6 +43,8 @@ async function app() {
       },
     });
     const app = Express();
+    app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }))
+    app.use(expressHealthApi({ apiPath: '/health' }))
     app.use(
       Helmet({
         contentSecurityPolicy: false,

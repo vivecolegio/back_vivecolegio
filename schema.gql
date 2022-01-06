@@ -1211,6 +1211,7 @@ type Mutation {
   deleteTeacher(id: String!): Boolean!
   deleteUser(id: String!): Boolean!
   login(password: String!, username: String!): Jwt!
+  singleUpload(file: Upload, id: String!): Boolean!
   updateAcademicArea(data: NewAcademicArea!, id: String!): AcademicArea!
   updateAcademicAsignature(data: NewAcademicAsignature!, id: String!): AcademicAsignature!
   updateAcademicDay(data: NewAcademicDay!, id: String!): AcademicDay!
@@ -1661,6 +1662,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    schoolId: String!
   ): AcademicAreaConnection!
   getAllAcademicAsignature(
     """Paginate after opaque cursor"""
@@ -1676,6 +1678,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    schoolId: String!
   ): AcademicAsignatureConnection!
   getAllAcademicDay(
     """Paginate after opaque cursor"""
@@ -1684,6 +1687,7 @@ type Query {
 
     """Paginate before opaque cursor"""
     before: String
+    campusId: String!
 
     """Paginate first"""
     first: Float
@@ -1706,6 +1710,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    schoolId: String!
   ): AcademicGradeConnection!
   getAllAcademicHour(
     """Paginate after opaque cursor"""
@@ -1714,6 +1719,7 @@ type Query {
 
     """Paginate before opaque cursor"""
     before: String
+    campusId: String!
 
     """Paginate first"""
     first: Float
@@ -1736,6 +1742,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    schoolId: String!
   ): AcademicIndicatorConnection!
   getAllAcademicPeriod(
     """Paginate after opaque cursor"""
@@ -1751,6 +1758,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    schoolId: String!
   ): AcademicPeriodConnection!
   getAllAcademicStandard(
     """Paginate after opaque cursor"""
@@ -1766,6 +1774,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    schoolId: String!
   ): AcademicStandardConnection!
   getAllAuditLogin(
     """Paginate after opaque cursor"""
@@ -1796,6 +1805,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    schoolId: String!
   ): CampusConnection!
   getAllCampusAdministrator(
     """Paginate after opaque cursor"""
@@ -1811,6 +1821,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    schoolId: String!
   ): CampusAdministratorConnection!
   getAllCampusCoordinator(
     """Paginate after opaque cursor"""
@@ -1826,6 +1837,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    schoolId: String!
   ): CampusCoordinatorConnection!
   getAllCourse(
     """Paginate after opaque cursor"""
@@ -1834,6 +1846,7 @@ type Query {
 
     """Paginate before opaque cursor"""
     before: String
+    campusId: String!
 
     """Paginate first"""
     first: Float
@@ -1871,6 +1884,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    schoolId: String!
   ): EducationLevelConnection!
   getAllEmail(
     """Paginate after opaque cursor"""
@@ -1901,6 +1915,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    schoolId: String!
   ): EvaluativeComponentConnection!
   getAllGender(
     """Paginate after opaque cursor"""
@@ -2021,6 +2036,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    schoolId: String!
   ): GradeAssignmentConnection!
   getAllGuardian(
     """Paginate after opaque cursor"""
@@ -2080,6 +2096,7 @@ type Query {
 
     """Paginate last"""
     last: Float
+    menuId: String!
     orderCreated: Boolean!
   ): MenuItemConnection!
   getAllModality(
@@ -2096,6 +2113,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    schoolId: String!
   ): ModalityConnection!
   getAllModule(
     """Paginate after opaque cursor"""
@@ -2156,6 +2174,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    schoolId: String!
   ): PerformanceLevelConnection!
   getAllRole(
     """Paginate after opaque cursor"""
@@ -2215,6 +2234,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    schoolId: String!
   ): SchoolAdministratorConnection!
   getAllSchoolYear(
     """Paginate after opaque cursor"""
@@ -2230,6 +2250,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    schoolId: String!
   ): SchoolYearConnection!
   getAllSpecialty(
     """Paginate after opaque cursor"""
@@ -2245,6 +2266,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    schoolId: String!
   ): SpecialtyConnection!
   getAllStudent(
     """Paginate after opaque cursor"""
@@ -2253,6 +2275,7 @@ type Query {
 
     """Paginate before opaque cursor"""
     before: String
+    campusId: String!
 
     """Paginate first"""
     first: Float
@@ -2260,6 +2283,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    schoolId: String!
   ): StudentConnection!
   getAllTeacher(
     """Paginate after opaque cursor"""
@@ -2555,6 +2579,9 @@ type TeacherEdge {
   cursor: String!
   node: Teacher!
 }
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
 
 """The User model"""
 type User {
