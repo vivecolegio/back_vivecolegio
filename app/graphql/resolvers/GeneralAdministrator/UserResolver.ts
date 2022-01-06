@@ -445,12 +445,12 @@ export class UserResolver {
   async singleUpload(@Arg('id', () => String) id: string, @Arg("file", () => GraphQLUpload, { nullable: true }) file: FileUpload) {
     if (file?.filename) {
       var fs = require('fs');
-      var dir = './uploads/users/profile/' + id;
+      var dir = './public/uploads/users/profile/' + id;
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
       const stream = file?.createReadStream();
-      const out = fs.createWriteStream(dir + file?.filename);
+      const out = fs.createWriteStream(dir + "/" + file?.filename);
       stream.pipe(out);
       await finished(out);
       // return { filename, mimetype, encoding };

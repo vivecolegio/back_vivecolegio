@@ -7,6 +7,7 @@ import Express from 'express';
 import expressJwt from 'express-jwt';
 import { graphqlUploadExpress } from 'graphql-upload';
 import Helmet from 'helmet';
+import path from 'path';
 import 'reflect-metadata';
 import { port } from './config/index';
 
@@ -45,6 +46,7 @@ async function app() {
     const app = Express();
     app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }))
     app.use(expressHealthApi({ apiPath: '/health' }))
+    app.use('/public', Express.static(path.join(__dirname, '../public')));
     app.use(
       Helmet({
         contentSecurityPolicy: false,
