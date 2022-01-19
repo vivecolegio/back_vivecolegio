@@ -8,7 +8,7 @@ export class NewTeacher implements Partial<Teacher> {
   schoolId?: string;
 
   @Field({ nullable: true })
-  campusId?: string;
+  campusId?: String[];
 
   @Field({ nullable: true })
   userId?: string;

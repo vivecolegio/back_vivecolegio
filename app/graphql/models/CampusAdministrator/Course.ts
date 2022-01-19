@@ -13,10 +13,15 @@ export class Course extends IModelData {
 
   @Field({ nullable: true })
   campus?: Campus;
+
+  nombre
+  orden
+  nivelEduticativo
+  Especialidad
 }
 
 @ObjectType()
-export class CourseEdge extends EdgeType('Course', Course) {}
+export class CourseEdge extends EdgeType('Course', Course) { }
 
 @ObjectType()
-export class CourseConnection extends ConnectionType<CourseEdge>('Course', CourseEdge) {}
+export class CourseConnection extends ConnectionType<CourseEdge>('Course', CourseEdge) { }

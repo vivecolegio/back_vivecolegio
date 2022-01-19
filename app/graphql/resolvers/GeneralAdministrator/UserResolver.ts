@@ -399,7 +399,7 @@ export class UserResolver {
         });
         if (userRole && userRole.length > 0) {
           schoolId = userRole[0].schoolId;
-          campusId = userRole[0].campusId;
+          campusId = userRole[0].campusId !== undefined ? userRole[0].campusId[0] : "";
         }
       }
       if (role.isGuardian) {

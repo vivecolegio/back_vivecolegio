@@ -16,12 +16,12 @@ export class Teacher extends IModelData {
   @Field({ nullable: true })
   school?: School;
 
-  @Field({ nullable: true })
+  @Field(() => [String], { nullable: true })
   @Column({ nullable: true })
-  campusId?: string;
+  campusId?: String[];
 
-  @Field({ nullable: true })
-  campus?: Campus;
+  @Field(() => [Campus], { nullable: true })
+  campus?: Campus[];
 
   @Field({ nullable: true })
   @Column({ nullable: true })
@@ -40,7 +40,7 @@ export class Teacher extends IModelData {
 }
 
 @ObjectType()
-export class TeacherEdge extends EdgeType('Teacher', Teacher) {}
+export class TeacherEdge extends EdgeType('Teacher', Teacher) { }
 
 @ObjectType()
-export class TeacherConnection extends ConnectionType<TeacherEdge>('Teacher', TeacherEdge) {}
+export class TeacherConnection extends ConnectionType<TeacherEdge>('Teacher', TeacherEdge) { }
