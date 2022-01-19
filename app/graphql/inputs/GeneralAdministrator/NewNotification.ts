@@ -4,7 +4,7 @@ import { Notification } from '../../models/GeneralAdministrator/Notification';
 @InputType()
 export class NewNotification implements Partial<Notification> {
   @Field({ nullable: true })
-  toId?: string;
+  userId?: string;
 
   @Field({ nullable: true })
   title?: string;

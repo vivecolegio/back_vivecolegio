@@ -8,11 +8,11 @@ export abstract class IModelSchoolData {
   @ObjectIdColumn()
   id!: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @Column({ nullable: true })
   schoolId?: string;
 
-  @Field({ nullable: true })
+  @Field(() => School, { nullable: true })
   school?: School;
 
   @Field({ nullable: true })

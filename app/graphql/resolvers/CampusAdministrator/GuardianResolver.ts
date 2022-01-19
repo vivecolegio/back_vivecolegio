@@ -210,21 +210,21 @@ export class GuardianResolver {
     return null;
   }
 
-  @FieldResolver((_type) => School, { nullable: true })
+  @FieldResolver((_type) => [School], { nullable: true })
   async school(@Root() data: Guardian) {
     let id = data.schoolId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositorySchool.findOne(id);
+      const result = await this.repositorySchool.find({ where: { _id: { $in: id } } });
       return result;
     }
     return null;
   }
 
-  @FieldResolver((_type) => Campus, { nullable: true })
+  @FieldResolver((_type) => [Campus], { nullable: true })
   async campus(@Root() data: Guardian) {
     let id = data.campusId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryCampus.findOne(id);
+      const result = await this.repositoryCampus.find({ where: { _id: { $in: id } } });
       return result;
     }
     return null;

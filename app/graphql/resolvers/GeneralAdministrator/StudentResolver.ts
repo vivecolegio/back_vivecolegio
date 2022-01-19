@@ -208,7 +208,7 @@ export class StudentResolver {
   async school(@Root() data: Student) {
     let id = data.schoolId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositorySchool.findOne(id);
+      const result = await this.repositorySchool.find({ where: { _id: { $in: id } } });
       return result;
     }
     return null;
@@ -218,7 +218,7 @@ export class StudentResolver {
   async campus(@Root() data: Student) {
     let id = data.campusId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryCampus.findOne(id);
+      const result = await this.repositoryCampus.find({ where: { _id: { $in: id } } });
       return result;
     }
     return null;

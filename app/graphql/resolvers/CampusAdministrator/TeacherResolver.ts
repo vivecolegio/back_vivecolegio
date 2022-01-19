@@ -41,28 +41,28 @@ export class TeacherResolver {
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
-    @Arg('schoolId', () => String) schoolId: String,
-    @Arg('campusId', () => String, { nullable: true }) campusId: String,
+    @Arg('schoolId', () => [String]) schoolId: String[],
+    @Arg('campusId', () => [String], { nullable: true }) campusId: String[],
   ): Promise<TeacherConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
         if (campusId) {
           result = await this.repository.find({
-            where: { schoolId, campusId: { $in: [campusId] } },
+            where: { schoolId: { $in: [schoolId] }, campusId: { $in: [campusId] } },
             order: { createdAt: 'DESC' },
           });
         } else {
           result = await this.repository.find({
-            where: { schoolId },
+            where: { schoolId: { $in: [schoolId] } },
             order: { createdAt: 'DESC' },
           });
         }
       } else {
         if (campusId) {
-          result = await this.repository.find({ where: { schoolId, campusId: { $in: [campusId] } } });
+          result = await this.repository.find({ where: { schoolId: { $in: [schoolId] }, campusId: { $in: [campusId] } } });
         } else {
-          result = await this.repository.find({ where: { schoolId } });
+          result = await this.repository.find({ where: { schoolId: { $in: [schoolId] } } });
         }
       }
     } else {
@@ -70,7 +70,7 @@ export class TeacherResolver {
         if (campusId) {
           result = await this.repository.find({
             where: {
-              schoolId,
+              schoolId: { $in: [schoolId] },
               campusId: { $in: [campusId] },
               active: true,
             },
@@ -79,7 +79,7 @@ export class TeacherResolver {
         } else {
           result = await this.repository.find({
             where: {
-              schoolId,
+              schoolId: { $in: [schoolId] },
               active: true,
             },
             order: { createdAt: 'DESC' },
@@ -89,7 +89,7 @@ export class TeacherResolver {
         if (campusId) {
           result = await this.repository.find({
             where: {
-              schoolId,
+              schoolId: { $in: [schoolId] },
               campusId: { $in: [campusId] },
               active: true,
             },
@@ -248,7 +248,7 @@ export class TeacherResolver {
   async school(@Root() data: Teacher) {
     let id = data.schoolId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositorySchool.findOne(id);
+      const result = await this.repositorySchool.find({ where: { _id: { $in: id } } });
       return result;
     }
     return null;
@@ -256,13 +256,9 @@ export class TeacherResolver {
 
   @FieldResolver((_type) => [Campus], { nullable: true })
   async campus(@Root() data: Teacher) {
-    let ids = data.campusId;
-    if (ids !== null && ids !== undefined) {
-      let dataIds: any[] = [];
-      ids.forEach(async (id: any) => {
-        dataIds.push(new ObjectId(id));
-      });
-      const result = await this.repositoryCampus.find({ where: { _id: { $in: dataIds } } });
+    let id = data.campusId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryCampus.find({ where: { _id: { $in: id } } });
       return result;
     }
     return null;

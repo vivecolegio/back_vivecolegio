@@ -314,13 +314,17 @@ export class UserResolver {
             campusId = userRole[0].campusId;
           }
         }
-        let campus = await this.repositoryCampus.findOne(campusId);
-        let school = await this.repositorySchool.findOne(schoolId);
+        let campus = await this.repositoryCampus.find({
+          where: { _id: { $in: campusId } },
+        });
+        let school = await this.repositorySchool.find({
+          where: { _id: { $in: schoolId } },
+        });
         if (campus) {
-          jwtUtil.campus = [campus];
+          jwtUtil.campus = campus;
         }
         if (school) {
-          jwtUtil.schools = [school];
+          jwtUtil.schools = school;
         }
         if (user.roleId) {
           let menus = await this.repositoryMenu.find({
@@ -399,7 +403,7 @@ export class UserResolver {
         });
         if (userRole && userRole.length > 0) {
           schoolId = userRole[0].schoolId;
-          campusId = userRole[0].campusId !== undefined ? userRole[0].campusId[0] : "";
+          campusId = userRole[0].campusId;
         }
       }
       if (role.isGuardian) {
@@ -411,13 +415,17 @@ export class UserResolver {
           campusId = userRole[0].campusId;
         }
       }
-      let campus = await this.repositoryCampus.findOne(campusId);
-      let school = await this.repositorySchool.findOne(schoolId);
+      let campus = await this.repositoryCampus.find({
+        where: { _id: { $in: campusId } },
+      });
+      let school = await this.repositorySchool.find({
+        where: { _id: { $in: schoolId } },
+      });
       if (campus) {
-        jwtUtil.campus = [campus];
+        jwtUtil.campus = campus;
       }
       if (school) {
-        jwtUtil.schools = [school];
+        jwtUtil.schools = school;
       }
       if (user.roleId) {
         let menus = await this.repositoryMenu.find({

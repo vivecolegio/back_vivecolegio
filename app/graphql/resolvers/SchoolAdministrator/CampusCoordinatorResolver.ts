@@ -211,7 +211,7 @@ export class CampusCoordinatorResolver {
   async campus(@Root() data: CampusCoordinator) {
     let id = data.campusId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryCampus.findOne(id);
+      const result = await this.repositoryCampus.find({ where: { _id: { $in: id } } });
       return result;
     }
     return null;
@@ -221,7 +221,7 @@ export class CampusCoordinatorResolver {
   async school(@Root() data: CampusCoordinator) {
     let id = data.schoolId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositorySchool.findOne(id);
+      const result = await this.repositorySchool.find({ where: { _id: { $in: id } } });
       return result;
     }
     return null;

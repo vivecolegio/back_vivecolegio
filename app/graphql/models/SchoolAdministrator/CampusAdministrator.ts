@@ -1,19 +1,27 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Column, Entity } from 'typeorm';
-import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
+import { IModelData } from '../../interfaces/IModelData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { Campus } from '../GeneralAdministrator/Campus';
+import { School } from '../GeneralAdministrator/School';
 import { User } from '../GeneralAdministrator/User';
 
-@ObjectType({ description: 'The CampusAdministrator model', implements: IModelSchoolData })
+@ObjectType({ description: 'The CampusAdministrator model', implements: IModelData })
 @Entity()
-export class CampusAdministrator extends IModelSchoolData {
-  @Field({ nullable: true })
+export class CampusAdministrator extends IModelData {
+  @Field(() => [String], { nullable: true })
   @Column({ nullable: true })
-  campusId?: string;
+  schoolId?: String[];
 
-  @Field({ nullable: true })
-  campus?: Campus;
+  @Field(() => [School], { nullable: true })
+  school?: School[];
+
+  @Field(() => [String], { nullable: true })
+  @Column({ nullable: true })
+  campusId?: String[];
+
+  @Field(() => [Campus], { nullable: true })
+  campus?: Campus[];
 
   @Field({ nullable: true })
   @Column({ nullable: true })
@@ -24,10 +32,10 @@ export class CampusAdministrator extends IModelSchoolData {
 }
 
 @ObjectType()
-export class CampusAdministratorEdge extends EdgeType('CampusAdministrator', CampusAdministrator) {}
+export class CampusAdministratorEdge extends EdgeType('CampusAdministrator', CampusAdministrator) { }
 
 @ObjectType()
 export class CampusAdministratorConnection extends ConnectionType<CampusAdministratorEdge>(
   'CampusAdministrator',
   CampusAdministratorEdge
-) {}
+) { }

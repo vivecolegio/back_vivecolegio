@@ -328,16 +328,16 @@ type Campus implements IModelData {
 }
 
 """The CampusAdministrator model"""
-type CampusAdministrator implements IModelSchoolData {
+type CampusAdministrator implements IModelData {
   active: Boolean
-  campus: Campus
-  campusId: String
+  campus: [Campus!]
+  campusId: [String!]
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
   id: ID!
-  school: School
-  schoolId: String
+  school: [School!]
+  schoolId: [String!]
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -369,16 +369,16 @@ type CampusConnection {
 }
 
 """The CampusCoordinator model"""
-type CampusCoordinator implements IModelSchoolData {
+type CampusCoordinator implements IModelData {
   active: Boolean
-  campus: Campus
-  campusId: String
+  campus: [Campus!]
+  campusId: [String!]
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
   id: ID!
-  school: School
-  schoolId: String
+  school: [School!]
+  schoolId: [String!]
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -409,6 +409,8 @@ type CampusEdge {
 
 """The Course model"""
 type Course implements IModelData {
+  academicGrade: AcademicGrade
+  academicGradeId: String
   active: Boolean
   campus: Campus
   campusId: String
@@ -416,6 +418,8 @@ type Course implements IModelData {
   createdByUser: User
   createdByUserId: String
   id: ID!
+  name: String
+  order: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -811,14 +815,14 @@ type GradeAssignmentEdge {
 """The Guardian model"""
 type Guardian implements IModelData {
   active: Boolean
-  campus: Campus
-  campusId: String
+  campus: [Campus!]
+  campusId: [String!]
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
   id: ID!
-  school: School
-  schoolId: String
+  school: [School!]
+  schoolId: [String!]
   studentsId: String
   updatedAt: DateTime
   updatedByUser: User
@@ -877,11 +881,11 @@ type Inbox implements IModelData {
   id: ID!
   message: String
   title: String
-  to: User
-  toId: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
+  user: User
+  userId: String
   version: Float
 }
 
@@ -1332,21 +1336,24 @@ input NewCampus {
 }
 
 input NewCampusAdministrator {
-  campusId: String
+  campusId: [String!]
   newUser: NewUser
-  schoolId: String
+  schoolId: [String!]
   userId: String
 }
 
 input NewCampusCoordinator {
-  campusId: String
+  campusId: [String!]
   newUser: NewUser
-  schoolId: String
+  schoolId: [String!]
   userId: String
 }
 
 input NewCourse {
+  academicGradeId: String
   campusId: String
+  name: String
+  order: String
 }
 
 input NewDocumentType {
@@ -1419,9 +1426,9 @@ input NewGradeAssignment {
 }
 
 input NewGuardian {
-  campusId: String
+  campusId: [String!]
   newUser: NewUser
-  schoolId: String
+  schoolId: [String!]
   studentsId: String
   userId: String
 }
@@ -1432,7 +1439,7 @@ input NewInbox {
   fromId: String
   message: String
   title: String
-  toId: String
+  userId: String
 }
 
 input NewMenu {
@@ -1487,7 +1494,7 @@ input NewNotification {
   dateSend: DateTime
   message: String
   title: String
-  toId: String
+  userId: String
 }
 
 input NewPerformanceLevel {
@@ -1515,7 +1522,7 @@ input NewSchool {
 
 input NewSchoolAdministrator {
   newUser: NewUser
-  schoolId: String
+  schoolId: [String!]
   userId: String
 }
 
@@ -1535,18 +1542,20 @@ input NewSpecialty {
 }
 
 input NewStudent {
-  campusId: String
+  academicGradeId: String
+  campusId: [String!]
+  courseId: String
   newUser: NewUser
-  schoolId: String
+  schoolId: [String!]
   userId: String
 }
 
 input NewTeacher {
   assignaturesId: String
   attentionSchedule: String
-  campusId: String
+  campusId: [String!]
   newUser: NewUser
-  schoolId: String
+  schoolId: [String!]
   userId: String
 }
 
@@ -1576,11 +1585,11 @@ type Notification implements IModelData {
   id: ID!
   message: String
   title: String
-  to: User
-  toId: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
+  user: User
+  userId: String
   version: Float
 }
 
@@ -1840,6 +1849,8 @@ type Query {
     schoolId: String!
   ): CampusCoordinatorConnection!
   getAllCourse(
+    academicGradeId: String!
+
     """Paginate after opaque cursor"""
     after: String
     allData: Boolean!
@@ -2067,6 +2078,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    userId: String!
   ): InboxConnection!
   getAllMenu(
     """Paginate after opaque cursor"""
@@ -2159,6 +2171,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    userId: String!
   ): NotificationConnection!
   getAllPerformanceLevel(
     """Paginate after opaque cursor"""
@@ -2292,6 +2305,7 @@ type Query {
 
     """Paginate before opaque cursor"""
     before: String
+    campusId: [String!]
 
     """Paginate first"""
     first: Float
@@ -2299,6 +2313,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    schoolId: [String!]!
   ): TeacherConnection!
   getAllUser(
     """Paginate after opaque cursor"""
@@ -2404,12 +2419,14 @@ type School implements IModelData {
 """The SchoolAdministrator model"""
 type SchoolAdministrator implements IModelData {
   active: Boolean
+  campus: [Campus!]
+  campusId: [String!]
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
   id: ID!
-  school: School
-  schoolId: String
+  school: [School!]
+  schoolId: [String!]
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -2514,15 +2531,19 @@ type SpecialtyEdge {
 
 """The Student model"""
 type Student implements IModelData {
+  academicGrade: AcademicGrade
+  academicGradeId: String
   active: Boolean
-  campus: Campus
-  campusId: String
+  campus: [Campus!]
+  campusId: [String!]
+  course: Course
+  courseId: String
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
   id: ID!
-  school: School
-  schoolId: String
+  school: [School!]
+  schoolId: [String!]
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -2550,14 +2571,14 @@ type Teacher implements IModelData {
   active: Boolean
   assignaturesId: String
   attentionSchedule: String
-  campus: Campus
-  campusId: String
+  campus: [Campus!]
+  campusId: [String!]
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
   id: ID!
-  school: School
-  schoolId: String
+  school: [School!]
+  schoolId: [String!]
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String

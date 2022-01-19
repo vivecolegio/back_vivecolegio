@@ -207,7 +207,7 @@ export class SchoolAdministratorResolver {
   async school(@Root() data: SchoolAdministrator) {
     let id = data.schoolId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositorySchool.findOne(id);
+      const result = await this.repositorySchool.find({ where: { _id: { $in: id } } });
       return result;
     }
     return null;

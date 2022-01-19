@@ -9,19 +9,19 @@ import { User } from '../GeneralAdministrator/User';
 @ObjectType({ description: 'The Guardian model', implements: IModelData })
 @Entity()
 export class Guardian extends IModelData {
-  @Field({ nullable: true })
+  @Field(() => [String], { nullable: true })
   @Column({ nullable: true })
-  schoolId?: string;
+  schoolId?: String[];
 
-  @Field({ nullable: true })
-  school?: School;
+  @Field(() => [School], { nullable: true })
+  school?: School[];
 
-  @Field({ nullable: true })
+  @Field(() => [String], { nullable: true })
   @Column({ nullable: true })
-  campusId?: string;
+  campusId?: String[];
 
-  @Field({ nullable: true })
-  campus?: Campus;
+  @Field(() => [Campus], { nullable: true })
+  campus?: Campus[];
 
   @Field({ nullable: true })
   @Column({ nullable: true })
@@ -36,7 +36,7 @@ export class Guardian extends IModelData {
 }
 
 @ObjectType()
-export class GuardianEdge extends EdgeType('Guardian', Guardian) {}
+export class GuardianEdge extends EdgeType('Guardian', Guardian) { }
 
 @ObjectType()
-export class GuardianConnection extends ConnectionType<GuardianEdge>('Guardian', GuardianEdge) {}
+export class GuardianConnection extends ConnectionType<GuardianEdge>('Guardian', GuardianEdge) { }

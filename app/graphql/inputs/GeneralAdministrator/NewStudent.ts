@@ -4,11 +4,17 @@ import { NewUser } from './NewUser';
 
 @InputType()
 export class NewStudent implements Partial<Student> {
-  @Field({ nullable: true })
-  schoolId?: string;
+  @Field(() => [String], { nullable: true })
+  schoolId?: string[];
+
+  @Field(() => [String], { nullable: true })
+  campusId?: string[];
 
   @Field({ nullable: true })
-  campusId?: string;
+  academicGradeId?: string;
+
+  @Field({ nullable: true })
+  courseId?: string;
 
   @Field({ nullable: true })
   userId?: string;

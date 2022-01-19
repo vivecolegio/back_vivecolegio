@@ -8,7 +8,7 @@ import { NewNotification } from '../../inputs/GeneralAdministrator/NewNotificati
 import { IContext } from '../../interfaces/IContext';
 import {
   Notification,
-  NotificationConnection,
+  NotificationConnection
 } from '../../models/GeneralAdministrator/Notification';
 import { User } from '../../models/GeneralAdministrator/User';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
@@ -31,21 +31,24 @@ export class NotificationResolver {
   async getAllNotification(
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
-    @Arg('orderCreated', () => Boolean) orderCreated: Boolean
+    @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
+    @Arg('userId', () => String) userId: String,
   ): Promise<NotificationConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
         result = await this.repository.find({
+          where: { userId },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find();
+        result = await this.repository.find({ where: { userId } });
       }
     } else {
       if (orderCreated) {
         result = await this.repository.find({
           where: {
+            userId,
             active: true,
           },
           order: { createdAt: 'DESC' },
@@ -53,6 +56,7 @@ export class NotificationResolver {
       } else {
         result = await this.repository.find({
           where: {
+            userId,
             active: true,
           },
         });
@@ -156,8 +160,8 @@ export class NotificationResolver {
   }
 
   @FieldResolver((_type) => User, { nullable: true })
-  async to(@Root() data: Notification) {
-    let id = data.toId;
+  async user(@Root() data: Notification) {
+    let id = data.userId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryUser.findOne(id);
       return result;

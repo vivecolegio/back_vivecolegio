@@ -10,11 +10,11 @@ import { User } from './User';
 export class Notification extends IModelData {
   @ManyToOne(() => User, (data) => data.id, { lazy: true })
   @Field(() => User, { nullable: true })
-  to?: Lazy<User>;
+  user?: Lazy<User>;
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  toId?: string;
+  userId?: string;
 
   @Field({ nullable: true })
   @Column({ nullable: true })
@@ -34,10 +34,10 @@ export class Notification extends IModelData {
 }
 
 @ObjectType()
-export class NotificationEdge extends EdgeType('Notification', Notification) {}
+export class NotificationEdge extends EdgeType('Notification', Notification) { }
 
 @ObjectType()
 export class NotificationConnection extends ConnectionType<NotificationEdge>(
   'Notification',
   NotificationEdge
-) {}
+) { }

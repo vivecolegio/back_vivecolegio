@@ -4,7 +4,7 @@ import { Inbox } from '../../models/GeneralAdministrator/Inbox';
 @InputType()
 export class NewInbox implements Partial<Inbox> {
   @Field({ nullable: true })
-  toId?: string;
+  userId?: string;
 
   @Field({ nullable: true })
   fromId?: string;

@@ -4,11 +4,11 @@ import { NewUser } from '../GeneralAdministrator/NewUser';
 
 @InputType()
 export class NewGuardian implements Partial<Guardian> {
-  @Field({ nullable: true })
-  schoolId?: string;
+  @Field(() => [String], { nullable: true })
+  schoolId?: string[];
 
-  @Field({ nullable: true })
-  campusId?: string;
+  @Field(() => [String], { nullable: true })
+  campusId?: string[];
 
   @Field({ nullable: true })
   userId?: string;

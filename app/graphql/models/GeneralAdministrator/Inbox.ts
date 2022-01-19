@@ -10,11 +10,11 @@ import { User } from './User';
 export class Inbox extends IModelData {
   @ManyToOne(() => User, (data) => data.id, { lazy: true })
   @Field(() => User, { nullable: true })
-  to?: Lazy<User>;
+  user?: Lazy<User>;
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  toId?: string;
+  userId?: string;
 
   @ManyToOne(() => User, (data) => data.id, { lazy: true })
   @Field(() => User, { nullable: true })
@@ -42,7 +42,7 @@ export class Inbox extends IModelData {
 }
 
 @ObjectType()
-export class InboxEdge extends EdgeType('Inbox', Inbox) {}
+export class InboxEdge extends EdgeType('Inbox', Inbox) { }
 
 @ObjectType()
-export class InboxConnection extends ConnectionType<InboxEdge>('Inbox', InboxEdge) {}
+export class InboxConnection extends ConnectionType<InboxEdge>('Inbox', InboxEdge) { }

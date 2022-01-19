@@ -16,10 +16,10 @@ export class Jwt {
   userId?: string;
 
   @Field((_type) => [School], { nullable: true })
-  schools?: [School];
+  schools?: School[];
 
   @Field((_type) => [Campus], { nullable: true })
-  campus?: [Campus];
+  campus?: Campus[];
 
   @Field({ nullable: true })
   role?: Role;

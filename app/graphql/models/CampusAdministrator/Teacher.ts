@@ -9,12 +9,12 @@ import { User } from '../GeneralAdministrator/User';
 @ObjectType({ description: 'The Teacher model', implements: IModelData })
 @Entity()
 export class Teacher extends IModelData {
-  @Field({ nullable: true })
+  @Field(() => [String], { nullable: true })
   @Column({ nullable: true })
-  schoolId?: string;
+  schoolId?: String[];
 
-  @Field({ nullable: true })
-  school?: School;
+  @Field(() => [School], { nullable: true })
+  school?: School[];
 
   @Field(() => [String], { nullable: true })
   @Column({ nullable: true })
