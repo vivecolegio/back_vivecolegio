@@ -1,5 +1,5 @@
 
-nombre
-tipoDeEspacioFisico
-estado
-Capacidad
+// nombre
+// tipoDeEspacioFisico
+// estado
+// Capacidad
