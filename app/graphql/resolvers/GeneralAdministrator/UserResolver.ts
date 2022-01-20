@@ -314,16 +314,22 @@ export class UserResolver {
             campusId = userRole[0].campusId;
           }
         }
-        let campus = await this.repositoryCampus.find({
-          where: { _id: { $in: campusId } },
-        });
-        let school = await this.repositorySchool.find({
-          where: { _id: { $in: schoolId } },
-        });
-        if (campus) {
+        let campus;
+        let school;
+        if (campusId !== undefined) {
+          campus = await this.repositoryCampus.find({
+            where: { _id: { $in: campusId } },
+          });
+        }
+        if (schoolId) {
+          school = await this.repositorySchool.find({
+            where: { _id: { $in: schoolId } },
+          });
+        }
+        if (campus && campus !== undefined) {
           jwtUtil.campus = campus;
         }
-        if (school) {
+        if (school && school !== undefined) {
           jwtUtil.schools = school;
         }
         if (user.roleId) {

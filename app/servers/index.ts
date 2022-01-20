@@ -222,7 +222,7 @@ const server = new ApolloServer({
   schema: applyMiddleware(federatedSchema),
   context: ({ req }: any) => {
     const user = req.headers.user ? JSON.parse(req.headers.user) : null;
-    console.log(req.headers);
+    // console.log(req.headers);
     return { user };
   },
   introspection: true,
