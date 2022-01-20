@@ -263,7 +263,7 @@ export class UserResolver {
         let schoolId;
         if (role.isSchoolAdministrator) {
           let userRole = await this.repositorySchoolAdministrator.find({
-            where: { userId: user.id.toString() },
+            where: { userId: user.id },
           });
           if (userRole && userRole.length > 0) {
             schoolId = userRole[0].schoolId;
@@ -271,7 +271,7 @@ export class UserResolver {
         }
         if (role.isCampusAdministrator) {
           let userRole = await this.repositoryCampusAdministrator.find({
-            where: { userId: user.id.toString() },
+            where: { userId: user.id },
           });
           if (userRole && userRole.length > 0) {
             schoolId = userRole[0].schoolId;
@@ -280,7 +280,7 @@ export class UserResolver {
         }
         if (role.isCampusCoordinator) {
           let userRole = await this.repositoryCampusCoordinator.find({
-            where: { userId: user.id.toString() },
+            where: { userId: user.id },
           });
           if (userRole && userRole.length > 0) {
             schoolId = userRole[0].schoolId;
@@ -289,7 +289,7 @@ export class UserResolver {
         }
         if (role.isStudent) {
           let userRole = await this.repositoryStudent.find({
-            where: { userId: user.id.toString() },
+            where: { userId: user.id },
           });
           if (userRole && userRole.length > 0) {
             schoolId = userRole[0].schoolId;
@@ -298,7 +298,7 @@ export class UserResolver {
         }
         if (role.isTeacher) {
           let userRole = await this.repositoryTeacher.find({
-            where: { userId: user.id.toString() },
+            where: { userId: user.id },
           });
           if (userRole && userRole.length > 0) {
             schoolId = userRole[0].schoolId;
@@ -307,7 +307,7 @@ export class UserResolver {
         }
         if (role.isGuardian) {
           let userRole = await this.repositoryGuardian.find({
-            where: { userId: user.id.toString() },
+            where: { userId: user.id },
           });
           if (userRole && userRole.length > 0) {
             schoolId = userRole[0].schoolId;
@@ -317,13 +317,21 @@ export class UserResolver {
         let campus;
         let school;
         if (campusId !== undefined) {
+          let campusIds: any[] = [];
+          campusId.forEach((id: any) => {
+            campusIds.push(new ObjectId(id))
+          })
           campus = await this.repositoryCampus.find({
-            where: { _id: { $in: campusId } },
+            where: { _id: { $in: campusIds } },
           });
         }
         if (schoolId) {
+          let schoolIds: any[] = [];
+          schoolId.forEach((id: any) => {
+            schoolIds.push(new ObjectId(id))
+          })
           school = await this.repositorySchool.find({
-            where: { _id: { $in: schoolId } },
+            where: { _id: { $in: schoolIds } },
           });
         }
         if (campus && campus !== undefined) {
@@ -370,7 +378,7 @@ export class UserResolver {
       let schoolId;
       if (role.isSchoolAdministrator) {
         let userRole = await this.repositorySchoolAdministrator.find({
-          where: { userId: user.id.toString() },
+          where: { userId: user.id },
         });
         if (userRole && userRole.length > 0) {
           schoolId = userRole[0].schoolId;
@@ -378,7 +386,7 @@ export class UserResolver {
       }
       if (role.isCampusAdministrator) {
         let userRole = await this.repositoryCampusAdministrator.find({
-          where: { userId: user.id.toString() },
+          where: { userId: user.id },
         });
         if (userRole && userRole.length > 0) {
           schoolId = userRole[0].schoolId;
@@ -387,7 +395,7 @@ export class UserResolver {
       }
       if (role.isCampusCoordinator) {
         let userRole = await this.repositoryCampusCoordinator.find({
-          where: { userId: user.id.toString() },
+          where: { userId: user.id },
         });
         if (userRole && userRole.length > 0) {
           schoolId = userRole[0].schoolId;
@@ -396,7 +404,7 @@ export class UserResolver {
       }
       if (role.isStudent) {
         let userRole = await this.repositoryStudent.find({
-          where: { userId: user.id.toString() },
+          where: { userId: user.id },
         });
         if (userRole && userRole.length > 0) {
           schoolId = userRole[0].schoolId;
@@ -405,7 +413,7 @@ export class UserResolver {
       }
       if (role.isTeacher) {
         let userRole = await this.repositoryTeacher.find({
-          where: { userId: user.id.toString() },
+          where: { userId: user.id },
         });
         if (userRole && userRole.length > 0) {
           schoolId = userRole[0].schoolId;
@@ -414,23 +422,37 @@ export class UserResolver {
       }
       if (role.isGuardian) {
         let userRole = await this.repositoryGuardian.find({
-          where: { userId: user.id.toString() },
+          where: { userId: user.id },
         });
         if (userRole && userRole.length > 0) {
           schoolId = userRole[0].schoolId;
           campusId = userRole[0].campusId;
         }
       }
-      let campus = await this.repositoryCampus.find({
-        where: { _id: { $in: campusId } },
-      });
-      let school = await this.repositorySchool.find({
-        where: { _id: { $in: schoolId } },
-      });
-      if (campus) {
+      let campus;
+      let school;
+      if (campusId !== undefined) {
+        let campusIds: any[] = [];
+        campusId.forEach((id: any) => {
+          campusIds.push(new ObjectId(id))
+        })
+        campus = await this.repositoryCampus.find({
+          where: { _id: { $in: campusIds } },
+        });
+      }
+      if (schoolId) {
+        let schoolIds: any[] = [];
+        schoolId.forEach((id: any) => {
+          schoolIds.push(new ObjectId(id))
+        })
+        school = await this.repositorySchool.find({
+          where: { _id: { $in: schoolIds } },
+        });
+      }
+      if (campus && campus !== undefined) {
         jwtUtil.campus = campus;
       }
-      if (school) {
+      if (school && school !== undefined) {
         jwtUtil.schools = school;
       }
       if (user.roleId) {

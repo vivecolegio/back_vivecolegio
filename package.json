@@ -10,6 +10,7 @@
     "cover": "nyc npm run test",
     "report": "nyc report --reporter=html && open coverage/index.html",
     "build": "tsc",
+    "dev:server": "nodemon ./app/servers/index.ts",
     "development": "concurrently -k npm:development:*",
     "development:server": "ts-node ./app/servers/index.ts",
     "development:gateway": "wait-on tcp:4001 && ts-node ./app/index.dev",
@@ -69,7 +70,7 @@
     "wait-on": "6.0.0"
   },
   "devDependencies": {
-    "@types/graphql-upload": "8.0.9",
+    "@types/graphql-upload": "8.0.10",
     "chalk": "5.0.0",
     "eslint": "8.7.0",
     "eslint-config-prettier": "8.3.0",

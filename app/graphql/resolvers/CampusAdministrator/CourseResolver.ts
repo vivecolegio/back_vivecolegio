@@ -7,7 +7,9 @@ import { removeEmptyStringElements } from '../../../types';
 import { NewCourse } from '../../inputs/CampusAdministrator/NewCourse';
 import { IContext } from '../../interfaces/IContext';
 import { Course, CourseConnection } from '../../models/CampusAdministrator/Course';
+import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { User } from '../../models/GeneralAdministrator/User';
+import { AcademicGrade } from '../../models/SchoolAdministrator/AcademicGrade';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
 @Resolver(Course)
@@ -17,6 +19,12 @@ export class CourseResolver {
 
   @InjectRepository(User)
   private repositoryUser = getMongoRepository(User);
+
+  @InjectRepository(Campus)
+  private repositoryCampus = getMongoRepository(Campus);
+
+  @InjectRepository(AcademicGrade)
+  private repositoryAcademicGrade = getMongoRepository(AcademicGrade);
 
   @Query(() => Course, { nullable: true })
   async getCourse(@Arg('id', () => String) id: string) {
@@ -159,6 +167,26 @@ export class CourseResolver {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryUser.findOne(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => Campus, { nullable: true })
+  async campus(@Root() data: Course) {
+    let id = data.campusId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryCampus.findOne(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => AcademicGrade, { nullable: true })
+  async academicGrade(@Root() data: Course) {
+    let id = data.academicGradeId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryAcademicGrade.findOne(id);
       return result;
     }
     return null;
