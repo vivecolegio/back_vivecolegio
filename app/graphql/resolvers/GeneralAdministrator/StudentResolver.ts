@@ -8,10 +8,12 @@ import { removeEmptyStringElements } from '../../../types';
 import { NewStudent } from '../../inputs/GeneralAdministrator/NewStudent';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
 import { IContext } from '../../interfaces/IContext';
+import { Course } from '../../models/CampusAdministrator/Course';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { School } from '../../models/GeneralAdministrator/School';
 import { Student, StudentConnection } from '../../models/GeneralAdministrator/Student';
 import { User } from '../../models/GeneralAdministrator/User';
+import { AcademicGrade } from '../../models/SchoolAdministrator/AcademicGrade';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
 const BCRYPT_SALT_ROUNDS = 12;
@@ -29,6 +31,12 @@ export class StudentResolver {
 
   @InjectRepository(Campus)
   private repositoryCampus = getMongoRepository(Campus);
+
+  @InjectRepository(AcademicGrade)
+  private repositoryAcademicGrade = getMongoRepository(AcademicGrade);
+
+  @InjectRepository(Course)
+  private repositoryCourse = getMongoRepository(Course);
 
   @Query(() => Student, { nullable: true })
   async getStudent(@Arg('id', () => String) id: string) {
@@ -229,6 +237,26 @@ export class StudentResolver {
     let id = data.userId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryUser.findOne(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => AcademicGrade, { nullable: true })
+  async academicGrade(@Root() data: Student) {
+    let id = data.academicGradeId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryAcademicGrade.findOne(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => Course, { nullable: true })
+  async course(@Root() data: Student) {
+    let id = data.courseId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryCourse.findOne(id);
       return result;
     }
     return null;
