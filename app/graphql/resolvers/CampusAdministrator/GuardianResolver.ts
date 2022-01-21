@@ -40,32 +40,100 @@ export class GuardianResolver {
   async getAllGuardian(
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
-    @Arg('orderCreated', () => Boolean) orderCreated: Boolean
+    @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
+    @Arg('schoolId', () => [String]) schoolId: String[],
+    @Arg('campusId', () => [String], { nullable: true }) campusId: String[],
   ): Promise<GuardianConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
-        result = await this.repository.find({
-          order: { createdAt: 'DESC' },
-        });
+        if (campusId) {
+          result = await this.repository.find({
+            where: { schoolId: { $in: [schoolId] }, campusId: { $in: [campusId] } },
+            order: { createdAt: 'DESC' },
+          });
+        } else {
+          result = await this.repository.find({
+            where: { schoolId: { $in: [schoolId] } },
+            order: { createdAt: 'DESC' },
+          });
+        }
       } else {
-        result = await this.repository.find();
+        if (campusId) {
+          result = await this.repository.find({ where: { schoolId: { $in: [schoolId] }, campusId: { $in: [campusId] } } });
+        } else {
+          result = await this.repository.find({ where: { schoolId: { $in: [schoolId] } } });
+        }
       }
     } else {
       if (orderCreated) {
-        result = await this.repository.find({
-          where: {
-            active: true,
-          },
-          order: { createdAt: 'DESC' },
-        });
+        if (campusId) {
+          result = await this.repository.find({
+            where: {
+              schoolId: { $in: [schoolId] },
+              campusId: { $in: [campusId] },
+              active: true,
+            },
+            order: { createdAt: 'DESC' },
+          });
+        } else {
+          result = await this.repository.find({
+            where: {
+              schoolId: { $in: [schoolId] },
+              active: true,
+            },
+            order: { createdAt: 'DESC' },
+          });
+        }
       } else {
-        result = await this.repository.find({
-          where: {
-            active: true,
-          },
-        });
+        if (campusId) {
+          result = await this.repository.find({
+            where: {
+              schoolId: { $in: [schoolId] },
+              campusId: { $in: [campusId] },
+              active: true,
+            },
+          });
+        } else {
+          result = await this.repository.find({
+            where: {
+              schoolId,
+              active: true,
+            },
+          });
+        }
       }
+    }
+    let resultConn = new GuardianConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
+  }
+
+
+  @Query(() => GuardianConnection)
+  async getAllSearchGuardian(
+    @Args() args: ConnectionArgs,
+    @Arg('documentTypeId', () => String) documentTypeId: string,
+    @Arg('documentNumber', () => String) documentNumber: string,
+  ): Promise<GuardianConnection> {
+    let result;
+    result = await this.repositoryUser.find({
+      where: { documentTypeId, documentNumber: new RegExp(documentNumber), active: true, },
+      order: { createdAt: 'DESC' },
+    });
+    if (result.length > 0) {
+      let ids: any[] = [];
+      result.forEach((data: Guardian) => {
+        ids.push(new ObjectId(data.id))
+        console.log(data.id)
+      })
+      result = await this.repository.find({
+        where: { userId: { $in: ids } },
+      });
     }
     let resultConn = new GuardianConnection();
     let resultConnection = connectionFromArraySlice(result, args, {
