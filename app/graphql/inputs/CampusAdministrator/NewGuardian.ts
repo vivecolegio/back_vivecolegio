@@ -13,8 +13,8 @@ export class NewGuardian implements Partial<Guardian> {
   @Field({ nullable: true })
   userId?: string;
 
-  @Field({ nullable: true })
-  studentsId?: string;
+  @Field(() => [String], { nullable: true })
+  studentsId?: string[];
 
   @Field({ nullable: true })
   newUser?: NewUser;

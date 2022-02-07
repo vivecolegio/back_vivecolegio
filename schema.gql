@@ -823,7 +823,8 @@ type Guardian implements IModelData {
   id: ID!
   school: [School!]
   schoolId: [String!]
-  studentsId: String
+  students: [Student!]
+  studentsId: [String!]
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -1429,7 +1430,7 @@ input NewGuardian {
   campusId: [String!]
   newUser: NewUser
   schoolId: [String!]
-  studentsId: String
+  studentsId: [String!]
   userId: String
 }
 
@@ -1849,7 +1850,7 @@ type Query {
     schoolId: String!
   ): CampusCoordinatorConnection!
   getAllCourse(
-    academicGradeId: String!
+    academicGradeId: String
 
     """Paginate after opaque cursor"""
     after: String

@@ -30,9 +30,9 @@ export class Guardian extends IModelData {
   @Field({ nullable: true })
   user?: User;
 
-  @Field({ nullable: true })
+  @Field(() => [String], { nullable: true })
   @Column({ nullable: true })
-  studentsId?: string;
+  studentsId?: String[];
 }
 
 @ObjectType()

@@ -11,6 +11,7 @@ import { IContext } from '../../interfaces/IContext';
 import { Guardian, GuardianConnection } from '../../models/CampusAdministrator/Guardian';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { School } from '../../models/GeneralAdministrator/School';
+import { Student } from '../../models/GeneralAdministrator/Student';
 import { User } from '../../models/GeneralAdministrator/User';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
@@ -29,6 +30,9 @@ export class GuardianResolver {
 
   @InjectRepository(Campus)
   private repositoryCampus = getMongoRepository(Campus);
+
+  @InjectRepository(Student)
+  private repositoryStudent = getMongoRepository(Student);
 
   @Query(() => Guardian, { nullable: true })
   async getGuardian(@Arg('id', () => String) id: string) {
@@ -293,6 +297,16 @@ export class GuardianResolver {
     let id = data.campusId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryCampus.find({ where: { _id: { $in: id } } });
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => [Student], { nullable: true })
+  async students(@Root() data: Guardian) {
+    let id = data.studentsId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryStudent.find({ where: { _id: { $in: id } } });
       return result;
     }
     return null;

@@ -38,44 +38,80 @@ export class CourseResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('campusId', () => String) campusId: String,
-    @Arg('academicGradeId', () => String) academicGradeId: String,
+    @Arg('academicGradeId', () => String, { nullable: true }) academicGradeId: String,
   ): Promise<CourseConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
-        result = await this.repository.find({
-          where: {
-            campusId,
-            academicGradeId
-          },
-          order: { createdAt: 'DESC' },
-        });
+        if (academicGradeId) {
+          result = await this.repository.find({
+            where: {
+              campusId,
+              academicGradeId
+            },
+            order: { createdAt: 'DESC' },
+          });
+        } else {
+          result = await this.repository.find({
+            where: {
+              campusId,
+            },
+            order: { createdAt: 'DESC' },
+          });
+        }
       } else {
-        result = await this.repository.find({
-          where: {
-            campusId,
-            academicGradeId
-          },
-        });
+        if (academicGradeId) {
+          result = await this.repository.find({
+            where: {
+              campusId,
+              academicGradeId
+            },
+          });
+        } else {
+          result = await this.repository.find({
+            where: {
+              campusId,
+            },
+          });
+        }
       }
     } else {
       if (orderCreated) {
-        result = await this.repository.find({
-          where: {
-            campusId,
-            academicGradeId,
-            active: true,
-          },
-          order: { createdAt: 'DESC' },
-        });
+        if (academicGradeId) {
+          result = await this.repository.find({
+            where: {
+              campusId,
+              academicGradeId,
+              active: true,
+            },
+            order: { createdAt: 'DESC' },
+          });
+        } else {
+          result = await this.repository.find({
+            where: {
+              campusId,
+              active: true,
+            },
+            order: { createdAt: 'DESC' },
+          });
+        }
       } else {
-        result = await this.repository.find({
-          where: {
-            campusId,
-            academicGradeId,
-            active: true,
-          },
-        });
+        if (academicGradeId) {
+          result = await this.repository.find({
+            where: {
+              campusId,
+              academicGradeId,
+              active: true,
+            },
+          });
+        } else {
+          result = await this.repository.find({
+            where: {
+              campusId,
+              active: true,
+            },
+          });
+        }
       }
     }
     let resultConn = new CourseConnection();

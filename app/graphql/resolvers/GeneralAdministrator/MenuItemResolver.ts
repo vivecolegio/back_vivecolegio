@@ -41,34 +41,61 @@ export class MenuItemResolver {
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
-    @Arg('menuId', () => String) menuId: String,
+    @Arg('menuId', () => String, { nullable: true }) menuId: String,
   ): Promise<MenuItemConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
-        result = await this.repository.find({
-          where: { menuId },
-          order: { createdAt: 'DESC' },
-        });
+        if (menuId) {
+          result = await this.repository.find({
+            where: { menuId },
+            order: { createdAt: 'DESC' },
+          });
+        } else {
+          result = await this.repository.find({
+            order: { createdAt: 'DESC' },
+          });
+        }
       } else {
-        result = await this.repository.find({ where: { menuId } });
+        if (menuId) {
+          result = await this.repository.find({ where: { menuId } });
+        } else {
+          result = await this.repository.find();
+        }
       }
     } else {
       if (orderCreated) {
-        result = await this.repository.find({
-          where: {
-            menuId,
-            active: true,
-          },
-          order: { createdAt: 'DESC' },
-        });
+        if (menuId) {
+          result = await this.repository.find({
+            where: {
+              menuId,
+              active: true,
+            },
+            order: { createdAt: 'DESC' },
+          });
+        } else {
+          result = await this.repository.find({
+            where: {
+              active: true,
+            },
+            order: { createdAt: 'DESC' },
+          });
+        }
       } else {
-        result = await this.repository.find({
-          where: {
-            menuId,
-            active: true,
-          },
-        });
+        if (menuId) {
+          result = await this.repository.find({
+            where: {
+              menuId,
+              active: true,
+            },
+          });
+        } else {
+          result = await this.repository.find({
+            where: {
+              active: true,
+            },
+          });
+        }
       }
     }
     let resultConn = new MenuItemConnection();
