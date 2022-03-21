@@ -32,7 +32,7 @@ export class MenuResolver {
 
   @Query(() => Menu, { nullable: true })
   async getMenu(@Arg('id', () => String) id: string) {
-    const result = await this.repository.findOne(id);
+    const result = await this.repository.findOneBy(id);
     return result;
   }
 
@@ -45,7 +45,7 @@ export class MenuResolver {
     let result;
     if (allData) {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           order: { createdAt: 'DESC' },
         });
       } else {
@@ -53,14 +53,14 @@ export class MenuResolver {
       }
     } else {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             active: true,
           },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             active: true,
           },
@@ -95,10 +95,10 @@ export class MenuResolver {
     @Arg('data') data: NewMenu,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Menu | undefined> {
+  ): Promise<Menu | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -114,9 +114,9 @@ export class MenuResolver {
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
+  ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -135,8 +135,8 @@ export class MenuResolver {
   async deleteMenu(
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
-    let data = await this.repository.findOne(id);
+  ): Promise<Boolean | null> {
+    let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: ObjectId(id) });
     return result?.result?.ok === 1 ?? true;
   }
@@ -145,7 +145,7 @@ export class MenuResolver {
   async createdByUser(@Root() data: Menu) {
     let id = data.createdByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -155,7 +155,7 @@ export class MenuResolver {
   async updatedByUser(@Root() data: Menu) {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -165,7 +165,7 @@ export class MenuResolver {
   async module(@Root() data: Menu) {
     let id = data.moduleId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryModule.findOne(id);
+      const result = await this.repositoryModule.findOneBy(id);
       return result;
     }
     return null;
@@ -175,7 +175,7 @@ export class MenuResolver {
   async menuItems(@Root() data: Menu) {
     let id = data.id;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryMenuItem.find({ where: { menuId: id.toString() } });
+      const result = await this.repositoryMenuItem.findBy({ where: { menuId: id.toString() } });
       return result;
     }
     return null;
@@ -189,7 +189,7 @@ export class MenuResolver {
       ids.forEach(async (id: any) => {
         dataIds.push(new ObjectId(id));
       });
-      const result = await this.repositoryRole.find({ where: { _id: { $in: dataIds } } });
+      const result = await this.repositoryRole.findBy({ where: { _id: { $in: dataIds } } });
       return result;
     }
     return null;

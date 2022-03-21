@@ -31,7 +31,7 @@ export class SchoolAdministratorResolver {
 
   @Query(() => SchoolAdministrator, { nullable: true })
   async getSchoolAdministrator(@Arg('id', () => String) id: string) {
-    const result = await this.repository.findOne(id);
+    const result = await this.repository.findOneBy(id);
     return result;
   }
 
@@ -45,16 +45,16 @@ export class SchoolAdministratorResolver {
     let result;
     if (allData) {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: { schoolId },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find({ where: { schoolId } });
+        result = await this.repository.findBy({ where: { schoolId } });
       }
     } else {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             schoolId,
             active: true,
@@ -62,7 +62,7 @@ export class SchoolAdministratorResolver {
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             schoolId,
             active: true,
@@ -119,12 +119,12 @@ export class SchoolAdministratorResolver {
     @Arg('data') data: NewSchoolAdministrator,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<SchoolAdministrator | undefined> {
+  ): Promise<SchoolAdministrator | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     let dataUserProcess: NewUser = removeEmptyStringElements(dataProcess?.newUser);
-    let resultUser = await this.repositoryUser.findOne(result?.userId?.toString());
+    let resultUser = await this.repositoryUser.findOneBy(result?.userId?.toString());
     resultUser = await this.repositoryUser.save({
       _id: new ObjectId(result?.userId?.toString()),
       ...resultUser,
@@ -148,10 +148,10 @@ export class SchoolAdministratorResolver {
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
+  ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
-    let resultUser = await this.repositoryUser.findOne(result?.userId?.toString());
+    let result = await this.repository.findOneBy(id);
+    let resultUser = await this.repositoryUser.findOneBy(result?.userId?.toString());
     resultUser = await this.repositoryUser.save({
       _id: new ObjectId(result?.userId?.toString()),
       ...resultUser,
@@ -177,8 +177,8 @@ export class SchoolAdministratorResolver {
   async deleteSchoolAdministrator(
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
-    let data = await this.repository.findOne(id);
+  ): Promise<Boolean | null> {
+    let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: ObjectId(id) });
     return result?.result?.ok === 1 ?? true;
   }
@@ -187,7 +187,7 @@ export class SchoolAdministratorResolver {
   async createdByUser(@Root() data: SchoolAdministrator) {
     let id = data.createdByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -197,7 +197,7 @@ export class SchoolAdministratorResolver {
   async updatedByUser(@Root() data: SchoolAdministrator) {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -207,7 +207,7 @@ export class SchoolAdministratorResolver {
   async school(@Root() data: SchoolAdministrator) {
     let id = data.schoolId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositorySchool.find({ where: { _id: { $in: id } } });
+      const result = await this.repositorySchool.findBy({ where: { _id: { $in: id } } });
       return result;
     }
     return null;
@@ -217,7 +217,7 @@ export class SchoolAdministratorResolver {
   async user(@Root() data: SchoolAdministrator) {
     let id = data.userId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;

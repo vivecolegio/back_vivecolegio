@@ -32,7 +32,7 @@ export class MenuItemResolver {
 
   @Query(() => MenuItem, { nullable: true })
   async getMenuItem(@Arg('id', () => String) id: string) {
-    const result = await this.repository.findOne(id);
+    const result = await this.repository.findOneBy(id);
     return result;
   }
 
@@ -47,18 +47,18 @@ export class MenuItemResolver {
     if (allData) {
       if (orderCreated) {
         if (menuId) {
-          result = await this.repository.find({
+          result = await this.repository.findBy({
             where: { menuId },
             order: { createdAt: 'DESC' },
           });
         } else {
-          result = await this.repository.find({
+          result = await this.repository.findBy({
             order: { createdAt: 'DESC' },
           });
         }
       } else {
         if (menuId) {
-          result = await this.repository.find({ where: { menuId } });
+          result = await this.repository.findBy({ where: { menuId } });
         } else {
           result = await this.repository.find();
         }
@@ -66,7 +66,7 @@ export class MenuItemResolver {
     } else {
       if (orderCreated) {
         if (menuId) {
-          result = await this.repository.find({
+          result = await this.repository.findBy({
             where: {
               menuId,
               active: true,
@@ -74,7 +74,7 @@ export class MenuItemResolver {
             order: { createdAt: 'DESC' },
           });
         } else {
-          result = await this.repository.find({
+          result = await this.repository.findBy({
             where: {
               active: true,
             },
@@ -83,14 +83,14 @@ export class MenuItemResolver {
         }
       } else {
         if (menuId) {
-          result = await this.repository.find({
+          result = await this.repository.findBy({
             where: {
               menuId,
               active: true,
             },
           });
         } else {
-          result = await this.repository.find({
+          result = await this.repository.findBy({
             where: {
               active: true,
             },
@@ -129,10 +129,10 @@ export class MenuItemResolver {
     @Arg('data') data: NewMenuItem,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<MenuItem | undefined> {
+  ): Promise<MenuItem | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -148,9 +148,9 @@ export class MenuItemResolver {
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
+  ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -169,8 +169,8 @@ export class MenuItemResolver {
   async deleteMenuItem(
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
-    let data = await this.repository.findOne(id);
+  ): Promise<Boolean | null> {
+    let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: ObjectId(id) });
     return result?.result?.ok === 1 ?? true;
   }
@@ -179,7 +179,7 @@ export class MenuItemResolver {
   async createdByUser(@Root() data: MenuItem) {
     let id = data.createdByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -189,7 +189,7 @@ export class MenuItemResolver {
   async updatedByUser(@Root() data: MenuItem) {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -199,7 +199,7 @@ export class MenuItemResolver {
   async menu(@Root() data: MenuItem) {
     let id = data.menuId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryMenu.findOne(id);
+      const result = await this.repositoryMenu.findOneBy(id);
       return result;
     }
     return null;
@@ -209,7 +209,7 @@ export class MenuItemResolver {
   async module(@Root() data: MenuItem) {
     let id = data.moduleId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryModule.findOne(id);
+      const result = await this.repositoryModule.findOneBy(id);
       return result;
     }
     return null;
@@ -223,7 +223,7 @@ export class MenuItemResolver {
       ids.forEach(async (id: any) => {
         dataIds.push(new ObjectId(id));
       });
-      const result = await this.repositoryRole.find({ where: { _id: { $in: dataIds } } });
+      const result = await this.repositoryRole.findBy({ where: { _id: { $in: dataIds } } });
       return result;
     }
     return null;

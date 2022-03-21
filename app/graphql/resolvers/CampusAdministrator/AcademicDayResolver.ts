@@ -24,7 +24,7 @@ export class AcademicDayResolver {
 
   @Query(() => AcademicDay, { nullable: true })
   async getAcademicDay(@Arg('id', () => String) id: string) {
-    const result = await this.repository.findOne(id);
+    const result = await this.repository.findOneBy(id);
     return result;
   }
 
@@ -38,14 +38,14 @@ export class AcademicDayResolver {
     let result;
     if (allData) {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             campusId
           },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             campusId
           },
@@ -53,7 +53,7 @@ export class AcademicDayResolver {
       }
     } else {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             campusId,
             active: true,
@@ -61,7 +61,7 @@ export class AcademicDayResolver {
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             campusId,
             active: true,
@@ -100,10 +100,10 @@ export class AcademicDayResolver {
     @Arg('data') data: NewAcademicDay,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<AcademicDay | undefined> {
+  ): Promise<AcademicDay | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -119,9 +119,9 @@ export class AcademicDayResolver {
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
+  ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -140,8 +140,8 @@ export class AcademicDayResolver {
   async deleteAcademicDay(
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
-    let data = await this.repository.findOne(id);
+  ): Promise<Boolean | null> {
+    let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: ObjectId(id) });
     return result?.result?.ok === 1 ?? true;
   }
@@ -150,7 +150,7 @@ export class AcademicDayResolver {
   async createdByUser(@Root() data: AcademicDay) {
     let id = data.createdByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -160,7 +160,7 @@ export class AcademicDayResolver {
   async updatedByUser(@Root() data: AcademicDay) {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -170,7 +170,7 @@ export class AcademicDayResolver {
   async campus(@Root() data: AcademicDay) {
     let id = data.campusId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryCampus.findOne(id);
+      const result = await this.repositoryCampus.findOneBy(id);
       return result;
     }
     return null;

@@ -39,7 +39,7 @@ export class AcademicIndicatorResolver {
 
   @Query(() => AcademicIndicator, { nullable: true })
   async getAcademicIndicator(@Arg('id', () => String) id: string) {
-    const result = await this.repository.findOne(id);
+    const result = await this.repository.findOneBy(id);
     return result;
   }
 
@@ -53,16 +53,16 @@ export class AcademicIndicatorResolver {
     let result;
     if (allData) {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: { schoolId },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find({ where: { schoolId } });
+        result = await this.repository.findBy({ where: { schoolId } });
       }
     } else {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             schoolId,
             active: true,
@@ -70,7 +70,7 @@ export class AcademicIndicatorResolver {
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             schoolId,
             active: true,
@@ -109,10 +109,10 @@ export class AcademicIndicatorResolver {
     @Arg('data') data: NewAcademicIndicator,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<AcademicIndicator | undefined> {
+  ): Promise<AcademicIndicator | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -128,9 +128,9 @@ export class AcademicIndicatorResolver {
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
+  ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -149,8 +149,8 @@ export class AcademicIndicatorResolver {
   async deleteAcademicIndicator(
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
-    let data = await this.repository.findOne(id);
+  ): Promise<Boolean | null> {
+    let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: ObjectId(id) });
     return result?.result?.ok === 1 ?? true;
   }
@@ -159,7 +159,7 @@ export class AcademicIndicatorResolver {
   async createdByUser(@Root() data: AcademicIndicator) {
     let id = data.createdByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -169,7 +169,7 @@ export class AcademicIndicatorResolver {
   async updatedByUser(@Root() data: AcademicIndicator) {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -179,7 +179,7 @@ export class AcademicIndicatorResolver {
   async academicStandard(@Root() data: AcademicIndicator) {
     let id = data.academicStandardId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryAcademicStandard.findOne(id);
+      const result = await this.repositoryAcademicStandard.findOneBy(id);
       return result;
     }
     return null;
@@ -189,7 +189,7 @@ export class AcademicIndicatorResolver {
   async academicAsignature(@Root() data: AcademicIndicator) {
     let id = data.academicAsignatureId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryAcademicAsignature.findOne(id);
+      const result = await this.repositoryAcademicAsignature.findOneBy(id);
       return result;
     }
     return null;
@@ -199,7 +199,7 @@ export class AcademicIndicatorResolver {
   async academicGrade(@Root() data: AcademicIndicator) {
     let id = data.academicGradeId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryAcademicGrade.findOne(id);
+      const result = await this.repositoryAcademicGrade.findOneBy(id);
       return result;
     }
     return null;
@@ -209,7 +209,7 @@ export class AcademicIndicatorResolver {
   async school(@Root() data: AcademicIndicator) {
     let id = data.schoolId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositorySchool.findOne(id);
+      const result = await this.repositorySchool.findOneBy(id);
       return result;
     }
     return null;

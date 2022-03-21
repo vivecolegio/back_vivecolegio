@@ -31,7 +31,7 @@ export class PerformanceLevelResolver {
 
   @Query(() => PerformanceLevel, { nullable: true })
   async getPerformanceLevel(@Arg('id', () => String) id: string) {
-    const result = await this.repository.findOne(id);
+    const result = await this.repository.findOneBy(id);
     return result;
   }
 
@@ -45,16 +45,16 @@ export class PerformanceLevelResolver {
     let result;
     if (allData) {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: { schoolId },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find({ where: { schoolId } });
+        result = await this.repository.findBy({ where: { schoolId } });
       }
     } else {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             schoolId,
             active: true,
@@ -62,7 +62,7 @@ export class PerformanceLevelResolver {
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             schoolId,
             active: true,
@@ -101,10 +101,10 @@ export class PerformanceLevelResolver {
     @Arg('data') data: NewPerformanceLevel,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<PerformanceLevel | undefined> {
+  ): Promise<PerformanceLevel | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -120,9 +120,9 @@ export class PerformanceLevelResolver {
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
+  ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -141,8 +141,8 @@ export class PerformanceLevelResolver {
   async deletePerformanceLevel(
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
-    let data = await this.repository.findOne(id);
+  ): Promise<Boolean | null> {
+    let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: ObjectId(id) });
     return result?.result?.ok === 1 ?? true;
   }
@@ -151,7 +151,7 @@ export class PerformanceLevelResolver {
   async createdByUser(@Root() data: PerformanceLevel) {
     let id = data.createdByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -161,7 +161,7 @@ export class PerformanceLevelResolver {
   async updatedByUser(@Root() data: PerformanceLevel) {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -171,7 +171,7 @@ export class PerformanceLevelResolver {
   async generalPerformanceLevel(@Root() data: PerformanceLevel) {
     let id = data.generalPerformanceLevelId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryGeneralPerformanceLevel.findOne(id);
+      const result = await this.repositoryGeneralPerformanceLevel.findOneBy(id);
       return result;
     }
     return null;
@@ -181,7 +181,7 @@ export class PerformanceLevelResolver {
   async school(@Root() data: PerformanceLevel) {
     let id = data.schoolId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositorySchool.findOne(id);
+      const result = await this.repositorySchool.findOneBy(id);
       return result;
     }
     return null;

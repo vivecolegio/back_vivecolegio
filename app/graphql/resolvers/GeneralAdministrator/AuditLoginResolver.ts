@@ -20,7 +20,7 @@ export class AuditLoginResolver {
 
   @Query(() => AuditLogin, { nullable: true })
   async getAuditLogin(@Arg('id', () => String) id: string) {
-    const result = await this.repository.findOne(id);
+    const result = await this.repository.findOneBy(id);
     return result;
   }
 
@@ -33,7 +33,7 @@ export class AuditLoginResolver {
     let result;
     if (allData) {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           order: { createdAt: 'DESC' },
         });
       } else {
@@ -41,14 +41,14 @@ export class AuditLoginResolver {
       }
     } else {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             active: true,
           },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             active: true,
           },
@@ -86,10 +86,10 @@ export class AuditLoginResolver {
     @Arg('data') data: NewAuditLogin,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<AuditLogin | undefined> {
+  ): Promise<AuditLogin | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -105,9 +105,9 @@ export class AuditLoginResolver {
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
+  ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -126,7 +126,7 @@ export class AuditLoginResolver {
   async createdByUser(@Root() data: AuditLogin) {
     let id = data.createdByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -136,7 +136,7 @@ export class AuditLoginResolver {
   async updatedByUser(@Root() data: AuditLogin) {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -146,7 +146,7 @@ export class AuditLoginResolver {
   async user(@Root() data: AuditLogin) {
     let id = data.userId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;

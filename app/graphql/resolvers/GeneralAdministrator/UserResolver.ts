@@ -76,7 +76,7 @@ export class UserResolver {
 
   @Query(() => User, { nullable: true })
   async getUser(@Arg('id', () => String) id: string) {
-    const result = await this.repository.findOne(id);
+    const result = await this.repository.findOneBy(id);
     return result;
   }
 
@@ -89,7 +89,7 @@ export class UserResolver {
     let result;
     if (allData) {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           order: { createdAt: 'DESC' },
         });
       } else {
@@ -97,14 +97,14 @@ export class UserResolver {
       }
     } else {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             active: true,
           },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             active: true,
           },
@@ -147,10 +147,10 @@ export class UserResolver {
     @Arg('data') data: NewUser,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<User | undefined> {
+  ): Promise<User | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -166,9 +166,9 @@ export class UserResolver {
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
+  ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -187,8 +187,8 @@ export class UserResolver {
   async deleteUser(
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
-    let data = await this.repository.findOne(id);
+  ): Promise<Boolean | null> {
+    let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: ObjectId(id) });
     return result?.result?.ok === 1 ?? true;
   }
@@ -197,7 +197,7 @@ export class UserResolver {
   async createdByUser(@Root() data: User) {
     let id = data.createdByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repository.findOne(id);
+      const result = await this.repository.findOneBy(id);
       return result;
     }
     return null;
@@ -207,7 +207,7 @@ export class UserResolver {
   async updatedByUser(@Root() data: User) {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repository.findOne(id);
+      const result = await this.repository.findOneBy(id);
       return result;
     }
     return null;
@@ -217,7 +217,7 @@ export class UserResolver {
   async gender(@Root() data: User) {
     let id = data.genderId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryGender.findOne(id);
+      const result = await this.repositoryGender.findOneBy(id);
       return result;
     }
     return null;
@@ -227,7 +227,7 @@ export class UserResolver {
   async documentType(@Root() data: User) {
     let id = data.documentTypeId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryDocumentType.findOne(id);
+      const result = await this.repositoryDocumentType.findOneBy(id);
       return result;
     }
     return null;
@@ -237,7 +237,7 @@ export class UserResolver {
   async role(@Root() data: User) {
     let id = data.roleId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryRole.findOne(id);
+      const result = await this.repositoryRole.findOneBy(id);
       return result;
     }
     return null;
@@ -245,7 +245,7 @@ export class UserResolver {
 
   @Mutation(() => Jwt)
   async login(@Arg('username') username: string, @Arg('password') password: string) {
-    let user = await this.repository.findOne({ where: { username } });
+    let user = await this.repository.findOneBy({ where: { username } });
     let compare = await bcrypt.compare(password, user?.password as string);
     let jwtUtil = new Jwt();
     if (compare) {
@@ -257,12 +257,12 @@ export class UserResolver {
       if (user) {
         jwtUtil.name = user.name + ' ' + user.lastName;
         jwtUtil.userId = user.id;
-        let role = (await this.repositoryRole.findOne(user.roleId)) as Role;
+        let role = (await this.repositoryRole.findOneBy(user.roleId)) as Role;
         user.roleId ? (jwtUtil.role = role) : null;
         let campusId;
         let schoolId;
         if (role.isSchoolAdministrator) {
-          let userRole = await this.repositorySchoolAdministrator.find({
+          let userRole = await this.repositorySchoolAdministrator.findBy({
             where: { userId: user.id },
           });
           if (userRole && userRole.length > 0) {
@@ -270,7 +270,7 @@ export class UserResolver {
           }
         }
         if (role.isCampusAdministrator) {
-          let userRole = await this.repositoryCampusAdministrator.find({
+          let userRole = await this.repositoryCampusAdministrator.findBy({
             where: { userId: user.id },
           });
           if (userRole && userRole.length > 0) {
@@ -279,7 +279,7 @@ export class UserResolver {
           }
         }
         if (role.isCampusCoordinator) {
-          let userRole = await this.repositoryCampusCoordinator.find({
+          let userRole = await this.repositoryCampusCoordinator.findBy({
             where: { userId: user.id },
           });
           if (userRole && userRole.length > 0) {
@@ -288,7 +288,7 @@ export class UserResolver {
           }
         }
         if (role.isStudent) {
-          let userRole = await this.repositoryStudent.find({
+          let userRole = await this.repositoryStudent.findBy({
             where: { userId: user.id },
           });
           if (userRole && userRole.length > 0) {
@@ -297,7 +297,7 @@ export class UserResolver {
           }
         }
         if (role.isTeacher) {
-          let userRole = await this.repositoryTeacher.find({
+          let userRole = await this.repositoryTeacher.findBy({
             where: { userId: user.id },
           });
           if (userRole && userRole.length > 0) {
@@ -306,7 +306,7 @@ export class UserResolver {
           }
         }
         if (role.isGuardian) {
-          let userRole = await this.repositoryGuardian.find({
+          let userRole = await this.repositoryGuardian.findBy({
             where: { userId: user.id },
           });
           if (userRole && userRole.length > 0) {
@@ -321,7 +321,7 @@ export class UserResolver {
           campusId.forEach((id: any) => {
             campusIds.push(new ObjectId(id))
           })
-          campus = await this.repositoryCampus.find({
+          campus = await this.repositoryCampus.findBy({
             where: { _id: { $in: campusIds } },
           });
         }
@@ -330,7 +330,7 @@ export class UserResolver {
           schoolId.forEach((id: any) => {
             schoolIds.push(new ObjectId(id))
           })
-          school = await this.repositorySchool.find({
+          school = await this.repositorySchool.findBy({
             where: { _id: { $in: schoolIds } },
           });
         }
@@ -341,12 +341,12 @@ export class UserResolver {
           jwtUtil.schools = school;
         }
         if (user.roleId) {
-          let menus = await this.repositoryMenu.find({
+          let menus = await this.repositoryMenu.findBy({
             where: { rolesId: { $in: [user.roleId] }, active: true },
             order: { order: 'ASC' },
           });
           for (let index = 0; index < menus.length; index++) {
-            let menusItems = await this.repositoryMenuItem.find({
+            let menusItems = await this.repositoryMenuItem.findBy({
               where: {
                 menuId: menus[index].id.toString(),
                 rolesId: { $in: [user?.roleId] },
@@ -367,17 +367,17 @@ export class UserResolver {
   @Query(() => Jwt)
   async me(@Ctx() context: IContext) {
     let userId = context?.user?.authorization?.id;
-    let user = await this.repository.findOne(userId);
+    let user = await this.repository.findOneBy(userId);
     let jwtUtil = new Jwt();
     if (user) {
       jwtUtil.name = user.name + ' ' + user.lastName;
       jwtUtil.userId = user.id;
-      let role = (await this.repositoryRole.findOne(user.roleId)) as Role;
+      let role = (await this.repositoryRole.findOneBy(user.roleId)) as Role;
       user.roleId ? (jwtUtil.role = role) : null;
       let campusId;
       let schoolId;
       if (role.isSchoolAdministrator) {
-        let userRole = await this.repositorySchoolAdministrator.find({
+        let userRole = await this.repositorySchoolAdministrator.findBy({
           where: { userId: user.id },
         });
         if (userRole && userRole.length > 0) {
@@ -385,7 +385,7 @@ export class UserResolver {
         }
       }
       if (role.isCampusAdministrator) {
-        let userRole = await this.repositoryCampusAdministrator.find({
+        let userRole = await this.repositoryCampusAdministrator.findBy({
           where: { userId: user.id },
         });
         if (userRole && userRole.length > 0) {
@@ -394,7 +394,7 @@ export class UserResolver {
         }
       }
       if (role.isCampusCoordinator) {
-        let userRole = await this.repositoryCampusCoordinator.find({
+        let userRole = await this.repositoryCampusCoordinator.findBy({
           where: { userId: user.id },
         });
         if (userRole && userRole.length > 0) {
@@ -403,7 +403,7 @@ export class UserResolver {
         }
       }
       if (role.isStudent) {
-        let userRole = await this.repositoryStudent.find({
+        let userRole = await this.repositoryStudent.findBy({
           where: { userId: user.id },
         });
         if (userRole && userRole.length > 0) {
@@ -412,7 +412,7 @@ export class UserResolver {
         }
       }
       if (role.isTeacher) {
-        let userRole = await this.repositoryTeacher.find({
+        let userRole = await this.repositoryTeacher.findBy({
           where: { userId: user.id },
         });
         if (userRole && userRole.length > 0) {
@@ -421,7 +421,7 @@ export class UserResolver {
         }
       }
       if (role.isGuardian) {
-        let userRole = await this.repositoryGuardian.find({
+        let userRole = await this.repositoryGuardian.findBy({
           where: { userId: user.id },
         });
         if (userRole && userRole.length > 0) {
@@ -436,7 +436,7 @@ export class UserResolver {
         campusId.forEach((id: any) => {
           campusIds.push(new ObjectId(id))
         })
-        campus = await this.repositoryCampus.find({
+        campus = await this.repositoryCampus.findBy({
           where: { _id: { $in: campusIds } },
         });
       }
@@ -445,7 +445,7 @@ export class UserResolver {
         schoolId.forEach((id: any) => {
           schoolIds.push(new ObjectId(id))
         })
-        school = await this.repositorySchool.find({
+        school = await this.repositorySchool.findBy({
           where: { _id: { $in: schoolIds } },
         });
       }
@@ -456,12 +456,12 @@ export class UserResolver {
         jwtUtil.schools = school;
       }
       if (user.roleId) {
-        let menus = await this.repositoryMenu.find({
+        let menus = await this.repositoryMenu.findBy({
           where: { rolesId: { $in: [user.roleId] }, active: true },
           order: { order: 'ASC' },
         });
         for (let index = 0; index < menus.length; index++) {
-          let menusItems = await this.repositoryMenuItem.find({
+          let menusItems = await this.repositoryMenuItem.findBy({
             where: {
               menuId: menus[index].id.toString(),
               rolesId: { $in: [user?.roleId] },

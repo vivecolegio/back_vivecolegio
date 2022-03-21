@@ -31,7 +31,7 @@ export class AcademicHourResolver {
 
   @Query(() => AcademicHour, { nullable: true })
   async getAcademicHour(@Arg('id', () => String) id: string) {
-    const result = await this.repository.findOne(id);
+    const result = await this.repository.findOneBy(id);
     return result;
   }
 
@@ -45,14 +45,14 @@ export class AcademicHourResolver {
     let result;
     if (allData) {
       if (orderCreated) {
-        result = await this.repository.find({
-          where: {
+        result = await this.repository.findBy({
+          where: [{
             campusId
-          },
+          }],
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             campusId
           },
@@ -60,7 +60,7 @@ export class AcademicHourResolver {
       }
     } else {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             campusId,
             active: true,
@@ -68,7 +68,7 @@ export class AcademicHourResolver {
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             campusId,
             active: true,
@@ -107,10 +107,10 @@ export class AcademicHourResolver {
     @Arg('data') data: NewAcademicHour,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<AcademicHour | undefined> {
+  ): Promise<AcademicHour | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -126,9 +126,9 @@ export class AcademicHourResolver {
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
+  ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -147,8 +147,8 @@ export class AcademicHourResolver {
   async deleteAcademicHour(
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
-    let data = await this.repository.findOne(id);
+  ): Promise<Boolean | null> {
+    let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: ObjectId(id) });
     return result?.result?.ok === 1 ?? true;
   }
@@ -157,7 +157,7 @@ export class AcademicHourResolver {
   async createdByUser(@Root() data: AcademicHour) {
     let id = data.createdByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -167,7 +167,7 @@ export class AcademicHourResolver {
   async updatedByUser(@Root() data: AcademicHour) {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -177,7 +177,7 @@ export class AcademicHourResolver {
   async campus(@Root() data: AcademicHour) {
     let id = data.campusId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryCampus.findOne(id);
+      const result = await this.repositoryCampus.findOneBy(id);
       return result;
     }
     return null;
@@ -187,7 +187,7 @@ export class AcademicHourResolver {
   async academicDay(@Root() data: AcademicHour) {
     let id = data.academicDayId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryAcademicDay.findOne(id);
+      const result = await this.repositoryAcademicDay.findOneBy(id);
       return result;
     }
     return null;

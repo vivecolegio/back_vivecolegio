@@ -8,7 +8,7 @@ import { NewGeneralPerformanceLevel } from '../../inputs/GeneralAdministrator/Ne
 import { IContext } from '../../interfaces/IContext';
 import {
   GeneralPerformanceLevel,
-  GeneralPerformanceLevelConnection,
+  GeneralPerformanceLevelConnection
 } from '../../models/GeneralAdministrator/GeneralPerformanceLevel';
 import { User } from '../../models/GeneralAdministrator/User';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
@@ -23,7 +23,7 @@ export class GeneralPerformanceLevelResolver {
 
   @Query(() => GeneralPerformanceLevel, { nullable: true })
   async getGeneralPerformanceLevel(@Arg('id', () => String) id: string) {
-    const result = await this.repository.findOne(id);
+    const result = await this.repository.findOneBy(id);
     return result;
   }
 
@@ -36,7 +36,7 @@ export class GeneralPerformanceLevelResolver {
     let result;
     if (allData) {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           order: { createdAt: 'DESC' },
         });
       } else {
@@ -44,14 +44,14 @@ export class GeneralPerformanceLevelResolver {
       }
     } else {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             active: true,
           },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             active: true,
           },
@@ -89,10 +89,10 @@ export class GeneralPerformanceLevelResolver {
     @Arg('data') data: NewGeneralPerformanceLevel,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<GeneralPerformanceLevel | undefined> {
+  ): Promise<GeneralPerformanceLevel | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -108,9 +108,9 @@ export class GeneralPerformanceLevelResolver {
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
+  ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -129,8 +129,8 @@ export class GeneralPerformanceLevelResolver {
   async deleteGeneralPerformanceLevel(
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
-    let data = await this.repository.findOne(id);
+  ): Promise<Boolean | null> {
+    let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: ObjectId(id) });
     return result?.result?.ok === 1 ?? true;
   }
@@ -139,7 +139,7 @@ export class GeneralPerformanceLevelResolver {
   async createdByUser(@Root() data: GeneralPerformanceLevel) {
     let id = data.createdByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -149,7 +149,7 @@ export class GeneralPerformanceLevelResolver {
   async updatedByUser(@Root() data: GeneralPerformanceLevel) {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;

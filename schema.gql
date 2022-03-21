@@ -2111,7 +2111,7 @@ type Query {
 
     """Paginate last"""
     last: Float
-    menuId: String!
+    menuId: String
     orderCreated: Boolean!
   ): MenuItemConnection!
   getAllModality(

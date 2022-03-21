@@ -28,7 +28,7 @@ export class SpecialtyResolver {
 
   @Query(() => Specialty, { nullable: true })
   async getSpecialty(@Arg('id', () => String) id: string) {
-    const result = await this.repository.findOne(id);
+    const result = await this.repository.findOneBy(id);
     return result;
   }
 
@@ -42,16 +42,16 @@ export class SpecialtyResolver {
     let result;
     if (allData) {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: { schoolId },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find({ where: { schoolId } });
+        result = await this.repository.findBy({ where: { schoolId } });
       }
     } else {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             schoolId,
             active: true,
@@ -59,7 +59,7 @@ export class SpecialtyResolver {
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             schoolId,
             active: true,
@@ -98,10 +98,10 @@ export class SpecialtyResolver {
     @Arg('data') data: NewSpecialty,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Specialty | undefined> {
+  ): Promise<Specialty | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -117,9 +117,9 @@ export class SpecialtyResolver {
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
+  ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -138,8 +138,8 @@ export class SpecialtyResolver {
   async deleteSpecialty(
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
-    let data = await this.repository.findOne(id);
+  ): Promise<Boolean | null> {
+    let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: ObjectId(id) });
     return result?.result?.ok === 1 ?? true;
   }
@@ -148,7 +148,7 @@ export class SpecialtyResolver {
   async createdByUser(@Root() data: Specialty) {
     let id = data.createdByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -158,7 +158,7 @@ export class SpecialtyResolver {
   async updatedByUser(@Root() data: Specialty) {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -168,7 +168,7 @@ export class SpecialtyResolver {
   async modality(@Root() data: Specialty) {
     let id = data.modalityId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryModality.findOne(id);
+      const result = await this.repositoryModality.findOneBy(id);
       return result;
     }
     return null;
@@ -178,7 +178,7 @@ export class SpecialtyResolver {
   async school(@Root() data: Specialty) {
     let id = data.schoolId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositorySchool.findOne(id);
+      const result = await this.repositorySchool.findOneBy(id);
       return result;
     }
     return null;

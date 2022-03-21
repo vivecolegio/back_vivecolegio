@@ -9,7 +9,7 @@ import { IContext } from '../../interfaces/IContext';
 import { GeneralAcademicArea } from '../../models/GeneralAdministrator/GeneralAcademicArea';
 import {
   GeneralAcademicAsignature,
-  GeneralAcademicAsignatureConnection,
+  GeneralAcademicAsignatureConnection
 } from '../../models/GeneralAdministrator/GeneralAcademicAsignature';
 import { User } from '../../models/GeneralAdministrator/User';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
@@ -27,7 +27,7 @@ export class GeneralAcademicAsignatureResolver {
 
   @Query(() => GeneralAcademicAsignature, { nullable: true })
   async getGeneralAcademicAsignature(@Arg('id', () => String) id: string) {
-    const result = await this.repository.findOne(id);
+    const result = await this.repository.findOneBy(id);
     return result;
   }
 
@@ -40,7 +40,7 @@ export class GeneralAcademicAsignatureResolver {
     let result;
     if (allData) {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           order: { createdAt: 'DESC' },
         });
       } else {
@@ -48,14 +48,14 @@ export class GeneralAcademicAsignatureResolver {
       }
     } else {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             active: true,
           },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             active: true,
           },
@@ -93,10 +93,10 @@ export class GeneralAcademicAsignatureResolver {
     @Arg('data') data: NewGeneralAcademicAsignature,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<GeneralAcademicAsignature | undefined> {
+  ): Promise<GeneralAcademicAsignature | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -112,9 +112,9 @@ export class GeneralAcademicAsignatureResolver {
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
+  ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -133,8 +133,8 @@ export class GeneralAcademicAsignatureResolver {
   async deleteGeneralAcademicAsignature(
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
-    let data = await this.repository.findOne(id);
+  ): Promise<Boolean | null> {
+    let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: ObjectId(id) });
     return result?.result?.ok === 1 ?? true;
   }
@@ -143,7 +143,7 @@ export class GeneralAcademicAsignatureResolver {
   async createdByUser(@Root() data: GeneralAcademicAsignature) {
     let id = data.createdByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -153,7 +153,7 @@ export class GeneralAcademicAsignatureResolver {
   async updatedByUser(@Root() data: GeneralAcademicAsignature) {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -163,7 +163,7 @@ export class GeneralAcademicAsignatureResolver {
   async generalAcademicArea(@Root() data: GeneralAcademicAsignature) {
     let id = data.generalAcademicAreaId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryGeneralAcademicArea.findOne(id);
+      const result = await this.repositoryGeneralAcademicArea.findOneBy(id);
       return result;
     }
     return null;

@@ -28,7 +28,7 @@ export class CourseResolver {
 
   @Query(() => Course, { nullable: true })
   async getCourse(@Arg('id', () => String) id: string) {
-    const result = await this.repository.findOne(id);
+    const result = await this.repository.findOneBy(id);
     return result;
   }
 
@@ -44,7 +44,7 @@ export class CourseResolver {
     if (allData) {
       if (orderCreated) {
         if (academicGradeId) {
-          result = await this.repository.find({
+          result = await this.repository.findBy({
             where: {
               campusId,
               academicGradeId
@@ -52,7 +52,7 @@ export class CourseResolver {
             order: { createdAt: 'DESC' },
           });
         } else {
-          result = await this.repository.find({
+          result = await this.repository.findBy({
             where: {
               campusId,
             },
@@ -61,14 +61,14 @@ export class CourseResolver {
         }
       } else {
         if (academicGradeId) {
-          result = await this.repository.find({
+          result = await this.repository.findBy({
             where: {
               campusId,
               academicGradeId
             },
           });
         } else {
-          result = await this.repository.find({
+          result = await this.repository.findBy({
             where: {
               campusId,
             },
@@ -78,7 +78,7 @@ export class CourseResolver {
     } else {
       if (orderCreated) {
         if (academicGradeId) {
-          result = await this.repository.find({
+          result = await this.repository.findBy({
             where: {
               campusId,
               academicGradeId,
@@ -87,7 +87,7 @@ export class CourseResolver {
             order: { createdAt: 'DESC' },
           });
         } else {
-          result = await this.repository.find({
+          result = await this.repository.findBy({
             where: {
               campusId,
               active: true,
@@ -97,7 +97,7 @@ export class CourseResolver {
         }
       } else {
         if (academicGradeId) {
-          result = await this.repository.find({
+          result = await this.repository.findBy({
             where: {
               campusId,
               academicGradeId,
@@ -105,7 +105,7 @@ export class CourseResolver {
             },
           });
         } else {
-          result = await this.repository.find({
+          result = await this.repository.findBy({
             where: {
               campusId,
               active: true,
@@ -142,10 +142,10 @@ export class CourseResolver {
     @Arg('data') data: NewCourse,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Course | undefined> {
+  ): Promise<Course | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -161,9 +161,9 @@ export class CourseResolver {
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
+  ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -182,8 +182,8 @@ export class CourseResolver {
   async deleteCourse(
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
-    let data = await this.repository.findOne(id);
+  ): Promise<Boolean | null> {
+    let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: ObjectId(id) });
     return result?.result?.ok === 1 ?? true;
   }
@@ -192,7 +192,7 @@ export class CourseResolver {
   async createdByUser(@Root() data: Course) {
     let id = data.createdByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -202,7 +202,7 @@ export class CourseResolver {
   async updatedByUser(@Root() data: Course) {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -212,7 +212,7 @@ export class CourseResolver {
   async campus(@Root() data: Course) {
     let id = data.campusId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryCampus.findOne(id);
+      const result = await this.repositoryCampus.findOneBy(id);
       return result;
     }
     return null;
@@ -222,7 +222,7 @@ export class CourseResolver {
   async academicGrade(@Root() data: Course) {
     let id = data.academicGradeId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryAcademicGrade.findOne(id);
+      const result = await this.repositoryAcademicGrade.findOneBy(id);
       return result;
     }
     return null;

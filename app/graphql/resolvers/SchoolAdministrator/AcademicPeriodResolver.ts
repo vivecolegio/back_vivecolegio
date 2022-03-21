@@ -31,7 +31,7 @@ export class AcademicPeriodResolver {
 
   @Query(() => AcademicPeriod, { nullable: true })
   async getAcademicPeriod(@Arg('id', () => String) id: string) {
-    const result = await this.repository.findOne(id);
+    const result = await this.repository.findOneBy(id);
     return result;
   }
 
@@ -45,16 +45,16 @@ export class AcademicPeriodResolver {
     let result;
     if (allData) {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: { schoolId },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find({ where: { schoolId } });
+        result = await this.repository.findBy({ where: { schoolId } });
       }
     } else {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             schoolId,
             active: true,
@@ -62,7 +62,7 @@ export class AcademicPeriodResolver {
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             schoolId,
             active: true,
@@ -101,10 +101,10 @@ export class AcademicPeriodResolver {
     @Arg('data') data: NewAcademicPeriod,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<AcademicPeriod | undefined> {
+  ): Promise<AcademicPeriod | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -120,9 +120,9 @@ export class AcademicPeriodResolver {
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
+  ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -141,8 +141,8 @@ export class AcademicPeriodResolver {
   async deleteAcademicPeriod(
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
-    let data = await this.repository.findOne(id);
+  ): Promise<Boolean | null> {
+    let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: ObjectId(id) });
     return result?.result?.ok === 1 ?? true;
   }
@@ -151,7 +151,7 @@ export class AcademicPeriodResolver {
   async createdByUser(@Root() data: AcademicPeriod) {
     let id = data.createdByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -161,7 +161,7 @@ export class AcademicPeriodResolver {
   async updatedByUser(@Root() data: AcademicPeriod) {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -171,7 +171,7 @@ export class AcademicPeriodResolver {
   async schoolYear(@Root() data: AcademicPeriod) {
     let id = data.schoolYearId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositorySchoolYear.findOne(id);
+      const result = await this.repositorySchoolYear.findOneBy(id);
       return result;
     }
     return null;
@@ -181,7 +181,7 @@ export class AcademicPeriodResolver {
   async school(@Root() data: AcademicPeriod) {
     let id = data.schoolId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositorySchool.findOne(id);
+      const result = await this.repositorySchool.findOneBy(id);
       return result;
     }
     return null;

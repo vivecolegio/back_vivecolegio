@@ -20,7 +20,7 @@ export class InboxResolver {
 
   @Query(() => Inbox, { nullable: true })
   async getInbox(@Arg('id', () => String) id: string) {
-    const result = await this.repository.findOne(id);
+    const result = await this.repository.findOneBy(id);
     return result;
   }
 
@@ -34,16 +34,16 @@ export class InboxResolver {
     let result;
     if (allData) {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: { userId },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find({ where: { userId } });
+        result = await this.repository.findBy({ where: { userId } });
       }
     } else {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             userId,
             active: true,
@@ -51,7 +51,7 @@ export class InboxResolver {
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             userId,
             active: true,
@@ -87,10 +87,10 @@ export class InboxResolver {
     @Arg('data') data: NewInbox,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Inbox | undefined> {
+  ): Promise<Inbox | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -106,9 +106,9 @@ export class InboxResolver {
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
+  ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -127,8 +127,8 @@ export class InboxResolver {
   async deleteInbox(
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
-    let data = await this.repository.findOne(id);
+  ): Promise<Boolean | null> {
+    let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: ObjectId(id) });
     return result?.result?.ok === 1 ?? true;
   }
@@ -137,7 +137,7 @@ export class InboxResolver {
   async createdByUser(@Root() data: Inbox) {
     let id = data.createdByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -147,7 +147,7 @@ export class InboxResolver {
   async updatedByUser(@Root() data: Inbox) {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -157,7 +157,7 @@ export class InboxResolver {
   async user(@Root() data: Inbox) {
     let id = data.userId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -167,7 +167,7 @@ export class InboxResolver {
   async from(@Root() data: Inbox) {
     let id = data.fromId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;

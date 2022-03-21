@@ -35,7 +35,7 @@ export class GradeAssignmentResolver {
 
   @Query(() => GradeAssignment, { nullable: true })
   async getGradeAssignment(@Arg('id', () => String) id: string) {
-    const result = await this.repository.findOne(id);
+    const result = await this.repository.findOneBy(id);
     return result;
   }
 
@@ -49,16 +49,16 @@ export class GradeAssignmentResolver {
     let result;
     if (allData) {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: { schoolId },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find({ where: { schoolId } });
+        result = await this.repository.findBy({ where: { schoolId } });
       }
     } else {
       if (orderCreated) {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             schoolId,
             active: true,
@@ -66,7 +66,7 @@ export class GradeAssignmentResolver {
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.find({
+        result = await this.repository.findBy({
           where: {
             schoolId,
             active: true,
@@ -105,10 +105,10 @@ export class GradeAssignmentResolver {
     @Arg('data') data: NewGradeAssignment,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<GradeAssignment | undefined> {
+  ): Promise<GradeAssignment | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -124,9 +124,9 @@ export class GradeAssignmentResolver {
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
+  ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOne(id);
+    let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,
@@ -145,8 +145,8 @@ export class GradeAssignmentResolver {
   async deleteGradeAssignment(
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<Boolean | undefined> {
-    let data = await this.repository.findOne(id);
+  ): Promise<Boolean | null> {
+    let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: ObjectId(id) });
     return result?.result?.ok === 1 ?? true;
   }
@@ -155,7 +155,7 @@ export class GradeAssignmentResolver {
   async createdByUser(@Root() data: GradeAssignment) {
     let id = data.createdByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -165,7 +165,7 @@ export class GradeAssignmentResolver {
   async updatedByUser(@Root() data: GradeAssignment) {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryUser.findOne(id);
+      const result = await this.repositoryUser.findOneBy(id);
       return result;
     }
     return null;
@@ -175,7 +175,7 @@ export class GradeAssignmentResolver {
   async academicGrade(@Root() data: GradeAssignment) {
     let id = data.academicGradeId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryAcademicGrade.findOne(id);
+      const result = await this.repositoryAcademicGrade.findOneBy(id);
       return result;
     }
     return null;
@@ -185,7 +185,7 @@ export class GradeAssignmentResolver {
   async academicAsignature(@Root() data: GradeAssignment) {
     let id = data.academicAsignatureId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryAcademicAsignature.findOne(id);
+      const result = await this.repositoryAcademicAsignature.findOneBy(id);
       return result;
     }
     return null;
@@ -195,7 +195,7 @@ export class GradeAssignmentResolver {
   async school(@Root() data: GradeAssignment) {
     let id = data.schoolId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositorySchool.findOne(id);
+      const result = await this.repositorySchool.findOneBy(id);
       return result;
     }
     return null;
