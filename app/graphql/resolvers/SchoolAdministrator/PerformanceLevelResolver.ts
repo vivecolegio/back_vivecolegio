@@ -1,8 +1,8 @@
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { GeneralPerformanceLevelRepository, PerformanceLevelRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewPerformanceLevel } from '../../inputs/SchoolAdministrator/NewPerformanceLevel';
 import { IContext } from '../../interfaces/IContext';
@@ -18,16 +18,16 @@ import { ConnectionArgs } from '../../pagination/relaySpecs';
 @Resolver(PerformanceLevel)
 export class PerformanceLevelResolver {
   @InjectRepository(PerformanceLevel)
-  private repository = getMongoRepository(PerformanceLevel);
+  private repository = PerformanceLevelRepository;
 
   @InjectRepository(User)
-  private repositoryUser = getMongoRepository(User);
+  private repositoryUser = UserRepository;
 
   @InjectRepository(GeneralPerformanceLevel)
-  private repositoryGeneralPerformanceLevel = getMongoRepository(GeneralPerformanceLevel);
+  private repositoryGeneralPerformanceLevel = GeneralPerformanceLevelRepository;
 
   @InjectRepository(School)
-  private repositorySchool = getMongoRepository(School);
+  private repositorySchool = SchoolRepository;
 
   @Query(() => PerformanceLevel, { nullable: true })
   async getPerformanceLevel(@Arg('id', () => String) id: string) {

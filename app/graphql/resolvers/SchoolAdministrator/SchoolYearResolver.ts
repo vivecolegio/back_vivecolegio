@@ -1,8 +1,8 @@
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { SchoolRepository, SchoolYearRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewSchoolYear } from '../../inputs/SchoolAdministrator/NewSchoolYear';
 import { IContext } from '../../interfaces/IContext';
@@ -14,13 +14,13 @@ import { ConnectionArgs } from '../../pagination/relaySpecs';
 @Resolver(SchoolYear)
 export class SchoolYearResolver {
   @InjectRepository(SchoolYear)
-  private repository = getMongoRepository(SchoolYear);
+  private repository = SchoolYearRepository;
 
   @InjectRepository(User)
-  private repositoryUser = getMongoRepository(User);
+  private repositoryUser = UserRepository;
 
   @InjectRepository(School)
-  private repositorySchool = getMongoRepository(School);
+  private repositorySchool = SchoolRepository;
 
   @Query(() => SchoolYear, { nullable: true })
   async getSchoolYear(@Arg('id', () => String) id: string) {

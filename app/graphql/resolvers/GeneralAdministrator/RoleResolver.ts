@@ -1,8 +1,8 @@
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { RoleRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewRole } from '../../inputs/GeneralAdministrator/NewRole';
 import { IContext } from '../../interfaces/IContext';
@@ -13,10 +13,10 @@ import { ConnectionArgs } from '../../pagination/relaySpecs';
 @Resolver(Role)
 export class RoleResolver {
   @InjectRepository(Role)
-  private repository = getMongoRepository(Role);
+  private repository = RoleRepository;
 
   @InjectRepository(User)
-  private repositoryUser = getMongoRepository(User);
+  private repositoryUser = UserRepository;
 
   @Query(() => Role, { nullable: true })
   async getRole(@Arg('id', () => String) id: string) {

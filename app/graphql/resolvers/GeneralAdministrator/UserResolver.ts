@@ -5,8 +5,8 @@ import jsonwebtoken from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
 import { finished } from 'stream/promises';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { CampusAdministratorRepository, CampusCoordinatorRepository, CampusRepository, DocumentTypeRepository, GenderRepository, GuardianRepository, MenuItemRepository, MenuRepository, RoleRepository, SchoolAdministratorRepository, SchoolRepository, StudentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
 import { IContext } from '../../interfaces/IContext';
@@ -33,46 +33,46 @@ const BCRYPT_SALT_ROUNDS = 12;
 @Resolver(User)
 export class UserResolver {
   @InjectRepository(User)
-  private repository = getMongoRepository(User);
+  private repository = UserRepository;
 
   @InjectRepository(Gender)
-  private repositoryGender = getMongoRepository(Gender);
+  private repositoryGender = GenderRepository;
 
   @InjectRepository(DocumentType)
-  private repositoryDocumentType = getMongoRepository(DocumentType);
+  private repositoryDocumentType = DocumentTypeRepository;
 
   @InjectRepository(Role)
-  private repositoryRole = getMongoRepository(Role);
+  private repositoryRole = RoleRepository;
 
   @InjectRepository(Menu)
-  private repositoryMenu = getMongoRepository(Menu);
+  private repositoryMenu = MenuRepository;
 
   @InjectRepository(MenuItem)
-  private repositoryMenuItem = getMongoRepository(MenuItem);
+  private repositoryMenuItem = MenuItemRepository;
 
   @InjectRepository(SchoolAdministrator)
-  private repositorySchoolAdministrator = getMongoRepository(SchoolAdministrator);
+  private repositorySchoolAdministrator = SchoolAdministratorRepository;
 
   @InjectRepository(CampusAdministrator)
-  private repositoryCampusAdministrator = getMongoRepository(CampusAdministrator);
+  private repositoryCampusAdministrator = CampusAdministratorRepository;
 
   @InjectRepository(CampusCoordinator)
-  private repositoryCampusCoordinator = getMongoRepository(CampusCoordinator);
+  private repositoryCampusCoordinator = CampusCoordinatorRepository;
 
   @InjectRepository(Student)
-  private repositoryStudent = getMongoRepository(Student);
+  private repositoryStudent = StudentRepository;
 
   @InjectRepository(Teacher)
-  private repositoryTeacher = getMongoRepository(Teacher);
+  private repositoryTeacher = TeacherRepository;
 
   @InjectRepository(Guardian)
-  private repositoryGuardian = getMongoRepository(Guardian);
+  private repositoryGuardian = GuardianRepository;
 
   @InjectRepository(Campus)
-  private repositoryCampus = getMongoRepository(Campus);
+  private repositoryCampus = CampusRepository;
 
   @InjectRepository(School)
-  private repositorySchool = getMongoRepository(School);
+  private repositorySchool = SchoolRepository;
 
   @Query(() => User, { nullable: true })
   async getUser(@Arg('id', () => String) id: string) {

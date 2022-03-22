@@ -2,8 +2,8 @@ import bcrypt from 'bcrypt';
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { AcademicGradeRepository, CampusRepository, CourseRepository, SchoolRepository, StudentRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewStudent } from '../../inputs/GeneralAdministrator/NewStudent';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
@@ -21,22 +21,22 @@ const BCRYPT_SALT_ROUNDS = 12;
 @Resolver(Student)
 export class StudentResolver {
   @InjectRepository(Student)
-  private repository = getMongoRepository(Student);
+  private repository = StudentRepository;
 
   @InjectRepository(User)
-  private repositoryUser = getMongoRepository(User);
+  private repositoryUser = UserRepository;
 
   @InjectRepository(School)
-  private repositorySchool = getMongoRepository(School);
+  private repositorySchool = SchoolRepository;
 
   @InjectRepository(Campus)
-  private repositoryCampus = getMongoRepository(Campus);
+  private repositoryCampus = CampusRepository;
 
   @InjectRepository(AcademicGrade)
-  private repositoryAcademicGrade = getMongoRepository(AcademicGrade);
+  private repositoryAcademicGrade = AcademicGradeRepository;
 
   @InjectRepository(Course)
-  private repositoryCourse = getMongoRepository(Course);
+  private repositoryCourse = CourseRepository;
 
   @Query(() => Student, { nullable: true })
   async getStudent(@Arg('id', () => String) id: string) {

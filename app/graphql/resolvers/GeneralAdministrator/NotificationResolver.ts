@@ -1,8 +1,8 @@
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { NotificationRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewNotification } from '../../inputs/GeneralAdministrator/NewNotification';
 import { IContext } from '../../interfaces/IContext';
@@ -16,10 +16,10 @@ import { ConnectionArgs } from '../../pagination/relaySpecs';
 @Resolver(Notification)
 export class NotificationResolver {
   @InjectRepository(Notification)
-  private repository = getMongoRepository(Notification);
+  private repository = NotificationRepository;
 
   @InjectRepository(User)
-  private repositoryUser = getMongoRepository(User);
+  private repositoryUser = UserRepository;
 
   @Query(() => Notification, { nullable: true })
   async getNotification(@Arg('id', () => String) id: string) {

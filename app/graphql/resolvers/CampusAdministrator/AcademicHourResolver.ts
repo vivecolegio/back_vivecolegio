@@ -1,8 +1,8 @@
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { AcademicDayRepository, AcademicHourRepository, CampusRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicHour } from '../../inputs/CampusAdministrator/NewAcademicHour';
 import { IContext } from '../../interfaces/IContext';
@@ -18,16 +18,16 @@ import { ConnectionArgs } from '../../pagination/relaySpecs';
 @Resolver(AcademicHour)
 export class AcademicHourResolver {
   @InjectRepository(AcademicHour)
-  private repository = getMongoRepository(AcademicHour);
+  private repository = AcademicHourRepository;
 
   @InjectRepository(User)
-  private repositoryUser = getMongoRepository(User);
+  private repositoryUser = UserRepository;
 
   @InjectRepository(Campus)
-  private repositoryCampus = getMongoRepository(Campus);
+  private repositoryCampus = CampusRepository;
 
   @InjectRepository(AcademicDay)
-  private repositoryAcademicDay = getMongoRepository(AcademicDay);
+  private repositoryAcademicDay = AcademicDayRepository;
 
   @Query(() => AcademicHour, { nullable: true })
   async getAcademicHour(@Arg('id', () => String) id: string) {

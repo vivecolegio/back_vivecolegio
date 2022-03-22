@@ -1,8 +1,8 @@
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { CampusRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewCampus } from '../../inputs/GeneralAdministrator/NewCampus';
 import { IContext } from '../../interfaces/IContext';
@@ -14,13 +14,13 @@ import { ConnectionArgs } from '../../pagination/relaySpecs';
 @Resolver(Campus)
 export class CampusResolver {
   @InjectRepository(Campus)
-  private repository = getMongoRepository(Campus);
+  private repository = CampusRepository;
 
   @InjectRepository(User)
-  private repositoryUser = getMongoRepository(User);
+  private repositoryUser = UserRepository;
 
   @InjectRepository(School)
-  private repositorySchool = getMongoRepository(School);
+  private repositorySchool = SchoolRepository;
 
   @Query(() => Campus, { nullable: true })
   async getCampus(@Arg('id', () => String) id: string) {

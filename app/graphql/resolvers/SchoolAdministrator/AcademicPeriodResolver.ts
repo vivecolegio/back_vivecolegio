@@ -1,8 +1,8 @@
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { AcademicPeriodRepository, SchoolRepository, SchoolYearRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicPeriod } from '../../inputs/SchoolAdministrator/NewAcademicPeriod';
 import { IContext } from '../../interfaces/IContext';
@@ -18,16 +18,16 @@ import { ConnectionArgs } from '../../pagination/relaySpecs';
 @Resolver(AcademicPeriod)
 export class AcademicPeriodResolver {
   @InjectRepository(AcademicPeriod)
-  private repository = getMongoRepository(AcademicPeriod);
+  private repository = AcademicPeriodRepository;
 
   @InjectRepository(User)
-  private repositoryUser = getMongoRepository(User);
+  private repositoryUser = UserRepository;
 
   @InjectRepository(SchoolYear)
-  private repositorySchoolYear = getMongoRepository(SchoolYear);
+  private repositorySchoolYear = SchoolYearRepository;
 
   @InjectRepository(School)
-  private repositorySchool = getMongoRepository(School);
+  private repositorySchool = SchoolRepository;
 
   @Query(() => AcademicPeriod, { nullable: true })
   async getAcademicPeriod(@Arg('id', () => String) id: string) {

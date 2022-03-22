@@ -1,26 +1,27 @@
-import { ApolloGateway } from '@apollo/gateway';
-import FileUploadDataSource from '@profusion/apollo-federation-upload';
-import { ApolloServerPluginInlineTraceDisabled } from 'apollo-server-core';
+import { ApolloGateway, IntrospectAndCompose, RemoteGraphQLDataSource } from '@apollo/gateway';
+import { ApolloServerPluginLandingPageLocalDefault, ApolloServerPluginLandingPageProductionDefault } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import Cors from 'cors';
 import Express from 'express';
 import expressJwt from 'express-jwt';
 import { graphqlUploadExpress } from 'graphql-upload';
-import Helmet from 'helmet';
+import Morgan from 'morgan';
 import path from 'path';
 import 'reflect-metadata';
-import { port } from './config/index';
+import { port, SERVER_NAME_APP, SERVER_PORT_APP } from './config/index';
 
 const expressHealthApi = require('express-health-api');
 
 async function app() {
   try {
     const gateway = new ApolloGateway({
-      serviceList: [
-        { name: 'servers', url: 'http://backendcolegio.vhmsoluciones.com:4001/graphql' },
-      ],
+      supergraphSdl: new IntrospectAndCompose({
+        subgraphs: [
+          { name: 'servers', url: 'http://backendcolegio.vhmsoluciones.com:4001/graphql' },
+        ],
+      }),
       buildService({ url }: any) {
-        return new FileUploadDataSource({
+        return new RemoteGraphQLDataSource({
           url,
           willSendRequest({ request, context }: any) {
             request.http.headers.set('user', context.user ? JSON.stringify(context.user) : null);
@@ -28,33 +29,78 @@ async function app() {
         });
       },
     });
+
+    const { schema, executor } = await gateway.load();
+
+    const configExpressStatusMonitor = {
+      title: 'Express Status ViveColegios', // Default title
+      theme: 'default.css', // Default styles
+      path: '/status',
+      spans: [
+        {
+          interval: 1, // Every second
+          retention: 60, // Keep 60 datapoints in memory
+        },
+        {
+          interval: 5, // Every 5 seconds
+          retention: 60,
+        },
+        {
+          interval: 15, // Every 15 seconds
+          retention: 60,
+        },
+      ],
+      chartVisibility: {
+        cpu: true,
+        mem: true,
+        load: true,
+        eventLoop: true,
+        heap: true,
+        responseTime: true,
+        rps: true,
+        statusCodes: true,
+      },
+      healthChecks: [
+        {
+          protocol: 'http',
+          host: 'localhost',
+          path: `/healthcheck-${SERVER_NAME_APP}`,
+          port: `${SERVER_PORT_APP}`,
+        }
+      ],
+    };
+
     const server = new ApolloServer({
-      gateway,
+      schema,
+      executor,
       // playground: true,
       plugins: [
-        // ApolloServerPluginLandingPageGraphQLPlayground(),
-        // ApolloServerPluginUsageReporting({
-        //   sendVariableValues: { all: true },
-        // }),
-        ApolloServerPluginInlineTraceDisabled(),
+        process.env.NODE_ENV === 'production'
+          ? ApolloServerPluginLandingPageProductionDefault({ footer: false })
+          : ApolloServerPluginLandingPageLocalDefault({ footer: false }),
       ],
       introspection: true,
-      context: ({ req }: any) => {
-        const user = req.user || null;
+      context: (context: any) => {
+        const user = context.req.user || null;
         return { user };
       },
     });
+
     const app = Express();
-    app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }))
-    app.use(expressHealthApi({ apiPath: '/health' }))
-    app.use('/public', Express.static(path.join(__dirname, '../public')));
-    app.use(
-      Helmet({
-        contentSecurityPolicy: false,
-      })
-    );
-    app.use(Express.json());
+
+    // Middlewares
+    app.use(require('express-status-monitor')(configExpressStatusMonitor));
+    app.use(Morgan('common'));
+    // app.use(Helmet({
+    //   contentSecurityPolicy: false,
+    // }));
     app.use(Cors());
+    app.use(expressHealthApi({ apiPath: '/health' }));
+
+
+    app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }))
+    app.use('/public', Express.static(path.join(__dirname, '../public')));
+    app.use(Express.json());
     app.use(
       expressJwt({
         secret: 'f1BtnWgD3VKY',

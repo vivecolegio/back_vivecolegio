@@ -1,8 +1,8 @@
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { MenuItemRepository, MenuRepository, ModuleRepository, RoleRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewMenuItem } from '../../inputs/GeneralAdministrator/NewMenuItem';
 import { IContext } from '../../interfaces/IContext';
@@ -16,19 +16,19 @@ import { ConnectionArgs } from '../../pagination/relaySpecs';
 @Resolver(MenuItem)
 export class MenuItemResolver {
   @InjectRepository(MenuItem)
-  private repository = getMongoRepository(MenuItem);
+  private repository = MenuItemRepository;
 
   @InjectRepository(Role)
-  private repositoryRole = getMongoRepository(Role);
+  private repositoryRole = RoleRepository;
 
   @InjectRepository(User)
-  private repositoryUser = getMongoRepository(User);
+  private repositoryUser = UserRepository;
 
   @InjectRepository(Module)
-  private repositoryModule = getMongoRepository(Module);
+  private repositoryModule = ModuleRepository;
 
   @InjectRepository(Menu)
-  private repositoryMenu = getMongoRepository(Menu);
+  private repositoryMenu = MenuRepository;
 
   @Query(() => MenuItem, { nullable: true })
   async getMenuItem(@Arg('id', () => String) id: string) {

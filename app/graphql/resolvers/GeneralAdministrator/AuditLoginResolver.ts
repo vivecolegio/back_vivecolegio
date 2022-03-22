@@ -1,8 +1,8 @@
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { AuditLoginRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAuditLogin } from '../../inputs/GeneralAdministrator/NewAuditLogin';
 import { IContext } from '../../interfaces/IContext';
@@ -13,10 +13,10 @@ import { User } from './../../models/GeneralAdministrator/User';
 @Resolver(AuditLogin)
 export class AuditLoginResolver {
   @InjectRepository(AuditLogin)
-  private repository = getMongoRepository(AuditLogin);
+  private repository = AuditLoginRepository;
 
   @InjectRepository(User)
-  private repositoryUser = getMongoRepository(User);
+  private repositoryUser = UserRepository;
 
   @Query(() => AuditLogin, { nullable: true })
   async getAuditLogin(@Arg('id', () => String) id: string) {

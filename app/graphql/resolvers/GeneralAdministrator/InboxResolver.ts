@@ -1,8 +1,8 @@
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { InboxRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewInbox } from '../../inputs/GeneralAdministrator/NewInbox';
 import { IContext } from '../../interfaces/IContext';
@@ -13,10 +13,10 @@ import { ConnectionArgs } from '../../pagination/relaySpecs';
 @Resolver(Inbox)
 export class InboxResolver {
   @InjectRepository(Inbox)
-  private repository = getMongoRepository(Inbox);
+  private repository = InboxRepository;
 
   @InjectRepository(User)
-  private repositoryUser = getMongoRepository(User);
+  private repositoryUser = UserRepository;
 
   @Query(() => Inbox, { nullable: true })
   async getInbox(@Arg('id', () => String) id: string) {

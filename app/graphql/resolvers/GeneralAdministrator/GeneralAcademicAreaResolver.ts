@@ -1,8 +1,8 @@
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { GeneralAcademicAreaRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewGeneralAcademicArea } from '../../inputs/GeneralAdministrator/NewGeneralAcademicArea';
 import { IContext } from '../../interfaces/IContext';
@@ -16,10 +16,10 @@ import { ConnectionArgs } from '../../pagination/relaySpecs';
 @Resolver(GeneralAcademicArea)
 export class GeneralAcademicAreaResolver {
   @InjectRepository(GeneralAcademicArea)
-  private repository = getMongoRepository(GeneralAcademicArea);
+  private repository = GeneralAcademicAreaRepository;
 
   @InjectRepository(User)
-  private repositoryUser = getMongoRepository(User);
+  private repositoryUser = UserRepository;
 
   @Query(() => GeneralAcademicArea, { nullable: true })
   async getGeneralAcademicArea(@Arg('id', () => String) id: string) {

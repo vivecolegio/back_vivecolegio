@@ -1,8 +1,8 @@
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { AcademicAsignatureRepository, AcademicGradeRepository, GradeAssignmentRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewGradeAssignment } from '../../inputs/SchoolAdministrator/NewGradeAssignment';
 import { IContext } from '../../interfaces/IContext';
@@ -19,19 +19,19 @@ import { ConnectionArgs } from '../../pagination/relaySpecs';
 @Resolver(GradeAssignment)
 export class GradeAssignmentResolver {
   @InjectRepository(GradeAssignment)
-  private repository = getMongoRepository(GradeAssignment);
+  private repository = GradeAssignmentRepository;
 
   @InjectRepository(User)
-  private repositoryUser = getMongoRepository(User);
+  private repositoryUser = UserRepository;
 
   @InjectRepository(AcademicGrade)
-  private repositoryAcademicGrade = getMongoRepository(AcademicGrade);
+  private repositoryAcademicGrade = AcademicGradeRepository;
 
   @InjectRepository(AcademicAsignature)
-  private repositoryAcademicAsignature = getMongoRepository(AcademicAsignature);
+  private repositoryAcademicAsignature = AcademicAsignatureRepository;
 
   @InjectRepository(School)
-  private repositorySchool = getMongoRepository(School);
+  private repositorySchool = SchoolRepository;
 
   @Query(() => GradeAssignment, { nullable: true })
   async getGradeAssignment(@Arg('id', () => String) id: string) {

@@ -1,8 +1,8 @@
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { AcademicAsignatureRepository, AcademicStandardRepository, GeneralAcademicCycleRepository, GeneralAcademicStandardRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicStandard } from '../../inputs/SchoolAdministrator/NewAcademicStandard';
 import { IContext } from '../../interfaces/IContext';
@@ -20,22 +20,22 @@ import { ConnectionArgs } from '../../pagination/relaySpecs';
 @Resolver(AcademicStandard)
 export class AcademicStandardResolver {
   @InjectRepository(AcademicStandard)
-  private repository = getMongoRepository(AcademicStandard);
+  private repository = AcademicStandardRepository;
 
   @InjectRepository(User)
-  private repositoryUser = getMongoRepository(User);
+  private repositoryUser = UserRepository;
 
   @InjectRepository(GeneralAcademicStandard)
-  private repositoryGeneralAcademicStandard = getMongoRepository(GeneralAcademicStandard);
+  private repositoryGeneralAcademicStandard = GeneralAcademicStandardRepository;
 
   @InjectRepository(AcademicAsignature)
-  private repositoryAcademicAsignature = getMongoRepository(AcademicAsignature);
+  private repositoryAcademicAsignature = AcademicAsignatureRepository;
 
   @InjectRepository(GeneralAcademicCycle)
-  private repositoryGeneralAcademicCycle = getMongoRepository(GeneralAcademicCycle);
+  private repositoryGeneralAcademicCycle = GeneralAcademicCycleRepository;
 
   @InjectRepository(School)
-  private repositorySchool = getMongoRepository(School);
+  private repositorySchool = SchoolRepository;
 
   @Query(() => AcademicStandard, { nullable: true })
   async getAcademicStandard(@Arg('id', () => String) id: string) {

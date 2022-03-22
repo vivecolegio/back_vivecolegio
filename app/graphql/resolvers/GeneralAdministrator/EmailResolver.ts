@@ -1,8 +1,8 @@
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { EmailRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewEmail } from '../../inputs/GeneralAdministrator/NewEmail';
 import { IContext } from '../../interfaces/IContext';
@@ -13,10 +13,10 @@ import { ConnectionArgs } from '../../pagination/relaySpecs';
 @Resolver(Email)
 export class EmailResolver {
   @InjectRepository(Email)
-  private repository = getMongoRepository(Email);
+  private repository = EmailRepository;
 
   @InjectRepository(User)
-  private repositoryUser = getMongoRepository(User);
+  private repositoryUser = UserRepository;
 
   @Query(() => Email, { nullable: true })
   async getEmail(@Arg('id', () => String) id: string) {

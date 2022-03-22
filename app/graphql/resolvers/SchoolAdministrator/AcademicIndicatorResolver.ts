@@ -1,8 +1,8 @@
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { AcademicAsignatureRepository, AcademicGradeRepository, AcademicIndicatorRepository, AcademicStandardRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicIndicator } from '../../inputs/SchoolAdministrator/NewAcademicIndicator';
 import { IContext } from '../../interfaces/IContext';
@@ -20,22 +20,22 @@ import { ConnectionArgs } from '../../pagination/relaySpecs';
 @Resolver(AcademicIndicator)
 export class AcademicIndicatorResolver {
   @InjectRepository(AcademicIndicator)
-  private repository = getMongoRepository(AcademicIndicator);
+  private repository = AcademicIndicatorRepository;
 
   @InjectRepository(User)
-  private repositoryUser = getMongoRepository(User);
+  private repositoryUser = UserRepository;
 
   @InjectRepository(AcademicStandard)
-  private repositoryAcademicStandard = getMongoRepository(AcademicStandard);
+  private repositoryAcademicStandard = AcademicStandardRepository;
 
   @InjectRepository(AcademicAsignature)
-  private repositoryAcademicAsignature = getMongoRepository(AcademicAsignature);
+  private repositoryAcademicAsignature = AcademicAsignatureRepository;
 
   @InjectRepository(AcademicGrade)
-  private repositoryAcademicGrade = getMongoRepository(AcademicGrade);
+  private repositoryAcademicGrade = AcademicGradeRepository;
 
   @InjectRepository(School)
-  private repositorySchool = getMongoRepository(School);
+  private repositorySchool = SchoolRepository;
 
   @Query(() => AcademicIndicator, { nullable: true })
   async getAcademicIndicator(@Arg('id', () => String) id: string) {

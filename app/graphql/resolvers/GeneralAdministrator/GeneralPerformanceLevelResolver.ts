@@ -1,8 +1,8 @@
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { GeneralPerformanceLevelRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewGeneralPerformanceLevel } from '../../inputs/GeneralAdministrator/NewGeneralPerformanceLevel';
 import { IContext } from '../../interfaces/IContext';
@@ -16,10 +16,10 @@ import { ConnectionArgs } from '../../pagination/relaySpecs';
 @Resolver(GeneralPerformanceLevel)
 export class GeneralPerformanceLevelResolver {
   @InjectRepository(GeneralPerformanceLevel)
-  private repository = getMongoRepository(GeneralPerformanceLevel);
+  private repository = GeneralPerformanceLevelRepository;
 
   @InjectRepository(User)
-  private repositoryUser = getMongoRepository(User);
+  private repositoryUser = UserRepository;
 
   @Query(() => GeneralPerformanceLevel, { nullable: true })
   async getGeneralPerformanceLevel(@Arg('id', () => String) id: string) {

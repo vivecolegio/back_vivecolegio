@@ -2,8 +2,8 @@ import bcrypt from 'bcrypt';
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { CampusRepository, GuardianRepository, SchoolRepository, StudentRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewGuardian } from '../../inputs/CampusAdministrator/NewGuardian';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
@@ -20,19 +20,19 @@ const BCRYPT_SALT_ROUNDS = 12;
 @Resolver(Guardian)
 export class GuardianResolver {
   @InjectRepository(Guardian)
-  private repository = getMongoRepository(Guardian);
+  private repository = GuardianRepository;
 
   @InjectRepository(User)
-  private repositoryUser = getMongoRepository(User);
+  private repositoryUser = UserRepository;
 
   @InjectRepository(School)
-  private repositorySchool = getMongoRepository(School);
+  private repositorySchool = SchoolRepository;
 
   @InjectRepository(Campus)
-  private repositoryCampus = getMongoRepository(Campus);
+  private repositoryCampus = CampusRepository;
 
   @InjectRepository(Student)
-  private repositoryStudent = getMongoRepository(Student);
+  private repositoryStudent = StudentRepository;
 
   @Query(() => Guardian, { nullable: true })
   async getGuardian(@Arg('id', () => String) id: string) {

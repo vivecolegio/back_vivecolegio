@@ -2,8 +2,8 @@ import bcrypt from 'bcrypt';
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { SchoolAdministratorRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewSchoolAdministrator } from '../../inputs/GeneralAdministrator/NewSchoolAdministrator';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
@@ -21,13 +21,13 @@ const BCRYPT_SALT_ROUNDS = 12;
 @Resolver(SchoolAdministrator)
 export class SchoolAdministratorResolver {
   @InjectRepository(SchoolAdministrator)
-  private repository = getMongoRepository(SchoolAdministrator);
+  private repository = SchoolAdministratorRepository;
 
   @InjectRepository(User)
-  private repositoryUser = getMongoRepository(User);
+  private repositoryUser = UserRepository;
 
   @InjectRepository(School)
-  private repositorySchool = getMongoRepository(School);
+  private repositorySchool = SchoolRepository;
 
   @Query(() => SchoolAdministrator, { nullable: true })
   async getSchoolAdministrator(@Arg('id', () => String) id: string) {

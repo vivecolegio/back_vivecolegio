@@ -1,8 +1,8 @@
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { ModuleRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewModule } from '../../inputs/GeneralAdministrator/NewModule';
 import { IContext } from '../../interfaces/IContext';
@@ -13,10 +13,10 @@ import { ConnectionArgs } from '../../pagination/relaySpecs';
 @Resolver(Module)
 export class ModuleResolver {
   @InjectRepository(Module)
-  private repository = getMongoRepository(Module);
+  private repository = ModuleRepository;
 
   @InjectRepository(User)
-  private repositoryUser = getMongoRepository(User);
+  private repositoryUser = UserRepository;
 
   @Query(() => Module, { nullable: true })
   async getModule(@Arg('id', () => String) id: string) {

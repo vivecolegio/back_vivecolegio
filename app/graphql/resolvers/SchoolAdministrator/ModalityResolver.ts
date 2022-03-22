@@ -1,8 +1,8 @@
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { ModalityRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewModality } from '../../inputs/SchoolAdministrator/NewModality';
 import { IContext } from '../../interfaces/IContext';
@@ -14,13 +14,13 @@ import { ConnectionArgs } from '../../pagination/relaySpecs';
 @Resolver(Modality)
 export class ModalityResolver {
   @InjectRepository(Modality)
-  private repository = getMongoRepository(Modality);
+  private repository = ModalityRepository;
 
   @InjectRepository(User)
-  private repositoryUser = getMongoRepository(User);
+  private repositoryUser = UserRepository;
 
   @InjectRepository(School)
-  private repositorySchool = getMongoRepository(School);
+  private repositorySchool = SchoolRepository;
 
   @Query(() => Modality, { nullable: true })
   async getModality(@Arg('id', () => String) id: string) {

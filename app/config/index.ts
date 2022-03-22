@@ -28,3 +28,6 @@ export const defaultUserPassword = process.env.DEFAULT_USER_PASSWORD;
 export const authJwtSecret = process.env.AUTH_JWT_SECRET;
 export const publicApiKeyToke = process.env.PUBLIC_API_KEY_TOKEN;
 export const adminApiKeyToken = process.env.ADMIN_API_KEY_TOKEN;
+
+export const SERVER_PORT_APP = 4001
+export const SERVER_NAME_APP = 'Smscpr'

@@ -1,8 +1,8 @@
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { GeneralAcademicCycleRepository, GeneralAcademicGradeRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewGeneralAcademicGrade } from '../../inputs/GeneralAdministrator/NewGeneralAcademicGrade';
 import { IContext } from '../../interfaces/IContext';
@@ -17,13 +17,13 @@ import { ConnectionArgs } from '../../pagination/relaySpecs';
 @Resolver(GeneralAcademicGrade)
 export class GeneralAcademicGradeResolver {
   @InjectRepository(GeneralAcademicGrade)
-  private repository = getMongoRepository(GeneralAcademicGrade);
+  private repository = GeneralAcademicGradeRepository;
 
   @InjectRepository(User)
-  private repositoryUser = getMongoRepository(User);
+  private repositoryUser = UserRepository;
 
   @InjectRepository(GeneralAcademicCycle)
-  private repositoryGeneralAcademicCycle = getMongoRepository(GeneralAcademicCycle);
+  private repositoryGeneralAcademicCycle = GeneralAcademicCycleRepository;
 
   @Query(() => GeneralAcademicGrade, { nullable: true })
   async getGeneralAcademicGrade(@Arg('id', () => String) id: string) {

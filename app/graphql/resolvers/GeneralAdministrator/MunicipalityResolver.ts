@@ -1,8 +1,8 @@
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { MunicipalityRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewMunicipality } from '../../inputs/GeneralAdministrator/NewMunicipality';
 import { IContext } from '../../interfaces/IContext';
@@ -16,10 +16,10 @@ import { ConnectionArgs } from '../../pagination/relaySpecs';
 @Resolver(Municipality)
 export class MunicipalityResolver {
   @InjectRepository(Municipality)
-  private repository = getMongoRepository(Municipality);
+  private repository = MunicipalityRepository;
 
   @InjectRepository(User)
-  private repositoryUser = getMongoRepository(User);
+  private repositoryUser = UserRepository;
 
   @Query(() => Municipality, { nullable: true })
   async getMunicipality(@Arg('id', () => String) id: string) {

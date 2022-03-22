@@ -1,8 +1,8 @@
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { AcademicAreaRepository, GeneralAcademicAreaRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicArea } from '../../inputs/SchoolAdministrator/NewAcademicArea';
 import { IContext } from '../../interfaces/IContext';
@@ -18,16 +18,16 @@ import { ConnectionArgs } from '../../pagination/relaySpecs';
 @Resolver(AcademicArea)
 export class AcademicAreaResolver {
   @InjectRepository(AcademicArea)
-  private repository = getMongoRepository(AcademicArea);
+  private repository = AcademicAreaRepository;
 
   @InjectRepository(User)
-  private repositoryUser = getMongoRepository(User);
+  private repositoryUser = UserRepository;
 
   @InjectRepository(GeneralAcademicArea)
-  private repositoryGeneralAcademicArea = getMongoRepository(GeneralAcademicArea);
+  private repositoryGeneralAcademicArea = GeneralAcademicAreaRepository;
 
   @InjectRepository(School)
-  private repositorySchool = getMongoRepository(School);
+  private repositorySchool = SchoolRepository;
 
   @Query(() => AcademicArea, { nullable: true })
   async getAcademicArea(@Arg('id', () => String) id: string) {

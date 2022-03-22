@@ -1,8 +1,8 @@
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { getMongoRepository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { GeneralAcademicAsignatureRepository, GeneralAcademicCycleRepository, GeneralAcademicStandardRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewGeneralAcademicStandard } from '../../inputs/GeneralAdministrator/NewGeneralAcademicStandard';
 import { IContext } from '../../interfaces/IContext';
@@ -18,16 +18,16 @@ import { ConnectionArgs } from '../../pagination/relaySpecs';
 @Resolver(GeneralAcademicStandard)
 export class GeneralAcademicStandardResolver {
   @InjectRepository(GeneralAcademicStandard)
-  private repository = getMongoRepository(GeneralAcademicStandard);
+  private repository = GeneralAcademicStandardRepository;
 
   @InjectRepository(User)
-  private repositoryUser = getMongoRepository(User);
+  private repositoryUser = UserRepository;
 
   @InjectRepository(GeneralAcademicAsignature)
-  private repositoryGeneralAcademicAsignature = getMongoRepository(GeneralAcademicAsignature);
+  private repositoryGeneralAcademicAsignature = GeneralAcademicAsignatureRepository;
 
   @InjectRepository(GeneralAcademicCycle)
-  private repositoryGeneralAcademicCycle = getMongoRepository(GeneralAcademicCycle);
+  private repositoryGeneralAcademicCycle = GeneralAcademicCycleRepository;
 
   @Query(() => GeneralAcademicStandard, { nullable: true })
   async getGeneralAcademicStandard(@Arg('id', () => String) id: string) {
