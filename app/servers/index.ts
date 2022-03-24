@@ -17,6 +17,8 @@ import { AcademicHourResolver } from '../graphql/resolvers/CampusAdministrator/A
 import { AuditLoginResolver } from '../graphql/resolvers/GeneralAdministrator/AuditLoginResolver';
 import { GenderResolver } from '../graphql/resolvers/GeneralAdministrator/GenderResolver';
 import { GeneralAcademicAsignatureResolver } from '../graphql/resolvers/GeneralAdministrator/GeneralAcademicAsignatureResolver';
+import { ForumInteractionResolver } from '../graphql/resolvers/SchoolAdministrator/ForumInteractionResolver';
+import { ForumResolver } from '../graphql/resolvers/SchoolAdministrator/ForumResolver';
 import { AcademicDayResolver } from './../graphql/resolvers/CampusAdministrator/AcademicDayResolver';
 import { CourseResolver } from './../graphql/resolvers/CampusAdministrator/CourseResolver';
 import { GuardianResolver } from './../graphql/resolvers/CampusAdministrator/GuardianResolver';
@@ -106,6 +108,8 @@ async function app() {
         CourseResolver,
         GuardianResolver,
         TeacherResolver,
+        ForumResolver,
+        ForumInteractionResolver
       ],
       emitSchemaFile: true,
       validate: false,

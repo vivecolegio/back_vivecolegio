@@ -37,6 +37,8 @@ import { CampusAdministrator } from '../graphql/models/SchoolAdministrator/Campu
 import { CampusCoordinator } from '../graphql/models/SchoolAdministrator/CampusCoordinator';
 import { EducationLevel } from '../graphql/models/SchoolAdministrator/EducationLevel';
 import { EvaluativeComponent } from '../graphql/models/SchoolAdministrator/EvaluativeComponent';
+import { Forum } from '../graphql/models/SchoolAdministrator/Forum';
+import { ForumInteraction } from '../graphql/models/SchoolAdministrator/ForumInteraction';
 import { GradeAssignment } from '../graphql/models/SchoolAdministrator/GradeAssignment';
 import { Modality } from '../graphql/models/SchoolAdministrator/Modality';
 import { PerformanceLevel } from '../graphql/models/SchoolAdministrator/PerformanceLevel';
@@ -91,6 +93,8 @@ export const dataSource = new DataSource({
     Course,
     Guardian,
     Teacher,
+    Forum,
+    ForumInteraction
   ],
   synchronize: true,
   logger: 'advanced-console',
@@ -143,3 +147,5 @@ export const AcademicHourRepository = dataSource.getMongoRepository(AcademicHour
 export const CourseRepository = dataSource.getMongoRepository(Course);
 export const GuardianRepository = dataSource.getMongoRepository(Guardian);
 export const TeacherRepository = dataSource.getMongoRepository(Teacher);
+export const ForumRepository = dataSource.getMongoRepository(Forum);
+export const ForumInteractionRepository = dataSource.getMongoRepository(ForumInteraction);
