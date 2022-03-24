@@ -4,7 +4,7 @@ import { ForumInteraction } from '../../models/SchoolAdministrator/ForumInteract
 @InputType()
 export class NewForumInteraction implements Partial<ForumInteraction> {
     @Field({ nullable: true })
-    description?: string;
+    comment?: string;
 
     @Field(() => String, { nullable: true })
     forumId?: string;

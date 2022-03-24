@@ -9,7 +9,7 @@ import { Forum } from './Forum';
 export class ForumInteraction extends IModelSchoolData {
     @Field({ nullable: true })
     @Column({ nullable: true })
-    description?: string;
+    comment?: string;
 
     @Field(() => String, { nullable: true })
     @Column({ nullable: true })
