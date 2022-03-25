@@ -39,38 +39,12 @@ export class ForumInteractionResolver {
     @Query(() => ForumInteractionConnection)
     async getAllForumInteraction(
         @Args() args: ConnectionArgs,
-        @Arg('allData', () => Boolean) allData: Boolean,
-        @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
-        @Arg('schoolId', () => String) schoolId: String,
+        @Arg('forumId', () => String) forumId: String,
     ): Promise<ForumInteractionConnection> {
-        let result;
-        if (allData) {
-            if (orderCreated) {
-                result = await this.repository.findBy({
-                    where: { schoolId },
-                    order: { createdAt: 'DESC' },
-                });
-            } else {
-                result = await this.repository.findBy({ where: { schoolId } });
-            }
-        } else {
-            if (orderCreated) {
-                result = await this.repository.findBy({
-                    where: {
-                        schoolId,
-                        active: true,
-                    },
-                    order: { createdAt: 'DESC' },
-                });
-            } else {
-                result = await this.repository.findBy({
-                    where: {
-                        schoolId,
-                        active: true,
-                    },
-                });
-            }
-        }
+        let result = await this.repository.findBy({
+            where: { forumId },
+            order: { createdAt: 'DESC' },
+        });
         let resultConn = new ForumInteractionConnection();
         let resultConnection = connectionFromArraySlice(result, args, {
             sliceStart: 0,
