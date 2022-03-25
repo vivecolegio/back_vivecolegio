@@ -3,6 +3,15 @@ import { Forum } from '../../models/SchoolAdministrator/Forum';
 
 @InputType()
 export class NewForum implements Partial<Forum> {
+    @Field(() => String, { nullable: true })
+    schoolId?: string;
+
     @Field({ nullable: true })
     name?: string;
+
+    @Field({ nullable: true })
+    description?: string;
+
+    @Field({ nullable: true })
+    details?: string;
 }

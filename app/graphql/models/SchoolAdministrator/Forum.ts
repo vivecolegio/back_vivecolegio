@@ -9,6 +9,14 @@ export class Forum extends IModelSchoolData {
     @Field({ nullable: true })
     @Column({ nullable: true })
     name?: string;
+
+    @Field({ nullable: true })
+    @Column({ nullable: true })
+    description?: string;
+
+    @Field({ nullable: true })
+    @Column({ nullable: true })
+    details?: string;
 }
 
 @ObjectType()
