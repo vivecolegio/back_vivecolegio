@@ -3,6 +3,7 @@ import { Column, Entity } from 'typeorm';
 import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { GeneralAcademicArea } from '../GeneralAdministrator/GeneralAcademicArea';
+import { AcademicGrade } from './AcademicGrade';
 
 @ObjectType({ description: 'The AcademicArea model', implements: IModelSchoolData })
 @Entity()
@@ -21,13 +22,21 @@ export class AcademicArea extends IModelSchoolData {
 
   @Field({ nullable: true })
   generalAcademicArea?: GeneralAcademicArea;
+
+  @Field(() => [String], { nullable: true })
+  @Column({ nullable: true })
+  academicGradeId?: [string];
+
+  @Field(() => [AcademicGrade], { nullable: true })
+  academicGrade?: [AcademicGrade];
+
 }
 
 @ObjectType()
-export class AcademicAreaEdge extends EdgeType('AcademicArea', AcademicArea) {}
+export class AcademicAreaEdge extends EdgeType('AcademicArea', AcademicArea) { }
 
 @ObjectType()
 export class AcademicAreaConnection extends ConnectionType<AcademicAreaEdge>(
   'AcademicArea',
   AcademicAreaEdge
-) {}
+) { }

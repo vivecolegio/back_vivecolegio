@@ -1,5 +1,6 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Column, Entity } from 'typeorm';
+import { Day } from '../../enums/Day';
 import { IModelData } from '../../interfaces/IModelData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { Campus } from '../GeneralAdministrator/Campus';
@@ -16,18 +17,18 @@ export class AcademicDay extends IModelData {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  workingDay?: string;
+  name?: string;
 
-  @Field({ nullable: true })
+  @Field(() => [Day], { nullable: true })
   @Column({ nullable: true })
-  typeDay?: string; // DROPDWON
+  day?: [Day];
 }
 
 @ObjectType()
-export class AcademicDayEdge extends EdgeType('AcademicDay', AcademicDay) {}
+export class AcademicDayEdge extends EdgeType('AcademicDay', AcademicDay) { }
 
 @ObjectType()
 export class AcademicDayConnection extends ConnectionType<AcademicDayEdge>(
   'AcademicDay',
   AcademicDayEdge
-) {}
+) { }

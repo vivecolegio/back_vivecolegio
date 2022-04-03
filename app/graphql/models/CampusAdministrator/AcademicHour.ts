@@ -29,13 +29,17 @@ export class AcademicHour extends IModelData {
   @Field({ nullable: true })
   @Column({ nullable: true })
   endTime?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  order?: number;
 }
 
 @ObjectType()
-export class AcademicHourEdge extends EdgeType('AcademicHour', AcademicHour) {}
+export class AcademicHourEdge extends EdgeType('AcademicHour', AcademicHour) { }
 
 @ObjectType()
 export class AcademicHourConnection extends ConnectionType<AcademicHourEdge>(
   'AcademicHour',
   AcademicHourEdge
-) {}
+) { }

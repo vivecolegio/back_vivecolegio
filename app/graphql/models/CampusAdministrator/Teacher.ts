@@ -5,6 +5,7 @@ import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { Campus } from '../GeneralAdministrator/Campus';
 import { School } from '../GeneralAdministrator/School';
 import { User } from '../GeneralAdministrator/User';
+import { AcademicAsignature } from '../SchoolAdministrator/AcademicAsignature';
 
 @ObjectType({ description: 'The Teacher model', implements: IModelData })
 @Entity()
@@ -30,9 +31,12 @@ export class Teacher extends IModelData {
   @Field({ nullable: true })
   user?: User;
 
-  @Field({ nullable: true })
+  @Field(() => [String], { nullable: true })
   @Column({ nullable: true })
-  assignaturesId?: string;
+  academicAsignatureId?: [string];
+
+  @Field(() => [AcademicAsignature], { nullable: true })
+  academicAsignature?: [AcademicAsignature];
 
   @Field({ nullable: true })
   @Column({ nullable: true })
