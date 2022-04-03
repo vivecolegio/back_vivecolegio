@@ -6,6 +6,8 @@
 """The AcademicArea model"""
 type AcademicArea implements IModelSchoolData {
   abbreviation: String
+  academicGrade: [AcademicGrade!]
+  academicGradeId: [String!]
   active: Boolean
   createdAt: DateTime
   createdByUser: User
@@ -41,12 +43,16 @@ type AcademicAsignature implements IModelSchoolData {
   abbreviation: String
   academicArea: AcademicArea
   academicAreaId: String
+  academicGrade: [AcademicGrade!]
+  academicGradeId: [String!]
   active: Boolean
   code: String
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
   id: ID!
+  maxWeight: Float
+  minWeight: Float
   name: String
   school: School
   schoolId: String
@@ -54,7 +60,6 @@ type AcademicAsignature implements IModelSchoolData {
   updatedByUser: User
   updatedByUserId: String
   version: Float
-  weight: Float
 }
 
 type AcademicAsignatureConnection {
@@ -72,20 +77,20 @@ type AcademicAsignatureEdge {
 }
 
 """The AcademicDay model"""
-type AcademicDay implements IModelData {
+type AcademicDay implements IModelCampusData {
   active: Boolean
   campus: Campus
   campusId: String
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  day: [Day!]
   id: ID!
-  typeDay: String
+  name: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
   version: Float
-  workingDay: String
 }
 
 type AcademicDayConnection {
@@ -139,7 +144,7 @@ type AcademicGradeEdge {
 }
 
 """The AcademicHour model"""
-type AcademicHour implements IModelData {
+type AcademicHour implements IModelCampusData {
   academicDay: AcademicDay
   academicDayId: String
   active: Boolean
@@ -150,6 +155,7 @@ type AcademicHour implements IModelData {
   createdByUserId: String
   endTime: String
   id: ID!
+  order: Float
   startTime: String
   updatedAt: DateTime
   updatedByUser: User
@@ -408,7 +414,7 @@ type CampusEdge {
 }
 
 """The Course model"""
-type Course implements IModelData {
+type Course implements IModelCampusData {
   academicGrade: AcademicGrade
   academicGradeId: String
   active: Boolean
@@ -444,6 +450,17 @@ type CourseEdge {
 The javascript `Date` as string. Type represents date and time as the ISO Date string.
 """
 scalar DateTime
+
+"""The Day Register"""
+enum Day {
+  FRIDAY
+  MONDAY
+  SATURDAY
+  SUNDAY
+  THURSDAY
+  TUESDAY
+  WEDNESDAY
+}
 
 """The Document Type model"""
 type DocumentType implements IModelData {
@@ -576,6 +593,8 @@ type Forum implements IModelSchoolData {
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  description: String
+  details: String
   id: ID!
   name: String
   school: School
@@ -603,10 +622,10 @@ type ForumEdge {
 """The ForumInteraction model"""
 type ForumInteraction implements IModelSchoolData {
   active: Boolean
+  comment: String
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
-  description: String
   forum: Forum
   forumId: String
   id: ID!
@@ -907,6 +926,18 @@ type GuardianEdge {
   """Used in `before` and `after` args"""
   cursor: String!
   node: Guardian!
+}
+
+interface IModelCampusData {
+  active: Boolean
+  campus: Campus
+  campusId: String
+  createdAt: DateTime
+  createdByUserId: String
+  id: ID!
+  updatedAt: DateTime
+  updatedByUserId: String
+  version: Float
 }
 
 interface IModelData {
@@ -1333,6 +1364,7 @@ type Mutation {
 
 input NewAcademicArea {
   abbreviation: String
+  academicGradeId: [String!]
   generalAcademicAreaId: String
   name: String
   schoolId: String
@@ -1341,16 +1373,18 @@ input NewAcademicArea {
 input NewAcademicAsignature {
   abbreviation: String
   academicAreaId: String
+  academicGradeId: [String!]
   code: String
+  maxWeight: Float
+  minWeight: Float
   name: String
   schoolId: String
-  weight: Float
 }
 
 input NewAcademicDay {
   campusId: String
-  typeDay: String
-  workingDay: String
+  day: [Day!]
+  name: String
 }
 
 input NewAcademicGrade {
@@ -1365,6 +1399,7 @@ input NewAcademicHour {
   academicDayId: String
   campusId: String
   endTime: String
+  order: Float
   startTime: String
 }
 
@@ -1454,11 +1489,14 @@ input NewEvaluativeComponent {
 }
 
 input NewForum {
+  description: String
+  details: String
   name: String
+  schoolId: String
 }
 
 input NewForumInteraction {
-  description: String
+  comment: String
   forumId: String
 }
 
@@ -1631,7 +1669,7 @@ input NewStudent {
 }
 
 input NewTeacher {
-  assignaturesId: String
+  academicAsignatureId: [String!]
   attentionSchedule: String
   campusId: [String!]
   newUser: NewUser
@@ -2027,18 +2065,16 @@ type Query {
   getAllForumInteraction(
     """Paginate after opaque cursor"""
     after: String
-    allData: Boolean!
 
     """Paginate before opaque cursor"""
     before: String
 
     """Paginate first"""
     first: Float
+    forumId: String!
 
     """Paginate last"""
     last: Float
-    orderCreated: Boolean!
-    schoolId: String!
   ): ForumInteractionConnection!
   getAllGender(
     """Paginate after opaque cursor"""
@@ -2699,8 +2735,9 @@ type StudentEdge {
 
 """The Teacher model"""
 type Teacher implements IModelData {
+  academicAsignature: [AcademicAsignature!]
+  academicAsignatureId: [String!]
   active: Boolean
-  assignaturesId: String
   attentionSchedule: String
   campus: [Campus!]
   campusId: [String!]
