@@ -14,4 +14,7 @@ export class NewAcademicHour implements Partial<AcademicHour> {
 
   @Field({ nullable: true })
   endTime?: string;
+
+  @Field({ nullable: true })
+  order?: number;
 }

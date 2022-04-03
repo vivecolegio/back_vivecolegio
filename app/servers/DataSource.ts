@@ -1,7 +1,9 @@
 import { env } from 'process';
 import { DataSource } from 'typeorm';
+import { AcademicAsignatureCourse } from '../graphql/models/CampusAdministrator/AcademicAsignatureCourse';
 import { AcademicDay } from '../graphql/models/CampusAdministrator/AcademicDay';
 import { AcademicHour } from '../graphql/models/CampusAdministrator/AcademicHour';
+import { AcademicSchedule } from '../graphql/models/CampusAdministrator/AcademicSchedule';
 import { Course } from '../graphql/models/CampusAdministrator/Course';
 import { Guardian } from '../graphql/models/CampusAdministrator/Guardian';
 import { Teacher } from '../graphql/models/CampusAdministrator/Teacher';
@@ -94,7 +96,9 @@ export const dataSource = new DataSource({
     Guardian,
     Teacher,
     Forum,
-    ForumInteraction
+    ForumInteraction,
+    AcademicAsignatureCourse,
+    AcademicSchedule
   ],
   synchronize: true,
   logger: 'advanced-console',
@@ -149,3 +153,5 @@ export const GuardianRepository = dataSource.getMongoRepository(Guardian);
 export const TeacherRepository = dataSource.getMongoRepository(Teacher);
 export const ForumRepository = dataSource.getMongoRepository(Forum);
 export const ForumInteractionRepository = dataSource.getMongoRepository(ForumInteraction);
+export const AcademicAsignatureCourseRepository = dataSource.getMongoRepository(AcademicAsignatureCourse);
+export const AcademicScheduleRepository = dataSource.getMongoRepository(AcademicSchedule);

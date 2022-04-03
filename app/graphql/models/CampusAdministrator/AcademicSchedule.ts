@@ -1,16 +1,15 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Column, Entity } from 'typeorm';
-import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
+import { IModelCampusData } from '../../interfaces/IModelCampusData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { AcademicAsignatureCourse } from './AcademicAsignatureCourse';
 import { AcademicHour } from './AcademicHour';
 import { Course } from './Course';
 import { Teacher } from './Teacher';
 
-@ObjectType({ description: 'The AcademicSchedule model', implements: IModelSchoolData })
+@ObjectType({ description: 'The AcademicSchedule model', implements: IModelCampusData })
 @Entity()
-export class AcademicSchedule extends IModelSchoolData {
-
+export class AcademicSchedule extends IModelCampusData {
     @Field({ nullable: true })
     @Column({ nullable: true })
     academicAsignatureCourseId?: string;

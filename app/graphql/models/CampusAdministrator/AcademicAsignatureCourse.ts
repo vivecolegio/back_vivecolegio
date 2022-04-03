@@ -1,14 +1,14 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Column, Entity } from 'typeorm';
-import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
+import { IModelCampusData } from '../../interfaces/IModelCampusData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { AcademicAsignature } from '../SchoolAdministrator/AcademicAsignature';
 import { Course } from './Course';
 import { Teacher } from './Teacher';
-@ObjectType({ description: 'The AcademicAsignatureCourse model', implements: IModelSchoolData })
-@Entity()
-export class AcademicAsignatureCourse extends IModelSchoolData {
 
+@ObjectType({ description: 'The AcademicAsignatureCourse model', implements: IModelCampusData })
+@Entity()
+export class AcademicAsignatureCourse extends IModelCampusData {
     @Field({ nullable: true })
     @Column({ nullable: true })
     academicAsignatureId?: string;

@@ -4,6 +4,9 @@ import { AcademicAsignature } from './../../models/SchoolAdministrator/AcademicA
 @InputType()
 export class NewAcademicAsignature implements Partial<AcademicAsignature> {
   @Field({ nullable: true })
+  schoolId?: string;
+
+  @Field({ nullable: true })
   name?: string;
 
   @Field({ nullable: true })
@@ -13,11 +16,14 @@ export class NewAcademicAsignature implements Partial<AcademicAsignature> {
   code?: string;
 
   @Field({ nullable: true })
-  weight?: number;
+  minWeight?: number;
+
+  @Field({ nullable: true })
+  maxWeight?: number;
 
   @Field({ nullable: true })
   academicAreaId?: string;
 
-  @Field({ nullable: true })
-  schoolId?: string;
+  @Field(() => [String], { nullable: true })
+  academicGradeId?: [string];
 }

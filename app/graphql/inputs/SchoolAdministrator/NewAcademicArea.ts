@@ -4,6 +4,9 @@ import { AcademicArea } from '../../models/SchoolAdministrator/AcademicArea';
 @InputType()
 export class NewAcademicArea implements Partial<AcademicArea> {
   @Field({ nullable: true })
+  schoolId?: string;
+
+  @Field({ nullable: true })
   name?: string;
 
   @Field({ nullable: true })
@@ -12,6 +15,6 @@ export class NewAcademicArea implements Partial<AcademicArea> {
   @Field({ nullable: true })
   generalAcademicAreaId?: string;
 
-  @Field({ nullable: true })
-  schoolId?: string;
+  @Field(() => [String], { nullable: true })
+  academicGradeId?: [string];
 }

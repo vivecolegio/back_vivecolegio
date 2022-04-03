@@ -1,4 +1,5 @@
 import { Field, InputType } from 'type-graphql';
+import { Day } from '../../enums/Day';
 import { AcademicDay } from '../../models/CampusAdministrator/AcademicDay';
 
 @InputType()
@@ -7,8 +8,8 @@ export class NewAcademicDay implements Partial<AcademicDay> {
   campusId?: string;
 
   @Field({ nullable: true })
-  workingDay?: string;
+  name?: string;
 
-  @Field({ nullable: true })
-  typeDay?: string;
+  @Field(() => [Day], { nullable: true })
+  day?: [Day];
 }

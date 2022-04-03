@@ -14,11 +14,11 @@ export class NewTeacher implements Partial<Teacher> {
   userId?: string;
 
   @Field({ nullable: true })
-  assignaturesId?: string;
-
-  @Field({ nullable: true })
   attentionSchedule?: string;
 
   @Field({ nullable: true })
   newUser?: NewUser;
+
+  @Field(() => [String], { nullable: true })
+  academicAsignatureId?: [string];
 }
