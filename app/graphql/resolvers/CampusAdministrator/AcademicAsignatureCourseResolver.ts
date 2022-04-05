@@ -191,7 +191,7 @@ export class AcademicAsignatureCourseResolver {
 
     @FieldResolver((_type) => AcademicAsignature, { nullable: true })
     async academicAsignature(@Root() data: AcademicAsignatureCourse) {
-        let id = data.academicAsignature;
+        let id = data.academicAsignatureId;
         if (id !== null && id !== undefined) {
             const result = await this.repositoryAcademicAsignature.findOneBy(id);
             return result;
