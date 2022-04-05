@@ -41,4 +41,7 @@ export class NewMenuItem implements Partial<MenuItem> {
 
   @Field({ nullable: true })
   inactiveAction?: Boolean;
+
+  @Field({ nullable: true })
+  isHidden?: Boolean;
 }

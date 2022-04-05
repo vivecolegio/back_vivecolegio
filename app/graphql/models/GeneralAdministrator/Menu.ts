@@ -70,10 +70,14 @@ export class Menu extends IModelData {
 
   @Field(() => [MenuItem], { nullable: true })
   menuItemsLogin?: [MenuItem];
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  isHidden?: Boolean;
 }
 
 @ObjectType()
-export class MenuEdge extends EdgeType('Menu', Menu) {}
+export class MenuEdge extends EdgeType('Menu', Menu) { }
 
 @ObjectType()
-export class MenuConnection extends ConnectionType<MenuEdge>('Menu', MenuEdge) {}
+export class MenuConnection extends ConnectionType<MenuEdge>('Menu', MenuEdge) { }

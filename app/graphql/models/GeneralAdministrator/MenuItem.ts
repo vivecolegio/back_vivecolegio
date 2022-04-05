@@ -72,10 +72,15 @@ export class MenuItem extends IModelData {
   @Field({ nullable: true })
   @Column({ nullable: true })
   inactiveAction?: Boolean;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  isHidden?: Boolean;
+
 }
 
 @ObjectType()
-export class MenuItemEdge extends EdgeType('MenuItem', MenuItem) {}
+export class MenuItemEdge extends EdgeType('MenuItem', MenuItem) { }
 
 @ObjectType()
-export class MenuItemConnection extends ConnectionType<MenuItemEdge>('MenuItem', MenuItemEdge) {}
+export class MenuItemConnection extends ConnectionType<MenuItemEdge>('MenuItem', MenuItemEdge) { }
