@@ -2,13 +2,16 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicAsignatureCourseRepository, CampusRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAsignatureCourseRepository, AcademicAsignatureRepository, CampusRepository, CourseRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicAsignatureCourse } from '../../inputs/CampusAdministrator/NewAcademicAsignatureCourse';
 import { IContext } from '../../interfaces/IContext';
 import { AcademicAsignatureCourse, AcademicAsignatureCourseConnection } from '../../models/CampusAdministrator/AcademicAsignatureCourse';
+import { Course } from '../../models/CampusAdministrator/Course';
+import { Teacher } from '../../models/CampusAdministrator/Teacher';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { User } from '../../models/GeneralAdministrator/User';
+import { AcademicAsignature } from '../../models/SchoolAdministrator/AcademicAsignature';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
 @Resolver(AcademicAsignatureCourse)
@@ -21,6 +24,16 @@ export class AcademicAsignatureCourseResolver {
 
     @InjectRepository(Campus)
     private repositoryCampus = CampusRepository;
+
+    @InjectRepository(AcademicAsignature)
+    private repositoryAcademicAsignature = AcademicAsignatureRepository;
+
+    @InjectRepository(Course)
+    private repositoryCourse = CourseRepository;
+
+    @InjectRepository(Teacher)
+    private repositoryTeacher = TeacherRepository;
+
 
     @Query(() => AcademicAsignatureCourse, { nullable: true })
     async getAcademicAsignatureCourse(@Arg('id', () => String) id: string) {
@@ -171,6 +184,36 @@ export class AcademicAsignatureCourseResolver {
         let id = data.campusId;
         if (id !== null && id !== undefined) {
             const result = await this.repositoryCampus.findOneBy(id);
+            return result;
+        }
+        return null;
+    }
+
+    @FieldResolver((_type) => AcademicAsignature, { nullable: true })
+    async academicAsignature(@Root() data: AcademicAsignatureCourse) {
+        let id = data.academicAsignature;
+        if (id !== null && id !== undefined) {
+            const result = await this.repositoryAcademicAsignature.findOneBy(id);
+            return result;
+        }
+        return null;
+    }
+
+    @FieldResolver((_type) => Course, { nullable: true })
+    async course(@Root() data: AcademicAsignatureCourse) {
+        let id = data.courseId;
+        if (id !== null && id !== undefined) {
+            const result = await this.repositoryCourse.findOneBy(id);
+            return result;
+        }
+        return null;
+    }
+
+    @FieldResolver((_type) => Teacher, { nullable: true })
+    async teacher(@Root() data: AcademicAsignatureCourse) {
+        let id = data.teacherId;
+        if (id !== null && id !== undefined) {
+            const result = await this.repositoryTeacher.findOneBy(id);
             return result;
         }
         return null;
