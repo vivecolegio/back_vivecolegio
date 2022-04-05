@@ -17,6 +17,7 @@ import { GeneralAcademicAsignature } from '../graphql/models/GeneralAdministrato
 import { GeneralAcademicCycle } from '../graphql/models/GeneralAdministrator/GeneralAcademicCycle';
 import { GeneralAcademicGrade } from '../graphql/models/GeneralAdministrator/GeneralAcademicGrade';
 import { GeneralAcademicStandard } from '../graphql/models/GeneralAdministrator/GeneralAcademicStandard';
+import { GeneralBasicLearningRight } from '../graphql/models/GeneralAdministrator/GeneralBasicLearningRight';
 import { GeneralPerformanceLevel } from '../graphql/models/GeneralAdministrator/GeneralPerformanceLevel';
 import { Inbox } from '../graphql/models/GeneralAdministrator/Inbox';
 import { Menu } from '../graphql/models/GeneralAdministrator/Menu';
@@ -39,9 +40,11 @@ import { CampusAdministrator } from '../graphql/models/SchoolAdministrator/Campu
 import { CampusCoordinator } from '../graphql/models/SchoolAdministrator/CampusCoordinator';
 import { EducationLevel } from '../graphql/models/SchoolAdministrator/EducationLevel';
 import { EvaluativeComponent } from '../graphql/models/SchoolAdministrator/EvaluativeComponent';
+import { EvidenceLearning } from '../graphql/models/SchoolAdministrator/EvidenceLearning';
 import { Forum } from '../graphql/models/SchoolAdministrator/Forum';
 import { ForumInteraction } from '../graphql/models/SchoolAdministrator/ForumInteraction';
 import { GradeAssignment } from '../graphql/models/SchoolAdministrator/GradeAssignment';
+import { Learning } from '../graphql/models/SchoolAdministrator/Learning';
 import { Modality } from '../graphql/models/SchoolAdministrator/Modality';
 import { PerformanceLevel } from '../graphql/models/SchoolAdministrator/PerformanceLevel';
 import { SchoolYear } from '../graphql/models/SchoolAdministrator/SchoolYear';
@@ -98,7 +101,10 @@ export const dataSource = new DataSource({
     Forum,
     ForumInteraction,
     AcademicAsignatureCourse,
-    AcademicSchedule
+    AcademicSchedule,
+    Learning,
+    EvidenceLearning,
+    GeneralBasicLearningRight
   ],
   synchronize: true,
   logger: 'advanced-console',
@@ -155,3 +161,6 @@ export const ForumRepository = dataSource.getMongoRepository(Forum);
 export const ForumInteractionRepository = dataSource.getMongoRepository(ForumInteraction);
 export const AcademicAsignatureCourseRepository = dataSource.getMongoRepository(AcademicAsignatureCourse);
 export const AcademicScheduleRepository = dataSource.getMongoRepository(AcademicSchedule);
+export const LearningRepository = dataSource.getMongoRepository(Learning);
+export const EvidenceLearningRepository = dataSource.getMongoRepository(EvidenceLearning);
+export const GeneralBasicLearningRightRepository = dataSource.getMongoRepository(GeneralBasicLearningRight);
