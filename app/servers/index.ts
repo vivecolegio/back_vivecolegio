@@ -13,7 +13,9 @@ import Morgan from 'morgan';
 import 'reflect-metadata';
 import { buildSchemaSync, createResolversMap } from 'type-graphql';
 import { SERVER_NAME_APP, SERVER_PORT_APP } from '../config';
+import { AcademicAsignatureCourseResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAsignatureCourseResolver';
 import { AcademicHourResolver } from '../graphql/resolvers/CampusAdministrator/AcademicHourResolver';
+import { AcademicScheduleResolver } from '../graphql/resolvers/CampusAdministrator/AcademicScheduleResolver';
 import { AuditLoginResolver } from '../graphql/resolvers/GeneralAdministrator/AuditLoginResolver';
 import { GenderResolver } from '../graphql/resolvers/GeneralAdministrator/GenderResolver';
 import { GeneralAcademicAsignatureResolver } from '../graphql/resolvers/GeneralAdministrator/GeneralAcademicAsignatureResolver';
@@ -109,7 +111,9 @@ async function app() {
         GuardianResolver,
         TeacherResolver,
         ForumResolver,
-        ForumInteractionResolver
+        ForumInteractionResolver,
+        AcademicAsignatureCourseResolver,
+        AcademicScheduleResolver
       ],
       emitSchemaFile: true,
       validate: false,
