@@ -49,33 +49,101 @@ export class AcademicStandardResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => String) schoolId: String,
+    @Arg('academicAsignatureId', () => String, { nullable: true }) academicAsignatureId: string,
+    @Arg('generalAcademicCycleId', () => String, { nullable: true }) generalAcademicCycleId: string,
   ): Promise<AcademicStandardConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
-        result = await this.repository.findBy({
-          where: { schoolId },
-          order: { createdAt: 'DESC' },
-        });
+        if (academicAsignatureId && generalAcademicCycleId) {
+          result = await this.repository.findBy({
+            where: { schoolId, academicAsignatureId, generalAcademicCycleId },
+            order: { createdAt: 'DESC' },
+          });
+        } else {
+          if (academicAsignatureId) {
+            result = await this.repository.findBy({
+              where: { schoolId, academicAsignatureId },
+              order: { createdAt: 'DESC' },
+            });
+          } else {
+            result = await this.repository.findBy({
+              where: { schoolId, generalAcademicCycleId },
+              order: { createdAt: 'DESC' },
+            });
+          }
+        }
       } else {
-        result = await this.repository.findBy({ where: { schoolId } });
+        if (academicAsignatureId && generalAcademicCycleId) {
+          result = await this.repository.findBy({
+            where: { schoolId, academicAsignatureId, generalAcademicCycleId },
+          });
+        } else {
+          if (academicAsignatureId) {
+            result = await this.repository.findBy({
+              where: { schoolId, academicAsignatureId },
+            });
+          } else {
+            result = await this.repository.findBy({
+              where: { schoolId, generalAcademicCycleId },
+            });
+          }
+        }
       }
     } else {
       if (orderCreated) {
-        result = await this.repository.findBy({
-          where: {
-            schoolId,
-            active: true,
-          },
-          order: { createdAt: 'DESC' },
-        });
+        if (academicAsignatureId && generalAcademicCycleId) {
+          result = await this.repository.findBy({
+            where: {
+              schoolId, academicAsignatureId, generalAcademicCycleId,
+              active: true,
+            },
+            order: { createdAt: 'DESC' },
+          });
+        } else {
+          if (academicAsignatureId) {
+            result = await this.repository.findBy({
+              where: {
+                schoolId, academicAsignatureId,
+                active: true,
+              },
+              order: { createdAt: 'DESC' },
+            });
+          } else {
+            result = await this.repository.findBy({
+              where: {
+                schoolId, generalAcademicCycleId,
+                active: true,
+              },
+              order: { createdAt: 'DESC' },
+            });
+          }
+        }
       } else {
-        result = await this.repository.findBy({
-          where: {
-            schoolId,
-            active: true,
-          },
-        });
+        if (academicAsignatureId && generalAcademicCycleId) {
+          result = await this.repository.findBy({
+            where: {
+              schoolId, academicAsignatureId, generalAcademicCycleId,
+              active: true,
+            },
+          });
+        } else {
+          if (academicAsignatureId) {
+            result = await this.repository.findBy({
+              where: {
+                schoolId, academicAsignatureId,
+                active: true,
+              },
+            });
+          } else {
+            result = await this.repository.findBy({
+              where: {
+                schoolId, generalAcademicCycleId,
+                active: true,
+              },
+            });
+          }
+        }
       }
     }
     let resultConn = new AcademicStandardConnection();
