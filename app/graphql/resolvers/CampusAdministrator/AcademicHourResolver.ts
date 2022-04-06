@@ -41,39 +41,80 @@ export class AcademicHourResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('campusId', () => String) campusId: String,
+    @Arg('academicDayId', () => String, { nullable: true }) academicDayId: String,
   ): Promise<AcademicHourConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
-        result = await this.repository.findBy({
-          where: [{
-            campusId
-          }],
-          order: { createdAt: 'DESC' },
-        });
+        if (academicDayId) {
+          result = await this.repository.findBy({
+            where: [{
+              campusId,
+              academicDayId
+            }],
+            order: { createdAt: 'DESC' },
+          });
+        } else {
+          result = await this.repository.findBy({
+            where: [{
+              campusId
+            }],
+            order: { createdAt: 'DESC' },
+          });
+        }
       } else {
-        result = await this.repository.findBy({
-          where: {
-            campusId
-          },
-        });
+        if (academicDayId) {
+          result = await this.repository.findBy({
+            where: [{
+              campusId,
+              academicDayId
+            }],
+          });
+        } else {
+          result = await this.repository.findBy({
+            where: [{
+              campusId
+            }],
+          });
+        }
       }
     } else {
       if (orderCreated) {
-        result = await this.repository.findBy({
-          where: {
-            campusId,
-            active: true,
-          },
-          order: { createdAt: 'DESC' },
-        });
+        if (academicDayId) {
+          result = await this.repository.findBy({
+            where: [{
+              campusId,
+              academicDayId,
+              active: true
+            }],
+            order: { createdAt: 'DESC' },
+          });
+        } else {
+          result = await this.repository.findBy({
+            where: [{
+              campusId,
+              active: true
+            }],
+            order: { createdAt: 'DESC' },
+          });
+        }
       } else {
-        result = await this.repository.findBy({
-          where: {
-            campusId,
-            active: true,
-          },
-        });
+        if (academicDayId) {
+          result = await this.repository.findBy({
+            where: [{
+              campusId,
+              academicDayId,
+              active: true
+            }],
+          });
+        } else {
+          result = await this.repository.findBy({
+            where: [{
+              campusId,
+              active: true
+            }],
+          });
+        }
       }
     }
     let resultConn = new AcademicHourConnection();
