@@ -40,34 +40,66 @@ export class AcademicAsignatureResolver {
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
-    @Arg('schoolId', () => String, { nullable: true }) schoolId: String,
+    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('academicAreaId', () => String, { nullable: true }) academicAreaId: string,
   ): Promise<AcademicAsignatureConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
-        result = await this.repository.findBy({
-          where: { schoolId },
-          order: { createdAt: 'DESC' },
-        });
+        if (academicAreaId) {
+          result = await this.repository.findBy({
+            where: { schoolId, academicAreaId },
+            order: { createdAt: 'DESC' },
+          });
+        } else {
+          result = await this.repository.findBy({
+            where: { schoolId },
+            order: { createdAt: 'DESC' },
+          });
+        }
       } else {
-        result = await this.repository.findBy({ where: { schoolId } });
+        if (academicAreaId) {
+          result = await this.repository.findBy({ where: { schoolId, academicAreaId } });
+        } else {
+          result = await this.repository.findBy({ where: { schoolId } });
+        }
       }
     } else {
       if (orderCreated) {
-        result = await this.repository.findBy({
-          where: {
-            schoolId,
-            active: true,
-          },
-          order: { createdAt: 'DESC' },
-        });
+        if (academicAreaId) {
+          result = await this.repository.findBy({
+            where: {
+              schoolId,
+              academicAreaId,
+              active: true,
+            },
+            order: { createdAt: 'DESC' },
+          });
+        } else {
+          result = await this.repository.findBy({
+            where: {
+              schoolId,
+              active: true,
+            },
+            order: { createdAt: 'DESC' },
+          });
+        }
       } else {
-        result = await this.repository.findBy({
-          where: {
-            schoolId,
-            active: true,
-          },
-        });
+        if (academicAreaId) {
+          result = await this.repository.findBy({
+            where: {
+              schoolId, academicAreaId,
+              active: true,
+            },
+          });
+        } else {
+          result = await this.repository.findBy({
+            where: {
+              schoolId,
+              active: true,
+            },
+          });
+        }
       }
     }
     let resultConn = new AcademicAsignatureConnection();
