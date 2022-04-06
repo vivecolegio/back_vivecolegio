@@ -26,4 +26,8 @@ export class NewAcademicAsignature implements Partial<AcademicAsignature> {
 
   @Field(() => [String], { nullable: true })
   academicGradeId?: [string];
+
+  @Field({ nullable: true })
+  generalAcademicAsignatureId?: string;
+
 }
