@@ -5,6 +5,7 @@ import { AcademicDay } from '../graphql/models/CampusAdministrator/AcademicDay';
 import { AcademicHour } from '../graphql/models/CampusAdministrator/AcademicHour';
 import { AcademicSchedule } from '../graphql/models/CampusAdministrator/AcademicSchedule';
 import { Course } from '../graphql/models/CampusAdministrator/Course';
+import { ExperienceLearning } from '../graphql/models/CampusAdministrator/ExperienceLearning';
 import { Guardian } from '../graphql/models/CampusAdministrator/Guardian';
 import { Teacher } from '../graphql/models/CampusAdministrator/Teacher';
 import { AuditLogin } from '../graphql/models/GeneralAdministrator/AuditLogin';
@@ -102,7 +103,8 @@ export const dataSource = new DataSource({
     AcademicSchedule,
     Learning,
     EvidenceLearning,
-    GeneralBasicLearningRight
+    GeneralBasicLearningRight,
+    ExperienceLearning
   ],
   synchronize: true,
   logger: 'advanced-console',
@@ -161,3 +163,4 @@ export const AcademicScheduleRepository = dataSource.getMongoRepository(Academic
 export const LearningRepository = dataSource.getMongoRepository(Learning);
 export const EvidenceLearningRepository = dataSource.getMongoRepository(EvidenceLearning);
 export const GeneralBasicLearningRightRepository = dataSource.getMongoRepository(GeneralBasicLearningRight);
+export const ExperienceLearningRepository = dataSource.getMongoRepository(ExperienceLearning);

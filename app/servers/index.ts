@@ -16,6 +16,7 @@ import { SERVER_NAME_APP, SERVER_PORT_APP } from '../config';
 import { AcademicAsignatureCourseResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAsignatureCourseResolver';
 import { AcademicHourResolver } from '../graphql/resolvers/CampusAdministrator/AcademicHourResolver';
 import { AcademicScheduleResolver } from '../graphql/resolvers/CampusAdministrator/AcademicScheduleResolver';
+import { ExperienceLearningResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningResolver';
 import { AuditLoginResolver } from '../graphql/resolvers/GeneralAdministrator/AuditLoginResolver';
 import { GenderResolver } from '../graphql/resolvers/GeneralAdministrator/GenderResolver';
 import { GeneralAcademicAsignatureResolver } from '../graphql/resolvers/GeneralAdministrator/GeneralAcademicAsignatureResolver';
@@ -117,7 +118,8 @@ async function app() {
         AcademicScheduleResolver,
         LearningResolver,
         EvidenceLearningResolver,
-        GeneralBasicLearningRightResolver
+        GeneralBasicLearningRightResolver,
+        ExperienceLearningResolver
       ],
       emitSchemaFile: true,
       validate: false,
