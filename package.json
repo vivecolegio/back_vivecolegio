@@ -56,6 +56,7 @@
     "graphql-tag": "2.12.6",
     "graphql-tools": "8.2.4",
     "graphql-upload": "13.0.0",
+    "graphql-voyager": "^1.0.0-rc.31",
     "helmet": "5.0.2",
     "jsonwebtoken": "8.5.1",
     "mongodb": "3.7.3",

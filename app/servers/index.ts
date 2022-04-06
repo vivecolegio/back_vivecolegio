@@ -9,6 +9,7 @@ import Cors from 'cors';
 import express from 'express';
 import gql from 'graphql-tag';
 import { graphqlUploadExpress } from 'graphql-upload';
+import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
 import Morgan from 'morgan';
 import 'reflect-metadata';
 import { buildSchemaSync, createResolversMap } from 'type-graphql';
@@ -179,6 +180,7 @@ async function app() {
     app.use(Morgan('common'));
     // app.use(Helmet());
     app.use(Cors());
+    app.use('/voyager', voyagerMiddleware({ endpointUrl: '/graphql' }));
 
     // const openApi = OpenAPI({
     //   schema,

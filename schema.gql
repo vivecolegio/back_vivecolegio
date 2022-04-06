@@ -155,6 +155,8 @@ type AcademicGrade implements IModelSchoolData {
   educationLevelId: String
   generalAcademicCycle: GeneralAcademicCycle
   generalAcademicCycleId: String
+  generalAcademicGrade: GeneralAcademicGrade
+  generalAcademicGradeId: String
   id: ID!
   name: String
   school: School
@@ -293,12 +295,12 @@ type AcademicScheduleEdge {
 type AcademicStandard implements IModelSchoolData {
   academicAsignature: AcademicAsignature
   academicAsignatureId: String
+  academicGrade: AcademicGrade
+  academicGradeId: String
   active: Boolean
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
-  generalAcademicCycle: GeneralAcademicCycle
-  generalAcademicCycleId: String
   generalAcademicStandard: GeneralAcademicStandard
   generalAcademicStandardId: String
   id: ID!
@@ -660,6 +662,38 @@ type EvidenceLearningEdge {
   """Used in `before` and `after` args"""
   cursor: String!
   node: EvidenceLearning!
+}
+
+"""The ExperienceLearning model"""
+type ExperienceLearning implements IModelCampusData {
+  academicAsignatureCourse: AcademicAsignatureCourse
+  academicAsignatureCourseId: String
+  active: Boolean
+  campus: Campus
+  campusId: String
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  id: ID!
+  title: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type ExperienceLearningConnection {
+  edges: [ExperienceLearningEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type ExperienceLearningEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: ExperienceLearning!
 }
 
 """The Forum model"""
@@ -1350,6 +1384,7 @@ type Mutation {
   changeActiveEmail(active: Boolean!, id: String!): Boolean!
   changeActiveEvaluativeComponent(active: Boolean!, id: String!): Boolean!
   changeActiveEvidenceLearning(active: Boolean!, id: String!): Boolean!
+  changeActiveExperienceLearning(active: Boolean!, id: String!): Boolean!
   changeActiveForum(active: Boolean!, id: String!): Boolean!
   changeActiveForumInteraction(active: Boolean!, id: String!): Boolean!
   changeActiveGender(active: Boolean!, id: String!): Boolean!
@@ -1398,6 +1433,7 @@ type Mutation {
   createEmail(data: NewEmail!): Email!
   createEvaluativeComponent(data: NewEvaluativeComponent!): EvaluativeComponent!
   createEvidenceLearning(data: NewEvidenceLearning!): EvidenceLearning!
+  createExperienceLearning(data: NewExperienceLearning!): ExperienceLearning!
   createForum(data: NewForum!): Forum!
   createForumInteraction(data: NewForumInteraction!): ForumInteraction!
   createGender(data: NewGender!): Gender!
@@ -1445,6 +1481,7 @@ type Mutation {
   deleteEmail(id: String!): Boolean!
   deleteEvaluativeComponent(id: String!): Boolean!
   deleteEvidenceLearning(id: String!): Boolean!
+  deleteExperienceLearning(id: String!): Boolean!
   deleteForum(id: String!): Boolean!
   deleteForumInteraction(id: String!): Boolean!
   deleteGender(id: String!): Boolean!
@@ -1495,6 +1532,7 @@ type Mutation {
   updateEmail(data: NewEmail!, id: String!): Email!
   updateEvaluativeComponent(data: NewEvaluativeComponent!, id: String!): EvaluativeComponent!
   updateEvidenceLearning(data: NewEvidenceLearning!, id: String!): EvidenceLearning!
+  updateExperienceLearning(data: NewExperienceLearning!, id: String!): ExperienceLearning!
   updateForum(data: NewForum!, id: String!): Forum!
   updateForumInteraction(data: NewForumInteraction!, id: String!): ForumInteraction!
   updateGender(data: NewGender!, id: String!): Gender!
@@ -1563,6 +1601,7 @@ input NewAcademicDay {
 input NewAcademicGrade {
   educationLevelId: String
   generalAcademicCycleId: String
+  generalAcademicGradeId: String
   name: String
   schoolId: String
   specialtyId: String
@@ -1596,7 +1635,7 @@ input NewAcademicSchedule {
 
 input NewAcademicStandard {
   academicAsignatureId: String
-  generalAcademicCycleId: String
+  academicGradeId: String
   generalAcademicStandardId: String
   schoolId: String
   standard: String
@@ -1667,6 +1706,12 @@ input NewEvidenceLearning {
   learningId: String
   schoolId: String
   statement: String
+}
+
+input NewExperienceLearning {
+  academicAsignatureCourseId: String
+  campusId: String
+  title: String
 }
 
 input NewForum {
@@ -1753,6 +1798,7 @@ input NewLearning {
   academicGradeId: String
   academicStandardId: String
   generalBasicLearningRightId: String
+  schoolId: String
   statement: String
 }
 
@@ -2057,6 +2103,8 @@ type Query {
     schoolId: String!
   ): AcademicGradeConnection!
   getAllAcademicHour(
+    academicDayId: String
+
     """Paginate after opaque cursor"""
     after: String
     allData: Boolean!
@@ -2106,6 +2154,7 @@ type Query {
   ): AcademicScheduleConnection!
   getAllAcademicStandard(
     academicAsignatureId: String
+    academicGradeId: String
 
     """Paginate after opaque cursor"""
     after: String
@@ -2116,7 +2165,6 @@ type Query {
 
     """Paginate first"""
     first: Float
-    generalAcademicCycleId: String
 
     """Paginate last"""
     last: Float
@@ -2283,6 +2331,24 @@ type Query {
     orderCreated: Boolean!
     schoolId: String!
   ): EvidenceLearningConnection!
+  getAllExperienceLearning(
+    academicAsignatureCourseId: String
+
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+    campusId: String!
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): ExperienceLearningConnection!
   getAllForum(
     """Paginate after opaque cursor"""
     after: String
@@ -2778,6 +2844,7 @@ type Query {
   getEmail(id: String!): Email
   getEvaluativeComponent(id: String!): EvaluativeComponent
   getEvidenceLearning(id: String!): EvidenceLearning
+  getExperienceLearning(id: String!): ExperienceLearning
   getForum(id: String!): Forum
   getForumInteraction(id: String!): ForumInteraction
   getGender(id: String!): Gender

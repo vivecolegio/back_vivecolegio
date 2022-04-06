@@ -5,6 +5,7 @@ import Cors from 'cors';
 import Express from 'express';
 import expressJwt from 'express-jwt';
 import { graphqlUploadExpress } from 'graphql-upload';
+import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
 import Morgan from 'morgan';
 import path from 'path';
 import 'reflect-metadata';
@@ -96,7 +97,7 @@ async function app() {
     // }));
     app.use(Cors());
     app.use(expressHealthApi({ apiPath: '/health' }));
-
+    app.use('/voyager', voyagerMiddleware({ endpointUrl: '/graphql' }));
 
     app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }))
     app.use('/public', Express.static(path.join(__dirname, '../public')));
