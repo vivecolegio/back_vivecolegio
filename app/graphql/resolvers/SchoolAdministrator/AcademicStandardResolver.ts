@@ -2,15 +2,15 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicAsignatureRepository, AcademicStandardRepository, GeneralAcademicCycleRepository, GeneralAcademicStandardRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAsignatureRepository, AcademicGradeRepository, AcademicStandardRepository, GeneralAcademicStandardRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicStandard } from '../../inputs/SchoolAdministrator/NewAcademicStandard';
 import { IContext } from '../../interfaces/IContext';
-import { GeneralAcademicCycle } from '../../models/GeneralAdministrator/GeneralAcademicCycle';
 import { GeneralAcademicStandard } from '../../models/GeneralAdministrator/GeneralAcademicStandard';
 import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicAsignature } from '../../models/SchoolAdministrator/AcademicAsignature';
+import { AcademicGrade } from '../../models/SchoolAdministrator/AcademicGrade';
 import {
   AcademicStandard,
   AcademicStandardConnection
@@ -31,8 +31,9 @@ export class AcademicStandardResolver {
   @InjectRepository(AcademicAsignature)
   private repositoryAcademicAsignature = AcademicAsignatureRepository;
 
-  @InjectRepository(GeneralAcademicCycle)
-  private repositoryGeneralAcademicCycle = GeneralAcademicCycleRepository;
+  @InjectRepository(AcademicGrade)
+  private repositoryAcademicGrade = AcademicGradeRepository;
+
 
   @InjectRepository(School)
   private repositorySchool = SchoolRepository;
@@ -50,14 +51,14 @@ export class AcademicStandardResolver {
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => String) schoolId: String,
     @Arg('academicAsignatureId', () => String, { nullable: true }) academicAsignatureId: string,
-    @Arg('generalAcademicCycleId', () => String, { nullable: true }) generalAcademicCycleId: string,
+    @Arg('academicGradeId', () => String, { nullable: true }) academicGradeId: string,
   ): Promise<AcademicStandardConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
-        if (academicAsignatureId && generalAcademicCycleId) {
+        if (academicAsignatureId && academicGradeId) {
           result = await this.repository.findBy({
-            where: { schoolId, academicAsignatureId, generalAcademicCycleId },
+            where: { schoolId, academicAsignatureId, academicGradeId },
             order: { createdAt: 'DESC' },
           });
         } else {
@@ -68,15 +69,15 @@ export class AcademicStandardResolver {
             });
           } else {
             result = await this.repository.findBy({
-              where: { schoolId, generalAcademicCycleId },
+              where: { schoolId, academicGradeId },
               order: { createdAt: 'DESC' },
             });
           }
         }
       } else {
-        if (academicAsignatureId && generalAcademicCycleId) {
+        if (academicAsignatureId && academicGradeId) {
           result = await this.repository.findBy({
-            where: { schoolId, academicAsignatureId, generalAcademicCycleId },
+            where: { schoolId, academicAsignatureId, academicGradeId },
           });
         } else {
           if (academicAsignatureId) {
@@ -85,17 +86,17 @@ export class AcademicStandardResolver {
             });
           } else {
             result = await this.repository.findBy({
-              where: { schoolId, generalAcademicCycleId },
+              where: { schoolId, academicGradeId },
             });
           }
         }
       }
     } else {
       if (orderCreated) {
-        if (academicAsignatureId && generalAcademicCycleId) {
+        if (academicAsignatureId && academicGradeId) {
           result = await this.repository.findBy({
             where: {
-              schoolId, academicAsignatureId, generalAcademicCycleId,
+              schoolId, academicAsignatureId, academicGradeId,
               active: true,
             },
             order: { createdAt: 'DESC' },
@@ -112,7 +113,7 @@ export class AcademicStandardResolver {
           } else {
             result = await this.repository.findBy({
               where: {
-                schoolId, generalAcademicCycleId,
+                schoolId, academicGradeId,
                 active: true,
               },
               order: { createdAt: 'DESC' },
@@ -120,10 +121,10 @@ export class AcademicStandardResolver {
           }
         }
       } else {
-        if (academicAsignatureId && generalAcademicCycleId) {
+        if (academicAsignatureId && academicGradeId) {
           result = await this.repository.findBy({
             where: {
-              schoolId, academicAsignatureId, generalAcademicCycleId,
+              schoolId, academicAsignatureId, academicGradeId,
               active: true,
             },
           });
@@ -138,7 +139,7 @@ export class AcademicStandardResolver {
           } else {
             result = await this.repository.findBy({
               where: {
-                schoolId, generalAcademicCycleId,
+                schoolId, academicGradeId,
                 active: true,
               },
             });
@@ -263,11 +264,11 @@ export class AcademicStandardResolver {
     return null;
   }
 
-  @FieldResolver((_type) => GeneralAcademicCycle, { nullable: true })
-  async generalAcademicCycle(@Root() data: AcademicStandard) {
-    let id = data.generalAcademicCycleId;
+  @FieldResolver((_type) => AcademicGrade, { nullable: true })
+  async academicGrade(@Root() data: AcademicStandard) {
+    let id = data.academicGradeId;
     if (id !== null && id !== undefined) {
-      const result = await this.repositoryGeneralAcademicCycle.findOneBy(id);
+      const result = await this.repositoryAcademicGrade.findOneBy(id);
       return result;
     }
     return null;
