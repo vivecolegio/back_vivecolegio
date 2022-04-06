@@ -40,34 +40,71 @@ export class EvidenceLearningResolver {
         @Args() args: ConnectionArgs,
         @Arg('allData', () => Boolean) allData: Boolean,
         @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
-        @Arg('schoolId', () => String) schoolId: String,
+        @Arg('schoolId', () => String) schoolId: string,
+        @Arg('learningId', () => String, { nullable: true }) learningId: string,
     ): Promise<EvidenceLearningConnection> {
         let result;
         if (allData) {
             if (orderCreated) {
-                result = await this.repository.findBy({
-                    where: { schoolId },
-                    order: { createdAt: 'DESC' },
-                });
+                if (learningId) {
+                    result = await this.repository.findBy({
+                        where: { schoolId, learningId },
+                        order: { createdAt: 'DESC' },
+                    });
+                }
+                else {
+                    result = await this.repository.findBy({
+                        where: { schoolId },
+                        order: { createdAt: 'DESC' },
+                    });
+                }
             } else {
-                result = await this.repository.findBy({ where: { schoolId } });
+                if (learningId) {
+                    result = await this.repository.findBy({ where: { schoolId, learningId } });
+                }
+                else {
+                    result = await this.repository.findBy({ where: { schoolId } });
+                }
             }
         } else {
             if (orderCreated) {
-                result = await this.repository.findBy({
-                    where: {
-                        schoolId,
-                        active: true,
-                    },
-                    order: { createdAt: 'DESC' },
-                });
+                if (learningId) {
+                    result = await this.repository.findBy({
+                        where: {
+                            schoolId,
+                            learningId,
+                            active: true,
+                        },
+                        order: { createdAt: 'DESC' },
+                    });
+                }
+                else {
+                    result = await this.repository.findBy({
+                        where: {
+                            schoolId,
+                            active: true,
+                        },
+                        order: { createdAt: 'DESC' },
+                    });
+                }
             } else {
-                result = await this.repository.findBy({
-                    where: {
-                        schoolId,
-                        active: true,
-                    },
-                });
+                if (learningId) {
+                    result = await this.repository.findBy({
+                        where: {
+                            schoolId,
+                            learningId,
+                            active: true,
+                        },
+                    });
+                }
+                else {
+                    result = await this.repository.findBy({
+                        where: {
+                            schoolId,
+                            active: true,
+                        },
+                    });
+                }
             }
         }
         let resultConn = new EvidenceLearningConnection();

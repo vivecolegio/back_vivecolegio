@@ -39,31 +39,96 @@ export class GeneralBasicLearningRightResolver {
     async getAllGeneralBasicLearningRight(
         @Args() args: ConnectionArgs,
         @Arg('allData', () => Boolean) allData: Boolean,
-        @Arg('orderCreated', () => Boolean) orderCreated: Boolean
+        @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
+        @Arg('generalAcademicAsignatureId', () => String, { nullable: true }) generalAcademicAsignatureId: string,
+        @Arg('generalAcademicGradeId', () => String, { nullable: true }) generalAcademicGradeId: string,
     ): Promise<GeneralBasicLearningRightConnection> {
         let result;
         if (allData) {
             if (orderCreated) {
-                result = await this.repository.findBy({
-                    order: { createdAt: 'DESC' },
-                });
+                if (generalAcademicAsignatureId && generalAcademicGradeId) {
+                    result = await this.repository.findBy({
+                        where: { generalAcademicAsignatureId, generalAcademicGradeId },
+                        order: { createdAt: 'DESC' },
+                    });
+                } else {
+                    if (generalAcademicAsignatureId) {
+                        result = await this.repository.findBy({
+                            where: { generalAcademicAsignatureId },
+                            order: { createdAt: 'DESC' },
+                        });
+                    } else {
+                        result = await this.repository.findBy({
+                            where: { generalAcademicGradeId },
+                            order: { createdAt: 'DESC' },
+                        });
+                    }
+                }
             } else {
-                result = await this.repository.find();
+                if (generalAcademicAsignatureId && generalAcademicGradeId) {
+                    result = await this.repository.findBy({
+                        where: { generalAcademicAsignatureId, generalAcademicGradeId },
+                    });
+                } else {
+                    if (generalAcademicAsignatureId) {
+                        result = await this.repository.findBy({
+                            where: { generalAcademicAsignatureId },
+                        });
+                    } else {
+                        result = await this.repository.findBy({
+                            where: { generalAcademicGradeId },
+                        });
+                    }
+                }
             }
         } else {
             if (orderCreated) {
-                result = await this.repository.findBy({
-                    where: {
-                        active: true,
-                    },
-                    order: { createdAt: 'DESC' },
-                });
+                if (generalAcademicAsignatureId && generalAcademicGradeId) {
+                    result = await this.repository.findBy({
+                        where: {
+                            generalAcademicAsignatureId, generalAcademicGradeId, active: true,
+                        },
+                        order: { createdAt: 'DESC' },
+                    });
+                } else {
+                    if (generalAcademicAsignatureId) {
+                        result = await this.repository.findBy({
+                            where: {
+                                generalAcademicAsignatureId, active: true,
+                            },
+                            order: { createdAt: 'DESC' },
+                        });
+                    } else {
+                        result = await this.repository.findBy({
+                            where: {
+                                generalAcademicGradeId, active: true,
+                            },
+                            order: { createdAt: 'DESC' },
+                        });
+                    }
+                }
             } else {
-                result = await this.repository.findBy({
-                    where: {
-                        active: true,
-                    },
-                });
+                if (generalAcademicAsignatureId && generalAcademicGradeId) {
+                    result = await this.repository.findBy({
+                        where: {
+                            generalAcademicAsignatureId, generalAcademicGradeId, active: true,
+                        },
+                    });
+                } else {
+                    if (generalAcademicAsignatureId) {
+                        result = await this.repository.findBy({
+                            where: {
+                                generalAcademicAsignatureId, active: true,
+                            },
+                        });
+                    } else {
+                        result = await this.repository.findBy({
+                            where: {
+                                generalAcademicGradeId, active: true,
+                            },
+                        });
+                    }
+                }
             }
         }
         let resultConn = new GeneralBasicLearningRightConnection();

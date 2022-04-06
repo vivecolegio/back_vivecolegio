@@ -1,5 +1,6 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Column, Entity } from 'typeorm';
+import { Day } from '../../enums/Day';
 import { IModelCampusData } from '../../interfaces/IModelCampusData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { AcademicAsignatureCourse } from './AcademicAsignatureCourse';
@@ -44,6 +45,10 @@ export class AcademicSchedule extends IModelCampusData {
 
     @Field({ nullable: true })
     endAcademicHour?: AcademicHour;
+
+    @Field({ nullable: true })
+    @Column({ nullable: true })
+    day?: Day;
 
 }
 

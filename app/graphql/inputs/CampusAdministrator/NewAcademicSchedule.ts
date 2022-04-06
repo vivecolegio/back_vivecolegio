@@ -1,4 +1,5 @@
 import { Field, InputType } from 'type-graphql';
+import { Day } from '../../enums/Day';
 import { AcademicSchedule } from '../../models/CampusAdministrator/AcademicSchedule';
 
 @InputType()
@@ -20,4 +21,7 @@ export class NewAcademicSchedule implements Partial<AcademicSchedule> {
 
     @Field({ nullable: true })
     endAcademicHourId?: string;
+
+    @Field({ nullable: true })
+    day?: Day;
 }

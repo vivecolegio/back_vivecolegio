@@ -9,4 +9,7 @@ export class NewEvidenceLearning implements Partial<EvidenceLearning> {
     @Field({ nullable: true })
     learningId?: string;
 
+    @Field({ nullable: true })
+    schoolId?: string;
+
 }

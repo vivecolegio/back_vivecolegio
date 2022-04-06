@@ -40,7 +40,7 @@ export class AcademicAsignatureResolver {
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
-    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('schoolId', () => String, { nullable: true }) schoolId: String,
   ): Promise<AcademicAsignatureConnection> {
     let result;
     if (allData) {

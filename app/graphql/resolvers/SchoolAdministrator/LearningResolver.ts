@@ -52,34 +52,84 @@ export class LearningResolver {
         @Args() args: ConnectionArgs,
         @Arg('allData', () => Boolean) allData: Boolean,
         @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
-        @Arg('schoolId', () => String) schoolId: String,
+        @Arg('schoolId', () => String) schoolId: string,
+        @Arg('academicAsignatureId', () => String, { nullable: true }) academicAsignatureId: string,
+        @Arg('academicGradeId', () => String, { nullable: true }) academicGradeId: string,
     ): Promise<LearningConnection> {
         let result;
         if (allData) {
             if (orderCreated) {
-                result = await this.repository.findBy({
-                    where: { schoolId },
-                    order: { createdAt: 'DESC' },
-                });
+                if (academicAsignatureId && academicGradeId) {
+                    result = await this.repository.findBy({
+                        where: { schoolId, academicAsignatureId, academicGradeId },
+                        order: { createdAt: 'DESC' },
+                    });
+                } else {
+                    if (academicAsignatureId) {
+                        result = await this.repository.findBy({
+                            where: { schoolId, academicAsignatureId },
+                            order: { createdAt: 'DESC' },
+                        });
+                    } else {
+                        result = await this.repository.findBy({
+                            where: { schoolId, academicGradeId },
+                            order: { createdAt: 'DESC' },
+                        });
+                    }
+                }
             } else {
-                result = await this.repository.findBy({ where: { schoolId } });
+                if (academicAsignatureId && academicGradeId) {
+                    result = await this.repository.findBy({
+                        where: { schoolId, academicAsignatureId, academicGradeId }
+                    });
+                } else {
+                    if (academicAsignatureId) {
+                        result = await this.repository.findBy({
+                            where: { schoolId, academicAsignatureId },
+                        });
+                    } else {
+                        result = await this.repository.findBy({
+                            where: { schoolId, academicGradeId },
+                        });
+                    }
+                }
             }
         } else {
             if (orderCreated) {
-                result = await this.repository.findBy({
-                    where: {
-                        schoolId,
-                        active: true,
-                    },
-                    order: { createdAt: 'DESC' },
-                });
+                if (academicAsignatureId && academicGradeId) {
+                    result = await this.repository.findBy({
+                        where: { schoolId, academicAsignatureId, academicGradeId, active: true },
+                        order: { createdAt: 'DESC' },
+                    });
+                } else {
+                    if (academicAsignatureId) {
+                        result = await this.repository.findBy({
+                            where: { schoolId, academicAsignatureId, active: true },
+                            order: { createdAt: 'DESC' },
+                        });
+                    } else {
+                        result = await this.repository.findBy({
+                            where: { schoolId, academicGradeId, active: true },
+                            order: { createdAt: 'DESC' },
+                        });
+                    }
+                }
             } else {
-                result = await this.repository.findBy({
-                    where: {
-                        schoolId,
-                        active: true,
-                    },
-                });
+                if (academicAsignatureId && academicGradeId) {
+                    result = await this.repository.findBy({
+                        where: { schoolId, academicAsignatureId, academicGradeId, active: true }
+                    });
+                } else {
+                    if (academicAsignatureId) {
+                        result = await this.repository.findBy({
+                            where: { schoolId, academicAsignatureId, active: true },
+                        });
+                    } else {
+                        result = await this.repository.findBy({
+                            where: { schoolId, academicGradeId, active: true },
+                        });
+                    }
+                }
             }
         }
         let resultConn = new LearningConnection();
