@@ -50,6 +50,8 @@ type AcademicAsignature implements IModelSchoolData {
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  generalAcademicAsignature: GeneralAcademicAsignature
+  generalAcademicAsignatureId: String
   id: ID!
   maxWeight: Float
   minWeight: Float
@@ -211,42 +213,6 @@ type AcademicHourEdge {
   """Used in `before` and `after` args"""
   cursor: String!
   node: AcademicHour!
-}
-
-"""The AcademicIndicator model"""
-type AcademicIndicator implements IModelSchoolData {
-  academicAsignature: AcademicAsignature
-  academicAsignatureId: String
-  academicGrade: AcademicGrade
-  academicGradeId: String
-  academicStandard: AcademicStandard
-  academicStandardId: String
-  active: Boolean
-  createdAt: DateTime
-  createdByUser: User
-  createdByUserId: String
-  id: ID!
-  indicator: String
-  school: School
-  schoolId: String
-  updatedAt: DateTime
-  updatedByUser: User
-  updatedByUserId: String
-  version: Float
-}
-
-type AcademicIndicatorConnection {
-  edges: [AcademicIndicatorEdge!]!
-  pageInfo: PageInfo!
-
-  """Total Count"""
-  totalCount: Float
-}
-
-type AcademicIndicatorEdge {
-  """Used in `before` and `after` args"""
-  cursor: String!
-  node: AcademicIndicator!
 }
 
 """The AcademicPeriod model"""
@@ -663,6 +629,39 @@ type EvaluativeComponentEdge {
   node: EvaluativeComponent!
 }
 
+"""The EvidenceLearning model"""
+type EvidenceLearning implements IModelSchoolData {
+  academicStandard: Learning
+  active: Boolean
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  id: ID!
+  learning: Learning
+  learningId: String
+  school: School
+  schoolId: String
+  statement: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type EvidenceLearningConnection {
+  edges: [EvidenceLearningEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type EvidenceLearningEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: EvidenceLearning!
+}
+
 """The Forum model"""
 type Forum implements IModelSchoolData {
   active: Boolean
@@ -907,6 +906,39 @@ type GeneralAcademicStandardEdge {
   node: GeneralAcademicStandard!
 }
 
+"""The GeneralBasicLearningRight model"""
+type GeneralBasicLearningRight implements IModelData {
+  active: Boolean
+  category: String
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  dba: String
+  generalAcademicAsignature: GeneralAcademicAsignature
+  generalAcademicAsignatureId: String
+  generalAcademicGrade: GeneralAcademicGrade
+  generalAcademicGradeId: String
+  id: ID!
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type GeneralBasicLearningRightConnection {
+  edges: [GeneralBasicLearningRightEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type GeneralBasicLearningRightEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: GeneralBasicLearningRight!
+}
+
 """The GeneralPerformanceLevel model"""
 type GeneralPerformanceLevel implements IModelData {
   active: Boolean
@@ -1084,6 +1116,44 @@ type Jwt {
   userId: String
 }
 
+"""The Learning model"""
+type Learning implements IModelSchoolData {
+  academicAsignature: AcademicAsignature
+  academicAsignatureId: String
+  academicGrade: AcademicGrade
+  academicGradeId: String
+  academicStandard: AcademicStandard
+  academicStandardId: String
+  active: Boolean
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  generalBasicLearningRight: GeneralBasicLearningRight
+  generalBasicLearningRightId: String
+  id: ID!
+  school: School
+  schoolId: String
+  statement: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type LearningConnection {
+  edges: [LearningEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type LearningEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: Learning!
+}
+
 """The Menu model"""
 type Menu implements IModelData {
   activateAction: Boolean
@@ -1097,6 +1167,7 @@ type Menu implements IModelData {
   icon: String
   id: ID!
   inactiveAction: Boolean
+  isHidden: Boolean
   menuItems: [MenuItem!]
   menuItemsLogin: [MenuItem!]
   module: Module
@@ -1140,6 +1211,7 @@ type MenuItem implements IModelData {
   icon: String
   id: ID!
   inactiveAction: Boolean
+  isHidden: Boolean
   menu: Menu
   menuId: String
   module: Module
@@ -1265,7 +1337,6 @@ type Mutation {
   changeActiveAcademicDay(active: Boolean!, id: String!): Boolean!
   changeActiveAcademicGrade(active: Boolean!, id: String!): Boolean!
   changeActiveAcademicHour(active: Boolean!, id: String!): Boolean!
-  changeActiveAcademicIndicator(active: Boolean!, id: String!): Boolean!
   changeActiveAcademicPeriod(active: Boolean!, id: String!): Boolean!
   changeActiveAcademicSchedule(active: Boolean!, id: String!): Boolean!
   changeActiveAcademicStandard(active: Boolean!, id: String!): Boolean!
@@ -1278,6 +1349,7 @@ type Mutation {
   changeActiveEducationLevel(active: Boolean!, id: String!): Boolean!
   changeActiveEmail(active: Boolean!, id: String!): Boolean!
   changeActiveEvaluativeComponent(active: Boolean!, id: String!): Boolean!
+  changeActiveEvidenceLearning(active: Boolean!, id: String!): Boolean!
   changeActiveForum(active: Boolean!, id: String!): Boolean!
   changeActiveForumInteraction(active: Boolean!, id: String!): Boolean!
   changeActiveGender(active: Boolean!, id: String!): Boolean!
@@ -1286,10 +1358,12 @@ type Mutation {
   changeActiveGeneralAcademicCycle(active: Boolean!, id: String!): Boolean!
   changeActiveGeneralAcademicGrade(active: Boolean!, id: String!): Boolean!
   changeActiveGeneralAcademicStandard(active: Boolean!, id: String!): Boolean!
+  changeActiveGeneralBasicLearningRight(active: Boolean!, id: String!): Boolean!
   changeActiveGeneralPerformanceLevel(active: Boolean!, id: String!): Boolean!
   changeActiveGradeAssignment(active: Boolean!, id: String!): Boolean!
   changeActiveGuardian(active: Boolean!, id: String!): Boolean!
   changeActiveInbox(active: Boolean!, id: String!): Boolean!
+  changeActiveLearning(active: Boolean!, id: String!): Boolean!
   changeActiveMenu(active: Boolean!, id: String!): Boolean!
   changeActiveMenuItem(active: Boolean!, id: String!): Boolean!
   changeActiveModality(active: Boolean!, id: String!): Boolean!
@@ -1311,7 +1385,6 @@ type Mutation {
   createAcademicDay(data: NewAcademicDay!): AcademicDay!
   createAcademicGrade(data: NewAcademicGrade!): AcademicGrade!
   createAcademicHour(data: NewAcademicHour!): AcademicHour!
-  createAcademicIndicator(data: NewAcademicIndicator!): AcademicIndicator!
   createAcademicPeriod(data: NewAcademicPeriod!): AcademicPeriod!
   createAcademicSchedule(data: NewAcademicSchedule!): AcademicSchedule!
   createAcademicStandard(data: NewAcademicStandard!): AcademicStandard!
@@ -1324,6 +1397,7 @@ type Mutation {
   createEducationLevel(data: NewEducationLevel!): EducationLevel!
   createEmail(data: NewEmail!): Email!
   createEvaluativeComponent(data: NewEvaluativeComponent!): EvaluativeComponent!
+  createEvidenceLearning(data: NewEvidenceLearning!): EvidenceLearning!
   createForum(data: NewForum!): Forum!
   createForumInteraction(data: NewForumInteraction!): ForumInteraction!
   createGender(data: NewGender!): Gender!
@@ -1332,10 +1406,12 @@ type Mutation {
   createGeneralAcademicCycle(data: NewGeneralAcademicCycle!): GeneralAcademicCycle!
   createGeneralAcademicGrade(data: NewGeneralAcademicGrade!): GeneralAcademicGrade!
   createGeneralAcademicStandard(data: NewGeneralAcademicStandard!): GeneralAcademicStandard!
+  createGeneralBasicLearningRight(data: NewGeneralBasicLearningRight!): GeneralBasicLearningRight!
   createGeneralPerformanceLevel(data: NewGeneralPerformanceLevel!): GeneralPerformanceLevel!
   createGradeAssignment(data: NewGradeAssignment!): GradeAssignment!
   createGuardian(data: NewGuardian!): Guardian!
   createInbox(data: NewInbox!): Inbox!
+  createLearning(data: NewLearning!): Learning!
   createMenu(data: NewMenu!): Menu!
   createMenuItem(data: NewMenuItem!): MenuItem!
   createModality(data: NewModality!): Modality!
@@ -1357,7 +1433,6 @@ type Mutation {
   deleteAcademicDay(id: String!): Boolean!
   deleteAcademicGrade(id: String!): Boolean!
   deleteAcademicHour(id: String!): Boolean!
-  deleteAcademicIndicator(id: String!): Boolean!
   deleteAcademicPeriod(id: String!): Boolean!
   deleteAcademicSchedule(id: String!): Boolean!
   deleteAcademicStandard(id: String!): Boolean!
@@ -1369,6 +1444,7 @@ type Mutation {
   deleteEducationLevel(id: String!): Boolean!
   deleteEmail(id: String!): Boolean!
   deleteEvaluativeComponent(id: String!): Boolean!
+  deleteEvidenceLearning(id: String!): Boolean!
   deleteForum(id: String!): Boolean!
   deleteForumInteraction(id: String!): Boolean!
   deleteGender(id: String!): Boolean!
@@ -1377,10 +1453,12 @@ type Mutation {
   deleteGeneralAcademicCycle(id: String!): Boolean!
   deleteGeneralAcademicGrade(id: String!): Boolean!
   deleteGeneralAcademicStandard(id: String!): Boolean!
+  deleteGeneralBasicLearningRight(id: String!): Boolean!
   deleteGeneralPerformanceLevel(id: String!): Boolean!
   deleteGradeAssignment(id: String!): Boolean!
   deleteGuardian(id: String!): Boolean!
   deleteInbox(id: String!): Boolean!
+  deleteLearning(id: String!): Boolean!
   deleteMenu(id: String!): Boolean!
   deleteMenuItem(id: String!): Boolean!
   deleteModality(id: String!): Boolean!
@@ -1404,7 +1482,6 @@ type Mutation {
   updateAcademicDay(data: NewAcademicDay!, id: String!): AcademicDay!
   updateAcademicGrade(data: NewAcademicGrade!, id: String!): AcademicGrade!
   updateAcademicHour(data: NewAcademicHour!, id: String!): AcademicHour!
-  updateAcademicIndicator(data: NewAcademicIndicator!, id: String!): AcademicIndicator!
   updateAcademicPeriod(data: NewAcademicPeriod!, id: String!): AcademicPeriod!
   updateAcademicSchedule(data: NewAcademicSchedule!, id: String!): AcademicSchedule!
   updateAcademicStandard(data: NewAcademicStandard!, id: String!): AcademicStandard!
@@ -1417,6 +1494,7 @@ type Mutation {
   updateEducationLevel(data: NewEducationLevel!, id: String!): EducationLevel!
   updateEmail(data: NewEmail!, id: String!): Email!
   updateEvaluativeComponent(data: NewEvaluativeComponent!, id: String!): EvaluativeComponent!
+  updateEvidenceLearning(data: NewEvidenceLearning!, id: String!): EvidenceLearning!
   updateForum(data: NewForum!, id: String!): Forum!
   updateForumInteraction(data: NewForumInteraction!, id: String!): ForumInteraction!
   updateGender(data: NewGender!, id: String!): Gender!
@@ -1425,10 +1503,12 @@ type Mutation {
   updateGeneralAcademicCycle(data: NewGeneralAcademicCycle!, id: String!): GeneralAcademicCycle!
   updateGeneralAcademicGrade(data: NewGeneralAcademicGrade!, id: String!): GeneralAcademicGrade!
   updateGeneralAcademicStandard(data: NewGeneralAcademicStandard!, id: String!): GeneralAcademicStandard!
+  updateGeneralBasicLearningRight(data: NewGeneralBasicLearningRight!, id: String!): GeneralBasicLearningRight!
   updateGeneralPerformanceLevel(data: NewGeneralPerformanceLevel!, id: String!): GeneralPerformanceLevel!
   updateGradeAssignment(data: NewGradeAssignment!, id: String!): GradeAssignment!
   updateGuardian(data: NewGuardian!, id: String!): Guardian!
   updateInbox(data: NewInbox!, id: String!): Inbox!
+  updateLearning(data: NewLearning!, id: String!): Learning!
   updateMenu(data: NewMenu!, id: String!): Menu!
   updateMenuItem(data: NewMenuItem!, id: String!): MenuItem!
   updateModality(data: NewModality!, id: String!): Modality!
@@ -1459,6 +1539,7 @@ input NewAcademicAsignature {
   academicAreaId: String
   academicGradeId: [String!]
   code: String
+  generalAcademicAsignatureId: String
   maxWeight: Float
   minWeight: Float
   name: String
@@ -1495,14 +1576,6 @@ input NewAcademicHour {
   startTime: String
 }
 
-input NewAcademicIndicator {
-  academicAsignatureId: String
-  academicGradeId: String
-  academicStandardId: String
-  indicator: String
-  schoolId: String
-}
-
 input NewAcademicPeriod {
   endDate: DateTime
   schoolId: String
@@ -1515,6 +1588,7 @@ input NewAcademicSchedule {
   academicAsignatureCourseId: String
   campusId: String
   courseId: String
+  day: String
   endAcademicHourId: String
   startAcademicHourId: String
   teacherId: String
@@ -1589,6 +1663,12 @@ input NewEvaluativeComponent {
   weight: Float
 }
 
+input NewEvidenceLearning {
+  learningId: String
+  schoolId: String
+  statement: String
+}
+
 input NewForum {
   description: String
   details: String
@@ -1633,6 +1713,13 @@ input NewGeneralAcademicStandard {
   type: String
 }
 
+input NewGeneralBasicLearningRight {
+  category: String
+  dba: String
+  generalAcademicAsignatureId: String
+  generalAcademicGradeId: String
+}
+
 input NewGeneralPerformanceLevel {
   name: String
 }
@@ -1661,6 +1748,14 @@ input NewInbox {
   userId: String
 }
 
+input NewLearning {
+  academicAsignatureId: String
+  academicGradeId: String
+  academicStandardId: String
+  generalBasicLearningRightId: String
+  statement: String
+}
+
 input NewMenu {
   activateAction: Boolean
   createAction: Boolean
@@ -1668,6 +1763,7 @@ input NewMenu {
   fullAccess: Boolean
   icon: String
   inactiveAction: Boolean
+  isHidden: Boolean
   moduleId: String
   name: String
   order: Float
@@ -1684,6 +1780,7 @@ input NewMenuItem {
   fullAccess: Boolean
   icon: String
   inactiveAction: Boolean
+  isHidden: Boolean
   menuId: String
   moduleId: String
   name: String
@@ -1874,7 +1971,6 @@ type Query {
   getAcademicDay(id: String!): AcademicDay
   getAcademicGrade(id: String!): AcademicGrade
   getAcademicHour(id: String!): AcademicHour
-  getAcademicIndicator(id: String!): AcademicIndicator
   getAcademicPeriod(id: String!): AcademicPeriod
   getAcademicSchedule(id: String!): AcademicSchedule
   getAcademicStandard(id: String!): AcademicStandard
@@ -1895,6 +1991,8 @@ type Query {
     schoolId: String!
   ): AcademicAreaConnection!
   getAllAcademicAsignature(
+    academicAreaId: String
+
     """Paginate after opaque cursor"""
     after: String
     allData: Boolean!
@@ -1974,22 +2072,6 @@ type Query {
     last: Float
     orderCreated: Boolean!
   ): AcademicHourConnection!
-  getAllAcademicIndicator(
-    """Paginate after opaque cursor"""
-    after: String
-    allData: Boolean!
-
-    """Paginate before opaque cursor"""
-    before: String
-
-    """Paginate first"""
-    first: Float
-
-    """Paginate last"""
-    last: Float
-    orderCreated: Boolean!
-    schoolId: String!
-  ): AcademicIndicatorConnection!
   getAllAcademicPeriod(
     """Paginate after opaque cursor"""
     after: String
@@ -2023,6 +2105,8 @@ type Query {
     orderCreated: Boolean!
   ): AcademicScheduleConnection!
   getAllAcademicStandard(
+    academicAsignatureId: String
+
     """Paginate after opaque cursor"""
     after: String
     allData: Boolean!
@@ -2032,6 +2116,7 @@ type Query {
 
     """Paginate first"""
     first: Float
+    generalAcademicCycleId: String
 
     """Paginate last"""
     last: Float
@@ -2181,6 +2266,23 @@ type Query {
     orderCreated: Boolean!
     schoolId: String!
   ): EvaluativeComponentConnection!
+  getAllEvidenceLearning(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    learningId: String
+    orderCreated: Boolean!
+    schoolId: String!
+  ): EvidenceLearningConnection!
   getAllForum(
     """Paginate after opaque cursor"""
     after: String
@@ -2301,6 +2403,23 @@ type Query {
     last: Float
     orderCreated: Boolean!
   ): GeneralAcademicStandardConnection!
+  getAllGeneralBasicLearningRight(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+    generalAcademicAsignatureId: String
+    generalAcademicGradeId: String
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): GeneralBasicLearningRightConnection!
   getAllGeneralPerformanceLevel(
     """Paginate after opaque cursor"""
     after: String
@@ -2365,6 +2484,25 @@ type Query {
     orderCreated: Boolean!
     userId: String!
   ): InboxConnection!
+  getAllLearning(
+    academicAsignatureId: String
+    academicGradeId: String
+
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+    schoolId: String!
+  ): LearningConnection!
   getAllMenu(
     """Paginate after opaque cursor"""
     after: String
@@ -2639,6 +2777,7 @@ type Query {
   getEducationLevel(id: String!): EducationLevel
   getEmail(id: String!): Email
   getEvaluativeComponent(id: String!): EvaluativeComponent
+  getEvidenceLearning(id: String!): EvidenceLearning
   getForum(id: String!): Forum
   getForumInteraction(id: String!): ForumInteraction
   getGender(id: String!): Gender
@@ -2647,10 +2786,12 @@ type Query {
   getGeneralAcademicCycle(id: String!): GeneralAcademicCycle
   getGeneralAcademicGrade(id: String!): GeneralAcademicGrade
   getGeneralAcademicStandard(id: String!): GeneralAcademicStandard
+  getGeneralBasicLearningRight(id: String!): GeneralBasicLearningRight
   getGeneralPerformanceLevel(id: String!): GeneralPerformanceLevel
   getGradeAssignment(id: String!): GradeAssignment
   getGuardian(id: String!): Guardian
   getInbox(id: String!): Inbox
+  getLearning(id: String!): Learning
   getMenu(id: String!): Menu
   getMenuItem(id: String!): MenuItem
   getModality(id: String!): Modality

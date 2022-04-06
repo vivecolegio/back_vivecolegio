@@ -50,7 +50,6 @@ import { UserResolver } from './../graphql/resolvers/GeneralAdministrator/UserRe
 import { AcademicAreaResolver } from './../graphql/resolvers/SchoolAdministrator/AcademicAreaResolver';
 import { AcademicAsignatureResolver } from './../graphql/resolvers/SchoolAdministrator/AcademicAsignatureResolver';
 import { AcademicGradeResolver } from './../graphql/resolvers/SchoolAdministrator/AcademicGradeResolver';
-import { AcademicIndicatorResolver } from './../graphql/resolvers/SchoolAdministrator/AcademicIndicatorResolver';
 import { AcademicPeriodResolver } from './../graphql/resolvers/SchoolAdministrator/AcademicPeriodResolver';
 import { AcademicStandardResolver } from './../graphql/resolvers/SchoolAdministrator/AcademicStandardResolver';
 import { CampusAdministratorResolver } from './../graphql/resolvers/SchoolAdministrator/CampusAdministratorResolver';
@@ -96,7 +95,6 @@ async function app() {
         AcademicAreaResolver,
         AcademicAsignatureResolver,
         AcademicGradeResolver,
-        AcademicIndicatorResolver,
         AcademicPeriodResolver,
         AcademicStandardResolver,
         CampusAdministratorResolver,
