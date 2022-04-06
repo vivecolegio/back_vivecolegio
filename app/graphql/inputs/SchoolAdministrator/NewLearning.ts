@@ -18,4 +18,7 @@ export class NewLearning implements Partial<Learning> {
     @Field({ nullable: true })
     academicGradeId?: string;
 
+    @Field({ nullable: true })
+    schoolId?: string;
+
 }
