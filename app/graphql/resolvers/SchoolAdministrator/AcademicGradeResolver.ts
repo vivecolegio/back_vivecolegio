@@ -2,11 +2,12 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicGradeRepository, EducationLevelRepository, GeneralAcademicCycleRepository, SchoolRepository, SpecialtyRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicGradeRepository, EducationLevelRepository, GeneralAcademicCycleRepository, GeneralAcademicGradeRepository, SchoolRepository, SpecialtyRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicGrade } from '../../inputs/SchoolAdministrator/NewAcademicGrade';
 import { IContext } from '../../interfaces/IContext';
 import { GeneralAcademicCycle } from '../../models/GeneralAdministrator/GeneralAcademicCycle';
+import { GeneralAcademicGrade } from '../../models/GeneralAdministrator/GeneralAcademicGrade';
 import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import {
@@ -33,6 +34,9 @@ export class AcademicGradeResolver {
 
   @InjectRepository(GeneralAcademicCycle)
   private repositoryGeneralAcademicCycle = GeneralAcademicCycleRepository;
+
+  @InjectRepository(GeneralAcademicGrade)
+  private repositoryGeneralAcademicGrade = GeneralAcademicGradeRepository;
 
   @InjectRepository(School)
   private repositorySchool = SchoolRepository;
@@ -200,6 +204,16 @@ export class AcademicGradeResolver {
     let id = data.generalAcademicCycleId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryGeneralAcademicCycle.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => GeneralAcademicGrade, { nullable: true })
+  async generalAcademicGrade(@Root() data: AcademicGrade) {
+    let id = data.generalAcademicGradeId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryGeneralAcademicGrade.findOneBy(id);
       return result;
     }
     return null;
