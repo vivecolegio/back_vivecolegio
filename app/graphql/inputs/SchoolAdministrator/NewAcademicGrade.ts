@@ -16,5 +16,8 @@ export class NewAcademicGrade implements Partial<AcademicGrade> {
   generalAcademicCycleId?: string;
 
   @Field({ nullable: true })
+  generalAcademicGradeId?: string;
+
+  @Field({ nullable: true })
   schoolId?: string;
 }

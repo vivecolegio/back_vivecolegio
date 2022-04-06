@@ -2,10 +2,11 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicAreaRepository, AcademicAsignatureRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAreaRepository, AcademicAsignatureRepository, GeneralAcademicAsignatureRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicAsignature } from '../../inputs/SchoolAdministrator/NewAcademicAsignature';
 import { IContext } from '../../interfaces/IContext';
+import { GeneralAcademicAsignature } from '../../models/GeneralAdministrator/GeneralAcademicAsignature';
 import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicArea } from '../../models/SchoolAdministrator/AcademicArea';
@@ -28,6 +29,9 @@ export class AcademicAsignatureResolver {
 
   @InjectRepository(School)
   private repositorySchool = SchoolRepository;
+
+  @InjectRepository(GeneralAcademicAsignature)
+  private repositoryGeneralAcademicAsignature = GeneralAcademicAsignatureRepository;
 
   @Query(() => AcademicAsignature, { nullable: true })
   async getAcademicAsignature(@Arg('id', () => String) id: string) {
@@ -204,6 +208,16 @@ export class AcademicAsignatureResolver {
     let id = data.academicAreaId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryAcademicArea.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => GeneralAcademicAsignature, { nullable: true })
+  async generalAcademicAsignature(@Root() data: AcademicAsignature) {
+    let id = data.generalAcademicAsignatureId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryGeneralAcademicAsignature.findOneBy(id);
       return result;
     }
     return null;

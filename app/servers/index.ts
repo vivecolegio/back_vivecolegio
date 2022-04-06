@@ -16,6 +16,7 @@ import { SERVER_NAME_APP, SERVER_PORT_APP } from '../config';
 import { AcademicAsignatureCourseResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAsignatureCourseResolver';
 import { AcademicHourResolver } from '../graphql/resolvers/CampusAdministrator/AcademicHourResolver';
 import { AcademicScheduleResolver } from '../graphql/resolvers/CampusAdministrator/AcademicScheduleResolver';
+import { ExperienceLearningResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningResolver';
 import { AuditLoginResolver } from '../graphql/resolvers/GeneralAdministrator/AuditLoginResolver';
 import { GenderResolver } from '../graphql/resolvers/GeneralAdministrator/GenderResolver';
 import { GeneralAcademicAsignatureResolver } from '../graphql/resolvers/GeneralAdministrator/GeneralAcademicAsignatureResolver';
@@ -50,7 +51,6 @@ import { UserResolver } from './../graphql/resolvers/GeneralAdministrator/UserRe
 import { AcademicAreaResolver } from './../graphql/resolvers/SchoolAdministrator/AcademicAreaResolver';
 import { AcademicAsignatureResolver } from './../graphql/resolvers/SchoolAdministrator/AcademicAsignatureResolver';
 import { AcademicGradeResolver } from './../graphql/resolvers/SchoolAdministrator/AcademicGradeResolver';
-import { AcademicIndicatorResolver } from './../graphql/resolvers/SchoolAdministrator/AcademicIndicatorResolver';
 import { AcademicPeriodResolver } from './../graphql/resolvers/SchoolAdministrator/AcademicPeriodResolver';
 import { AcademicStandardResolver } from './../graphql/resolvers/SchoolAdministrator/AcademicStandardResolver';
 import { CampusAdministratorResolver } from './../graphql/resolvers/SchoolAdministrator/CampusAdministratorResolver';
@@ -96,7 +96,6 @@ async function app() {
         AcademicAreaResolver,
         AcademicAsignatureResolver,
         AcademicGradeResolver,
-        AcademicIndicatorResolver,
         AcademicPeriodResolver,
         AcademicStandardResolver,
         CampusAdministratorResolver,
@@ -119,7 +118,8 @@ async function app() {
         AcademicScheduleResolver,
         LearningResolver,
         EvidenceLearningResolver,
-        GeneralBasicLearningRightResolver
+        GeneralBasicLearningRightResolver,
+        ExperienceLearningResolver
       ],
       emitSchemaFile: true,
       validate: false,

@@ -2,6 +2,7 @@ import { Field, ObjectType } from 'type-graphql';
 import { Column, Entity } from 'typeorm';
 import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
+import { GeneralAcademicAsignature } from '../GeneralAdministrator/GeneralAcademicAsignature';
 import { AcademicArea } from './AcademicArea';
 import { AcademicGrade } from './AcademicGrade';
 @ObjectType({ description: 'The AcademicAsignature model', implements: IModelSchoolData })
@@ -40,6 +41,13 @@ export class AcademicAsignature extends IModelSchoolData {
 
   @Field(() => [AcademicGrade], { nullable: true })
   academicGrade?: [AcademicGrade];
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  generalAcademicAsignatureId?: string;
+
+  @Field({ nullable: true })
+  generalAcademicAsignature?: GeneralAcademicAsignature;
 }
 
 @ObjectType()

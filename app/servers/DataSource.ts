@@ -5,6 +5,7 @@ import { AcademicDay } from '../graphql/models/CampusAdministrator/AcademicDay';
 import { AcademicHour } from '../graphql/models/CampusAdministrator/AcademicHour';
 import { AcademicSchedule } from '../graphql/models/CampusAdministrator/AcademicSchedule';
 import { Course } from '../graphql/models/CampusAdministrator/Course';
+import { ExperienceLearning } from '../graphql/models/CampusAdministrator/ExperienceLearning';
 import { Guardian } from '../graphql/models/CampusAdministrator/Guardian';
 import { Teacher } from '../graphql/models/CampusAdministrator/Teacher';
 import { AuditLogin } from '../graphql/models/GeneralAdministrator/AuditLogin';
@@ -33,7 +34,6 @@ import { User } from '../graphql/models/GeneralAdministrator/User';
 import { AcademicArea } from '../graphql/models/SchoolAdministrator/AcademicArea';
 import { AcademicAsignature } from '../graphql/models/SchoolAdministrator/AcademicAsignature';
 import { AcademicGrade } from '../graphql/models/SchoolAdministrator/AcademicGrade';
-import { AcademicIndicator } from '../graphql/models/SchoolAdministrator/AcademicIndicator';
 import { AcademicPeriod } from '../graphql/models/SchoolAdministrator/AcademicPeriod';
 import { AcademicStandard } from '../graphql/models/SchoolAdministrator/AcademicStandard';
 import { CampusAdministrator } from '../graphql/models/SchoolAdministrator/CampusAdministrator';
@@ -81,7 +81,6 @@ export const dataSource = new DataSource({
     AcademicArea,
     AcademicAsignature,
     AcademicGrade,
-    AcademicIndicator,
     AcademicPeriod,
     AcademicStandard,
     CampusAdministrator,
@@ -104,7 +103,8 @@ export const dataSource = new DataSource({
     AcademicSchedule,
     Learning,
     EvidenceLearning,
-    GeneralBasicLearningRight
+    GeneralBasicLearningRight,
+    ExperienceLearning
   ],
   synchronize: true,
   logger: 'advanced-console',
@@ -140,7 +140,6 @@ export const StudentRepository = dataSource.getMongoRepository(Student);
 export const AcademicAreaRepository = dataSource.getMongoRepository(AcademicArea);
 export const AcademicAsignatureRepository = dataSource.getMongoRepository(AcademicAsignature);
 export const AcademicGradeRepository = dataSource.getMongoRepository(AcademicGrade);
-export const AcademicIndicatorRepository = dataSource.getMongoRepository(AcademicIndicator);
 export const AcademicPeriodRepository = dataSource.getMongoRepository(AcademicPeriod);
 export const AcademicStandardRepository = dataSource.getMongoRepository(AcademicStandard);
 export const CampusAdministratorRepository = dataSource.getMongoRepository(CampusAdministrator);
@@ -164,3 +163,4 @@ export const AcademicScheduleRepository = dataSource.getMongoRepository(Academic
 export const LearningRepository = dataSource.getMongoRepository(Learning);
 export const EvidenceLearningRepository = dataSource.getMongoRepository(EvidenceLearning);
 export const GeneralBasicLearningRightRepository = dataSource.getMongoRepository(GeneralBasicLearningRight);
+export const ExperienceLearningRepository = dataSource.getMongoRepository(ExperienceLearning);

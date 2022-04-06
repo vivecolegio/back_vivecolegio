@@ -3,8 +3,8 @@ import { Column, Entity } from 'typeorm';
 import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { GeneralAcademicStandard } from '../GeneralAdministrator/GeneralAcademicStandard';
-import { GeneralAcademicCycle } from './../GeneralAdministrator/GeneralAcademicCycle';
 import { AcademicAsignature } from './AcademicAsignature';
+import { AcademicGrade } from './AcademicGrade';
 
 @ObjectType({ description: 'The AcademicStandard model', implements: IModelSchoolData })
 @Entity()
@@ -29,17 +29,18 @@ export class AcademicStandard extends IModelSchoolData {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  generalAcademicCycleId?: string;
+  academicGradeId?: string;
 
   @Field({ nullable: true })
-  generalAcademicCycle?: GeneralAcademicCycle;
+  academicGrade?: AcademicGrade;
+
 }
 
 @ObjectType()
-export class AcademicStandardEdge extends EdgeType('AcademicStandard', AcademicStandard) {}
+export class AcademicStandardEdge extends EdgeType('AcademicStandard', AcademicStandard) { }
 
 @ObjectType()
 export class AcademicStandardConnection extends ConnectionType<AcademicStandardEdge>(
   'AcademicStandard',
   AcademicStandardEdge
-) {}
+) { }
