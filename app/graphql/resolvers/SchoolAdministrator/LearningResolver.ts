@@ -259,6 +259,16 @@ export class LearningResolver {
         return null;
     }
 
+    @FieldResolver((_type) => AcademicGrade, { nullable: true })
+    async academicGrade(@Root() data: Learning) {
+        let id = data.academicGradeId;
+        if (id !== null && id !== undefined) {
+            const result = await this.repositoryAcademicGrade.findOneBy(id);
+            return result;
+        }
+        return null;
+    }
+
     @FieldResolver((_type) => School, { nullable: true })
     async school(@Root() data: Learning) {
         let id = data.schoolId;
