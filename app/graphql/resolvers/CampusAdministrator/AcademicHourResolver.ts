@@ -48,33 +48,33 @@ export class AcademicHourResolver {
       if (orderCreated) {
         if (academicDayId) {
           result = await this.repository.findBy({
-            where: [{
+            where: {
               campusId,
               academicDayId
-            }],
+            },
             order: { createdAt: 'DESC' },
           });
         } else {
           result = await this.repository.findBy({
-            where: [{
+            where: {
               campusId
-            }],
+            },
             order: { createdAt: 'DESC' },
           });
         }
       } else {
         if (academicDayId) {
           result = await this.repository.findBy({
-            where: [{
+            where: {
               campusId,
               academicDayId
-            }],
+            },
           });
         } else {
           result = await this.repository.findBy({
-            where: [{
+            where: {
               campusId
-            }],
+            },
           });
         }
       }
@@ -82,37 +82,37 @@ export class AcademicHourResolver {
       if (orderCreated) {
         if (academicDayId) {
           result = await this.repository.findBy({
-            where: [{
+            where: {
               campusId,
               academicDayId,
               active: true
-            }],
+            },
             order: { createdAt: 'DESC' },
           });
         } else {
           result = await this.repository.findBy({
-            where: [{
+            where: {
               campusId,
               active: true
-            }],
+            },
             order: { createdAt: 'DESC' },
           });
         }
       } else {
         if (academicDayId) {
           result = await this.repository.findBy({
-            where: [{
+            where: {
               campusId,
               academicDayId,
               active: true
-            }],
+            },
           });
         } else {
           result = await this.repository.findBy({
-            where: [{
+            where: {
               campusId,
               active: true
-            }],
+            },
           });
         }
       }
