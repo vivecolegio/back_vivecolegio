@@ -18,6 +18,7 @@ import { AcademicAsignatureCourseResolver } from '../graphql/resolvers/CampusAdm
 import { AcademicHourResolver } from '../graphql/resolvers/CampusAdministrator/AcademicHourResolver';
 import { AcademicScheduleResolver } from '../graphql/resolvers/CampusAdministrator/AcademicScheduleResolver';
 import { ExperienceLearningResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningResolver';
+import { ExperienceLearningTraditionalValuationResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningTraditionalValuationResolver';
 import { AuditLoginResolver } from '../graphql/resolvers/GeneralAdministrator/AuditLoginResolver';
 import { GenderResolver } from '../graphql/resolvers/GeneralAdministrator/GenderResolver';
 import { GeneralAcademicAsignatureResolver } from '../graphql/resolvers/GeneralAdministrator/GeneralAcademicAsignatureResolver';
@@ -120,7 +121,8 @@ async function app() {
         LearningResolver,
         EvidenceLearningResolver,
         GeneralBasicLearningRightResolver,
-        ExperienceLearningResolver
+        ExperienceLearningResolver,
+        ExperienceLearningTraditionalValuationResolver
       ],
       emitSchemaFile: true,
       validate: false,
