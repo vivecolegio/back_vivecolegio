@@ -36,7 +36,7 @@ export class Teacher extends IModelData {
   academicAsignatureId?: [string];
 
   @Field(() => [AcademicAsignature], { nullable: true })
-  academicAsignature?: [AcademicAsignature];
+  academicAsignature?: AcademicAsignature[];
 
   @Field({ nullable: true })
   @Column({ nullable: true })

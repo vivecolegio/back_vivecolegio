@@ -14,4 +14,7 @@ export class NewCourse implements Partial<Course> {
 
   @Field({ nullable: true })
   order?: string;
+
+  @Field(() => [String], { nullable: true })
+  studentsId?: String[];
 }

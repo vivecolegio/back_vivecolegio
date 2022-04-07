@@ -22,6 +22,10 @@ export class Course extends IModelCampusData {
   @Field({ nullable: true })
   @Column({ nullable: true })
   order?: string;
+
+  @Field(() => [String], { nullable: true })
+  @Column({ nullable: true })
+  studentsId?: String[];
 }
 
 @ObjectType()

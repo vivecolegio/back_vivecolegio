@@ -2,12 +2,13 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicGradeRepository, CampusRepository, CourseRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicGradeRepository, CampusRepository, CourseRepository, StudentRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewCourse } from '../../inputs/CampusAdministrator/NewCourse';
 import { IContext } from '../../interfaces/IContext';
 import { Course, CourseConnection } from '../../models/CampusAdministrator/Course';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
+import { Student } from '../../models/GeneralAdministrator/Student';
 import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicGrade } from '../../models/SchoolAdministrator/AcademicGrade';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
@@ -25,6 +26,9 @@ export class CourseResolver {
 
   @InjectRepository(AcademicGrade)
   private repositoryAcademicGrade = AcademicGradeRepository;
+
+  @InjectRepository(Student)
+  private repositoryStudent = StudentRepository;
 
   @Query(() => Course, { nullable: true })
   async getCourse(@Arg('id', () => String) id: string) {
@@ -223,6 +227,16 @@ export class CourseResolver {
     let id = data.academicGradeId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryAcademicGrade.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => [Student], { nullable: true })
+  async students(@Root() data: Course) {
+    let id = data.studentsId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryStudent.findBy({ where: { _id: { $in: id } } });
       return result;
     }
     return null;
