@@ -2,13 +2,15 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { CampusRepository, ExperienceLearningRepository, UserRepository } from '../../../servers/DataSource';
+import { CampusRepository, EvidenceLearningRepository, ExperienceLearningRepository, LearningRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewExperienceLearning } from '../../inputs/CampusAdministrator/NewExperienceLearning';
 import { IContext } from '../../interfaces/IContext';
 import { ExperienceLearning, ExperienceLearningConnection } from '../../models/CampusAdministrator/ExperienceLearning';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { User } from '../../models/GeneralAdministrator/User';
+import { EvidenceLearning } from '../../models/SchoolAdministrator/EvidenceLearning';
+import { Learning } from '../../models/SchoolAdministrator/Learning';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
 @Resolver(ExperienceLearning)
@@ -21,6 +23,12 @@ export class ExperienceLearningResolver {
 
     @InjectRepository(Campus)
     private repositoryCampus = CampusRepository;
+
+    @InjectRepository(Learning)
+    private repositoryLearning = LearningRepository;
+
+    @InjectRepository(EvidenceLearning)
+    private repositoryEvidenceLearning = EvidenceLearningRepository;
 
     @Query(() => ExperienceLearning, { nullable: true })
     async getExperienceLearning(@Arg('id', () => String) id: string) {
@@ -214,4 +222,23 @@ export class ExperienceLearningResolver {
         return null;
     }
 
+    @FieldResolver((_type) => [Learning], { nullable: true })
+    async learnigs(@Root() data: ExperienceLearning) {
+        let id = data.learningsId;
+        if (id !== null && id !== undefined) {
+            const result = await this.repositoryLearning.findBy({ where: { _id: { $in: id } } });
+            return result;
+        }
+        return null;
+    }
+
+    @FieldResolver((_type) => [EvidenceLearning], { nullable: true })
+    async evidenciceLearnings(@Root() data: ExperienceLearning) {
+        let id = data.evidenciceLearningsId;
+        if (id !== null && id !== undefined) {
+            const result = await this.repositoryEvidenceLearning.findBy({ where: { _id: { $in: id } } });
+            return result;
+        }
+        return null;
+    }
 }
