@@ -224,9 +224,13 @@ export class ExperienceLearningResolver {
 
     @FieldResolver((_type) => [Learning], { nullable: true })
     async learnigs(@Root() data: ExperienceLearning) {
-        let id = data.learningsId;
-        if (id !== null && id !== undefined) {
-            const result = await this.repositoryLearning.findBy({ where: { _id: { $in: id } } });
+        let ids = data.learningsId;
+        if (ids !== null && ids !== undefined) {
+            let dataIds: any[] = [];
+            ids.forEach(async (id: any) => {
+                dataIds.push(new ObjectId(id));
+            });
+            const result = await this.repositoryLearning.findBy({ where: { _id: { $in: dataIds } } });
             return result;
         }
         return null;
@@ -234,9 +238,13 @@ export class ExperienceLearningResolver {
 
     @FieldResolver((_type) => [EvidenceLearning], { nullable: true })
     async evidenciceLearnings(@Root() data: ExperienceLearning) {
-        let id = data.evidenciceLearningsId;
-        if (id !== null && id !== undefined) {
-            const result = await this.repositoryEvidenceLearning.findBy({ where: { _id: { $in: id } } });
+        let ids = data.evidenciceLearningsId;
+        if (ids !== null && ids !== undefined) {
+            let dataIds: any[] = [];
+            ids.forEach(async (id: any) => {
+                dataIds.push(new ObjectId(id));
+            });
+            const result = await this.repositoryEvidenceLearning.findBy({ where: { _id: { $in: dataIds } } });
             return result;
         }
         return null;

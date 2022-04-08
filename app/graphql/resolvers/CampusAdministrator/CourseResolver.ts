@@ -234,9 +234,13 @@ export class CourseResolver {
 
   @FieldResolver((_type) => [Student], { nullable: true })
   async students(@Root() data: Course) {
-    let id = data.studentsId;
-    if (id !== null && id !== undefined) {
-      const result = await this.repositoryStudent.findBy({ where: { _id: { $in: id } } });
+    let ids = data.studentsId;
+    if (ids !== null && ids !== undefined) {
+      let dataIds: any[] = [];
+      ids.forEach(async (id: any) => {
+        dataIds.push(new ObjectId(id));
+      });
+      const result = await this.repositoryStudent.findBy({ where: { _id: { $in: dataIds } } });
       return result;
     }
     return null;
