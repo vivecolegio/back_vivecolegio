@@ -57,16 +57,16 @@ export class LearningResolver {
         @Arg('allData', () => Boolean) allData: Boolean,
         @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
         @Arg('schoolId', () => String) schoolId: string,
-        @Arg('academicPeriodId', () => String, { nullable: true }) academicPeriodId: String,
+        @Arg('academicPeriodsId', () => [String], { nullable: true }) academicPeriodsId: String[],
         @Arg('academicAsignatureId', () => String, { nullable: true }) academicAsignatureId: string,
         @Arg('academicGradeId', () => String, { nullable: true }) academicGradeId: string,
     ): Promise<LearningConnection> {
         let result;
         if (allData) {
             if (orderCreated) {
-                if (academicAsignatureId && academicGradeId && academicPeriodId) {
+                if (academicAsignatureId && academicGradeId && academicPeriodsId) {
                     result = await this.repository.findBy({
-                        where: { schoolId, academicAsignatureId, academicGradeId, academicPeriodId },
+                        where: { schoolId, academicAsignatureId, academicGradeId, academicPeriodsId: { $in: academicPeriodsId } },
                         order: { createdAt: 'DESC' },
                     });
                 } else {
@@ -83,9 +83,9 @@ export class LearningResolver {
                     }
                 }
             } else {
-                if (academicAsignatureId && academicGradeId && academicPeriodId) {
+                if (academicAsignatureId && academicGradeId && academicPeriodsId) {
                     result = await this.repository.findBy({
-                        where: { schoolId, academicAsignatureId, academicGradeId, academicPeriodId }
+                        where: { schoolId, academicAsignatureId, academicGradeId, academicPeriodsId: { $in: academicPeriodsId } }
                     });
                 } else {
                     if (academicAsignatureId) {
@@ -101,9 +101,9 @@ export class LearningResolver {
             }
         } else {
             if (orderCreated) {
-                if (academicAsignatureId && academicGradeId && academicPeriodId) {
+                if (academicAsignatureId && academicGradeId && academicPeriodsId) {
                     result = await this.repository.findBy({
-                        where: { schoolId, academicAsignatureId, academicGradeId, academicPeriodId, active: true },
+                        where: { schoolId, academicAsignatureId, academicGradeId, academicPeriodsId: { $in: academicPeriodsId }, active: true },
                         order: { createdAt: 'DESC' },
                     });
                 } else {
@@ -120,9 +120,9 @@ export class LearningResolver {
                     }
                 }
             } else {
-                if (academicAsignatureId && academicGradeId && academicPeriodId) {
+                if (academicAsignatureId && academicGradeId && academicPeriodsId) {
                     result = await this.repository.findBy({
-                        where: { schoolId, academicAsignatureId, academicGradeId, academicPeriodId, active: true }
+                        where: { schoolId, academicAsignatureId, academicGradeId, academicPeriodsId: { $in: academicPeriodsId }, active: true }
                     });
                 } else {
                     if (academicAsignatureId) {
@@ -276,9 +276,13 @@ export class LearningResolver {
 
     @FieldResolver((_type) => AcademicPeriod, { nullable: true })
     async academicPeriod(@Root() data: Learning) {
-        let id = data.academicPeriodId;
-        if (id !== null && id !== undefined) {
-            const result = await this.repositoryAcademicPeriod.findOneBy(id);
+        let ids = data.academicPeriodsId;
+        if (ids !== null && ids !== undefined) {
+            let dataIds: any[] = [];
+            ids.forEach(async (id: any) => {
+                dataIds.push(new ObjectId(id));
+            });
+            const result = await this.repositoryAcademicPeriod.findBy({ where: { _id: { $in: dataIds } } });
             return result;
         }
         return null;

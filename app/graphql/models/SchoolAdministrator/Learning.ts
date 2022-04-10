@@ -44,12 +44,12 @@ export class Learning extends IModelSchoolData {
     @Field({ nullable: true })
     academicGrade?: AcademicGrade;
 
-    @Field({ nullable: true })
+    @Field(() => [String], { nullable: true })
     @Column({ nullable: true })
-    academicPeriodId?: string;
+    academicPeriodsId?: String[];;
 
-    @Field({ nullable: true })
-    academicPeriod?: AcademicPeriod;
+    @Field(() => [AcademicPeriod], { nullable: true })
+    academicPeriods?: AcademicPeriod[];
 }
 
 @ObjectType()

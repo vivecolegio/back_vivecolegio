@@ -21,7 +21,7 @@ export class NewLearning implements Partial<Learning> {
     @Field({ nullable: true })
     schoolId?: string;
 
-    @Field({ nullable: true })
-    academicPeriodId?: string;
+    @Field(() => [String], { nullable: true })
+    academicPeriodsId?: String[];;
 
 }
