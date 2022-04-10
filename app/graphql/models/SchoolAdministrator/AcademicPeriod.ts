@@ -9,6 +9,10 @@ import { SchoolYear } from './SchoolYear';
 export class AcademicPeriod extends IModelSchoolData {
   @Field({ nullable: true })
   @Column({ nullable: true })
+  name?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   schoolYearId?: string;
 
   @Field({ nullable: true })
@@ -28,10 +32,10 @@ export class AcademicPeriod extends IModelSchoolData {
 }
 
 @ObjectType()
-export class AcademicPeriodEdge extends EdgeType('AcademicPeriod', AcademicPeriod) {}
+export class AcademicPeriodEdge extends EdgeType('AcademicPeriod', AcademicPeriod) { }
 
 @ObjectType()
 export class AcademicPeriodConnection extends ConnectionType<AcademicPeriodEdge>(
   'AcademicPeriod',
   AcademicPeriodEdge
-) {}
+) { }

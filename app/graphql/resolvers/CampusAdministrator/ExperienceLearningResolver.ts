@@ -2,13 +2,15 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { CampusRepository, EvidenceLearningRepository, ExperienceLearningRepository, LearningRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAsignatureCourseRepository, AcademicPeriodRepository, CampusRepository, EvidenceLearningRepository, ExperienceLearningRepository, LearningRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewExperienceLearning } from '../../inputs/CampusAdministrator/NewExperienceLearning';
 import { IContext } from '../../interfaces/IContext';
+import { AcademicAsignatureCourse } from '../../models/CampusAdministrator/AcademicAsignatureCourse';
 import { ExperienceLearning, ExperienceLearningConnection } from '../../models/CampusAdministrator/ExperienceLearning';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { User } from '../../models/GeneralAdministrator/User';
+import { AcademicPeriod } from '../../models/SchoolAdministrator/AcademicPeriod';
 import { EvidenceLearning } from '../../models/SchoolAdministrator/EvidenceLearning';
 import { Learning } from '../../models/SchoolAdministrator/Learning';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
@@ -30,6 +32,12 @@ export class ExperienceLearningResolver {
     @InjectRepository(EvidenceLearning)
     private repositoryEvidenceLearning = EvidenceLearningRepository;
 
+    @InjectRepository(AcademicAsignatureCourse)
+    private repositoryAcademicAsignatureCourse = AcademicAsignatureCourseRepository;
+
+    @InjectRepository(AcademicPeriod)
+    private repositoryAcademicPeriod = AcademicPeriodRepository;
+
     @Query(() => ExperienceLearning, { nullable: true })
     async getExperienceLearning(@Arg('id', () => String) id: string) {
         const result = await this.repository.findOneBy(id);
@@ -42,79 +50,164 @@ export class ExperienceLearningResolver {
         @Arg('allData', () => Boolean) allData: Boolean,
         @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
         @Arg('campusId', () => String) campusId: String,
+        @Arg('academicPeriodId', () => String, { nullable: true }) academicPeriodId: String,
         @Arg('academicAsignatureCourseId', () => String, { nullable: true }) academicAsignatureCourseId: String,
     ): Promise<ExperienceLearningConnection> {
         let result;
         if (allData) {
             if (orderCreated) {
-                if (academicAsignatureCourseId) {
+                if (academicAsignatureCourseId && academicPeriodId) {
                     result = await this.repository.findBy({
                         where: {
                             campusId,
+                            academicPeriodId,
                             academicAsignatureCourseId
                         },
                         order: { createdAt: 'DESC' },
                     });
                 } else {
-                    result = await this.repository.findBy({
-                        where: {
-                            campusId,
-                        },
-                        order: { createdAt: 'DESC' },
-                    });
+                    if (academicAsignatureCourseId) {
+                        result = await this.repository.findBy({
+                            where: {
+                                academicAsignatureCourseId,
+                                campusId,
+                            },
+                            order: { createdAt: 'DESC' },
+                        });
+                    } else {
+                        if (academicPeriodId) {
+                            result = await this.repository.findBy({
+                                where: {
+                                    campusId,
+                                    academicPeriodId
+                                },
+                                order: { createdAt: 'DESC' },
+                            });
+                        } else {
+                            result = await this.repository.findBy({
+                                where: {
+                                    campusId,
+                                },
+                                order: { createdAt: 'DESC' },
+                            });
+                        }
+                    }
                 }
             } else {
-                if (academicAsignatureCourseId) {
+                if (academicAsignatureCourseId && academicPeriodId) {
                     result = await this.repository.findBy({
                         where: {
                             campusId,
+                            academicPeriodId,
                             academicAsignatureCourseId
                         },
                     });
                 } else {
-                    result = await this.repository.findBy({
-                        where: {
-                            campusId,
-                        },
-                    });
+                    if (academicAsignatureCourseId) {
+                        result = await this.repository.findBy({
+                            where: {
+                                academicAsignatureCourseId,
+                                campusId,
+                            },
+                        });
+                    } else {
+                        if (academicPeriodId) {
+                            result = await this.repository.findBy({
+                                where: {
+                                    campusId,
+                                    academicPeriodId
+                                },
+                            });
+                        } else {
+                            result = await this.repository.findBy({
+                                where: {
+                                    campusId,
+                                },
+                            });
+                        }
+                    }
                 }
             }
         } else {
             if (orderCreated) {
-                if (academicAsignatureCourseId) {
+                if (academicAsignatureCourseId && academicPeriodId) {
                     result = await this.repository.findBy({
                         where: {
                             campusId,
+                            academicPeriodId,
                             academicAsignatureCourseId,
-                            active: true,
+                            active: true
                         },
                         order: { createdAt: 'DESC' },
                     });
                 } else {
-                    result = await this.repository.findBy({
-                        where: {
-                            campusId,
-                            active: true,
-                        },
-                        order: { createdAt: 'DESC' },
-                    });
+                    if (academicAsignatureCourseId) {
+                        result = await this.repository.findBy({
+                            where: {
+                                academicAsignatureCourseId,
+                                campusId,
+                                active: true
+                            },
+                            order: { createdAt: 'DESC' },
+                        });
+                    } else {
+                        if (academicPeriodId) {
+                            result = await this.repository.findBy({
+                                where: {
+                                    campusId,
+                                    academicPeriodId,
+                                    active: true
+                                },
+                                order: { createdAt: 'DESC' },
+                            });
+                        } else {
+                            result = await this.repository.findBy({
+                                where: {
+                                    campusId,
+                                    active: true
+                                },
+                                order: { createdAt: 'DESC' },
+                            });
+                        }
+                    }
                 }
             } else {
-                if (academicAsignatureCourseId) {
+                if (academicAsignatureCourseId && academicPeriodId) {
                     result = await this.repository.findBy({
                         where: {
                             campusId,
+                            academicPeriodId,
                             academicAsignatureCourseId,
-                            active: true,
+                            active: true
                         },
                     });
                 } else {
-                    result = await this.repository.findBy({
-                        where: {
-                            campusId,
-                            active: true,
-                        },
-                    });
+                    if (academicAsignatureCourseId) {
+                        result = await this.repository.findBy({
+                            where: {
+                                academicAsignatureCourseId,
+                                campusId,
+                                active: true
+                            },
+                        });
+                    } else {
+                        if (academicPeriodId) {
+                            result = await this.repository.findBy({
+                                where: {
+                                    campusId,
+                                    academicPeriodId,
+                                    active: true
+                                },
+                            });
+                        } else {
+                            result = await this.repository.findBy({
+                                where: {
+                                    campusId,
+                                    active: true
+                                },
+                            });
+                        }
+                    }
                 }
             }
         }
@@ -217,6 +310,26 @@ export class ExperienceLearningResolver {
         let id = data.campusId;
         if (id !== null && id !== undefined) {
             const result = await this.repositoryCampus.findOneBy(id);
+            return result;
+        }
+        return null;
+    }
+
+    @FieldResolver((_type) => AcademicAsignatureCourse, { nullable: true })
+    async academicAsignatureCourse(@Root() data: ExperienceLearning) {
+        let id = data.academicAsignatureCourseId;
+        if (id !== null && id !== undefined) {
+            const result = await this.repositoryAcademicAsignatureCourse.findOneBy(id);
+            return result;
+        }
+        return null;
+    }
+
+    @FieldResolver((_type) => AcademicPeriod, { nullable: true })
+    async academicPeriod(@Root() data: ExperienceLearning) {
+        let id = data.academicPeriodId;
+        if (id !== null && id !== undefined) {
+            const result = await this.repositoryAcademicPeriod.findOneBy(id);
             return result;
         }
         return null;

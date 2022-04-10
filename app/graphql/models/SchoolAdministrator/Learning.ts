@@ -5,6 +5,7 @@ import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { GeneralBasicLearningRight } from '../GeneralAdministrator/GeneralBasicLearningRight';
 import { AcademicAsignature } from './AcademicAsignature';
 import { AcademicGrade } from './AcademicGrade';
+import { AcademicPeriod } from './AcademicPeriod';
 import { AcademicStandard } from './AcademicStandard';
 
 
@@ -42,6 +43,13 @@ export class Learning extends IModelSchoolData {
 
     @Field({ nullable: true })
     academicGrade?: AcademicGrade;
+
+    @Field({ nullable: true })
+    @Column({ nullable: true })
+    academicPeriodId?: string;
+
+    @Field({ nullable: true })
+    academicPeriod?: AcademicPeriod;
 }
 
 @ObjectType()

@@ -3,6 +3,7 @@ import { Column, Entity } from 'typeorm';
 import { ExperienceType } from '../../enums/ExperienceType';
 import { IModelCampusData } from '../../interfaces/IModelCampusData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
+import { AcademicPeriod } from '../SchoolAdministrator/AcademicPeriod';
 import { EvidenceLearning } from '../SchoolAdministrator/EvidenceLearning';
 import { Learning } from '../SchoolAdministrator/Learning';
 import { AcademicAsignatureCourse } from './AcademicAsignatureCourse';
@@ -46,6 +47,13 @@ export class ExperienceLearning extends IModelCampusData {
 
     @Field(() => [EvidenceLearning], { nullable: true })
     evidenciceLearnings?: EvidenceLearning[];
+
+    @Field({ nullable: true })
+    @Column({ nullable: true })
+    academicPeriodId?: string;
+
+    @Field({ nullable: true })
+    academicPeriod?: AcademicPeriod;
 }
 
 @ObjectType()

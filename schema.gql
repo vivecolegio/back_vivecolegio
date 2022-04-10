@@ -225,6 +225,7 @@ type AcademicPeriod implements IModelSchoolData {
   createdByUserId: String
   endDate: DateTime
   id: ID!
+  name: String
   school: School
   schoolId: String
   schoolYear: SchoolYear
@@ -670,6 +671,8 @@ type EvidenceLearningEdge {
 type ExperienceLearning implements IModelCampusData {
   academicAsignatureCourse: AcademicAsignatureCourse
   academicAsignatureCourseId: String
+  academicPeriod: AcademicPeriod
+  academicPeriodId: String
   active: Boolean
   campus: Campus
   campusId: String
@@ -1208,6 +1211,8 @@ type Learning implements IModelSchoolData {
   academicAsignatureId: String
   academicGrade: AcademicGrade
   academicGradeId: String
+  academicPeriod: AcademicPeriod
+  academicPeriodId: String
   academicStandard: AcademicStandard
   academicStandardId: String
   active: Boolean
@@ -1673,6 +1678,7 @@ input NewAcademicHour {
 
 input NewAcademicPeriod {
   endDate: DateTime
+  name: String
   schoolId: String
   schoolYearId: String
   startDate: DateTime
@@ -1767,6 +1773,7 @@ input NewEvidenceLearning {
 
 input NewExperienceLearning {
   academicAsignatureCourseId: String
+  academicPeriodId: String
   campusId: String
   description: String
   evidenciceLearningsId: [String!]
@@ -1865,6 +1872,7 @@ input NewInbox {
 input NewLearning {
   academicAsignatureId: String
   academicGradeId: String
+  academicPeriodId: String
   academicStandardId: String
   generalBasicLearningRightId: String
   schoolId: String
@@ -2402,6 +2410,7 @@ type Query {
   ): EvidenceLearningConnection!
   getAllExperienceLearning(
     academicAsignatureCourseId: String
+    academicPeriodId: String
 
     """Paginate after opaque cursor"""
     after: String
@@ -2640,6 +2649,7 @@ type Query {
   getAllLearning(
     academicAsignatureId: String
     academicGradeId: String
+    academicPeriodId: String
 
     """Paginate after opaque cursor"""
     after: String

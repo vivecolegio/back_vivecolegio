@@ -142,6 +142,17 @@ export class StudentResolver {
       updatedByUserId,
     });
     delete dataProcess?.newUser;
+    if (data.courseId) {
+      let course = await this.repositoryCourse.findOneBy(data.courseId);
+      let studentsId = course?.studentsId;
+      studentsId?.push(id);
+      let resultCourse = await this.repositoryCourse.save({
+        _id: new ObjectId(data.courseId),
+        ...course,
+        studentsId,
+        version: (result?.version as number) + 1,
+      });
+    }
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,

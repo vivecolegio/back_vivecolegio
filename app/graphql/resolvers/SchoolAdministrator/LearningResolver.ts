@@ -2,7 +2,7 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicAsignatureRepository, AcademicGradeRepository, AcademicStandardRepository, GeneralBasicLearningRightRepository, LearningRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAsignatureRepository, AcademicGradeRepository, AcademicPeriodRepository, AcademicStandardRepository, GeneralBasicLearningRightRepository, LearningRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewLearning } from '../../inputs/SchoolAdministrator/NewLearning';
 import { IContext } from '../../interfaces/IContext';
@@ -11,6 +11,7 @@ import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicAsignature } from '../../models/SchoolAdministrator/AcademicAsignature';
 import { AcademicGrade } from '../../models/SchoolAdministrator/AcademicGrade';
+import { AcademicPeriod } from '../../models/SchoolAdministrator/AcademicPeriod';
 import { AcademicStandard } from '../../models/SchoolAdministrator/AcademicStandard';
 import {
     Learning,
@@ -41,6 +42,9 @@ export class LearningResolver {
     @InjectRepository(School)
     private repositorySchool = SchoolRepository;
 
+    @InjectRepository(AcademicPeriod)
+    private repositoryAcademicPeriod = AcademicPeriodRepository;
+
     @Query(() => Learning, { nullable: true })
     async getLearning(@Arg('id', () => String) id: string) {
         const result = await this.repository.findOneBy(id);
@@ -53,15 +57,16 @@ export class LearningResolver {
         @Arg('allData', () => Boolean) allData: Boolean,
         @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
         @Arg('schoolId', () => String) schoolId: string,
+        @Arg('academicPeriodId', () => String, { nullable: true }) academicPeriodId: String,
         @Arg('academicAsignatureId', () => String, { nullable: true }) academicAsignatureId: string,
         @Arg('academicGradeId', () => String, { nullable: true }) academicGradeId: string,
     ): Promise<LearningConnection> {
         let result;
         if (allData) {
             if (orderCreated) {
-                if (academicAsignatureId && academicGradeId) {
+                if (academicAsignatureId && academicGradeId && academicPeriodId) {
                     result = await this.repository.findBy({
-                        where: { schoolId, academicAsignatureId, academicGradeId },
+                        where: { schoolId, academicAsignatureId, academicGradeId, academicPeriodId },
                         order: { createdAt: 'DESC' },
                     });
                 } else {
@@ -78,9 +83,9 @@ export class LearningResolver {
                     }
                 }
             } else {
-                if (academicAsignatureId && academicGradeId) {
+                if (academicAsignatureId && academicGradeId && academicPeriodId) {
                     result = await this.repository.findBy({
-                        where: { schoolId, academicAsignatureId, academicGradeId }
+                        where: { schoolId, academicAsignatureId, academicGradeId, academicPeriodId }
                     });
                 } else {
                     if (academicAsignatureId) {
@@ -96,9 +101,9 @@ export class LearningResolver {
             }
         } else {
             if (orderCreated) {
-                if (academicAsignatureId && academicGradeId) {
+                if (academicAsignatureId && academicGradeId && academicPeriodId) {
                     result = await this.repository.findBy({
-                        where: { schoolId, academicAsignatureId, academicGradeId, active: true },
+                        where: { schoolId, academicAsignatureId, academicGradeId, academicPeriodId, active: true },
                         order: { createdAt: 'DESC' },
                     });
                 } else {
@@ -115,9 +120,9 @@ export class LearningResolver {
                     }
                 }
             } else {
-                if (academicAsignatureId && academicGradeId) {
+                if (academicAsignatureId && academicGradeId && academicPeriodId) {
                     result = await this.repository.findBy({
-                        where: { schoolId, academicAsignatureId, academicGradeId, active: true }
+                        where: { schoolId, academicAsignatureId, academicGradeId, academicPeriodId, active: true }
                     });
                 } else {
                     if (academicAsignatureId) {
@@ -264,6 +269,16 @@ export class LearningResolver {
         let id = data.academicGradeId;
         if (id !== null && id !== undefined) {
             const result = await this.repositoryAcademicGrade.findOneBy(id);
+            return result;
+        }
+        return null;
+    }
+
+    @FieldResolver((_type) => AcademicPeriod, { nullable: true })
+    async academicPeriod(@Root() data: Learning) {
+        let id = data.academicPeriodId;
+        if (id !== null && id !== undefined) {
+            const result = await this.repositoryAcademicPeriod.findOneBy(id);
             return result;
         }
         return null;
