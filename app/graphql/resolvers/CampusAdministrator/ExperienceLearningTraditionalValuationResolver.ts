@@ -41,51 +41,51 @@ export class ExperienceLearningTraditionalValuationResolver {
         @Args() args: ConnectionArgs,
         @Arg('allData', () => Boolean) allData: Boolean,
         @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
-        @Arg('campusId', () => String) campusId: String,
-        @Arg('academicAsignatureCourseId', () => String, { nullable: true }) academicAsignatureCourseId: String,
+        @Arg('experienceLearningId', () => String) experienceLearningId: String,
+        @Arg('studentId', () => String, { nullable: true }) studentId: String,
     ): Promise<ExperienceLearningTraditionalValuationConnection> {
         let result;
         if (allData) {
             if (orderCreated) {
-                if (academicAsignatureCourseId) {
+                if (studentId) {
                     result = await this.repository.findBy({
                         where: {
-                            campusId,
-                            academicAsignatureCourseId
+                            experienceLearningId,
+                            studentId
                         },
                         order: { createdAt: 'DESC' },
                     });
                 } else {
                     result = await this.repository.findBy({
                         where: {
-                            campusId,
+                            experienceLearningId,
                         },
                         order: { createdAt: 'DESC' },
                     });
                 }
             } else {
-                if (academicAsignatureCourseId) {
+                if (studentId) {
                     result = await this.repository.findBy({
                         where: {
-                            campusId,
-                            academicAsignatureCourseId
+                            experienceLearningId,
+                            studentId
                         },
                     });
                 } else {
                     result = await this.repository.findBy({
                         where: {
-                            campusId,
+                            experienceLearningId,
                         },
                     });
                 }
             }
         } else {
             if (orderCreated) {
-                if (academicAsignatureCourseId) {
+                if (studentId) {
                     result = await this.repository.findBy({
                         where: {
-                            campusId,
-                            academicAsignatureCourseId,
+                            experienceLearningId,
+                            studentId,
                             active: true,
                         },
                         order: { createdAt: 'DESC' },
@@ -93,25 +93,25 @@ export class ExperienceLearningTraditionalValuationResolver {
                 } else {
                     result = await this.repository.findBy({
                         where: {
-                            campusId,
+                            experienceLearningId,
                             active: true,
                         },
                         order: { createdAt: 'DESC' },
                     });
                 }
             } else {
-                if (academicAsignatureCourseId) {
+                if (studentId) {
                     result = await this.repository.findBy({
                         where: {
-                            campusId,
-                            academicAsignatureCourseId,
+                            experienceLearningId,
+                            studentId,
                             active: true,
                         },
                     });
                 } else {
                     result = await this.repository.findBy({
                         where: {
-                            campusId,
+                            experienceLearningId,
                             active: true,
                         },
                     });
