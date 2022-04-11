@@ -21,4 +21,7 @@ export class NewStudent implements Partial<Student> {
 
   @Field({ nullable: true })
   newUser?: NewUser;
+
+  @Field({ nullable: true })
+  code?: number;
 }

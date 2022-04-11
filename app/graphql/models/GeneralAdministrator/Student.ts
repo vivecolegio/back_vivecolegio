@@ -45,6 +45,10 @@ export class Student extends IModelData {
 
   @Field({ nullable: true })
   user?: User;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  code?: number;
 }
 
 @ObjectType()
