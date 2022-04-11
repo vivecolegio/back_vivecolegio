@@ -274,8 +274,8 @@ export class LearningResolver {
         return null;
     }
 
-    @FieldResolver((_type) => AcademicPeriod, { nullable: true })
-    async academicPeriod(@Root() data: Learning) {
+    @FieldResolver((_type) => [AcademicPeriod], { nullable: true })
+    async academicPeriods(@Root() data: Learning) {
         let ids = data.academicPeriodsId;
         if (ids !== null && ids !== undefined) {
             let dataIds: any[] = [];

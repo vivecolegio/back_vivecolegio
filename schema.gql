@@ -1211,8 +1211,8 @@ type Learning implements IModelSchoolData {
   academicAsignatureId: String
   academicGrade: AcademicGrade
   academicGradeId: String
-  academicPeriod: AcademicPeriod
-  academicPeriodId: String
+  academicPeriods: [AcademicPeriod!]
+  academicPeriodsId: [String!]
   academicStandard: AcademicStandard
   academicStandardId: String
   active: Boolean
@@ -1872,7 +1872,7 @@ input NewInbox {
 input NewLearning {
   academicAsignatureId: String
   academicGradeId: String
-  academicPeriodId: String
+  academicPeriodsId: [String!]
   academicStandardId: String
   generalBasicLearningRightId: String
   schoolId: String
@@ -2649,7 +2649,7 @@ type Query {
   getAllLearning(
     academicAsignatureId: String
     academicGradeId: String
-    academicPeriodId: String
+    academicPeriodsId: [String!]
 
     """Paginate after opaque cursor"""
     after: String

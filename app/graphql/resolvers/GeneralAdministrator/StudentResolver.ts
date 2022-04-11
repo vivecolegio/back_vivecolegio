@@ -145,6 +145,9 @@ export class StudentResolver {
     if (data.courseId) {
       let course = await this.repositoryCourse.findOneBy(data.courseId);
       let studentsId = course?.studentsId;
+      if (studentsId == undefined || studentsId == null) {
+        studentsId = []
+      }
       studentsId?.push(id);
       let resultCourse = await this.repositoryCourse.save({
         _id: new ObjectId(data.courseId),
