@@ -821,6 +821,74 @@ type ExperienceLearningRubricCriteriaPerformanceLevel {
   performanceLevelId: String
 }
 
+"""The ExperienceLearningRubricCriteriaValuation model"""
+type ExperienceLearningRubricCriteriaValuation implements IModelCampusData {
+  active: Boolean
+  assessment: Float
+  campus: Campus
+  campusId: String
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  experienceLearningRubricCriteria: ExperienceLearningRubricCriteria
+  experienceLearningRubricCriteriaId: String
+  id: ID!
+  student: Student
+  studentId: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type ExperienceLearningRubricCriteriaValuationConnection {
+  edges: [ExperienceLearningRubricCriteriaValuationEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type ExperienceLearningRubricCriteriaValuationEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: ExperienceLearningRubricCriteriaValuation!
+}
+
+"""The ExperienceLearningRubricValuation model"""
+type ExperienceLearningRubricValuation implements IModelCampusData {
+  active: Boolean
+  assessment: Float
+  campus: Campus
+  campusId: String
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  experienceLearning: ExperienceLearning
+  experienceLearningId: String
+  id: ID!
+  student: Student
+  studentId: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type ExperienceLearningRubricValuationConnection {
+  edges: [ExperienceLearningRubricValuationEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type ExperienceLearningRubricValuationEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: ExperienceLearningRubricValuation!
+}
+
 """The ExperienceLearningSelfAssessmentValuation model"""
 type ExperienceLearningSelfAssessmentValuation implements IModelCampusData {
   active: Boolean
@@ -1592,6 +1660,8 @@ type Mutation {
   changeActiveExperienceLearningCoEvaluation(active: Boolean!, id: String!): Boolean!
   changeActiveExperienceLearningCoEvaluationValuation(active: Boolean!, id: String!): Boolean!
   changeActiveExperienceLearningRubricCriteria(active: Boolean!, id: String!): Boolean!
+  changeActiveExperienceLearningRubricCriteriaValuation(active: Boolean!, id: String!): Boolean!
+  changeActiveExperienceLearningRubricValuation(active: Boolean!, id: String!): Boolean!
   changeActiveExperienceLearningSelfAssessmentValuation(active: Boolean!, id: String!): Boolean!
   changeActiveExperienceLearningTraditionalValuation(active: Boolean!, id: String!): Boolean!
   changeActiveForum(active: Boolean!, id: String!): Boolean!
@@ -1646,6 +1716,8 @@ type Mutation {
   createExperienceLearningCoEvaluation(data: NewExperienceLearningCoEvaluation!): ExperienceLearningCoEvaluation!
   createExperienceLearningCoEvaluationValuation(data: NewExperienceLearningCoEvaluationValuation!): ExperienceLearningCoEvaluationValuation!
   createExperienceLearningRubricCriteria(data: NewExperienceLearningRubricCriteria!): ExperienceLearningRubricCriteria!
+  createExperienceLearningRubricCriteriaValuation(data: NewExperienceLearningRubricCriteriaValuation!): ExperienceLearningRubricCriteriaValuation!
+  createExperienceLearningRubricValuation(data: NewExperienceLearningRubricValuation!): ExperienceLearningRubricValuation!
   createExperienceLearningSelfAssessmentValuation(data: NewExperienceLearningSelfAssessmentValuation!): ExperienceLearningSelfAssessmentValuation!
   createExperienceLearningTraditionalValuation(data: NewExperienceLearningTraditionalValuation!): ExperienceLearningTraditionalValuation!
   createForum(data: NewForum!): Forum!
@@ -1699,6 +1771,8 @@ type Mutation {
   deleteExperienceLearningCoEvaluation(id: String!): Boolean!
   deleteExperienceLearningCoEvaluationValuation(id: String!): Boolean!
   deleteExperienceLearningRubricCriteria(id: String!): Boolean!
+  deleteExperienceLearningRubricCriteriaValuation(id: String!): Boolean!
+  deleteExperienceLearningRubricValuation(id: String!): Boolean!
   deleteExperienceLearningSelfAssessmentValuation(id: String!): Boolean!
   deleteExperienceLearningTraditionalValuation(id: String!): Boolean!
   deleteForum(id: String!): Boolean!
@@ -1755,6 +1829,8 @@ type Mutation {
   updateExperienceLearningCoEvaluation(data: NewExperienceLearningCoEvaluation!, id: String!): ExperienceLearningCoEvaluation!
   updateExperienceLearningCoEvaluationValuation(data: NewExperienceLearningCoEvaluationValuation!, id: String!): ExperienceLearningCoEvaluationValuation!
   updateExperienceLearningRubricCriteria(data: NewExperienceLearningRubricCriteria!, id: String!): ExperienceLearningRubricCriteria!
+  updateExperienceLearningRubricCriteriaValuation(data: NewExperienceLearningRubricCriteriaValuation!, id: String!): ExperienceLearningRubricCriteriaValuation!
+  updateExperienceLearningRubricValuation(data: NewExperienceLearningRubricValuation!, id: String!): ExperienceLearningRubricValuation!
   updateExperienceLearningSelfAssessmentValuation(data: NewExperienceLearningSelfAssessmentValuation!, id: String!): ExperienceLearningSelfAssessmentValuation!
   updateExperienceLearningTraditionalValuation(data: NewExperienceLearningTraditionalValuation!, id: String!): ExperienceLearningTraditionalValuation!
   updateForum(data: NewForum!, id: String!): Forum!
@@ -1972,6 +2048,18 @@ input NewExperienceLearningRubricCriteria {
 input NewExperienceLearningRubricCriteriaPerformanceLevel {
   criteria: String
   performanceLevelId: String
+}
+
+input NewExperienceLearningRubricCriteriaValuation {
+  assessment: Float
+  experienceLearningRubricCriteriaId: String
+  studentId: String
+}
+
+input NewExperienceLearningRubricValuation {
+  assessment: Float
+  experienceLearningId: String
+  studentId: String
 }
 
 input NewExperienceLearningSelfAssessmentValuation {
@@ -2677,6 +2765,38 @@ type Query {
     last: Float
     orderCreated: Boolean!
   ): ExperienceLearningRubricCriteriaConnection!
+  getAllExperienceLearningRubricCriteriaValuation(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+    experienceLearningId: String!
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): ExperienceLearningRubricCriteriaValuationConnection!
+  getAllExperienceLearningRubricValuation(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+    experienceLearningId: String!
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): ExperienceLearningRubricValuationConnection!
   getAllExperienceLearningSelfAssessmentValuation(
     """Paginate after opaque cursor"""
     after: String
@@ -3211,6 +3331,8 @@ type Query {
   getExperienceLearningCoEvaluation(id: String!): ExperienceLearningCoEvaluation
   getExperienceLearningCoEvaluationValuation(id: String!): ExperienceLearningCoEvaluationValuation
   getExperienceLearningRubricCriteria(id: String!): ExperienceLearningRubricCriteria
+  getExperienceLearningRubricCriteriaValuation(id: String!): ExperienceLearningRubricCriteriaValuation
+  getExperienceLearningRubricValuation(id: String!): ExperienceLearningRubricValuation
   getExperienceLearningSelfAssessmentValuation(id: String!): ExperienceLearningSelfAssessmentValuation
   getExperienceLearningTraditionalValuation(id: String!): ExperienceLearningTraditionalValuation
   getForum(id: String!): Forum

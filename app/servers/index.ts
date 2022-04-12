@@ -22,6 +22,8 @@ import { ExperienceLearningCoEvaluationValuationResolver } from '../graphql/reso
 import { ExperienceLearningResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningResolver';
 import { ExperienceLearningRubricCriteriaPerformanceLevelResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningRubricCriteriaPerformanceLevelResolver';
 import { ExperienceLearningRubricCriteriaResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningRubricCriteriaResolver';
+import { ExperienceLearningRubricCriteriaValuationResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningRubricCriteriaValuationResolver';
+import { ExperienceLearningRubricValuationResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningRubricValuationResolver';
 import { ExperienceLearningSelfAssessmentValuationResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningSelfAssessmentValuationResolver';
 import { ExperienceLearningTraditionalValuationResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningTraditionalValuationResolver';
 import { AuditLoginResolver } from '../graphql/resolvers/GeneralAdministrator/AuditLoginResolver';
@@ -132,7 +134,9 @@ async function app() {
         ExperienceLearningCoEvaluationValuationResolver,
         ExperienceLearningCoEvaluationResolver,
         ExperienceLearningRubricCriteriaPerformanceLevelResolver,
-        ExperienceLearningRubricCriteriaResolver
+        ExperienceLearningRubricCriteriaResolver,
+        ExperienceLearningRubricValuationResolver,
+        ExperienceLearningRubricCriteriaValuationResolver
       ],
       emitSchemaFile: true,
       validate: false,
