@@ -694,6 +694,76 @@ type ExperienceLearning implements IModelCampusData {
   version: Float
 }
 
+"""The ExperienceLearningCoEvaluation model"""
+type ExperienceLearningCoEvaluation implements IModelCampusData {
+  active: Boolean
+  assessment: Float
+  campus: Campus
+  campusId: String
+  coEvaluator: Student
+  coEvaluatorId: String
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  experienceLearning: ExperienceLearning
+  experienceLearningId: String
+  id: ID!
+  student: Student
+  studentId: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type ExperienceLearningCoEvaluationConnection {
+  edges: [ExperienceLearningCoEvaluationEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type ExperienceLearningCoEvaluationEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: ExperienceLearningCoEvaluation!
+}
+
+"""The ExperienceLearningCoEvaluationValuation model"""
+type ExperienceLearningCoEvaluationValuation implements IModelCampusData {
+  active: Boolean
+  assessment: Float
+  campus: Campus
+  campusId: String
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  experienceLearning: ExperienceLearning
+  experienceLearningId: String
+  id: ID!
+  student: Student
+  studentId: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type ExperienceLearningCoEvaluationValuationConnection {
+  edges: [ExperienceLearningCoEvaluationValuationEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type ExperienceLearningCoEvaluationValuationEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: ExperienceLearningCoEvaluationValuation!
+}
+
 type ExperienceLearningConnection {
   edges: [ExperienceLearningEdge!]!
   pageInfo: PageInfo!
@@ -706,6 +776,83 @@ type ExperienceLearningEdge {
   """Used in `before` and `after` args"""
   cursor: String!
   node: ExperienceLearning!
+}
+
+"""The ExperienceLearningRubricCriteria model"""
+type ExperienceLearningRubricCriteria implements IModelCampusData {
+  active: Boolean
+  campus: Campus
+  campusId: String
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  criteria: String
+  evidenceLearnig: EvidenceLearning
+  evidenceLearningId: String
+  experienceLearning: ExperienceLearning
+  experienceLearningId: String
+  experienceLearningRubricCriteriaPerformanceLevel: [ExperienceLearningRubricCriteriaPerformanceLevel!]
+  id: ID!
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+  weight: Float
+}
+
+type ExperienceLearningRubricCriteriaConnection {
+  edges: [ExperienceLearningRubricCriteriaEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type ExperienceLearningRubricCriteriaEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: ExperienceLearningRubricCriteria!
+}
+
+"""The ExperienceLearningRubricCriteriaPerformanceLevel model"""
+type ExperienceLearningRubricCriteriaPerformanceLevel {
+  criteria: String
+  performanceLevel: PerformanceLevel
+  performanceLevelId: String
+}
+
+"""The ExperienceLearningSelfAssessmentValuation model"""
+type ExperienceLearningSelfAssessmentValuation implements IModelCampusData {
+  active: Boolean
+  assessment: Float
+  campus: Campus
+  campusId: String
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  experienceLearning: ExperienceLearning
+  experienceLearningId: String
+  id: ID!
+  student: Student
+  studentId: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type ExperienceLearningSelfAssessmentValuationConnection {
+  edges: [ExperienceLearningSelfAssessmentValuationEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type ExperienceLearningSelfAssessmentValuationEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: ExperienceLearningSelfAssessmentValuation!
 }
 
 """The ExperienceLearningTraditionalValuation model"""
@@ -1442,6 +1589,10 @@ type Mutation {
   changeActiveEvaluativeComponent(active: Boolean!, id: String!): Boolean!
   changeActiveEvidenceLearning(active: Boolean!, id: String!): Boolean!
   changeActiveExperienceLearning(active: Boolean!, id: String!): Boolean!
+  changeActiveExperienceLearningCoEvaluation(active: Boolean!, id: String!): Boolean!
+  changeActiveExperienceLearningCoEvaluationValuation(active: Boolean!, id: String!): Boolean!
+  changeActiveExperienceLearningRubricCriteria(active: Boolean!, id: String!): Boolean!
+  changeActiveExperienceLearningSelfAssessmentValuation(active: Boolean!, id: String!): Boolean!
   changeActiveExperienceLearningTraditionalValuation(active: Boolean!, id: String!): Boolean!
   changeActiveForum(active: Boolean!, id: String!): Boolean!
   changeActiveForumInteraction(active: Boolean!, id: String!): Boolean!
@@ -1492,6 +1643,10 @@ type Mutation {
   createEvaluativeComponent(data: NewEvaluativeComponent!): EvaluativeComponent!
   createEvidenceLearning(data: NewEvidenceLearning!): EvidenceLearning!
   createExperienceLearning(data: NewExperienceLearning!): ExperienceLearning!
+  createExperienceLearningCoEvaluation(data: NewExperienceLearningCoEvaluation!): ExperienceLearningCoEvaluation!
+  createExperienceLearningCoEvaluationValuation(data: NewExperienceLearningCoEvaluationValuation!): ExperienceLearningCoEvaluationValuation!
+  createExperienceLearningRubricCriteria(data: NewExperienceLearningRubricCriteria!): ExperienceLearningRubricCriteria!
+  createExperienceLearningSelfAssessmentValuation(data: NewExperienceLearningSelfAssessmentValuation!): ExperienceLearningSelfAssessmentValuation!
   createExperienceLearningTraditionalValuation(data: NewExperienceLearningTraditionalValuation!): ExperienceLearningTraditionalValuation!
   createForum(data: NewForum!): Forum!
   createForumInteraction(data: NewForumInteraction!): ForumInteraction!
@@ -1541,6 +1696,10 @@ type Mutation {
   deleteEvaluativeComponent(id: String!): Boolean!
   deleteEvidenceLearning(id: String!): Boolean!
   deleteExperienceLearning(id: String!): Boolean!
+  deleteExperienceLearningCoEvaluation(id: String!): Boolean!
+  deleteExperienceLearningCoEvaluationValuation(id: String!): Boolean!
+  deleteExperienceLearningRubricCriteria(id: String!): Boolean!
+  deleteExperienceLearningSelfAssessmentValuation(id: String!): Boolean!
   deleteExperienceLearningTraditionalValuation(id: String!): Boolean!
   deleteForum(id: String!): Boolean!
   deleteForumInteraction(id: String!): Boolean!
@@ -1593,6 +1752,10 @@ type Mutation {
   updateEvaluativeComponent(data: NewEvaluativeComponent!, id: String!): EvaluativeComponent!
   updateEvidenceLearning(data: NewEvidenceLearning!, id: String!): EvidenceLearning!
   updateExperienceLearning(data: NewExperienceLearning!, id: String!): ExperienceLearning!
+  updateExperienceLearningCoEvaluation(data: NewExperienceLearningCoEvaluation!, id: String!): ExperienceLearningCoEvaluation!
+  updateExperienceLearningCoEvaluationValuation(data: NewExperienceLearningCoEvaluationValuation!, id: String!): ExperienceLearningCoEvaluationValuation!
+  updateExperienceLearningRubricCriteria(data: NewExperienceLearningRubricCriteria!, id: String!): ExperienceLearningRubricCriteria!
+  updateExperienceLearningSelfAssessmentValuation(data: NewExperienceLearningSelfAssessmentValuation!, id: String!): ExperienceLearningSelfAssessmentValuation!
   updateExperienceLearningTraditionalValuation(data: NewExperienceLearningTraditionalValuation!, id: String!): ExperienceLearningTraditionalValuation!
   updateForum(data: NewForum!, id: String!): Forum!
   updateForumInteraction(data: NewForumInteraction!, id: String!): ForumInteraction!
@@ -1781,6 +1944,41 @@ input NewExperienceLearning {
   fecha: DateTime
   learningsId: [String!]
   title: String
+}
+
+input NewExperienceLearningCoEvaluation {
+  assessment: Float
+  campusId: String
+  coEvaluatorId: String
+  experienceLearningId: String
+  studentId: String
+}
+
+input NewExperienceLearningCoEvaluationValuation {
+  assessment: Float
+  campusId: String
+  experienceLearningId: String
+  studentId: String
+}
+
+input NewExperienceLearningRubricCriteria {
+  criteria: String
+  evidenceLearningId: String
+  experienceLearningId: String
+  experienceLearningRubricCriteriaPerformanceLevel: [NewExperienceLearningRubricCriteriaPerformanceLevel!]
+  weight: Float
+}
+
+input NewExperienceLearningRubricCriteriaPerformanceLevel {
+  criteria: String
+  performanceLevelId: String
+}
+
+input NewExperienceLearningSelfAssessmentValuation {
+  assessment: Float
+  campusId: String
+  experienceLearningId: String
+  studentId: String
 }
 
 input NewExperienceLearningTraditionalValuation {
@@ -1983,6 +2181,7 @@ input NewSpecialty {
 input NewStudent {
   academicGradeId: String
   campusId: [String!]
+  code: Float
   courseId: String
   newUser: NewUser
   schoolId: [String!]
@@ -2427,16 +2626,15 @@ type Query {
     last: Float
     orderCreated: Boolean!
   ): ExperienceLearningConnection!
-  getAllExperienceLearningTraditionalValuation(
-    academicAsignatureCourseId: String
-
+  getAllExperienceLearningCoEvaluation(
     """Paginate after opaque cursor"""
     after: String
     allData: Boolean!
 
     """Paginate before opaque cursor"""
     before: String
-    campusId: String!
+    coEvaluatorId: String
+    experienceLearningId: String!
 
     """Paginate first"""
     first: Float
@@ -2444,6 +2642,74 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    studentId: String
+  ): ExperienceLearningCoEvaluationConnection!
+  getAllExperienceLearningCoEvaluationValuation(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+    experienceLearningId: String!
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+    studentId: String
+  ): ExperienceLearningCoEvaluationValuationConnection!
+  getAllExperienceLearningRubricCriteria(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+    experienceLearningId: String!
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): ExperienceLearningRubricCriteriaConnection!
+  getAllExperienceLearningSelfAssessmentValuation(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+    experienceLearningId: String!
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+    studentId: String
+  ): ExperienceLearningSelfAssessmentValuationConnection!
+  getAllExperienceLearningTraditionalValuation(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+    experienceLearningId: String!
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+    studentId: String
   ): ExperienceLearningTraditionalValuationConnection!
   getAllForum(
     """Paginate after opaque cursor"""
@@ -2942,6 +3208,10 @@ type Query {
   getEvaluativeComponent(id: String!): EvaluativeComponent
   getEvidenceLearning(id: String!): EvidenceLearning
   getExperienceLearning(id: String!): ExperienceLearning
+  getExperienceLearningCoEvaluation(id: String!): ExperienceLearningCoEvaluation
+  getExperienceLearningCoEvaluationValuation(id: String!): ExperienceLearningCoEvaluationValuation
+  getExperienceLearningRubricCriteria(id: String!): ExperienceLearningRubricCriteria
+  getExperienceLearningSelfAssessmentValuation(id: String!): ExperienceLearningSelfAssessmentValuation
   getExperienceLearningTraditionalValuation(id: String!): ExperienceLearningTraditionalValuation
   getForum(id: String!): Forum
   getForumInteraction(id: String!): ForumInteraction
@@ -3144,6 +3414,7 @@ type Student implements IModelData {
   active: Boolean
   campus: [Campus!]
   campusId: [String!]
+  code: Float
   course: Course
   courseId: String
   createdAt: DateTime

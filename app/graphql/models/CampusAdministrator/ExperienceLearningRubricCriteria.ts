@@ -4,6 +4,7 @@ import { IModelCampusData } from '../../interfaces/IModelCampusData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { EvidenceLearning } from '../SchoolAdministrator/EvidenceLearning';
 import { ExperienceLearning } from './ExperienceLearning';
+import { ExperienceLearningRubricCriteriaPerformanceLevel } from './ExperienceLearningRubricCriteriaPerformanceLevel';
 
 @ObjectType({ description: 'The ExperienceLearningRubricCriteria model', implements: IModelCampusData })
 @Entity()
@@ -30,6 +31,11 @@ export class ExperienceLearningRubricCriteria extends IModelCampusData {
     @Field({ nullable: true })
     @Column({ nullable: true })
     criteria?: String;
+
+    @Field(() => [ExperienceLearningRubricCriteriaPerformanceLevel], { nullable: true })
+    @Column({ nullable: true })
+    experienceLearningRubricCriteriaPerformanceLevel?: ExperienceLearningRubricCriteriaPerformanceLevel[];
+
 }
 
 @ObjectType()
