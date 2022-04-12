@@ -6,6 +6,9 @@ import { AcademicHour } from '../graphql/models/CampusAdministrator/AcademicHour
 import { AcademicSchedule } from '../graphql/models/CampusAdministrator/AcademicSchedule';
 import { Course } from '../graphql/models/CampusAdministrator/Course';
 import { ExperienceLearning } from '../graphql/models/CampusAdministrator/ExperienceLearning';
+import { ExperienceLearningCoEvaluation } from '../graphql/models/CampusAdministrator/ExperienceLearningCoEvaluation';
+import { ExperienceLearningCoEvaluationValuation } from '../graphql/models/CampusAdministrator/ExperienceLearningCoEvaluationValuation';
+import { ExperienceLearningSelfAssessmentValuation } from '../graphql/models/CampusAdministrator/ExperienceLearningSelfAssessmentValuation';
 import { ExperienceLearningTraditionalValuation } from '../graphql/models/CampusAdministrator/ExperienceLearningTraditionalValuation';
 import { Guardian } from '../graphql/models/CampusAdministrator/Guardian';
 import { Teacher } from '../graphql/models/CampusAdministrator/Teacher';
@@ -167,3 +170,7 @@ export const EvidenceLearningRepository = dataSource.getMongoRepository(Evidence
 export const GeneralBasicLearningRightRepository = dataSource.getMongoRepository(GeneralBasicLearningRight);
 export const ExperienceLearningRepository = dataSource.getMongoRepository(ExperienceLearning);
 export const ExperienceLearningTraditionalValuationRepository = dataSource.getMongoRepository(ExperienceLearningTraditionalValuation);
+export const ExperienceLearningSelfAssessmentValuationRepository = dataSource.getMongoRepository(ExperienceLearningSelfAssessmentValuation);
+export const ExperienceLearningCoEvaluationValuationRepository = dataSource.getMongoRepository(ExperienceLearningCoEvaluationValuation);
+export const ExperienceLearningCoEvaluationRepository = dataSource.getMongoRepository(ExperienceLearningCoEvaluation);
+

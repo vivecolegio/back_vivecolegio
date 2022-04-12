@@ -17,7 +17,10 @@ import { SERVER_NAME_APP, SERVER_PORT_APP } from '../config';
 import { AcademicAsignatureCourseResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAsignatureCourseResolver';
 import { AcademicHourResolver } from '../graphql/resolvers/CampusAdministrator/AcademicHourResolver';
 import { AcademicScheduleResolver } from '../graphql/resolvers/CampusAdministrator/AcademicScheduleResolver';
+import { ExperienceLearningCoEvaluationResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningCoEvaluationResolver';
+import { ExperienceLearningCoEvaluationValuationResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningCoEvaluationValuationResolver';
 import { ExperienceLearningResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningResolver';
+import { ExperienceLearningSelfAssessmentValuationResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningSelfAssessmentValuationResolver';
 import { ExperienceLearningTraditionalValuationResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningTraditionalValuationResolver';
 import { AuditLoginResolver } from '../graphql/resolvers/GeneralAdministrator/AuditLoginResolver';
 import { GenderResolver } from '../graphql/resolvers/GeneralAdministrator/GenderResolver';
@@ -122,7 +125,10 @@ async function app() {
         EvidenceLearningResolver,
         GeneralBasicLearningRightResolver,
         ExperienceLearningResolver,
-        ExperienceLearningTraditionalValuationResolver
+        ExperienceLearningTraditionalValuationResolver,
+        ExperienceLearningSelfAssessmentValuationResolver,
+        ExperienceLearningCoEvaluationValuationResolver,
+        ExperienceLearningCoEvaluationResolver
       ],
       emitSchemaFile: true,
       validate: false,
