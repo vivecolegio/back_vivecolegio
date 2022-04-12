@@ -2,7 +2,7 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicAsignatureRepository, AcademicGradeRepository, AcademicPeriodRepository, AcademicStandardRepository, GeneralBasicLearningRightRepository, LearningRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAsignatureRepository, AcademicGradeRepository, AcademicPeriodRepository, AcademicStandardRepository, EvidenceLearningRepository, GeneralBasicLearningRightRepository, LearningRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewLearning } from '../../inputs/SchoolAdministrator/NewLearning';
 import { IContext } from '../../interfaces/IContext';
@@ -13,6 +13,7 @@ import { AcademicAsignature } from '../../models/SchoolAdministrator/AcademicAsi
 import { AcademicGrade } from '../../models/SchoolAdministrator/AcademicGrade';
 import { AcademicPeriod } from '../../models/SchoolAdministrator/AcademicPeriod';
 import { AcademicStandard } from '../../models/SchoolAdministrator/AcademicStandard';
+import { EvidenceLearning } from '../../models/SchoolAdministrator/EvidenceLearning';
 import {
     Learning,
     LearningConnection
@@ -44,6 +45,9 @@ export class LearningResolver {
 
     @InjectRepository(AcademicPeriod)
     private repositoryAcademicPeriod = AcademicPeriodRepository;
+
+    @InjectRepository(EvidenceLearning)
+    private repositoryEvidenceLearning = EvidenceLearningRepository;
 
     @Query(() => Learning, { nullable: true })
     async getLearning(@Arg('id', () => String) id: string) {
@@ -296,5 +300,11 @@ export class LearningResolver {
             return result;
         }
         return null;
+    }
+
+    @FieldResolver((_type) => [EvidenceLearning], { nullable: true })
+    async evindeceLearnings(@Root() data: Learning) {
+        const result = await this.repositoryEvidenceLearning.findBy({ where: { learningId: data.id } });
+        return result;
     }
 }

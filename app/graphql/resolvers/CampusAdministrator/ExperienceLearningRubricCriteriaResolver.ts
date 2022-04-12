@@ -2,15 +2,15 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { CampusRepository, ExperienceLearningRepository, ExperienceLearningRubricCriteriaRepository, StudentRepository, UserRepository } from '../../../servers/DataSource';
+import { CampusRepository, EvidenceLearningRepository, ExperienceLearningRepository, ExperienceLearningRubricCriteriaRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewExperienceLearningRubricCriteria } from '../../inputs/CampusAdministrator/NewExperienceLearningRubricCriteria';
 import { IContext } from '../../interfaces/IContext';
 import { ExperienceLearning } from '../../models/CampusAdministrator/ExperienceLearning';
 import { ExperienceLearningRubricCriteria, ExperienceLearningRubricCriteriaConnection } from '../../models/CampusAdministrator/ExperienceLearningRubricCriteria';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
-import { Student } from '../../models/GeneralAdministrator/Student';
 import { User } from '../../models/GeneralAdministrator/User';
+import { EvidenceLearning } from '../../models/SchoolAdministrator/EvidenceLearning';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
 @Resolver(ExperienceLearningRubricCriteria)
@@ -27,8 +27,8 @@ export class ExperienceLearningRubricCriteriaResolver {
     @InjectRepository(ExperienceLearning)
     private repositoryExperienceLearning = ExperienceLearningRepository;
 
-    @InjectRepository(Student)
-    private repositoryStudent = StudentRepository;
+    @InjectRepository(EvidenceLearning)
+    private repositoryEvidenceLearning = EvidenceLearningRepository;
 
     @Query(() => ExperienceLearningRubricCriteria, { nullable: true })
     async getExperienceLearningRubricCriteria(@Arg('id', () => String) id: string) {
@@ -187,6 +187,16 @@ export class ExperienceLearningRubricCriteriaResolver {
         let id = data.experienceLearningId;
         if (id !== null && id !== undefined) {
             const result = await this.repositoryExperienceLearning.findOneBy(id);
+            return result;
+        }
+        return null;
+    }
+
+    @FieldResolver((_type) => EvidenceLearning, { nullable: true })
+    async evidenceLearnig(@Root() data: ExperienceLearningRubricCriteria) {
+        let id = data.evidenceLearningId;
+        if (id !== null && id !== undefined) {
+            const result = await this.repositoryEvidenceLearning.findOneBy(id);
             return result;
         }
         return null;
