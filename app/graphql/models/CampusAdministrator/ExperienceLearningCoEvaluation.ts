@@ -34,6 +34,10 @@ export class ExperienceLearningCoEvaluation extends IModelCampusData {
     @Column({ nullable: true })
     assessment?: number;
 
+    @Field({ nullable: true })
+    @Column({ nullable: true })
+    observations?: String;
+
 }
 
 @ObjectType()

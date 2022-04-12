@@ -18,4 +18,6 @@ export class NewExperienceLearningCoEvaluation implements Partial<ExperienceLear
     @Field({ nullable: true })
     assessment?: number;
 
+    @Field({ nullable: true })
+    observations?: String;
 }

@@ -149,7 +149,7 @@ export class ExperienceLearningRubricCriteriaValuationResolver {
         @Ctx() context: IContext
     ): Promise<Boolean | null> {
         let data = await this.repository.findOneBy(id);
-        let result = await this.repository.deleteOne({ _id: ObjectId(id) });
+        let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
         return result?.result?.ok === 1 ?? true;
     }
 

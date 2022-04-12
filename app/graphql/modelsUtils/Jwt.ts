@@ -3,6 +3,7 @@ import { Campus } from '../models/GeneralAdministrator/Campus';
 import { Menu } from '../models/GeneralAdministrator/Menu';
 import { Role } from '../models/GeneralAdministrator/Role';
 import { School } from '../models/GeneralAdministrator/School';
+import { Student } from '../models/GeneralAdministrator/Student';
 
 @ObjectType({ description: 'The User model' })
 export class Jwt {
@@ -26,4 +27,7 @@ export class Jwt {
 
   @Field((_type) => [Menu], { nullable: true })
   roleMenus?: [Menu];
+
+  @Field({ nullable: true })
+  student?: Student;
 }

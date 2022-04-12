@@ -15,4 +15,7 @@ export class NewExperienceLearningSelfAssessmentValuation implements Partial<Exp
     @Field({ nullable: true })
     assessment?: number;
 
+    @Field({ nullable: true })
+    observations?: String;
+
 }

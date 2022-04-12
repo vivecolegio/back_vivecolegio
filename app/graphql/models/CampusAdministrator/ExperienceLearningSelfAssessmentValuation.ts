@@ -27,6 +27,10 @@ export class ExperienceLearningSelfAssessmentValuation extends IModelCampusData 
     @Column({ nullable: true })
     assessment?: number;
 
+    @Field({ nullable: true })
+    @Column({ nullable: true })
+    observations?: String;
+
 }
 
 @ObjectType()

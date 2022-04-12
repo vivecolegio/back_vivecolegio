@@ -1,4 +1,5 @@
-import { ApolloGateway, IntrospectAndCompose, RemoteGraphQLDataSource } from '@apollo/gateway';
+import { ApolloGateway, IntrospectAndCompose } from '@apollo/gateway';
+import FileUploadDataSource from '@profusion/apollo-federation-upload';
 import { ApolloServerPluginLandingPageLocalDefault, ApolloServerPluginLandingPageProductionDefault } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import Cors from 'cors';
@@ -21,7 +22,7 @@ async function app() {
         ],
       }),
       buildService({ url }: any) {
-        return new RemoteGraphQLDataSource({
+        return new FileUploadDataSource({
           url,
           willSendRequest({ request, context }: any) {
             request.http.headers.set('user', context.user ? JSON.stringify(context.user) : null);
@@ -30,7 +31,7 @@ async function app() {
       },
     });
 
-    const { schema, executor } = await gateway.load();
+    //const { schema, executor } = await gateway.load();
 
     const configExpressStatusMonitor = {
       title: 'Express Status ViveColegios', // Default title
@@ -71,8 +72,7 @@ async function app() {
     };
 
     const server = new ApolloServer({
-      schema,
-      executor,
+      gateway,
       // playground: true,
       plugins: [
         process.env.NODE_ENV === 'production'
