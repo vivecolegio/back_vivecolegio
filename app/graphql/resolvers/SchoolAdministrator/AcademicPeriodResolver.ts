@@ -41,7 +41,7 @@ export class AcademicPeriodResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => String) schoolId: String,
-    @Arg('orderCustom', () => Boolean) orderCustom: Boolean,
+    @Arg('orderCustom', () => Boolean, { nullable: true }) orderCustom: Boolean,
   ): Promise<AcademicPeriodConnection> {
     let result;
     if (allData) {
