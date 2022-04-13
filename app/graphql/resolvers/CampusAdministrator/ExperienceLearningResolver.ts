@@ -2,13 +2,15 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicAsignatureCourseRepository, AcademicPeriodRepository, CampusRepository, CourseRepository, EvaluativeComponentRepository, EvidenceLearningRepository, ExperienceLearningRepository, ExperienceLearningTraditionalValuationRepository, LearningRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAsignatureCourseRepository, AcademicPeriodRepository, CampusRepository, CourseRepository, EvaluativeComponentRepository, EvidenceLearningRepository, ExperienceLearningCoEvaluationRepository, ExperienceLearningRepository, ExperienceLearningSelfAssessmentValuationRepository, ExperienceLearningTraditionalValuationRepository, LearningRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewExperienceLearning } from '../../inputs/CampusAdministrator/NewExperienceLearning';
 import { IContext } from '../../interfaces/IContext';
 import { AcademicAsignatureCourse } from '../../models/CampusAdministrator/AcademicAsignatureCourse';
 import { Course } from '../../models/CampusAdministrator/Course';
 import { ExperienceLearning, ExperienceLearningConnection } from '../../models/CampusAdministrator/ExperienceLearning';
+import { ExperienceLearningCoEvaluation } from '../../models/CampusAdministrator/ExperienceLearningCoEvaluation';
+import { ExperienceLearningSelfAssessmentValuation } from '../../models/CampusAdministrator/ExperienceLearningSelfAssessmentValuation';
 import { ExperienceLearningTraditionalValuation } from '../../models/CampusAdministrator/ExperienceLearningTraditionalValuation';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { User } from '../../models/GeneralAdministrator/User';
@@ -50,6 +52,11 @@ export class ExperienceLearningResolver {
     @InjectRepository(ExperienceLearningTraditionalValuation)
     private repositoryExperienceLearningTraditionalValuation = ExperienceLearningTraditionalValuationRepository;
 
+    @InjectRepository(ExperienceLearningSelfAssessmentValuation)
+    private repositoryExperienceLearningSelfAssessmentValuation = ExperienceLearningSelfAssessmentValuationRepository;
+
+    @InjectRepository(ExperienceLearningCoEvaluation)
+    private repositoryExperienceLearningCoEvaluation = ExperienceLearningCoEvaluationRepository;
 
 
     @Query(() => ExperienceLearning, { nullable: true })
@@ -329,6 +336,89 @@ export class ExperienceLearningResolver {
                             });
                             let result = await this.repositoryExperienceLearningTraditionalValuation.save(model);
                         }
+                    })
+                }
+            }
+        }
+        return true;
+    }
+
+    @Mutation(() => Boolean)
+    async createExperienceLearningSelfAssessmentValuationStudents(
+        @Arg('id', () => String) id: string,
+        @Ctx() context: IContext): Promise<Boolean | null> {
+        const result = await this.repository.findOneBy(id);
+        if (result) {
+            const academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(result?.academicAsignatureCourseId);
+            if (academicAsignatureCourse) {
+                const course = await this.repositoryCourse.findOneBy(academicAsignatureCourse.courseId);
+                if (course) {
+                    const students = course.studentsId;
+                    students?.forEach(async (student) => {
+                        let experienceLearningSelfAssessmentValuation = await this.repositoryExperienceLearningSelfAssessmentValuation.findBy({
+                            where: {
+                                experienceLearningId: id,
+                                studentId: student
+                            }
+                        })
+                        if (experienceLearningSelfAssessmentValuation.length == 0) {
+                            let createdByUserId = context?.user?.authorization?.id;
+                            const model = await this.repositoryExperienceLearningSelfAssessmentValuation.create({
+                                experienceLearningId: id,
+                                studentId: student,
+                                assessment: undefined,
+                                observations: undefined,
+                                active: true,
+                                version: 0,
+                                createdByUserId,
+                            });
+                            let result = await this.repositoryExperienceLearningSelfAssessmentValuation.save(model);
+                        }
+                    })
+                }
+            }
+        }
+        return true;
+    }
+
+    @Mutation(() => Boolean)
+    async createExperienceLearningCoEvaluationStudents(
+        @Arg('id', () => String) id: string,
+        @Ctx() context: IContext): Promise<Boolean | null> {
+        const result = await this.repository.findOneBy(id);
+        if (result) {
+            const academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(result?.academicAsignatureCourseId);
+            if (academicAsignatureCourse) {
+                const course = await this.repositoryCourse.findOneBy(academicAsignatureCourse.courseId);
+                if (course) {
+                    const coEvaluators = course.studentsId;
+                    coEvaluators?.forEach(async (coEvaluator) => {
+                        const students = course.studentsId;
+                        students?.forEach(async (student) => {
+                            if (coEvaluator != student) {
+                                let experienceLearningCoEvaluation = await this.repositoryExperienceLearningCoEvaluation.findBy({
+                                    where: {
+                                        coEvaluatorId: coEvaluator,
+                                        experienceLearningId: id,
+                                        studentId: student
+                                    }
+                                })
+                                if (experienceLearningCoEvaluation.length == 0) {
+                                    let createdByUserId = context?.user?.authorization?.id;
+                                    const model = await this.repositoryExperienceLearningCoEvaluation.create({
+                                        experienceLearningId: id,
+                                        coEvaluatorId: coEvaluator,
+                                        studentId: student,
+                                        assessment: undefined,
+                                        observations: undefined,
+                                        active: true,
+                                        version: 0,
+                                        createdByUserId,
+                                    });
+                                    let result = await this.repositoryExperienceLearningCoEvaluation.save(model);
+                                }
+                            }
+                        })
                     })
                 }
             }

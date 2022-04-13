@@ -1731,11 +1731,13 @@ type Mutation {
   createEvidenceLearning(data: NewEvidenceLearning!): EvidenceLearning!
   createExperienceLearning(data: NewExperienceLearning!): ExperienceLearning!
   createExperienceLearningCoEvaluation(data: NewExperienceLearningCoEvaluation!): ExperienceLearningCoEvaluation!
+  createExperienceLearningCoEvaluationStudents(id: String!): Boolean!
   createExperienceLearningCoEvaluationValuation(data: NewExperienceLearningCoEvaluationValuation!): ExperienceLearningCoEvaluationValuation!
   createExperienceLearningRubricCriteria(data: NewExperienceLearningRubricCriteria!): ExperienceLearningRubricCriteria!
   createExperienceLearningRubricCriteriaValuation(data: NewExperienceLearningRubricCriteriaValuation!): ExperienceLearningRubricCriteriaValuation!
   createExperienceLearningRubricValuation(data: NewExperienceLearningRubricValuation!): ExperienceLearningRubricValuation!
   createExperienceLearningSelfAssessmentValuation(data: NewExperienceLearningSelfAssessmentValuation!): ExperienceLearningSelfAssessmentValuation!
+  createExperienceLearningSelfAssessmentValuationStudents(id: String!): Boolean!
   createExperienceLearningTraditionalValuation(data: NewExperienceLearningTraditionalValuation!): ExperienceLearningTraditionalValuation!
   createExperienceLearningTraditionalValuationStudents(id: String!): Boolean!
   createForum(data: NewForum!): Forum!
