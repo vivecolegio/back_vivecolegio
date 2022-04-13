@@ -2,12 +2,14 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicAsignatureCourseRepository, AcademicPeriodRepository, CampusRepository, EvaluativeComponentRepository, EvidenceLearningRepository, ExperienceLearningRepository, LearningRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAsignatureCourseRepository, AcademicPeriodRepository, CampusRepository, CourseRepository, EvaluativeComponentRepository, EvidenceLearningRepository, ExperienceLearningRepository, ExperienceLearningTraditionalValuationRepository, LearningRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewExperienceLearning } from '../../inputs/CampusAdministrator/NewExperienceLearning';
 import { IContext } from '../../interfaces/IContext';
 import { AcademicAsignatureCourse } from '../../models/CampusAdministrator/AcademicAsignatureCourse';
+import { Course } from '../../models/CampusAdministrator/Course';
 import { ExperienceLearning, ExperienceLearningConnection } from '../../models/CampusAdministrator/ExperienceLearning';
+import { ExperienceLearningTraditionalValuation } from '../../models/CampusAdministrator/ExperienceLearningTraditionalValuation';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicPeriod } from '../../models/SchoolAdministrator/AcademicPeriod';
@@ -41,6 +43,14 @@ export class ExperienceLearningResolver {
 
     @InjectRepository(EvaluativeComponent)
     private repositoryEvaluativeComponent = EvaluativeComponentRepository;
+
+    @InjectRepository(Course)
+    private repositoryCourse = CourseRepository;
+
+    @InjectRepository(ExperienceLearningTraditionalValuation)
+    private repositoryExperienceLearningTraditionalValuation = ExperienceLearningTraditionalValuationRepository;
+
+
 
     @Query(() => ExperienceLearning, { nullable: true })
     async getExperienceLearning(@Arg('id', () => String) id: string) {
@@ -287,6 +297,43 @@ export class ExperienceLearningResolver {
         let data = await this.repository.findOneBy(id);
         let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
         return result?.result?.ok === 1 ?? true;
+    }
+
+    @Mutation(() => Boolean)
+    async createExperienceLearningTraditionalValuationStudents(
+        @Arg('id', () => String) id: string,
+        @Ctx() context: IContext): Promise<Boolean | null> {
+        const result = await this.repository.findOneBy(id);
+        if (result) {
+            const academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(result?.academicAsignatureCourseId);
+            if (academicAsignatureCourse) {
+                const course = await this.repositoryCourse.findOneBy(academicAsignatureCourse.courseId);
+                if (course) {
+                    const students = course.studentsId;
+                    students?.forEach(async (student) => {
+                        let experienceLearningTraditionalValuation = await this.repositoryExperienceLearningTraditionalValuation.findBy({
+                            where: {
+                                experienceLearningId: id,
+                                studentId: student
+                            }
+                        })
+                        if (experienceLearningTraditionalValuation.length == 0) {
+                            let createdByUserId = context?.user?.authorization?.id;
+                            const model = await this.repositoryExperienceLearningTraditionalValuation.create({
+                                experienceLearningId: id,
+                                studentId: student,
+                                assessment: undefined,
+                                active: true,
+                                version: 0,
+                                createdByUserId,
+                            });
+                            let result = await this.repositoryExperienceLearningTraditionalValuation.save(model);
+                        }
+                    })
+                }
+            }
+        }
+        return true;
     }
 
     @FieldResolver((_type) => User, { nullable: true })

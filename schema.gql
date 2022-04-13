@@ -604,37 +604,6 @@ type EmailEdge {
   node: Email!
 }
 
-"""The EvaluationGroup model"""
-type EvaluationGroup implements IModelSchoolData {
-  active: Boolean
-  createdAt: DateTime
-  createdByUser: User
-  createdByUserId: String
-  id: ID!
-  name: String
-  school: School
-  schoolId: String
-  updatedAt: DateTime
-  updatedByUser: User
-  updatedByUserId: String
-  version: Float
-  weight: Float
-}
-
-type EvaluationGroupConnection {
-  edges: [EvaluationGroupEdge!]!
-  pageInfo: PageInfo!
-
-  """Total Count"""
-  totalCount: Float
-}
-
-type EvaluationGroupEdge {
-  """Used in `before` and `after` args"""
-  cursor: String!
-  node: EvaluationGroup!
-}
-
 """The EvaluativeComponent model"""
 type EvaluativeComponent implements IModelSchoolData {
   active: Boolean
@@ -714,8 +683,8 @@ type ExperienceLearning implements IModelCampusData {
   criteria: String
   dateDelivery: DateTime
   description: String
-  evaluationGroup: EvaluationGroup
-  evaluationGroupdId: String
+  evaluativeComponent: EvaluativeComponent
+  evaluativeComponentId: String
   evidenciceLearnings: [EvidenceLearning!]
   evidenciceLearningsId: [String!]
   experienceLearningPerformanceLevel: [ExperienceLearningPerformanceLevel!]
@@ -1702,7 +1671,6 @@ type Mutation {
   changeActiveDocumentType(active: Boolean!, id: String!): Boolean!
   changeActiveEducationLevel(active: Boolean!, id: String!): Boolean!
   changeActiveEmail(active: Boolean!, id: String!): Boolean!
-  changeActiveEvaluationGroup(active: Boolean!, id: String!): Boolean!
   changeActiveEvaluativeComponent(active: Boolean!, id: String!): Boolean!
   changeActiveEvidenceLearning(active: Boolean!, id: String!): Boolean!
   changeActiveExperienceLearning(active: Boolean!, id: String!): Boolean!
@@ -1759,7 +1727,6 @@ type Mutation {
   createDocumentType(data: NewDocumentType!): DocumentType!
   createEducationLevel(data: NewEducationLevel!): EducationLevel!
   createEmail(data: NewEmail!): Email!
-  createEvaluationGroup(data: NewEvaluationGroup!): EvaluationGroup!
   createEvaluativeComponent(data: NewEvaluativeComponent!): EvaluativeComponent!
   createEvidenceLearning(data: NewEvidenceLearning!): EvidenceLearning!
   createExperienceLearning(data: NewExperienceLearning!): ExperienceLearning!
@@ -1770,6 +1737,7 @@ type Mutation {
   createExperienceLearningRubricValuation(data: NewExperienceLearningRubricValuation!): ExperienceLearningRubricValuation!
   createExperienceLearningSelfAssessmentValuation(data: NewExperienceLearningSelfAssessmentValuation!): ExperienceLearningSelfAssessmentValuation!
   createExperienceLearningTraditionalValuation(data: NewExperienceLearningTraditionalValuation!): ExperienceLearningTraditionalValuation!
+  createExperienceLearningTraditionalValuationStudents(id: String!): Boolean!
   createForum(data: NewForum!): Forum!
   createForumInteraction(data: NewForumInteraction!): ForumInteraction!
   createGender(data: NewGender!): Gender!
@@ -1815,7 +1783,6 @@ type Mutation {
   deleteDocumentType(id: String!): Boolean!
   deleteEducationLevel(id: String!): Boolean!
   deleteEmail(id: String!): Boolean!
-  deleteEvaluationGroup(id: String!): Boolean!
   deleteEvaluativeComponent(id: String!): Boolean!
   deleteEvidenceLearning(id: String!): Boolean!
   deleteExperienceLearning(id: String!): Boolean!
@@ -1874,7 +1841,6 @@ type Mutation {
   updateDocumentType(data: NewDocumentType!, id: String!): DocumentType!
   updateEducationLevel(data: NewEducationLevel!, id: String!): EducationLevel!
   updateEmail(data: NewEmail!, id: String!): Email!
-  updateEvaluationGroup(data: NewEvaluationGroup!, id: String!): EvaluationGroup!
   updateEvaluativeComponent(data: NewEvaluativeComponent!, id: String!): EvaluativeComponent!
   updateEvidenceLearning(data: NewEvidenceLearning!, id: String!): EvidenceLearning!
   updateExperienceLearning(data: NewExperienceLearning!, id: String!): ExperienceLearning!
@@ -2051,12 +2017,6 @@ input NewEmail {
   toId: String
 }
 
-input NewEvaluationGroup {
-  name: String
-  schoolId: String
-  weight: Float
-}
-
 input NewEvaluativeComponent {
   name: String
   schoolId: String
@@ -2076,7 +2036,7 @@ input NewExperienceLearning {
   criteria: String
   dateDelivery: DateTime
   description: String
-  evaluationGroupdId: String
+  evaluativeComponentId: String
   evidenciceLearningsId: [String!]
   experienceLearningPerformanceLevel: [NewExperienceLearningPerformanceLevel!]
   experienceType: ExperienceType
@@ -2733,22 +2693,6 @@ type Query {
     last: Float
     orderCreated: Boolean!
   ): EmailConnection!
-  getAllEvaluationGroup(
-    """Paginate after opaque cursor"""
-    after: String
-    allData: Boolean!
-
-    """Paginate before opaque cursor"""
-    before: String
-
-    """Paginate first"""
-    first: Float
-
-    """Paginate last"""
-    last: Float
-    orderCreated: Boolean!
-    schoolId: String!
-  ): EvaluationGroupConnection!
   getAllEvaluativeComponent(
     """Paginate after opaque cursor"""
     after: String
@@ -3414,7 +3358,6 @@ type Query {
   getDocumentType(id: String!): DocumentType
   getEducationLevel(id: String!): EducationLevel
   getEmail(id: String!): Email
-  getEvaluationGroup(id: String!): EvaluationGroup
   getEvaluativeComponent(id: String!): EvaluativeComponent
   getEvidenceLearning(id: String!): EvidenceLearning
   getExperienceLearning(id: String!): ExperienceLearning
