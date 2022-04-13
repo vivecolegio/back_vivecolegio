@@ -33,7 +33,7 @@ export class NewExperienceLearning implements Partial<ExperienceLearning> {
     academicPeriodId?: string;
 
     @Field({ nullable: true })
-    evaluationGroupdId?: string;
+    evaluativeComponentId?: string;
 
     @Field({ nullable: true })
     onlineDelivery?: Boolean;

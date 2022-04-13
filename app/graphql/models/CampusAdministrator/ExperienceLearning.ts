@@ -4,7 +4,7 @@ import { ExperienceType } from '../../enums/ExperienceType';
 import { IModelCampusData } from '../../interfaces/IModelCampusData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { AcademicPeriod } from '../SchoolAdministrator/AcademicPeriod';
-import { EvaluationGroup } from '../SchoolAdministrator/EvaluationGroup';
+import { EvaluativeComponent } from '../SchoolAdministrator/EvaluativeComponent';
 import { EvidenceLearning } from '../SchoolAdministrator/EvidenceLearning';
 import { Learning } from '../SchoolAdministrator/Learning';
 import { AcademicAsignatureCourse } from './AcademicAsignatureCourse';
@@ -59,10 +59,10 @@ export class ExperienceLearning extends IModelCampusData {
 
     @Field({ nullable: true })
     @Column({ nullable: true })
-    evaluationGroupdId?: string;
+    evaluativeComponentId?: string;
 
     @Field({ nullable: true })
-    evaluationGroup?: EvaluationGroup;
+    evaluativeComponent?: EvaluativeComponent;
 
     @Field({ nullable: true })
     @Column({ nullable: true })

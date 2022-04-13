@@ -46,7 +46,6 @@ import { AcademicStandard } from '../graphql/models/SchoolAdministrator/Academic
 import { CampusAdministrator } from '../graphql/models/SchoolAdministrator/CampusAdministrator';
 import { CampusCoordinator } from '../graphql/models/SchoolAdministrator/CampusCoordinator';
 import { EducationLevel } from '../graphql/models/SchoolAdministrator/EducationLevel';
-import { EvaluationGroup } from '../graphql/models/SchoolAdministrator/EvaluationGroup';
 import { EvaluativeComponent } from '../graphql/models/SchoolAdministrator/EvaluativeComponent';
 import { EvidenceLearning } from '../graphql/models/SchoolAdministrator/EvidenceLearning';
 import { Forum } from '../graphql/models/SchoolAdministrator/Forum';
@@ -119,8 +118,7 @@ export const dataSource = new DataSource({
     ExperienceLearningCoEvaluation,
     ExperienceLearningRubricCriteria,
     ExperienceLearningRubricValuation,
-    ExperienceLearningRubricCriteriaValuation,
-    EvaluationGroup
+    ExperienceLearningRubricCriteriaValuation
   ],
   synchronize: true,
   logger: 'advanced-console',
@@ -187,5 +185,4 @@ export const ExperienceLearningCoEvaluationRepository = dataSource.getMongoRepos
 export const ExperienceLearningRubricCriteriaRepository = dataSource.getMongoRepository(ExperienceLearningRubricCriteria);
 export const ExperienceLearningRubricValuationRepository = dataSource.getMongoRepository(ExperienceLearningRubricValuation);
 export const ExperienceLearningRubricCriteriaValuationRepository = dataSource.getMongoRepository(ExperienceLearningRubricCriteriaValuation);
-export const EvaluationGroupRepository = dataSource.getMongoRepository(EvaluationGroup);
 

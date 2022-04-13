@@ -30,7 +30,6 @@ import { AuditLoginResolver } from '../graphql/resolvers/GeneralAdministrator/Au
 import { GenderResolver } from '../graphql/resolvers/GeneralAdministrator/GenderResolver';
 import { GeneralAcademicAsignatureResolver } from '../graphql/resolvers/GeneralAdministrator/GeneralAcademicAsignatureResolver';
 import { GeneralBasicLearningRightResolver } from '../graphql/resolvers/GeneralAdministrator/GeneralBasicLearningRightResolver';
-import { EvaluationGroupResolver } from '../graphql/resolvers/SchoolAdministrator/EvaluationGroupResolver';
 import { EvidenceLearningResolver } from '../graphql/resolvers/SchoolAdministrator/EvidenceLearningResolver';
 import { ForumInteractionResolver } from '../graphql/resolvers/SchoolAdministrator/ForumInteractionResolver';
 import { ForumResolver } from '../graphql/resolvers/SchoolAdministrator/ForumResolver';
@@ -137,8 +136,7 @@ async function app() {
         ExperienceLearningRubricCriteriaPerformanceLevelResolver,
         ExperienceLearningRubricCriteriaResolver,
         ExperienceLearningRubricValuationResolver,
-        ExperienceLearningRubricCriteriaValuationResolver,
-        EvaluationGroupResolver
+        ExperienceLearningRubricCriteriaValuationResolver
       ],
       emitSchemaFile: true,
       validate: false,
