@@ -2,7 +2,7 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicAsignatureCourseRepository, AcademicPeriodRepository, CampusRepository, EvidenceLearningRepository, ExperienceLearningRepository, LearningRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAsignatureCourseRepository, AcademicPeriodRepository, CampusRepository, EvaluationGroupRepository, EvidenceLearningRepository, ExperienceLearningRepository, LearningRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewExperienceLearning } from '../../inputs/CampusAdministrator/NewExperienceLearning';
 import { IContext } from '../../interfaces/IContext';
@@ -11,6 +11,7 @@ import { ExperienceLearning, ExperienceLearningConnection } from '../../models/C
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicPeriod } from '../../models/SchoolAdministrator/AcademicPeriod';
+import { EvaluationGroup } from '../../models/SchoolAdministrator/EvaluationGroup';
 import { EvidenceLearning } from '../../models/SchoolAdministrator/EvidenceLearning';
 import { Learning } from '../../models/SchoolAdministrator/Learning';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
@@ -37,6 +38,9 @@ export class ExperienceLearningResolver {
 
     @InjectRepository(AcademicPeriod)
     private repositoryAcademicPeriod = AcademicPeriodRepository;
+
+    @InjectRepository(EvaluationGroup)
+    private repositoryEvaluationGroup = EvaluationGroupRepository;
 
     @Query(() => ExperienceLearning, { nullable: true })
     async getExperienceLearning(@Arg('id', () => String) id: string) {
@@ -358,6 +362,16 @@ export class ExperienceLearningResolver {
                 dataIds.push(new ObjectId(id));
             });
             const result = await this.repositoryEvidenceLearning.findBy({ where: { _id: { $in: dataIds } } });
+            return result;
+        }
+        return null;
+    }
+
+    @FieldResolver((_type) => EvaluationGroup, { nullable: true })
+    async evaluationGroup(@Root() data: ExperienceLearning) {
+        let id = data.evaluationGroupdId;
+        if (id !== null && id !== undefined) {
+            const result = await this.repositoryEvaluationGroup.findOneBy(id);
             return result;
         }
         return null;

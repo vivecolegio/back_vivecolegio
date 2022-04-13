@@ -4,9 +4,11 @@ import { ExperienceType } from '../../enums/ExperienceType';
 import { IModelCampusData } from '../../interfaces/IModelCampusData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { AcademicPeriod } from '../SchoolAdministrator/AcademicPeriod';
+import { EvaluationGroup } from '../SchoolAdministrator/EvaluationGroup';
 import { EvidenceLearning } from '../SchoolAdministrator/EvidenceLearning';
 import { Learning } from '../SchoolAdministrator/Learning';
 import { AcademicAsignatureCourse } from './AcademicAsignatureCourse';
+import { ExperienceLearningPerformanceLevel } from './ExperienceLearningPerformanceLevel';
 
 @ObjectType({ description: 'The ExperienceLearning model', implements: IModelCampusData })
 @Entity()
@@ -32,7 +34,7 @@ export class ExperienceLearning extends IModelCampusData {
 
     @Field({ nullable: true })
     @Column({ nullable: true })
-    fecha?: Date;
+    dateDelivery?: Date;
 
     @Field(() => [String], { nullable: true })
     @Column({ nullable: true })
@@ -54,6 +56,25 @@ export class ExperienceLearning extends IModelCampusData {
 
     @Field({ nullable: true })
     academicPeriod?: AcademicPeriod;
+
+    @Field({ nullable: true })
+    @Column({ nullable: true })
+    evaluationGroupdId?: string;
+
+    @Field({ nullable: true })
+    evaluationGroup?: EvaluationGroup;
+
+    @Field({ nullable: true })
+    @Column({ nullable: true })
+    onlineDelivery?: Boolean;
+
+    @Field({ nullable: true })
+    @Column({ nullable: true })
+    criteria?: String;
+
+    @Field(() => [ExperienceLearningPerformanceLevel], { nullable: true })
+    @Column({ nullable: true })
+    experienceLearningPerformanceLevel?: ExperienceLearningPerformanceLevel[];
 }
 
 @ObjectType()
