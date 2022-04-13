@@ -20,4 +20,7 @@ export class NewAcademicPeriod implements Partial<AcademicPeriod> {
 
   @Field({ nullable: true })
   schoolId?: string;
+
+  @Field({ nullable: true })
+  order?: number;
 }
