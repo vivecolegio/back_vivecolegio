@@ -41,6 +41,7 @@ export class AcademicPeriodResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => String) schoolId: String,
+    @Arg('orderCustom', () => Boolean) orderCustom: Boolean,
   ): Promise<AcademicPeriodConnection> {
     let result;
     if (allData) {
@@ -51,6 +52,12 @@ export class AcademicPeriodResolver {
         });
       } else {
         result = await this.repository.findBy({ where: { schoolId } });
+      }
+      if (orderCustom) {
+        result = await this.repository.findBy({
+          where: { schoolId },
+          order: { order: 'ASC' },
+        });
       }
     } else {
       if (orderCreated) {
@@ -67,6 +74,15 @@ export class AcademicPeriodResolver {
             schoolId,
             active: true,
           },
+        });
+      }
+      if (orderCustom) {
+        result = await this.repository.findBy({
+          where: {
+            schoolId,
+            active: true,
+          },
+          order: { createdAt: 'ASC' },
         });
       }
     }
