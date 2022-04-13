@@ -2766,6 +2766,7 @@ type Query {
     last: Float
     orderCreated: Boolean!
   ): ExperienceLearningConnection!
+  getAllExperienceLearningAcademicAsignatureCourse(academicPeriodId: String!, experienceType: ExperienceType!, id: String!): [ExperienceLearning!]
   getAllExperienceLearningCoEvaluation(
     """Paginate after opaque cursor"""
     after: String

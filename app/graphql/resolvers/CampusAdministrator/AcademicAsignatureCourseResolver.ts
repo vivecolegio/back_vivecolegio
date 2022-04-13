@@ -2,12 +2,14 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicAsignatureCourseRepository, AcademicAsignatureRepository, CampusRepository, CourseRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAsignatureCourseRepository, AcademicAsignatureRepository, CampusRepository, CourseRepository, ExperienceLearningRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
+import { ExperienceType } from '../../enums/ExperienceType';
 import { NewAcademicAsignatureCourse } from '../../inputs/CampusAdministrator/NewAcademicAsignatureCourse';
 import { IContext } from '../../interfaces/IContext';
 import { AcademicAsignatureCourse, AcademicAsignatureCourseConnection } from '../../models/CampusAdministrator/AcademicAsignatureCourse';
 import { Course } from '../../models/CampusAdministrator/Course';
+import { ExperienceLearning } from '../../models/CampusAdministrator/ExperienceLearning';
 import { Teacher } from '../../models/CampusAdministrator/Teacher';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { User } from '../../models/GeneralAdministrator/User';
@@ -34,6 +36,8 @@ export class AcademicAsignatureCourseResolver {
     @InjectRepository(Teacher)
     private repositoryTeacher = TeacherRepository;
 
+    @InjectRepository(ExperienceLearning)
+    private repositoryExperienceLearning = ExperienceLearningRepository;
 
     @Query(() => AcademicAsignatureCourse, { nullable: true })
     async getAcademicAsignatureCourse(@Arg('id', () => String) id: string) {
@@ -158,6 +162,24 @@ export class AcademicAsignatureCourseResolver {
         let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
         return result?.result?.ok === 1 ?? true;
     }
+
+
+    @Query(() => [ExperienceLearning], { nullable: true })
+    async getAllExperienceLearningAcademicAsignatureCourse(
+        @Arg('id', () => String) id: string,
+        @Arg('academicPeriodId', () => String) academicPeriodId: string,
+        @Arg('experienceType', () => ExperienceType) experienceType: ExperienceType) {
+        const result = await this.repositoryExperienceLearning.findBy({
+            where: {
+                academicAsignatureCourseId: id,
+                academicPeriodId,
+                experienceType,
+                active: true,
+            }, order: { createdAt: 'ASC' },
+        });
+        return result;
+    }
+
 
     @FieldResolver((_type) => User, { nullable: true })
     async createdByUser(@Root() data: AcademicAsignatureCourse) {
