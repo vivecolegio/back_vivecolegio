@@ -1733,6 +1733,7 @@ type Mutation {
   createExperienceLearningCoEvaluation(data: NewExperienceLearningCoEvaluation!): ExperienceLearningCoEvaluation!
   createExperienceLearningCoEvaluationStudents(id: String!): Boolean!
   createExperienceLearningCoEvaluationValuation(data: NewExperienceLearningCoEvaluationValuation!): ExperienceLearningCoEvaluationValuation!
+  createExperienceLearningCoEvaluationValuationStudents(id: String!): Boolean!
   createExperienceLearningRubricCriteria(data: NewExperienceLearningRubricCriteria!): ExperienceLearningRubricCriteria!
   createExperienceLearningRubricCriteriaValuation(data: NewExperienceLearningRubricCriteriaValuation!): ExperienceLearningRubricCriteriaValuation!
   createExperienceLearningRubricValuation(data: NewExperienceLearningRubricValuation!): ExperienceLearningRubricValuation!
