@@ -226,6 +226,7 @@ type AcademicPeriod implements IModelSchoolData {
   endDate: DateTime
   id: ID!
   name: String
+  order: Float
   school: School
   schoolId: String
   schoolYear: SchoolYear
@@ -708,6 +709,7 @@ type ExperienceLearningCoEvaluation implements IModelCampusData {
   experienceLearning: ExperienceLearning
   experienceLearningId: String
   id: ID!
+  observations: String
   student: Student
   studentId: String
   updatedAt: DateTime
@@ -901,6 +903,7 @@ type ExperienceLearningSelfAssessmentValuation implements IModelCampusData {
   experienceLearning: ExperienceLearning
   experienceLearningId: String
   id: ID!
+  observations: String
   student: Student
   studentId: String
   updatedAt: DateTime
@@ -1417,6 +1420,7 @@ type Jwt {
   role: Role
   roleMenus: [Menu!]
   schools: [School!]
+  student: Student
   userId: String
 }
 
@@ -1434,6 +1438,7 @@ type Learning implements IModelSchoolData {
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  evidenceLearnings: [EvidenceLearning!]
   generalBasicLearningRight: GeneralBasicLearningRight
   generalBasicLearningRightId: String
   id: ID!
@@ -1918,6 +1923,7 @@ input NewAcademicHour {
 input NewAcademicPeriod {
   endDate: DateTime
   name: String
+  order: Float
   schoolId: String
   schoolYearId: String
   startDate: DateTime
@@ -2027,6 +2033,7 @@ input NewExperienceLearningCoEvaluation {
   campusId: String
   coEvaluatorId: String
   experienceLearningId: String
+  observations: String
   studentId: String
 }
 
@@ -2066,6 +2073,7 @@ input NewExperienceLearningSelfAssessmentValuation {
   assessment: Float
   campusId: String
   experienceLearningId: String
+  observations: String
   studentId: String
 }
 
@@ -2498,6 +2506,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    orderCustom: Boolean
     schoolId: String!
   ): AcademicPeriodConnection!
   getAllAcademicSchedule(
@@ -2946,6 +2955,8 @@ type Query {
 
     """Paginate first"""
     first: Float
+    generalAcademicAsignatureId: String
+    generalAcademicCycleId: String
 
     """Paginate last"""
     last: Float

@@ -303,8 +303,8 @@ export class LearningResolver {
     }
 
     @FieldResolver((_type) => [EvidenceLearning], { nullable: true })
-    async evindeceLearnings(@Root() data: Learning) {
-        const result = await this.repositoryEvidenceLearning.findBy({ where: { learningId: data.id } });
+    async evidenceLearnings(@Root() data: Learning) {
+        const result = await this.repositoryEvidenceLearning.findBy({ where: { learningId: data.id.toString() } });
         return result;
     }
 }
