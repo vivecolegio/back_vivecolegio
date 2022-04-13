@@ -56,7 +56,7 @@ export class AcademicPeriodResolver {
       if (orderCustom) {
         result = await this.repository.findBy({
           where: { schoolId },
-          order: { order: 'ASC' },
+          order: { order: 1 },
         });
       }
     } else {
@@ -82,7 +82,7 @@ export class AcademicPeriodResolver {
             schoolId,
             active: true,
           },
-          order: { createdAt: 'ASC' },
+          order: { order: 1 }
         });
       }
     }
