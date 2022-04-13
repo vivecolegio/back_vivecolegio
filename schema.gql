@@ -972,6 +972,24 @@ type ExperienceLearningTraditionalValuationEdge {
   node: ExperienceLearningTraditionalValuation!
 }
 
+"""The ExperienceLearningValuation model"""
+type ExperienceLearningValuation implements IModelCampusData {
+  active: Boolean
+  assessment: Float
+  campus: Campus
+  campusId: String
+  createdAt: DateTime
+  createdByUserId: String
+  experienceLearning: ExperienceLearning
+  experienceLearningId: String
+  id: ID!
+  student: Student
+  studentId: String
+  updatedAt: DateTime
+  updatedByUserId: String
+  version: Float
+}
+
 """The ExperienceType Register"""
 enum ExperienceType {
   COEVALUATION
@@ -3400,6 +3418,7 @@ type Query {
   getStudent(id: String!): Student
   getTeacher(id: String!): Teacher
   getUser(id: String!): User
+  getValuationStudents(id: String!): [ExperienceLearningValuation!]
   me: Jwt!
 }
 

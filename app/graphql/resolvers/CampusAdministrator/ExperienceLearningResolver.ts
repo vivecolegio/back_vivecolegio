@@ -4,6 +4,7 @@ import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from '
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { AcademicAsignatureCourseRepository, AcademicPeriodRepository, CampusRepository, CourseRepository, EvaluativeComponentRepository, EvidenceLearningRepository, ExperienceLearningCoEvaluationRepository, ExperienceLearningCoEvaluationValuationRepository, ExperienceLearningRepository, ExperienceLearningSelfAssessmentValuationRepository, ExperienceLearningTraditionalValuationRepository, LearningRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
+import { ExperienceType } from '../../enums/ExperienceType';
 import { NewExperienceLearning } from '../../inputs/CampusAdministrator/NewExperienceLearning';
 import { IContext } from '../../interfaces/IContext';
 import { AcademicAsignatureCourse } from '../../models/CampusAdministrator/AcademicAsignatureCourse';
@@ -13,6 +14,7 @@ import { ExperienceLearningCoEvaluation } from '../../models/CampusAdministrator
 import { ExperienceLearningCoEvaluationValuation } from '../../models/CampusAdministrator/ExperienceLearningCoEvaluationValuation';
 import { ExperienceLearningSelfAssessmentValuation } from '../../models/CampusAdministrator/ExperienceLearningSelfAssessmentValuation';
 import { ExperienceLearningTraditionalValuation } from '../../models/CampusAdministrator/ExperienceLearningTraditionalValuation';
+import { ExperienceLearningValuation } from '../../models/CampusAdministrator/ExperienceLearningValuation';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicPeriod } from '../../models/SchoolAdministrator/AcademicPeriod';
@@ -513,6 +515,43 @@ export class ExperienceLearningResolver {
         }
         return true;
     }
+
+    @Query(() => [ExperienceLearningValuation], { nullable: true })
+    async getValuationStudents(@Arg('id', () => String) id: string) {
+        let result: ExperienceLearningValuation[] = [];
+        const experienceLearning = await this.repository.findOneBy(id);
+        if (experienceLearning) {
+            switch (experienceLearning?.experienceType) {
+                case ExperienceType.COEVALUATION:
+                    result = await this.repositoryExperienceLearningCoEvaluationValuation.findBy({
+                        where: {
+                            experienceLearningId: experienceLearning?.id.toString(),
+                        }
+                    })
+                    break;
+                case ExperienceType.SELFAPPRAISAL:
+                    result = await this.repositoryExperienceLearningSelfAssessmentValuation.findBy({
+                        where: {
+                            experienceLearningId: experienceLearning?.id.toString(),
+                        }
+                    })
+                    break;
+                case ExperienceType.TRADITIONALVALUATION:
+                    result = await this.repositoryExperienceLearningTraditionalValuation.findBy({
+                        where: {
+                            experienceLearningId: experienceLearning?.id.toString(),
+                        }
+                    })
+                    break;
+                case ExperienceType.VALUATIONRUBRIC:
+                    break;
+                case ExperienceType.ONLINETEST:
+                    break;
+            }
+        }
+        return result;
+    }
+
 
     @FieldResolver((_type) => User, { nullable: true })
     async createdByUser(@Root() data: ExperienceLearning) {
