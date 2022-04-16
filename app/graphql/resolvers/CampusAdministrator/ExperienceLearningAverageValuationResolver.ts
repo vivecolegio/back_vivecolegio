@@ -51,16 +51,18 @@ export class ExperienceLearningAverageValuationResolver {
         @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
         @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: String,
         @Arg('academicPeriod', () => String) academicPeriod: String,
+        @Arg('evaluativeComponentId', () => String) evaluativeComponentId: String,
         @Arg('studentId', () => String, { nullable: true }) studentId: String,
     ): Promise<ExperienceLearningAverageValuationConnection> {
         let result;
         if (allData) {
             if (orderCreated) {
-                if (academicAsignatureCourseId && academicPeriod && studentId) {
+                if (academicAsignatureCourseId && academicPeriod && evaluativeComponentId && studentId) {
                     result = await this.repository.findBy({
                         where: {
                             academicAsignatureCourseId,
                             academicPeriod,
+                            evaluativeComponentId,
                             studentId
                         },
                         order: { createdAt: 'DESC' },
@@ -70,16 +72,18 @@ export class ExperienceLearningAverageValuationResolver {
                         where: {
                             academicAsignatureCourseId,
                             academicPeriod,
+                            evaluativeComponentId
                         },
                         order: { createdAt: 'DESC' },
                     });
                 }
             } else {
-                if (academicAsignatureCourseId && academicPeriod && studentId) {
+                if (academicAsignatureCourseId && academicPeriod && evaluativeComponentId && studentId) {
                     result = await this.repository.findBy({
                         where: {
                             academicAsignatureCourseId,
                             academicPeriod,
+                            evaluativeComponentId,
                             studentId
                         },
                     });
@@ -88,17 +92,19 @@ export class ExperienceLearningAverageValuationResolver {
                         where: {
                             academicAsignatureCourseId,
                             academicPeriod,
+                            evaluativeComponentId
                         },
                     });
                 }
             }
         } else {
             if (orderCreated) {
-                if (academicAsignatureCourseId && academicPeriod && studentId) {
+                if (academicAsignatureCourseId && academicPeriod && evaluativeComponentId && studentId) {
                     result = await this.repository.findBy({
                         where: {
                             academicAsignatureCourseId,
                             academicPeriod,
+                            evaluativeComponentId,
                             studentId,
                             active: true,
                         },
@@ -109,17 +115,19 @@ export class ExperienceLearningAverageValuationResolver {
                         where: {
                             academicAsignatureCourseId,
                             academicPeriod,
+                            evaluativeComponentId,
                             active: true,
                         },
                         order: { createdAt: 'DESC' },
                     });
                 }
             } else {
-                if (academicAsignatureCourseId && academicPeriod && studentId) {
+                if (academicAsignatureCourseId && academicPeriod && evaluativeComponentId && studentId) {
                     result = await this.repository.findBy({
                         where: {
                             academicAsignatureCourseId,
                             academicPeriod,
+                            evaluativeComponentId,
                             studentId,
                             active: true,
                         },
@@ -129,6 +137,7 @@ export class ExperienceLearningAverageValuationResolver {
                         where: {
                             academicAsignatureCourseId,
                             academicPeriod,
+                            evaluativeComponentId,
                             active: true,
                         },
                     });
