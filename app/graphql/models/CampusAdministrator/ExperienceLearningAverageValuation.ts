@@ -1,10 +1,10 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Column, Entity } from 'typeorm';
-import { ExperienceType } from '../../enums/ExperienceType';
 import { IModelCampusData } from '../../interfaces/IModelCampusData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { Student } from '../GeneralAdministrator/Student';
 import { AcademicPeriod } from '../SchoolAdministrator/AcademicPeriod';
+import { EvaluativeComponent } from '../SchoolAdministrator/EvaluativeComponent';
 import { AcademicAsignatureCourse } from './AcademicAsignatureCourse';
 
 @ObjectType({ description: 'The ExperienceLearningAverageValuation model', implements: IModelCampusData })
@@ -36,9 +36,12 @@ export class ExperienceLearningAverageValuation extends IModelCampusData {
     @Column({ nullable: true })
     average?: number;
 
-    @Field(() => ExperienceType, { nullable: true })
+    @Field({ nullable: true })
     @Column({ nullable: true })
-    experienceType?: ExperienceType;
+    evaluativeComponentId?: string;
+
+    @Field({ nullable: true })
+    evaluativeComponent?: EvaluativeComponent;
 
 }
 

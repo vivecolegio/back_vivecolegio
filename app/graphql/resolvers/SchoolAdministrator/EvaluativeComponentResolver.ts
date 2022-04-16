@@ -2,12 +2,13 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { EvaluativeComponentRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAsignatureRepository, EvaluativeComponentRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewEvaluativeComponent } from '../../inputs/SchoolAdministrator/NewEvaluativeComponent';
 import { IContext } from '../../interfaces/IContext';
 import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
+import { AcademicAsignature } from '../../models/SchoolAdministrator/AcademicAsignature';
 import {
   EvaluativeComponent,
   EvaluativeComponentConnection
@@ -25,6 +26,9 @@ export class EvaluativeComponentResolver {
   @InjectRepository(School)
   private repositorySchool = SchoolRepository;
 
+  @InjectRepository(AcademicAsignature)
+  private repositoryAcademicAsignature = AcademicAsignatureRepository;
+
   @Query(() => EvaluativeComponent, { nullable: true })
   async getEvaluativeComponent(@Arg('id', () => String) id: string) {
     const result = await this.repository.findOneBy(id);
@@ -37,33 +41,75 @@ export class EvaluativeComponentResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => String) schoolId: String,
+    @Arg('academicAsignatureId', () => String, { nullable: true }) academicAsignatureId: String,
   ): Promise<EvaluativeComponentConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
-        result = await this.repository.findBy({
-          where: { schoolId },
-          order: { createdAt: 'DESC' },
-        });
+        if (academicAsignatureId) {
+          result = await this.repository.findBy({
+            where: {
+              schoolId, academicAsignatureId: { $in: [academicAsignatureId] }
+            },
+            order: { createdAt: 'DESC' },
+          });
+        } else {
+          result = await this.repository.findBy({
+            where: { schoolId },
+            order: { createdAt: 'DESC' },
+          });
+        }
       } else {
-        result = await this.repository.findBy({ where: { schoolId } });
+        if (academicAsignatureId) {
+          result = await this.repository.findBy({
+            where: {
+              schoolId, academicAsignatureId: { $in: [academicAsignatureId] }
+            },
+          });
+        } else {
+          result = await this.repository.findBy({
+            where: { schoolId },
+          });
+        }
       }
     } else {
       if (orderCreated) {
-        result = await this.repository.findBy({
-          where: {
-            schoolId,
-            active: true,
-          },
-          order: { createdAt: 'DESC' },
-        });
+        if (academicAsignatureId) {
+          result = await this.repository.findBy({
+            where: {
+              schoolId, academicAsignatureId: { $in: [academicAsignatureId] },
+              default: true,
+              active: true
+            },
+            order: { createdAt: 'DESC' },
+          });
+        } else {
+          result = await this.repository.findBy({
+            where: {
+              schoolId,
+              default: true,
+              active: true
+            },
+            order: { createdAt: 'DESC' },
+          });
+        }
       } else {
-        result = await this.repository.findBy({
-          where: {
-            schoolId,
-            active: true,
-          },
-        });
+        if (academicAsignatureId) {
+          result = await this.repository.findBy({
+            where: {
+              schoolId, academicAsignatureId: { $in: [academicAsignatureId] },
+              default: true,
+              active: true
+            },
+          });
+        } else {
+          result = await this.repository.findBy({
+            where: {
+              schoolId, default: true,
+              active: true
+            },
+          });
+        }
       }
     }
     let resultConn = new EvaluativeComponentConnection();
@@ -168,6 +214,20 @@ export class EvaluativeComponentResolver {
     let id = data.schoolId;
     if (id !== null && id !== undefined) {
       const result = await this.repositorySchool.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => [AcademicAsignature], { nullable: true })
+  async academicAsignatures(@Root() data: EvaluativeComponent) {
+    let ids = data.academicAsignaturesId;
+    if (ids !== null && ids !== undefined) {
+      let dataIds: any[] = [];
+      ids.forEach(async (id: any) => {
+        dataIds.push(new ObjectId(id));
+      });
+      const result = await this.repositoryAcademicAsignature.findBy({ where: { _id: { $in: dataIds } } });
       return result;
     }
     return null;

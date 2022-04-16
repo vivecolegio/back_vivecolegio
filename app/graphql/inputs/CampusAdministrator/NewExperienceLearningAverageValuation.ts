@@ -1,5 +1,4 @@
 import { Field, InputType } from 'type-graphql';
-import { ExperienceType } from '../../enums/ExperienceType';
 import { ExperienceLearningAverageValuation } from '../../models/CampusAdministrator/ExperienceLearningAverageValuation';
 
 @InputType()
@@ -17,7 +16,7 @@ export class NewExperienceLearningAverageValuation implements Partial<Experience
     @Field({ nullable: true })
     average?: number;
 
-    @Field(() => ExperienceType, { nullable: true })
-    experienceType?: ExperienceType;
+    @Field({ nullable: true })
+    evaluativeComponentId?: string;
 
 }

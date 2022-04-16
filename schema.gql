@@ -606,10 +606,13 @@ type EmailEdge {
 
 """The EvaluativeComponent model"""
 type EvaluativeComponent implements IModelSchoolData {
+  academicAsignatures: [AcademicAsignature!]
+  academicAsignaturesId: [String!]
   active: Boolean
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  default: Boolean
   id: ID!
   name: String
   school: School
@@ -1731,6 +1734,7 @@ type Mutation {
   createAcademicArea(data: NewAcademicArea!): AcademicArea!
   createAcademicAsignature(data: NewAcademicAsignature!): AcademicAsignature!
   createAcademicAsignatureCourse(data: NewAcademicAsignatureCourse!): AcademicAsignatureCourse!
+  createAcademicAsignatureCoursePeriodValuationStudents(academicAsignatureCourseId: String!, academicPeriodId: String!, schoolId: String!): Boolean!
   createAcademicDay(data: NewAcademicDay!): AcademicDay!
   createAcademicGrade(data: NewAcademicGrade!): AcademicGrade!
   createAcademicHour(data: NewAcademicHour!): AcademicHour!
@@ -1748,7 +1752,7 @@ type Mutation {
   createEvaluativeComponent(data: NewEvaluativeComponent!): EvaluativeComponent!
   createEvidenceLearning(data: NewEvidenceLearning!): EvidenceLearning!
   createExperienceLearning(data: NewExperienceLearning!): ExperienceLearning!
-  createExperienceLearningAverageValuationStudents(academicAsignatureCourseId: String!, experienceType: ExperienceType!): Boolean!
+  createExperienceLearningAverageValuationStudents(academicAsignatureCourseId: String!, academicPeriodId: String!, evaluativeComponentId: String!): Boolean!
   createExperienceLearningCoEvaluation(data: NewExperienceLearningCoEvaluation!): ExperienceLearningCoEvaluation!
   createExperienceLearningCoEvaluationStudents(id: String!): Boolean!
   createExperienceLearningCoEvaluationValuation(data: NewExperienceLearningCoEvaluationValuation!): ExperienceLearningCoEvaluationValuation!
@@ -2716,6 +2720,8 @@ type Query {
     orderCreated: Boolean!
   ): EmailConnection!
   getAllEvaluativeComponent(
+    academicAsignatureId: String
+
     """Paginate after opaque cursor"""
     after: String
     allData: Boolean!

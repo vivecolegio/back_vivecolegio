@@ -2,7 +2,7 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicAsignatureCourseRepository, AcademicPeriodRepository, CampusRepository, ExperienceLearningAverageValuationRepository, StudentRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAsignatureCourseRepository, AcademicPeriodRepository, CampusRepository, EvaluativeComponentRepository, ExperienceLearningAverageValuationRepository, StudentRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewExperienceLearningAverageValuation } from '../../inputs/CampusAdministrator/NewExperienceLearningAverageValuation';
 import { IContext } from '../../interfaces/IContext';
@@ -12,6 +12,7 @@ import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { Student } from '../../models/GeneralAdministrator/Student';
 import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicPeriod } from '../../models/SchoolAdministrator/AcademicPeriod';
+import { EvaluativeComponent } from '../../models/SchoolAdministrator/EvaluativeComponent';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
 @Resolver(ExperienceLearningAverageValuation)
@@ -30,6 +31,9 @@ export class ExperienceLearningAverageValuationResolver {
 
     @InjectRepository(AcademicPeriod)
     private repositoryAcademicPeriod = AcademicPeriodRepository;
+
+    @InjectRepository(EvaluativeComponent)
+    private repositoryEvaluativeComponent = EvaluativeComponentRepository;
 
     @InjectRepository(Student)
     private repositoryStudent = StudentRepository;
@@ -250,6 +254,16 @@ export class ExperienceLearningAverageValuationResolver {
         let id = data.academicPeriodId;
         if (id !== null && id !== undefined) {
             const result = await this.repositoryAcademicPeriod.findOneBy(id);
+            return result;
+        }
+        return null;
+    }
+
+    @FieldResolver((_type) => EvaluativeComponent, { nullable: true })
+    async evaluativeComponent(@Root() data: ExperienceLearningAverageValuation) {
+        let id = data.evaluativeComponentId;
+        if (id !== null && id !== undefined) {
+            const result = await this.repositoryEvaluativeComponent.findOneBy(id);
             return result;
         }
         return null;
