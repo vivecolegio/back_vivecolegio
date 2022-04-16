@@ -1,11 +1,13 @@
 import { env } from 'process';
 import { DataSource } from 'typeorm';
 import { AcademicAsignatureCourse } from '../graphql/models/CampusAdministrator/AcademicAsignatureCourse';
+import { AcademicAsignatureCoursePeriodValuation } from '../graphql/models/CampusAdministrator/AcademicAsignatureCoursePeriodValuation';
 import { AcademicDay } from '../graphql/models/CampusAdministrator/AcademicDay';
 import { AcademicHour } from '../graphql/models/CampusAdministrator/AcademicHour';
 import { AcademicSchedule } from '../graphql/models/CampusAdministrator/AcademicSchedule';
 import { Course } from '../graphql/models/CampusAdministrator/Course';
 import { ExperienceLearning } from '../graphql/models/CampusAdministrator/ExperienceLearning';
+import { ExperienceLearningAverageValuation } from '../graphql/models/CampusAdministrator/ExperienceLearningAverageValuation';
 import { ExperienceLearningCoEvaluation } from '../graphql/models/CampusAdministrator/ExperienceLearningCoEvaluation';
 import { ExperienceLearningCoEvaluationValuation } from '../graphql/models/CampusAdministrator/ExperienceLearningCoEvaluationValuation';
 import { ExperienceLearningRubricCriteria } from '../graphql/models/CampusAdministrator/ExperienceLearningRubricCriteria';
@@ -118,7 +120,9 @@ export const dataSource = new DataSource({
     ExperienceLearningCoEvaluation,
     ExperienceLearningRubricCriteria,
     ExperienceLearningRubricValuation,
-    ExperienceLearningRubricCriteriaValuation
+    ExperienceLearningRubricCriteriaValuation,
+    ExperienceLearningAverageValuation,
+    AcademicAsignatureCoursePeriodValuation
   ],
   synchronize: true,
   logger: 'advanced-console',
@@ -185,4 +189,6 @@ export const ExperienceLearningCoEvaluationRepository = dataSource.getMongoRepos
 export const ExperienceLearningRubricCriteriaRepository = dataSource.getMongoRepository(ExperienceLearningRubricCriteria);
 export const ExperienceLearningRubricValuationRepository = dataSource.getMongoRepository(ExperienceLearningRubricValuation);
 export const ExperienceLearningRubricCriteriaValuationRepository = dataSource.getMongoRepository(ExperienceLearningRubricCriteriaValuation);
+export const ExperienceLearningAverageValuationRepository = dataSource.getMongoRepository(ExperienceLearningAverageValuation);
+export const AcademicAsignatureCoursePeriodValuationRepository = dataSource.getMongoRepository(AcademicAsignatureCoursePeriodValuation);
 

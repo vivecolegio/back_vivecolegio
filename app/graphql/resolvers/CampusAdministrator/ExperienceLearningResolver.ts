@@ -10,6 +10,7 @@ import { IContext } from '../../interfaces/IContext';
 import { AcademicAsignatureCourse } from '../../models/CampusAdministrator/AcademicAsignatureCourse';
 import { Course } from '../../models/CampusAdministrator/Course';
 import { ExperienceLearning, ExperienceLearningConnection } from '../../models/CampusAdministrator/ExperienceLearning';
+import { ExperienceLearningAverageValuation } from '../../models/CampusAdministrator/ExperienceLearningAverageValuation';
 import { ExperienceLearningCoEvaluation } from '../../models/CampusAdministrator/ExperienceLearningCoEvaluation';
 import { ExperienceLearningCoEvaluationValuation } from '../../models/CampusAdministrator/ExperienceLearningCoEvaluationValuation';
 import { ExperienceLearningSelfAssessmentValuation } from '../../models/CampusAdministrator/ExperienceLearningSelfAssessmentValuation';
@@ -552,6 +553,88 @@ export class ExperienceLearningResolver {
         return result;
     }
 
+    @Mutation(() => Boolean)
+    async createExperienceLearningAverageValuationStudents(
+        @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: string,
+        @Arg('experienceType', () => ExperienceType) experienceType: ExperienceType) {
+        let result: ExperienceLearningAverageValuation[] = [];
+        const experienceLearnings = await this.repository.findBy({
+            where: {
+                experienceType,
+                academicAsignatureCourseId,
+                active: true,
+            }
+        });
+        if (experienceLearnings) {
+            let dataIds: any[] = [];
+            experienceLearnings.forEach((experienceLearning: ExperienceLearning) => {
+                dataIds.push(experienceLearning.id.toString());
+            });
+            const academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(academicAsignatureCourseId);
+            if (academicAsignatureCourse) {
+                const course = await this.repositoryCourse.findOneBy(academicAsignatureCourse.courseId);
+                if (course) {
+                    const students = course.studentsId;
+                    if (students) {
+                        for (const student of students) {
+                            let studentAverage = new ExperienceLearningAverageValuation();
+                            let average = 0;
+                            let evaluations = [];
+                            studentAverage.active = true;
+                            studentAverage.studentId = student;
+                            studentAverage.experienceType = experienceType;
+                            switch (experienceType) {
+                                case ExperienceType.COEVALUATION:
+                                    evaluations = await this.repositoryExperienceLearningCoEvaluationValuation.findBy({
+                                        where: {
+                                            experienceLearningId: { $in: dataIds },
+                                            studentId: student
+                                        }
+                                    })
+                                    evaluations.forEach((evaluation) => {
+                                        average += evaluation?.assessment ? evaluation?.assessment : 0;
+                                    })
+                                    studentAverage.average = (average / experienceLearnings.length)
+                                    result.push(studentAverage)
+                                    break;
+                                case ExperienceType.SELFAPPRAISAL:
+                                    evaluations = await this.repositoryExperienceLearningSelfAssessmentValuation.findBy({
+                                        where: {
+                                            experienceLearningId: { $in: dataIds },
+                                            studentId: student
+                                        }
+                                    })
+                                    evaluations.forEach((evaluation) => {
+                                        average += evaluation?.assessment ? evaluation?.assessment : 0;
+                                    })
+                                    studentAverage.average = (average / experienceLearnings.length)
+                                    result.push(studentAverage)
+                                    break;
+                                case ExperienceType.TRADITIONALVALUATION:
+                                    evaluations = await this.repositoryExperienceLearningTraditionalValuation.findBy({
+                                        where: {
+                                            experienceLearningId: { $in: dataIds },
+                                            studentId: student
+                                        }
+                                    })
+                                    evaluations.forEach((evaluation) => {
+                                        average += evaluation?.assessment ? evaluation?.assessment : 0;
+                                    })
+                                    studentAverage.average = (average / experienceLearnings.length)
+                                    result.push(studentAverage)
+                                    break;
+                                case ExperienceType.VALUATIONRUBRIC:
+                                    break;
+                                case ExperienceType.ONLINETEST:
+                                    break;
+                            }
+                        }
+                    }
+                    return true
+                }
+            }
+        }
+    }
 
     @FieldResolver((_type) => User, { nullable: true })
     async createdByUser(@Root() data: ExperienceLearning) {
