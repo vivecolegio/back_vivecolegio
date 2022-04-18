@@ -645,7 +645,11 @@ export class ExperienceLearningResolver {
                                         break;
                                 }
                             }
-                            studentAverage.average = (average / experienceLearnings.length)
+                            if (average != null && average > 0 && experienceLearnings.length > 0) {
+                                studentAverage.average = (average / experienceLearnings.length);
+                            } else {
+                                studentAverage.average = 0;
+                            }
                             if (studentAverage.id) {
                                 studentAverage = await this.repositoryExperienceLearningAverageValuation.save({
                                     _id: new ObjectId(studentAverage.id.toString()),
