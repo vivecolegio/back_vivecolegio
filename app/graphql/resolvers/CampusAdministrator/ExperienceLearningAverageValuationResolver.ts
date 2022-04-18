@@ -50,18 +50,18 @@ export class ExperienceLearningAverageValuationResolver {
         @Arg('allData', () => Boolean) allData: Boolean,
         @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
         @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: String,
-        @Arg('academicPeriod', () => String) academicPeriod: String,
+        @Arg('academicPeriodId', () => String) academicPeriodId: String,
         @Arg('evaluativeComponentId', () => String) evaluativeComponentId: String,
         @Arg('studentId', () => String, { nullable: true }) studentId: String,
     ): Promise<ExperienceLearningAverageValuationConnection> {
         let result;
         if (allData) {
             if (orderCreated) {
-                if (academicAsignatureCourseId && academicPeriod && evaluativeComponentId && studentId) {
+                if (academicAsignatureCourseId && academicPeriodId && evaluativeComponentId && studentId) {
                     result = await this.repository.findBy({
                         where: {
                             academicAsignatureCourseId,
-                            academicPeriod,
+                            academicPeriodId,
                             evaluativeComponentId,
                             studentId
                         },
@@ -71,18 +71,18 @@ export class ExperienceLearningAverageValuationResolver {
                     result = await this.repository.findBy({
                         where: {
                             academicAsignatureCourseId,
-                            academicPeriod,
+                            academicPeriodId,
                             evaluativeComponentId
                         },
                         order: { createdAt: 'DESC' },
                     });
                 }
             } else {
-                if (academicAsignatureCourseId && academicPeriod && evaluativeComponentId && studentId) {
+                if (academicAsignatureCourseId && academicPeriodId && evaluativeComponentId && studentId) {
                     result = await this.repository.findBy({
                         where: {
                             academicAsignatureCourseId,
-                            academicPeriod,
+                            academicPeriodId,
                             evaluativeComponentId,
                             studentId
                         },
@@ -91,7 +91,7 @@ export class ExperienceLearningAverageValuationResolver {
                     result = await this.repository.findBy({
                         where: {
                             academicAsignatureCourseId,
-                            academicPeriod,
+                            academicPeriodId,
                             evaluativeComponentId
                         },
                     });
@@ -99,11 +99,11 @@ export class ExperienceLearningAverageValuationResolver {
             }
         } else {
             if (orderCreated) {
-                if (academicAsignatureCourseId && academicPeriod && evaluativeComponentId && studentId) {
+                if (academicAsignatureCourseId && academicPeriodId && evaluativeComponentId && studentId) {
                     result = await this.repository.findBy({
                         where: {
                             academicAsignatureCourseId,
-                            academicPeriod,
+                            academicPeriodId,
                             evaluativeComponentId,
                             studentId,
                             active: true,
@@ -114,7 +114,7 @@ export class ExperienceLearningAverageValuationResolver {
                     result = await this.repository.findBy({
                         where: {
                             academicAsignatureCourseId,
-                            academicPeriod,
+                            academicPeriodId,
                             evaluativeComponentId,
                             active: true,
                         },
@@ -122,11 +122,11 @@ export class ExperienceLearningAverageValuationResolver {
                     });
                 }
             } else {
-                if (academicAsignatureCourseId && academicPeriod && evaluativeComponentId && studentId) {
+                if (academicAsignatureCourseId && academicPeriodId && evaluativeComponentId && studentId) {
                     result = await this.repository.findBy({
                         where: {
                             academicAsignatureCourseId,
-                            academicPeriod,
+                            academicPeriodId,
                             evaluativeComponentId,
                             studentId,
                             active: true,
@@ -136,7 +136,7 @@ export class ExperienceLearningAverageValuationResolver {
                     result = await this.repository.findBy({
                         where: {
                             academicAsignatureCourseId,
-                            academicPeriod,
+                            academicPeriodId,
                             evaluativeComponentId,
                             active: true,
                         },

@@ -46,17 +46,17 @@ export class AcademicAsignatureCoursePeriodValuationResolver {
         @Arg('allData', () => Boolean) allData: Boolean,
         @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
         @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: String,
-        @Arg('academicPeriod', () => String) academicPeriod: String,
+        @Arg('academicPeriodId', () => String) academicPeriodId: String,
         @Arg('studentId', () => String, { nullable: true }) studentId: String,
     ): Promise<AcademicAsignatureCoursePeriodValuationConnection> {
         let result;
         if (allData) {
             if (orderCreated) {
-                if (academicAsignatureCourseId && academicPeriod && studentId) {
+                if (academicAsignatureCourseId && academicPeriodId && studentId) {
                     result = await this.repository.findBy({
                         where: {
                             academicAsignatureCourseId,
-                            academicPeriod,
+                            academicPeriodId,
                             studentId
                         },
                         order: { createdAt: 'DESC' },
@@ -65,17 +65,17 @@ export class AcademicAsignatureCoursePeriodValuationResolver {
                     result = await this.repository.findBy({
                         where: {
                             academicAsignatureCourseId,
-                            academicPeriod,
+                            academicPeriodId,
                         },
                         order: { createdAt: 'DESC' },
                     });
                 }
             } else {
-                if (academicAsignatureCourseId && academicPeriod && studentId) {
+                if (academicAsignatureCourseId && academicPeriodId && studentId) {
                     result = await this.repository.findBy({
                         where: {
                             academicAsignatureCourseId,
-                            academicPeriod,
+                            academicPeriodId,
                             studentId
                         },
                     });
@@ -83,18 +83,18 @@ export class AcademicAsignatureCoursePeriodValuationResolver {
                     result = await this.repository.findBy({
                         where: {
                             academicAsignatureCourseId,
-                            academicPeriod,
+                            academicPeriodId,
                         },
                     });
                 }
             }
         } else {
             if (orderCreated) {
-                if (academicAsignatureCourseId && academicPeriod && studentId) {
+                if (academicAsignatureCourseId && academicPeriodId && studentId) {
                     result = await this.repository.findBy({
                         where: {
                             academicAsignatureCourseId,
-                            academicPeriod,
+                            academicPeriodId,
                             studentId,
                             active: true,
                         },
@@ -104,18 +104,18 @@ export class AcademicAsignatureCoursePeriodValuationResolver {
                     result = await this.repository.findBy({
                         where: {
                             academicAsignatureCourseId,
-                            academicPeriod,
+                            academicPeriodId,
                             active: true,
                         },
                         order: { createdAt: 'DESC' },
                     });
                 }
             } else {
-                if (academicAsignatureCourseId && academicPeriod && studentId) {
+                if (academicAsignatureCourseId && academicPeriodId && studentId) {
                     result = await this.repository.findBy({
                         where: {
                             academicAsignatureCourseId,
-                            academicPeriod,
+                            academicPeriodId,
                             studentId,
                             active: true,
                         },
@@ -124,7 +124,7 @@ export class AcademicAsignatureCoursePeriodValuationResolver {
                     result = await this.repository.findBy({
                         where: {
                             academicAsignatureCourseId,
-                            academicPeriod,
+                            academicPeriodId,
                             active: true,
                         },
                     });
