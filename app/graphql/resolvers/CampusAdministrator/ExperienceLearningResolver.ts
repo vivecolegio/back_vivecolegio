@@ -600,6 +600,7 @@ export class ExperienceLearningResolver {
                                 studentAverage.version = 0;
                                 studentAverage.active = true;
                                 studentAverage.studentId = student;
+                                studentAverage.average = 0;
                                 studentAverage.evaluativeComponentId = evaluativeComponentId;
                                 studentAverage.academicPeriodId = academicPeriodId;
                                 studentAverage.academicAsignatureCourseId = academicAsignatureCourseId;
@@ -648,6 +649,9 @@ export class ExperienceLearningResolver {
                             if (average != null && average > 0 && experienceLearnings.length > 0) {
                                 studentAverage.average = (average / experienceLearnings.length);
                             } else {
+                                studentAverage.average = 0;
+                            }
+                            if (Number.isNaN(studentAverage.average)) {
                                 studentAverage.average = 0;
                             }
                             if (studentAverage.id) {
