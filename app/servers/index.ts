@@ -14,9 +14,11 @@ import Morgan from 'morgan';
 import 'reflect-metadata';
 import { buildSchemaSync, createResolversMap } from 'type-graphql';
 import { SERVER_NAME_APP, SERVER_PORT_APP } from '../config';
+import { AcademicAsignatureCoursePeriodValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAsignatureCoursePeriodValuationResolver';
 import { AcademicAsignatureCourseResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAsignatureCourseResolver';
 import { AcademicHourResolver } from '../graphql/resolvers/CampusAdministrator/AcademicHourResolver';
 import { AcademicScheduleResolver } from '../graphql/resolvers/CampusAdministrator/AcademicScheduleResolver';
+import { ExperienceLearningAverageValuationResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningAverageValuationResolver';
 import { ExperienceLearningCoEvaluationResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningCoEvaluationResolver';
 import { ExperienceLearningCoEvaluationValuationResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningCoEvaluationValuationResolver';
 import { ExperienceLearningPerformanceLevelResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningPerformanceLevelResolver';
@@ -138,7 +140,9 @@ async function app() {
         ExperienceLearningRubricCriteriaResolver,
         ExperienceLearningRubricValuationResolver,
         ExperienceLearningRubricCriteriaValuationResolver,
-        ExperienceLearningPerformanceLevelResolver
+        ExperienceLearningPerformanceLevelResolver,
+        ExperienceLearningAverageValuationResolver,
+        AcademicAsignatureCoursePeriodValuationResolver
       ],
       emitSchemaFile: true,
       validate: false,
