@@ -35,6 +35,20 @@ export class AcademicPeriodResolver {
     return result;
   }
 
+  @Query(() => AcademicPeriod, { nullable: true })
+  async getCurrentAcademicPeriod(@Arg('schoolId', () => String) schoolId: string) {
+    const currentDate = new Date();
+    let result = null;
+    const currentYear = await this.repositorySchoolYear.findBy({ where: { schoolId, active: true, startDate: { $lte: currentDate }, endDate: { $gte: currentDate } } })
+    if (currentYear.length > 0) {
+      const currentAcademicPeriod = await this.repository.findBy({ where: { schoolYearId: currentYear[0].id.toString(), startDate: { $lte: currentDate }, endDate: { $gte: currentDate } } });
+      if (currentAcademicPeriod) {
+        result = currentAcademicPeriod[0];
+      }
+    }
+    return result;
+  }
+
   @Query(() => AcademicPeriodConnection)
   async getAllAcademicPeriod(
     @Args() args: ConnectionArgs,
