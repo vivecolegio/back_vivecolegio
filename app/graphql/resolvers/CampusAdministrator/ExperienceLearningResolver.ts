@@ -718,6 +718,15 @@ export class ExperienceLearningResolver {
                                         })
                                         break;
                                     case ExperienceType.VALUATIONRUBRIC:
+                                        evaluations = await this.repositoryExperienceLearningRubricValuation.findBy({
+                                            where: {
+                                                experienceLearningId: experienceLearning.id.toString(),
+                                                studentId: student
+                                            }
+                                        })
+                                        evaluations.forEach((evaluation) => {
+                                            average += evaluation?.assessment ? evaluation?.assessment : 0;
+                                        })
                                         break;
                                     case ExperienceType.ONLINETEST:
                                         break;
