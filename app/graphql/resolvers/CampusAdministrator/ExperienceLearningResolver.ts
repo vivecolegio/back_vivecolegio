@@ -2,7 +2,7 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicPeriodRepository, CampusRepository, CourseRepository, EvaluativeComponentRepository, EvidenceLearningRepository, ExperienceLearningAverageValuationRepository, ExperienceLearningCoEvaluationRepository, ExperienceLearningCoEvaluationValuationRepository, ExperienceLearningRepository, ExperienceLearningSelfAssessmentValuationRepository, ExperienceLearningTraditionalValuationRepository, LearningRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicPeriodRepository, CampusRepository, CourseRepository, EvaluativeComponentRepository, EvidenceLearningRepository, ExperienceLearningAverageValuationRepository, ExperienceLearningCoEvaluationRepository, ExperienceLearningCoEvaluationValuationRepository, ExperienceLearningRepository, ExperienceLearningRubricCriteriaRepository, ExperienceLearningRubricCriteriaValuationRepository, ExperienceLearningRubricValuationRepository, ExperienceLearningSelfAssessmentValuationRepository, ExperienceLearningTraditionalValuationRepository, LearningRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { ExperienceType } from '../../enums/ExperienceType';
 import { NewExperienceLearning } from '../../inputs/CampusAdministrator/NewExperienceLearning';
@@ -14,6 +14,9 @@ import { ExperienceLearning, ExperienceLearningConnection } from '../../models/C
 import { ExperienceLearningAverageValuation } from '../../models/CampusAdministrator/ExperienceLearningAverageValuation';
 import { ExperienceLearningCoEvaluation } from '../../models/CampusAdministrator/ExperienceLearningCoEvaluation';
 import { ExperienceLearningCoEvaluationValuation } from '../../models/CampusAdministrator/ExperienceLearningCoEvaluationValuation';
+import { ExperienceLearningRubricCriteria } from '../../models/CampusAdministrator/ExperienceLearningRubricCriteria';
+import { ExperienceLearningRubricCriteriaValuation } from '../../models/CampusAdministrator/ExperienceLearningRubricCriteriaValuation';
+import { ExperienceLearningRubricValuation } from '../../models/CampusAdministrator/ExperienceLearningRubricValuation';
 import { ExperienceLearningSelfAssessmentValuation } from '../../models/CampusAdministrator/ExperienceLearningSelfAssessmentValuation';
 import { ExperienceLearningTraditionalValuation } from '../../models/CampusAdministrator/ExperienceLearningTraditionalValuation';
 import { ExperienceLearningValuation } from '../../models/CampusAdministrator/ExperienceLearningValuation';
@@ -71,6 +74,15 @@ export class ExperienceLearningResolver {
 
     @InjectRepository(AcademicAsignatureCoursePeriodValuation)
     private repositoryAcademicAsignatureCoursePeriodValuation = AcademicAsignatureCoursePeriodValuationRepository;
+
+    @InjectRepository(ExperienceLearningRubricCriteria)
+    private repositoryExperienceLearningRubricCriteria = ExperienceLearningRubricCriteriaRepository;
+
+    @InjectRepository(ExperienceLearningRubricCriteriaValuation)
+    private repositoryExperienceLearningRubricCriteriaValuation = ExperienceLearningRubricCriteriaValuationRepository;
+
+    @InjectRepository(ExperienceLearningRubricValuation)
+    private repositoryExperienceLearningRubricValuation = ExperienceLearningRubricValuationRepository;
 
     @Query(() => ExperienceLearning, { nullable: true })
     async getExperienceLearning(@Arg('id', () => String) id: string) {
@@ -524,6 +536,66 @@ export class ExperienceLearningResolver {
         return true;
     }
 
+    @Mutation(() => Boolean)
+    async createExperienceLearningRubricStudents(
+        @Arg('id', () => String) id: string,
+        @Ctx() context: IContext): Promise<Boolean | null> {
+        const result = await this.repository.findOneBy(id);
+        let createdByUserId = context?.user?.authorization?.id;
+        let updatedByUserId = context?.user?.authorization?.id;
+        if (result) {
+            const academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(result?.academicAsignatureCourseId);
+            const experienceLearningRubricCriterias = await this.repositoryExperienceLearningRubricCriteria.findBy({
+                where: {
+                    experienceLearningId: id,
+                }
+            })
+            if (academicAsignatureCourse && experienceLearningRubricCriterias) {
+                const course = await this.repositoryCourse.findOneBy(academicAsignatureCourse.courseId);
+                if (course) {
+                    const students = course.studentsId;
+                    students?.forEach(async (student) => {
+                        for (let experienceLearningRubricCriteria of experienceLearningRubricCriterias) {
+                            let experienceLearningRubricCriteriaValuation = await this.repositoryExperienceLearningRubricCriteriaValuation.findBy({
+                                where: {
+                                    experienceLearningRubricCriteriaId: experienceLearningRubricCriteria.id.toString(),
+                                    studentId: student
+                                }
+                            })
+                            if (experienceLearningRubricCriteriaValuation.length == 0) {
+                                const model = await this.repositoryExperienceLearningRubricCriteriaValuation.create({
+                                    experienceLearningRubricCriteriaId: experienceLearningRubricCriteria.id.toString(),
+                                    studentId: student,
+                                    active: true,
+                                    version: 0,
+                                    createdByUserId,
+                                });
+                                let result = await this.repositoryExperienceLearningRubricCriteriaValuation.save(model);
+                            }
+                        }
+                        let experienceLearningRubricValuation = await this.repositoryExperienceLearningRubricValuation.findBy({
+                            where: {
+                                experienceLearningId: id,
+                                studentId: student
+                            }
+                        })
+                        if (experienceLearningRubricValuation.length == 0) {
+                            const model = await this.repositoryExperienceLearningRubricValuation.create({
+                                experienceLearningId: id,
+                                studentId: student,
+                                active: true,
+                                version: 0,
+                                createdByUserId,
+                            });
+                            let result = await this.repositoryExperienceLearningRubricValuation.save(model);
+                        }
+                    })
+                }
+            }
+        }
+        return true;
+    }
+
     @Query(() => [ExperienceLearningValuation], { nullable: true })
     async getValuationStudents(@Arg('id', () => String) id: string) {
         let result: ExperienceLearningValuation[] = [];
@@ -552,6 +624,11 @@ export class ExperienceLearningResolver {
                     })
                     break;
                 case ExperienceType.VALUATIONRUBRIC:
+                    result = await this.repositoryExperienceLearningRubricValuation.findBy({
+                        where: {
+                            experienceLearningId: experienceLearning?.id.toString(),
+                        }
+                    })
                     break;
                 case ExperienceType.ONLINETEST:
                     break;
