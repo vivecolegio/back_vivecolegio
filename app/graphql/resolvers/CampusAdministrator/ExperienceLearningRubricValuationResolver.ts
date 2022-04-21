@@ -2,11 +2,13 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { CampusRepository, ExperienceLearningRepository, ExperienceLearningRubricValuationRepository, StudentRepository, UserRepository } from '../../../servers/DataSource';
+import { CampusRepository, ExperienceLearningRepository, ExperienceLearningRubricCriteriaRepository, ExperienceLearningRubricCriteriaValuationRepository, ExperienceLearningRubricValuationRepository, StudentRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewExperienceLearningRubricValuation } from '../../inputs/CampusAdministrator/NewExperienceLearningRubricValuation';
 import { IContext } from '../../interfaces/IContext';
 import { ExperienceLearning } from '../../models/CampusAdministrator/ExperienceLearning';
+import { ExperienceLearningRubricCriteria } from '../../models/CampusAdministrator/ExperienceLearningRubricCriteria';
+import { ExperienceLearningRubricCriteriaValuation } from '../../models/CampusAdministrator/ExperienceLearningRubricCriteriaValuation';
 import { ExperienceLearningRubricValuation, ExperienceLearningRubricValuationConnection } from '../../models/CampusAdministrator/ExperienceLearningRubricValuation';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { Student } from '../../models/GeneralAdministrator/Student';
@@ -29,6 +31,12 @@ export class ExperienceLearningRubricValuationResolver {
 
     @InjectRepository(Student)
     private repositoryStudent = StudentRepository;
+
+    @InjectRepository(ExperienceLearningRubricCriteriaValuation)
+    private repositoryExperienceLearningRubricCriteriaValuation = ExperienceLearningRubricCriteriaValuationRepository;
+
+    @InjectRepository(ExperienceLearningRubricCriteria)
+    private repositoryExperienceLearningRubricCriteria = ExperienceLearningRubricCriteriaRepository;
 
     @Query(() => ExperienceLearningRubricValuation, { nullable: true })
     async getExperienceLearningRubricValuation(@Arg('id', () => String) id: string) {
@@ -98,6 +106,38 @@ export class ExperienceLearningRubricValuationResolver {
             createdByUserId,
         });
         let result = await this.repository.save(model);
+        return result;
+    }
+
+    @Mutation(() => ExperienceLearningRubricValuation)
+    async updateAssessmentExperienceLearningRubricValuation(
+        @Arg('id', () => String) id: string,
+        @Ctx() context: IContext
+    ): Promise<ExperienceLearningRubricValuation | null> {
+        let updatedByUserId = context?.user?.authorization?.id;
+        let result = await this.repository.findOneBy(id);
+        let experienceLearningRubricCriterias = await this.repositoryExperienceLearningRubricCriteria.findBy({
+            experienceLearningId: result?.experienceLearningId, active: true,
+        });
+        let assessment = 0;
+        for (let experienceLearningRubricCriteria of experienceLearningRubricCriterias) {
+            let experienceLearningRubricCriteriaValuations = await this.repositoryExperienceLearningRubricCriteriaValuation.findBy({
+                where: { experienceLearningRubricCriteriaId: experienceLearningRubricCriteria?.id.toString(), active: true, studentId: result?.studentId }
+            })
+            if (experienceLearningRubricCriteriaValuations.length > 0) {
+                if (experienceLearningRubricCriteria && experienceLearningRubricCriteria.weight && experienceLearningRubricCriteriaValuations[0].assessment) {
+                    let assessmentWeight = (experienceLearningRubricCriteria.weight * experienceLearningRubricCriteriaValuations[0].assessment) / 100;
+                    assessment += assessmentWeight;
+                }
+            }
+        }
+        result = await this.repository.save({
+            _id: new ObjectId(id),
+            ...result,
+            assessment,
+            version: (result?.version as number) + 1,
+            updatedByUserId,
+        });
         return result;
     }
 

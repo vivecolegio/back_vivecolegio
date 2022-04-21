@@ -958,6 +958,7 @@ type ExperienceLearningRubricValuation implements IModelCampusData {
   experienceLearning: ExperienceLearning
   experienceLearningId: String
   id: ID!
+  observations: String
   student: Student
   studentId: String
   updatedAt: DateTime
@@ -1837,6 +1838,7 @@ type Mutation {
   createExperienceLearningCoEvaluationValuationStudents(id: String!): Boolean!
   createExperienceLearningRubricCriteria(data: NewExperienceLearningRubricCriteria!): ExperienceLearningRubricCriteria!
   createExperienceLearningRubricCriteriaValuation(data: NewExperienceLearningRubricCriteriaValuation!): ExperienceLearningRubricCriteriaValuation!
+  createExperienceLearningRubricStudents(id: String!): Boolean!
   createExperienceLearningRubricValuation(data: NewExperienceLearningRubricValuation!): ExperienceLearningRubricValuation!
   createExperienceLearningSelfAssessmentValuation(data: NewExperienceLearningSelfAssessmentValuation!): ExperienceLearningSelfAssessmentValuation!
   createExperienceLearningSelfAssessmentValuationStudents(id: String!): Boolean!
@@ -1940,6 +1942,7 @@ type Mutation {
   updateAcademicPeriod(data: NewAcademicPeriod!, id: String!): AcademicPeriod!
   updateAcademicSchedule(data: NewAcademicSchedule!, id: String!): AcademicSchedule!
   updateAcademicStandard(data: NewAcademicStandard!, id: String!): AcademicStandard!
+  updateAssessmentExperienceLearningRubricValuation(id: String!): ExperienceLearningRubricValuation!
   updateAuditLogin(data: NewAuditLogin!, id: String!): AuditLogin!
   updateCampus(data: NewCampus!, id: String!): Campus!
   updateCampusAdministrator(data: NewCampusAdministrator!, id: String!): CampusAdministrator!
@@ -2211,6 +2214,7 @@ input NewExperienceLearningRubricCriteriaValuation {
 input NewExperienceLearningRubricValuation {
   assessment: Float
   experienceLearningId: String
+  observations: String
   studentId: String
 }
 
@@ -2969,6 +2973,23 @@ type Query {
 
     """Paginate before opaque cursor"""
     before: String
+    experienceLearningRubricCriteriaId: String!
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+    studentId: String
+  ): ExperienceLearningRubricCriteriaValuationConnection!
+  getAllExperienceLearningRubricCriteriaValuationStudent(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
     experienceLearningId: String!
 
     """Paginate first"""
@@ -2977,6 +2998,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    studentId: String
   ): ExperienceLearningRubricCriteriaValuationConnection!
   getAllExperienceLearningRubricValuation(
     """Paginate after opaque cursor"""

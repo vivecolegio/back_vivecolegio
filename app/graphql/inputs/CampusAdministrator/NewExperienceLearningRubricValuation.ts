@@ -12,4 +12,7 @@ export class NewExperienceLearningRubricValuation implements Partial<ExperienceL
     @Field({ nullable: true })
     assessment?: number;
 
+    @Field({ nullable: true })
+    observations?: String;
+
 }
