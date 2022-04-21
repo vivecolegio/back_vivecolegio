@@ -6,7 +6,6 @@ import { CampusRepository, ExperienceLearningRubricCriteriaRepository, Experienc
 import { removeEmptyStringElements } from '../../../types';
 import { NewExperienceLearningRubricCriteriaValuation } from '../../inputs/CampusAdministrator/NewExperienceLearningRubricCriteriaValuation';
 import { IContext } from '../../interfaces/IContext';
-import { ExperienceLearning } from '../../models/CampusAdministrator/ExperienceLearning';
 import { ExperienceLearningRubricCriteria } from '../../models/CampusAdministrator/ExperienceLearningRubricCriteria';
 import { ExperienceLearningRubricCriteriaValuation, ExperienceLearningRubricCriteriaValuationConnection } from '../../models/CampusAdministrator/ExperienceLearningRubricCriteriaValuation';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
@@ -25,7 +24,7 @@ export class ExperienceLearningRubricCriteriaValuationResolver {
     @InjectRepository(Campus)
     private repositoryCampus = CampusRepository;
 
-    @InjectRepository(ExperienceLearning)
+    @InjectRepository(ExperienceLearningRubricCriteria)
     private repositoryExperienceLearningRubricCriteria = ExperienceLearningRubricCriteriaRepository;
 
     @InjectRepository(Student)
@@ -42,41 +41,81 @@ export class ExperienceLearningRubricCriteriaValuationResolver {
         @Args() args: ConnectionArgs,
         @Arg('allData', () => Boolean) allData: Boolean,
         @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
-        @Arg('experienceLearningId', () => String) experienceLearningId: String
+        @Arg('experienceLearningRubricCriteriaId', () => String) experienceLearningRubricCriteriaId: String,
+        @Arg('studentId', () => String, { nullable: true }) studentId: String,
     ): Promise<ExperienceLearningRubricCriteriaValuationConnection> {
         let result;
         if (allData) {
             if (orderCreated) {
-                result = await this.repository.findBy({
-                    where: {
-                        experienceLearningId,
-                    },
-                    order: { createdAt: 'DESC' },
-                });
+                if (studentId) {
+                    result = await this.repository.findBy({
+                        where: {
+                            experienceLearningRubricCriteriaId,
+                            studentId
+                        },
+                        order: { createdAt: 'DESC' },
+                    });
+                } else {
+                    result = await this.repository.findBy({
+                        where: {
+                            experienceLearningRubricCriteriaId,
+                        },
+                        order: { createdAt: 'DESC' },
+                    });
+                }
             } else {
-                result = await this.repository.findBy({
-                    where: {
-                        experienceLearningId,
-                    },
-                });
+                if (studentId) {
+                    result = await this.repository.findBy({
+                        where: {
+                            experienceLearningRubricCriteriaId,
+                            studentId
+                        },
+                    });
+                } else {
+                    result = await this.repository.findBy({
+                        where: {
+                            experienceLearningRubricCriteriaId,
+                        },
+                    });
+                }
             }
         } else {
             if (orderCreated) {
-                result = await this.repository.findBy({
-                    where: {
-                        experienceLearningId,
-                        active: true,
-                    },
-                    order: { createdAt: 'DESC' },
-                });
-
+                if (studentId) {
+                    result = await this.repository.findBy({
+                        where: {
+                            experienceLearningRubricCriteriaId,
+                            studentId,
+                            active: true,
+                        },
+                        order: { createdAt: 'DESC' },
+                    });
+                } else {
+                    result = await this.repository.findBy({
+                        where: {
+                            experienceLearningRubricCriteriaId,
+                            active: true,
+                        },
+                        order: { createdAt: 'DESC' },
+                    });
+                }
             } else {
-                result = await this.repository.findBy({
-                    where: {
-                        experienceLearningId,
-                        active: true,
-                    },
-                });
+                if (studentId) {
+                    result = await this.repository.findBy({
+                        where: {
+                            experienceLearningRubricCriteriaId,
+                            studentId,
+                            active: true,
+                        },
+                    });
+                } else {
+                    result = await this.repository.findBy({
+                        where: {
+                            experienceLearningRubricCriteriaId,
+                            active: true,
+                        },
+                    });
+                }
             }
         }
         let resultConn = new ExperienceLearningRubricCriteriaValuationConnection();
