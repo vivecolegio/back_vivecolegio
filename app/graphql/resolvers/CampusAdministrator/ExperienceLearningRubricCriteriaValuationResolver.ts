@@ -127,6 +127,109 @@ export class ExperienceLearningRubricCriteriaValuationResolver {
         return resultConn;
     }
 
+    @Query(() => ExperienceLearningRubricCriteriaValuationConnection)
+    async getAllExperienceLearningRubricCriteriaValuationStudent(
+        @Args() args: ConnectionArgs,
+        @Arg('allData', () => Boolean) allData: Boolean,
+        @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
+        @Arg('experienceLearningId', () => String) experienceLearningId: String,
+        @Arg('studentId', () => String, { nullable: true }) studentId: String,
+    ): Promise<ExperienceLearningRubricCriteriaValuationConnection> {
+        let result: any[] = [];
+        const experienceLearningRubricCriterias = await this.repositoryExperienceLearningRubricCriteria.findBy({
+            where: {
+                experienceLearningId,
+                active: true
+            }
+        })
+        if (experienceLearningRubricCriterias) {
+            let dataIds: any[] = [];
+            experienceLearningRubricCriterias.forEach(async (experienceLearningRubricCriteria: any) => {
+                dataIds.push(experienceLearningRubricCriteria.id.toString());
+            });
+            if (allData) {
+                if (orderCreated) {
+                    if (studentId) {
+                        result = await this.repository.findBy({
+                            where: {
+                                experienceLearningRubricCriteriaId: { $in: dataIds },
+                                studentId
+                            },
+                            order: { createdAt: 'DESC' },
+                        });
+                    } else {
+                        result = await this.repository.findBy({
+                            where: {
+                                experienceLearningRubricCriteriaId: { $in: dataIds },
+                            },
+                            order: { createdAt: 'DESC' },
+                        });
+                    }
+                } else {
+                    if (studentId) {
+                        result = await this.repository.findBy({
+                            where: {
+                                experienceLearningRubricCriteriaId: { $in: dataIds },
+                                studentId
+                            },
+                        });
+                    } else {
+                        result = await this.repository.findBy({
+                            where: {
+                                experienceLearningRubricCriteriaId: { $in: dataIds },
+                            },
+                        });
+                    }
+                }
+            } else {
+                if (orderCreated) {
+                    if (studentId) {
+                        result = await this.repository.findBy({
+                            where: {
+                                experienceLearningRubricCriteriaId: { $in: dataIds },
+                                studentId,
+                                active: true,
+                            },
+                            order: { createdAt: 'DESC' },
+                        });
+                    } else {
+                        result = await this.repository.findBy({
+                            where: {
+                                experienceLearningRubricCriteriaId: { $in: dataIds },
+                                active: true,
+                            },
+                            order: { createdAt: 'DESC' },
+                        });
+                    }
+                } else {
+                    if (studentId) {
+                        result = await this.repository.findBy({
+                            where: {
+                                experienceLearningRubricCriteriaId: { $in: dataIds },
+                                studentId,
+                                active: true,
+                            },
+                        });
+                    } else {
+                        result = await this.repository.findBy({
+                            where: {
+                                experienceLearningRubricCriteriaId: { $in: dataIds },
+                                active: true,
+                            },
+                        });
+                    }
+                }
+            }
+        }
+        let resultConn = new ExperienceLearningRubricCriteriaValuationConnection();
+        let resultConnection = connectionFromArraySlice(result, args, {
+            sliceStart: 0,
+            arrayLength: result.length,
+        });
+        resultConn = { ...resultConnection, totalCount: result.length };
+        return resultConn;
+    }
+
     @Mutation(() => ExperienceLearningRubricCriteriaValuation)
     async createExperienceLearningRubricCriteriaValuation(@Arg('data') data: NewExperienceLearningRubricCriteriaValuation, @Ctx() context: IContext): Promise<ExperienceLearningRubricCriteriaValuation> {
         let dataProcess: NewExperienceLearningRubricCriteriaValuation = removeEmptyStringElements(data);
