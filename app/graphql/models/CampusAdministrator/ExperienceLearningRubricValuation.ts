@@ -28,6 +28,7 @@ export class ExperienceLearningRubricValuation extends IModelCampusData {
     assessment?: number;
 
     @Field({ nullable: true })
+    @Column({ nullable: true })
     observations?: String;
 }
 

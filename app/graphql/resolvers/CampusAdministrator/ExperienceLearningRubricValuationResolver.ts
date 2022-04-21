@@ -150,6 +150,7 @@ export class ExperienceLearningRubricValuationResolver {
         let dataProcess = removeEmptyStringElements(data);
         let updatedByUserId = context?.user?.authorization?.id;
         let result = await this.repository.findOneBy(id);
+        console.log(dataProcess);
         result = await this.repository.save({
             _id: new ObjectId(id),
             ...result,
