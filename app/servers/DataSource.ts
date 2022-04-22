@@ -16,6 +16,9 @@ import { ExperienceLearningRubricValuation } from '../graphql/models/CampusAdmin
 import { ExperienceLearningSelfAssessmentValuation } from '../graphql/models/CampusAdministrator/ExperienceLearningSelfAssessmentValuation';
 import { ExperienceLearningTraditionalValuation } from '../graphql/models/CampusAdministrator/ExperienceLearningTraditionalValuation';
 import { Guardian } from '../graphql/models/CampusAdministrator/Guardian';
+import { QuestionBankTestOnline } from '../graphql/models/CampusAdministrator/QuestionBankTestOnline';
+import { QuestionCategoryTestOnline } from '../graphql/models/CampusAdministrator/QuestionCategoryTestOnline';
+import { QuestionTestOnline } from '../graphql/models/CampusAdministrator/QuestionTestOnline';
 import { Teacher } from '../graphql/models/CampusAdministrator/Teacher';
 import { AuditLogin } from '../graphql/models/GeneralAdministrator/AuditLogin';
 import { Campus } from '../graphql/models/GeneralAdministrator/Campus';
@@ -122,7 +125,10 @@ export const dataSource = new DataSource({
     ExperienceLearningRubricValuation,
     ExperienceLearningRubricCriteriaValuation,
     ExperienceLearningAverageValuation,
-    AcademicAsignatureCoursePeriodValuation
+    AcademicAsignatureCoursePeriodValuation,
+    QuestionTestOnline,
+    QuestionBankTestOnline,
+    QuestionCategoryTestOnline
   ],
   synchronize: true,
   logger: 'advanced-console',
@@ -191,4 +197,6 @@ export const ExperienceLearningRubricValuationRepository = dataSource.getMongoRe
 export const ExperienceLearningRubricCriteriaValuationRepository = dataSource.getMongoRepository(ExperienceLearningRubricCriteriaValuation);
 export const ExperienceLearningAverageValuationRepository = dataSource.getMongoRepository(ExperienceLearningAverageValuation);
 export const AcademicAsignatureCoursePeriodValuationRepository = dataSource.getMongoRepository(AcademicAsignatureCoursePeriodValuation);
-
+export const QuestionTestOnlineRepository = dataSource.getMongoRepository(QuestionTestOnline);
+export const QuestionBankTestOnlineRepository = dataSource.getMongoRepository(QuestionBankTestOnline);
+export const QuestionCategoryTestOnlineRepository = dataSource.getMongoRepository(QuestionCategoryTestOnline);

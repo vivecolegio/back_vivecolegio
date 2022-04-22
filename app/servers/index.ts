@@ -5,7 +5,6 @@ import {
   ApolloServerPluginLandingPageProductionDefault
 } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
-import Cors from 'cors';
 import express from 'express';
 import gql from 'graphql-tag';
 import { graphqlUploadExpress } from 'graphql-upload';
@@ -29,6 +28,9 @@ import { ExperienceLearningRubricCriteriaValuationResolver } from '../graphql/re
 import { ExperienceLearningRubricValuationResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningRubricValuationResolver';
 import { ExperienceLearningSelfAssessmentValuationResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningSelfAssessmentValuationResolver';
 import { ExperienceLearningTraditionalValuationResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningTraditionalValuationResolver';
+import { QuestionBankTestOnlineResolver } from '../graphql/resolvers/CampusAdministrator/QuestionBankTestOnlineResolver';
+import { QuestionCategoryTestOnlineResolver } from '../graphql/resolvers/CampusAdministrator/QuestionCategoryTestOnlineResolver';
+import { QuestionTestOnlineResolver } from '../graphql/resolvers/CampusAdministrator/QuestionTestOnlineResolver';
 import { AuditLoginResolver } from '../graphql/resolvers/GeneralAdministrator/AuditLoginResolver';
 import { GenderResolver } from '../graphql/resolvers/GeneralAdministrator/GenderResolver';
 import { GeneralAcademicAsignatureResolver } from '../graphql/resolvers/GeneralAdministrator/GeneralAcademicAsignatureResolver';
@@ -142,7 +144,10 @@ async function app() {
         ExperienceLearningRubricCriteriaValuationResolver,
         ExperienceLearningPerformanceLevelResolver,
         ExperienceLearningAverageValuationResolver,
-        AcademicAsignatureCoursePeriodValuationResolver
+        AcademicAsignatureCoursePeriodValuationResolver,
+        QuestionBankTestOnlineResolver,
+        QuestionCategoryTestOnlineResolver,
+        QuestionTestOnlineResolver
       ],
       emitSchemaFile: true,
       validate: false,
@@ -201,7 +206,7 @@ async function app() {
     app.use(`/healthcheck-${SERVER_NAME}`, require('express-healthcheck')());
     app.use(Morgan('common'));
     // app.use(Helmet());
-    app.use(Cors());
+    // app.use(Cors());
     app.use('/voyager', voyagerMiddleware({ endpointUrl: '/graphql' }));
 
     // const openApi = OpenAPI({

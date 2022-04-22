@@ -716,6 +716,7 @@ type ExperienceLearning implements IModelCampusData {
   active: Boolean
   campus: Campus
   campusId: String
+  closeTestDate: DateTime
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
@@ -731,7 +732,10 @@ type ExperienceLearning implements IModelCampusData {
   id: ID!
   learnigs: [Learning!]
   learningsId: [String!]
+  navigationMethod: String
   onlineDelivery: Boolean
+  openTestDate: DateTime
+  shuffleQuestions: Boolean
   title: String
   updatedAt: DateTime
   updatedByUser: User
@@ -1800,6 +1804,9 @@ type Mutation {
   changeActiveMunicipality(active: Boolean!, id: String!): Boolean!
   changeActiveNotification(active: Boolean!, id: String!): Boolean!
   changeActivePerformanceLevel(active: Boolean!, id: String!): Boolean!
+  changeActiveQuestionBankTestOnline(active: Boolean!, id: String!): Boolean!
+  changeActiveQuestionCategoryTestOnline(active: Boolean!, id: String!): Boolean!
+  changeActiveQuestionTestOnline(active: Boolean!, id: String!): Boolean!
   changeActiveRole(active: Boolean!, id: String!): Boolean!
   changeActiveSchool(active: Boolean!, id: String!): Boolean!
   changeActiveSchoolAdministrator(active: Boolean!, id: String!): Boolean!
@@ -1865,6 +1872,9 @@ type Mutation {
   createMunicipality(data: NewMunicipality!): Municipality!
   createNotification(data: NewNotification!): Notification!
   createPerformanceLevel(data: NewPerformanceLevel!): PerformanceLevel!
+  createQuestionBankTestOnline(data: NewQuestionBankTestOnline!): QuestionBankTestOnline!
+  createQuestionCategoryTestOnline(data: NewQuestionCategoryTestOnline!): QuestionCategoryTestOnline!
+  createQuestionTestOnline(data: NewQuestionTestOnline!): QuestionTestOnline!
   createRole(data: NewRole!): Role!
   createSchool(data: NewSchool!): School!
   createSchoolAdministrator(data: NewSchoolAdministrator!): SchoolAdministrator!
@@ -1922,6 +1932,9 @@ type Mutation {
   deleteMunicipality(id: String!): Boolean!
   deleteNotification(id: String!): Boolean!
   deletePerformanceLevel(id: String!): Boolean!
+  deleteQuestionBankTestOnline(id: String!): Boolean!
+  deleteQuestionCategoryTestOnline(id: String!): Boolean!
+  deleteQuestionTestOnline(id: String!): Boolean!
   deleteRole(id: String!): Boolean!
   deleteSchool(id: String!): Boolean!
   deleteSchoolAdministrator(id: String!): Boolean!
@@ -1983,6 +1996,9 @@ type Mutation {
   updateMunicipality(data: NewMunicipality!, id: String!): Municipality!
   updateNotification(data: NewNotification!, id: String!): Notification!
   updatePerformanceLevel(data: NewPerformanceLevel!, id: String!): PerformanceLevel!
+  updateQuestionBankTestOnline(data: NewQuestionBankTestOnline!, id: String!): QuestionBankTestOnline!
+  updateQuestionCategoryTestOnline(data: NewQuestionCategoryTestOnline!, id: String!): QuestionCategoryTestOnline!
+  updateQuestionTestOnline(data: NewQuestionTestOnline!, id: String!): QuestionTestOnline!
   updateRole(data: NewRole!, id: String!): Role!
   updateSchool(data: NewSchool!, id: String!): School!
   updateSchoolAdministrator(data: NewSchoolAdministrator!, id: String!): SchoolAdministrator!
@@ -2151,6 +2167,7 @@ input NewExperienceLearning {
   academicAsignatureCourseId: String
   academicPeriodId: String
   campusId: String
+  closeTestDate: DateTime
   criteria: String
   dateDelivery: DateTime
   description: String
@@ -2159,7 +2176,10 @@ input NewExperienceLearning {
   experienceLearningPerformanceLevel: [NewExperienceLearningPerformanceLevel!]
   experienceType: ExperienceType
   learningsId: [String!]
+  navigationMethod: String
   onlineDelivery: Boolean
+  openTestDate: DateTime
+  shuffleQuestions: Boolean
   title: String
 }
 
@@ -2385,6 +2405,28 @@ input NewPerformanceLevel {
   name: String
   schoolId: String
   topScore: Float
+}
+
+input NewQuestionBankTestOnline {
+  academicAsignatureId: String
+  academicGradeId: String
+  campusId: String
+  teacherId: String
+}
+
+input NewQuestionCategoryTestOnline {
+  campusId: String
+  description: String
+  name: String
+  questionBankTestOnlineId: String
+}
+
+input NewQuestionTestOnline {
+  campusId: String
+  name: String
+  questionCategoryTestOnlineId: String
+  questionType: String
+  statement: String
 }
 
 input NewRole {
@@ -3382,6 +3424,54 @@ type Query {
     orderCreated: Boolean!
     schoolId: String!
   ): PerformanceLevelConnection!
+  getAllQuestionBankTestOnline(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+    campusId: String!
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): QuestionBankTestOnlineConnection!
+  getAllQuestionCategoryTestOnline(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+    campusId: String!
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): QuestionCategoryTestOnlineConnection!
+  getAllQuestionTestOnline(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+    campusId: String!
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): QuestionTestOnlineConnection!
   getAllRole(
     """Paginate after opaque cursor"""
     after: String
@@ -3579,6 +3669,9 @@ type Query {
   getMunicipality(id: String!): Municipality
   getNotification(id: String!): Notification
   getPerformanceLevel(id: String!): PerformanceLevel
+  getQuestionBankTestOnline(id: String!): QuestionBankTestOnline
+  getQuestionCategoryTestOnline(id: String!): QuestionCategoryTestOnline
+  getQuestionTestOnline(id: String!): QuestionTestOnline
   getRole(id: String!): Role
   getSchool(id: String!): School
   getSchoolAdministrator(id: String!): SchoolAdministrator
@@ -3589,6 +3682,108 @@ type Query {
   getUser(id: String!): User
   getValuationStudents(id: String!): [ExperienceLearningValuation!]
   me: Jwt!
+}
+
+"""The QuestionBankTestOnline model"""
+type QuestionBankTestOnline implements IModelCampusData {
+  academicAsignature: AcademicAsignature
+  academicAsignatureId: String
+  academicGrade: AcademicGrade
+  academicGradeId: String
+  active: Boolean
+  campus: Campus
+  campusId: String
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  id: ID!
+  teacher: Teacher
+  teacherId: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type QuestionBankTestOnlineConnection {
+  edges: [QuestionBankTestOnlineEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type QuestionBankTestOnlineEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: QuestionBankTestOnline!
+}
+
+"""The QuestionCategoryTestOnline model"""
+type QuestionCategoryTestOnline implements IModelCampusData {
+  active: Boolean
+  campus: Campus
+  campusId: String
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  description: String
+  id: ID!
+  name: String
+  questionBankTestOnline: QuestionBankTestOnline
+  questionBankTestOnlineId: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type QuestionCategoryTestOnlineConnection {
+  edges: [QuestionCategoryTestOnlineEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type QuestionCategoryTestOnlineEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: QuestionCategoryTestOnline!
+}
+
+"""The QuestionTestOnline model"""
+type QuestionTestOnline implements IModelCampusData {
+  active: Boolean
+  campus: Campus
+  campusId: String
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  id: ID!
+  name: String
+  questionCategoryTestOnline: QuestionCategoryTestOnline
+  questionCategoryTestOnlineId: String
+  questionType: String
+  statement: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type QuestionTestOnlineConnection {
+  edges: [QuestionTestOnlineEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type QuestionTestOnlineEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: QuestionTestOnline!
 }
 
 """The Role model"""

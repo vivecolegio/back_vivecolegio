@@ -1,6 +1,7 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Column, Entity } from 'typeorm';
 import { ExperienceType } from '../../enums/ExperienceType';
+import { NavigationMethodTestOnline } from '../../enums/NavigationMethodTestOnline';
 import { IModelCampusData } from '../../interfaces/IModelCampusData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { AcademicPeriod } from '../SchoolAdministrator/AcademicPeriod';
@@ -75,6 +76,23 @@ export class ExperienceLearning extends IModelCampusData {
     @Field(() => [ExperienceLearningPerformanceLevel], { nullable: true })
     @Column({ nullable: true })
     experienceLearningPerformanceLevel?: ExperienceLearningPerformanceLevel[];
+
+    @Field({ nullable: true })
+    @Column({ nullable: true })
+    openTestDate?: Date;
+
+    @Field({ nullable: true })
+    @Column({ nullable: true })
+    closeTestDate?: Date;
+
+    @Field({ nullable: true })
+    @Column({ nullable: true })
+    navigationMethod?: NavigationMethodTestOnline;
+
+    @Field({ nullable: true })
+    @Column({ nullable: true })
+    shuffleQuestions?: Boolean;
+
 }
 
 @ObjectType()

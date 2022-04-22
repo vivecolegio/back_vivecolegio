@@ -1,5 +1,6 @@
 import { Field, InputType } from 'type-graphql';
 import { ExperienceType } from '../../enums/ExperienceType';
+import { NavigationMethodTestOnline } from '../../enums/NavigationMethodTestOnline';
 import { ExperienceLearning } from '../../models/CampusAdministrator/ExperienceLearning';
 import { NewExperienceLearningPerformanceLevel } from './NewExperienceLearningPerformanceLevel';
 
@@ -43,4 +44,16 @@ export class NewExperienceLearning implements Partial<ExperienceLearning> {
 
     @Field(() => [NewExperienceLearningPerformanceLevel], { nullable: true })
     experienceLearningPerformanceLevel?: NewExperienceLearningPerformanceLevel[];
+
+    @Field({ nullable: true })
+    openTestDate?: Date;
+
+    @Field({ nullable: true })
+    closeTestDate?: Date;
+
+    @Field({ nullable: true })
+    navigationMethod?: NavigationMethodTestOnline;
+
+    @Field({ nullable: true })
+    shuffleQuestions?: Boolean;
 }
