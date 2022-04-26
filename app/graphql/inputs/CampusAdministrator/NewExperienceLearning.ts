@@ -51,7 +51,7 @@ export class NewExperienceLearning implements Partial<ExperienceLearning> {
     @Field({ nullable: true })
     closeTestDate?: Date;
 
-    @Field({ nullable: true })
+    @Field(() => NavigationMethodTestOnline, { nullable: true })
     navigationMethod?: NavigationMethodTestOnline;
 
     @Field({ nullable: true })

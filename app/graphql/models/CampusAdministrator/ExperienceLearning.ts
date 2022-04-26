@@ -85,7 +85,7 @@ export class ExperienceLearning extends IModelCampusData {
     @Column({ nullable: true })
     closeTestDate?: Date;
 
-    @Field({ nullable: true })
+    @Field(() => NavigationMethodTestOnline, { nullable: true })
     @Column({ nullable: true })
     navigationMethod?: NavigationMethodTestOnline;
 

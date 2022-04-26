@@ -11,7 +11,7 @@ export class NewQuestionTestOnline implements Partial<QuestionTestOnline> {
     @Field({ nullable: true })
     questionCategoryTestOnlineId?: string;
 
-    @Field({ nullable: true })
+    @Field(() => QuestionTypeTestOnline, { nullable: true })
     questionType?: QuestionTypeTestOnline;
 
     @Field({ nullable: true })

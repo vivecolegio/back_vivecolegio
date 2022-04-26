@@ -16,7 +16,7 @@ export class QuestionTestOnline extends IModelCampusData {
     @Field({ nullable: true })
     questionCategoryTestOnline?: QuestionCategoryTestOnline;
 
-    @Field({ nullable: true })
+    @Field(() => QuestionTypeTestOnline, { nullable: true })
     @Column({ nullable: true })
     questionType?: QuestionTypeTestOnline;
 

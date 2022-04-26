@@ -497,6 +497,8 @@ type CampusEdge {
 
 """The Course model"""
 type Course implements IModelCampusData {
+  academicDay: AcademicDay
+  academicDayId: String
   academicGrade: AcademicGrade
   academicGradeId: String
   active: Boolean
@@ -732,7 +734,7 @@ type ExperienceLearning implements IModelCampusData {
   id: ID!
   learnigs: [Learning!]
   learningsId: [String!]
-  navigationMethod: String
+  navigationMethod: NavigationMethodTestOnline
   onlineDelivery: Boolean
   openTestDate: DateTime
   shuffleQuestions: Boolean
@@ -2009,6 +2011,12 @@ type Mutation {
   updateUser(data: NewUser!, id: String!): User!
 }
 
+"""The NavigationMethodTestOnline Register"""
+enum NavigationMethodTestOnline {
+  FREE
+  SEQUENTIAL
+}
+
 input NewAcademicArea {
   abbreviation: String
   academicGradeId: [String!]
@@ -2124,6 +2132,7 @@ input NewCampusCoordinator {
 }
 
 input NewCourse {
+  academicDayId: String
   academicGradeId: String
   campusId: String
   name: String
@@ -2176,7 +2185,7 @@ input NewExperienceLearning {
   experienceLearningPerformanceLevel: [NewExperienceLearningPerformanceLevel!]
   experienceType: ExperienceType
   learningsId: [String!]
-  navigationMethod: String
+  navigationMethod: NavigationMethodTestOnline
   onlineDelivery: Boolean
   openTestDate: DateTime
   shuffleQuestions: Boolean
@@ -2425,7 +2434,7 @@ input NewQuestionTestOnline {
   campusId: String
   name: String
   questionCategoryTestOnlineId: String
-  questionType: String
+  questionType: QuestionTypeTestOnline
   statement: String
 }
 
@@ -3764,7 +3773,7 @@ type QuestionTestOnline implements IModelCampusData {
   name: String
   questionCategoryTestOnline: QuestionCategoryTestOnline
   questionCategoryTestOnlineId: String
-  questionType: String
+  questionType: QuestionTypeTestOnline
   statement: String
   updatedAt: DateTime
   updatedByUser: User
@@ -3784,6 +3793,15 @@ type QuestionTestOnlineEdge {
   """Used in `before` and `after` args"""
   cursor: String!
   node: QuestionTestOnline!
+}
+
+"""The QuestionTypeTestOnline Register"""
+enum QuestionTypeTestOnline {
+  ESSAY
+  MULTIPLECHOICE
+  NUMERICAL
+  SHORTANSWER
+  TRUEFALSE
 }
 
 """The Role model"""
