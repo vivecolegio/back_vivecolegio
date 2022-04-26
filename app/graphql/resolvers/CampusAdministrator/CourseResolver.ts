@@ -2,10 +2,11 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicGradeRepository, CampusRepository, CourseRepository, StudentRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicDayRepository, AcademicGradeRepository, CampusRepository, CourseRepository, StudentRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewCourse } from '../../inputs/CampusAdministrator/NewCourse';
 import { IContext } from '../../interfaces/IContext';
+import { AcademicDay } from '../../models/CampusAdministrator/AcademicDay';
 import { Course, CourseConnection } from '../../models/CampusAdministrator/Course';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { Student } from '../../models/GeneralAdministrator/Student';
@@ -29,6 +30,9 @@ export class CourseResolver {
 
   @InjectRepository(Student)
   private repositoryStudent = StudentRepository;
+
+  @InjectRepository(AcademicDay)
+  private repositoryAcademicDay = AcademicDayRepository;
 
   @Query(() => Course, { nullable: true })
   async getCourse(@Arg('id', () => String) id: string) {
@@ -231,6 +235,17 @@ export class CourseResolver {
     }
     return null;
   }
+
+  @FieldResolver((_type) => AcademicDay, { nullable: true })
+  async academicDay(@Root() data: Course) {
+    let id = data.academicDayId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryAcademicDay.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
+
 
   @FieldResolver((_type) => [Student], { nullable: true })
   async students(@Root() data: Course) {

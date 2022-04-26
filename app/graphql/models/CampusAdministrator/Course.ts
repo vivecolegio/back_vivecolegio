@@ -3,6 +3,7 @@ import { Column, Entity } from 'typeorm';
 import { IModelCampusData } from '../../interfaces/IModelCampusData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { AcademicGrade } from '../SchoolAdministrator/AcademicGrade';
+import { AcademicDay } from './AcademicDay';
 
 @ObjectType({ description: 'The Course model', implements: IModelCampusData })
 @Entity()
@@ -14,6 +15,13 @@ export class Course extends IModelCampusData {
 
   @Field({ nullable: true })
   academicGrade?: AcademicGrade;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  academicDayId?: string;
+
+  @Field({ nullable: true })
+  academicDay?: AcademicDay;
 
   @Field({ nullable: true })
   @Column({ nullable: true })

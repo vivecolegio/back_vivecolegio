@@ -10,6 +10,9 @@ export class NewCourse implements Partial<Course> {
   academicGradeId?: string;
 
   @Field({ nullable: true })
+  academicDayId?: string;
+
+  @Field({ nullable: true })
   name?: string;
 
   @Field({ nullable: true })
