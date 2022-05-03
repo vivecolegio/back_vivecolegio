@@ -7,6 +7,9 @@ import { NewClassroomPlanPerformanceAppraisalStrategy } from './NewClassroomPlan
 @InputType()
 export class NewClassroomPlan implements Partial<ClassroomPlan> {
     @Field({ nullable: true })
+    campusId?: string;
+
+    @Field({ nullable: true })
     startDate?: Date;
 
     @Field({ nullable: true })
