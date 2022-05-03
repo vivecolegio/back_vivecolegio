@@ -2,10 +2,11 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicAsignatureRepository, AcademicGradeRepository, AcademicPeriodRepository, AcademicStandardRepository, CampusRepository, ClassroomPlanRepository, GeneralBasicLearningRightRepository, LearningRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAsignatureCourseRepository, AcademicAsignatureRepository, AcademicGradeRepository, AcademicPeriodRepository, AcademicStandardRepository, CampusRepository, ClassroomPlanRepository, GeneralBasicLearningRightRepository, LearningRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewClassroomPlan } from '../../inputs/CampusAdministrator/NewClassroomPlan';
 import { IContext } from '../../interfaces/IContext';
+import { AcademicAsignatureCourse } from '../../models/CampusAdministrator/AcademicAsignatureCourse';
 import { ClassroomPlan, ClassroomPlanConnection } from '../../models/CampusAdministrator/ClassroomPlan';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { GeneralBasicLearningRight } from '../../models/GeneralAdministrator/GeneralBasicLearningRight';
@@ -34,6 +35,9 @@ export class ClassroomPlanResolver {
     @InjectRepository(AcademicGrade)
     private repositoryAcademicGrade = AcademicGradeRepository;
 
+    @InjectRepository(AcademicAsignatureCourse)
+    private repositoryAcademicAsignatureCourse = AcademicAsignatureCourseRepository;
+
     @InjectRepository(AcademicPeriod)
     private repositoryAcademicPeriod = AcademicPeriodRepository;
 
@@ -52,26 +56,27 @@ export class ClassroomPlanResolver {
         return result;
     }
 
+    //Filtrar por area y grado 
     @Query(() => ClassroomPlanConnection)
     async getAllClassroomPlan(
         @Args() args: ConnectionArgs,
         @Arg('allData', () => Boolean) allData: Boolean,
         @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
-        @Arg('campusId', () => String) campusId: String,
+        @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: String,
     ): Promise<ClassroomPlanConnection> {
         let result;
         if (allData) {
             if (orderCreated) {
                 result = await this.repository.findBy({
                     where: {
-                        campusId
+                        academicAsignatureCourseId
                     },
                     order: { createdAt: 'DESC' },
                 });
             } else {
                 result = await this.repository.findBy({
                     where: {
-                        campusId
+                        academicAsignatureCourseId
                     },
                 });
             }
@@ -79,7 +84,7 @@ export class ClassroomPlanResolver {
             if (orderCreated) {
                 result = await this.repository.findBy({
                     where: {
-                        campusId,
+                        academicAsignatureCourseId,
                         active: true,
                     },
                     order: { createdAt: 'DESC' },
@@ -87,7 +92,7 @@ export class ClassroomPlanResolver {
             } else {
                 result = await this.repository.findBy({
                     where: {
-                        campusId,
+                        academicAsignatureCourseId,
                         active: true,
                     },
                 });
@@ -229,6 +234,17 @@ export class ClassroomPlanResolver {
         }
         return null;
     }
+
+    @FieldResolver((_type) => AcademicAsignatureCourse, { nullable: true })
+    async academicAsignatureCourse(@Root() data: ClassroomPlan) {
+        let id = data.academicAsignatureCourseId;
+        if (id !== null && id !== undefined) {
+            const result = await this.repositoryAcademicAsignatureCourse.findOneBy(id);
+            return result;
+        }
+        return null;
+    }
+
 
     @FieldResolver((_type) => [Learning], { nullable: true })
     async learnigs(@Root() data: ClassroomPlan) {

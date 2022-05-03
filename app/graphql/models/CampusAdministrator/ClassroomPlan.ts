@@ -8,6 +8,7 @@ import { AcademicGrade } from '../SchoolAdministrator/AcademicGrade';
 import { AcademicPeriod } from '../SchoolAdministrator/AcademicPeriod';
 import { AcademicStandard } from '../SchoolAdministrator/AcademicStandard';
 import { Learning } from '../SchoolAdministrator/Learning';
+import { AcademicAsignatureCourse } from './AcademicAsignatureCourse';
 import { ClassroomPlanExpectedPerformance } from './ClassroomPlanExpectedPerformance';
 import { ClassroomPlanMethodologicalRoute } from './ClassroomPlanMethodologicalRoute';
 import { ClassroomPlanPerformanceAppraisalStrategy } from './ClassroomPlanPerformanceAppraisalStrategy';
@@ -44,6 +45,13 @@ export class ClassroomPlan extends IModelCampusData {
 
     @Field({ nullable: true })
     academicGrade?: AcademicGrade;
+
+    @Field({ nullable: true })
+    @Column({ nullable: true })
+    academicAsignatureCourseId?: string;
+
+    @Field({ nullable: true })
+    academicAsignatureCourse?: AcademicAsignatureCourse;
 
     @Field(() => [String], { nullable: true })
     @Column({ nullable: true })

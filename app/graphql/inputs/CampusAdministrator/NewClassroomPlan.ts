@@ -15,6 +15,15 @@ export class NewClassroomPlan implements Partial<ClassroomPlan> {
     @Field({ nullable: true })
     academicPeriodId?: string;
 
+    @Field({ nullable: true })
+    academicAsignatureId?: string;
+
+    @Field({ nullable: true })
+    academicGradeId?: string;
+
+    @Field({ nullable: true })
+    academicAsignatureCourseId?: string;
+
     @Field(() => [String], { nullable: true })
     learningsId?: String[];
 
