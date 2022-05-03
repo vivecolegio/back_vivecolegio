@@ -8,4 +8,13 @@ export class NewSchool implements Partial<School> {
 
   @Field({ nullable: true })
   daneCode?: string;
+
+  @Field({ nullable: true })
+  pedagogicalModel?: string;
+
+  @Field({ nullable: true })
+  educationalModel?: string;
+
+  @Field({ nullable: true })
+  curricularComponent?: string;
 }

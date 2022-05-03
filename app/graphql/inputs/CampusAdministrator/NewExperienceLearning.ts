@@ -28,7 +28,7 @@ export class NewExperienceLearning implements Partial<ExperienceLearning> {
     learningsId?: String[];
 
     @Field(() => [String], { nullable: true })
-    evidenciceLearningsId?: String[];
+    evidenceLearningsId?: String[];
 
     @Field({ nullable: true })
     academicPeriodId?: string;

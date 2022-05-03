@@ -5,6 +5,7 @@ import { AcademicAsignatureCoursePeriodValuation } from '../graphql/models/Campu
 import { AcademicDay } from '../graphql/models/CampusAdministrator/AcademicDay';
 import { AcademicHour } from '../graphql/models/CampusAdministrator/AcademicHour';
 import { AcademicSchedule } from '../graphql/models/CampusAdministrator/AcademicSchedule';
+import { ClassroomPlan } from '../graphql/models/CampusAdministrator/ClassroomPlan';
 import { Course } from '../graphql/models/CampusAdministrator/Course';
 import { ExperienceLearning } from '../graphql/models/CampusAdministrator/ExperienceLearning';
 import { ExperienceLearningAverageValuation } from '../graphql/models/CampusAdministrator/ExperienceLearningAverageValuation';
@@ -128,7 +129,8 @@ export const dataSource = new DataSource({
     AcademicAsignatureCoursePeriodValuation,
     QuestionTestOnline,
     QuestionBankTestOnline,
-    QuestionCategoryTestOnline
+    QuestionCategoryTestOnline,
+    ClassroomPlan
   ],
   synchronize: true,
   logger: 'advanced-console',
@@ -200,3 +202,4 @@ export const AcademicAsignatureCoursePeriodValuationRepository = dataSource.getM
 export const QuestionTestOnlineRepository = dataSource.getMongoRepository(QuestionTestOnline);
 export const QuestionBankTestOnlineRepository = dataSource.getMongoRepository(QuestionBankTestOnline);
 export const QuestionCategoryTestOnlineRepository = dataSource.getMongoRepository(QuestionCategoryTestOnline);
+export const ClassroomPlanRepository = dataSource.getMongoRepository(ClassroomPlan);

@@ -13,10 +13,23 @@ export class School extends IModelData {
   @Field({ nullable: true })
   @Column({ nullable: true })
   daneCode?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  pedagogicalModel?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  educationalModel?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  curricularComponent?: string;
+
 }
 
 @ObjectType()
-export class SchoolEdge extends EdgeType('School', School) {}
+export class SchoolEdge extends EdgeType('School', School) { }
 
 @ObjectType()
-export class SchoolConnection extends ConnectionType<SchoolEdge>('School', SchoolEdge) {}
+export class SchoolConnection extends ConnectionType<SchoolEdge>('School', SchoolEdge) { }

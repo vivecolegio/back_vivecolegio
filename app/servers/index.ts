@@ -17,6 +17,9 @@ import { AcademicAsignatureCoursePeriodValuationResolver } from '../graphql/reso
 import { AcademicAsignatureCourseResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAsignatureCourseResolver';
 import { AcademicHourResolver } from '../graphql/resolvers/CampusAdministrator/AcademicHourResolver';
 import { AcademicScheduleResolver } from '../graphql/resolvers/CampusAdministrator/AcademicScheduleResolver';
+import { ClassroomPlanExpectedPerformanceResolver } from '../graphql/resolvers/CampusAdministrator/ClassroomPlanExpectedPerformanceResolver';
+import { ClassroomPlanPerformanceAppraisalStrategyResolver } from '../graphql/resolvers/CampusAdministrator/ClassroomPlanPerformanceAppraisalStrategyResolver';
+import { ClassroomPlanResolver } from '../graphql/resolvers/CampusAdministrator/ClassroomPlanResolver';
 import { ExperienceLearningAverageValuationResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningAverageValuationResolver';
 import { ExperienceLearningCoEvaluationResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningCoEvaluationResolver';
 import { ExperienceLearningCoEvaluationValuationResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningCoEvaluationValuationResolver';
@@ -147,7 +150,10 @@ async function app() {
         AcademicAsignatureCoursePeriodValuationResolver,
         QuestionBankTestOnlineResolver,
         QuestionCategoryTestOnlineResolver,
-        QuestionTestOnlineResolver
+        QuestionTestOnlineResolver,
+        ClassroomPlanPerformanceAppraisalStrategyResolver,
+        ClassroomPlanExpectedPerformanceResolver,
+        ClassroomPlanResolver
       ],
       emitSchemaFile: true,
       validate: false,

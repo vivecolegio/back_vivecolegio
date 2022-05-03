@@ -495,6 +495,73 @@ type CampusEdge {
   node: Campus!
 }
 
+"""The ClassroomPlan model"""
+type ClassroomPlan implements IModelCampusData {
+  academicAsignature: AcademicAsignature
+  academicAsignatureId: String
+  academicGrade: AcademicGrade
+  academicGradeId: String
+  academicPeriod: AcademicPeriod
+  academicPeriodId: String
+  academicStandards: [AcademicStandard!]
+  academicStandardsId: [String!]
+  active: Boolean
+  campus: Campus
+  campusId: String
+  classroomPlanExpectedPerformances: [ClassroomPlanExpectedPerformance!]
+  classroomPlanMethodologicalRoutes: [ClassroomPlanMethodologicalRoute!]
+  classroomPlanPerformanceAppraisalStrategies: [ClassroomPlanPerformanceAppraisalStrategy!]
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  endDate: DateTime
+  generalBasicLearningRights: [GeneralBasicLearningRight!]
+  generalBasicLearningRightsId: [String!]
+  id: ID!
+  learnigs: [Learning!]
+  learningsId: [String!]
+  startDate: DateTime
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type ClassroomPlanConnection {
+  edges: [ClassroomPlanEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type ClassroomPlanEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: ClassroomPlan!
+}
+
+"""The ClassroomPlanExpectedPerformance model"""
+type ClassroomPlanExpectedPerformance {
+  evaluativeComponent: EvaluativeComponent
+  evaluativeComponentId: String
+  evidenceLearnings: [EvidenceLearning!]
+  evidenceLearningsId: [String!]
+}
+
+"""The ClassroomPlanMethodologicalRoute model"""
+type ClassroomPlanMethodologicalRoute {
+  description: String
+  name: String
+}
+
+"""The ClassroomPlanPerformanceAppraisalStrategy model"""
+type ClassroomPlanPerformanceAppraisalStrategy {
+  description: String
+  evaluativeComponent: EvaluativeComponent
+  evaluativeComponentId: String
+}
+
 """The Course model"""
 type Course implements IModelCampusData {
   academicDay: AcademicDay
@@ -727,8 +794,8 @@ type ExperienceLearning implements IModelCampusData {
   description: String
   evaluativeComponent: EvaluativeComponent
   evaluativeComponentId: String
-  evidenciceLearnings: [EvidenceLearning!]
-  evidenciceLearningsId: [String!]
+  evidenceLearnings: [EvidenceLearning!]
+  evidenceLearningsId: [String!]
   experienceLearningPerformanceLevel: [ExperienceLearningPerformanceLevel!]
   experienceType: ExperienceType
   id: ID!
@@ -1770,6 +1837,7 @@ type Mutation {
   changeActiveCampus(active: Boolean!, id: String!): Boolean!
   changeActiveCampusAdministrator(active: Boolean!, id: String!): Boolean!
   changeActiveCampusCoordinator(active: Boolean!, id: String!): Boolean!
+  changeActiveClassroomPlan(active: Boolean!, id: String!): Boolean!
   changeActiveCourse(active: Boolean!, id: String!): Boolean!
   changeActiveDocumentType(active: Boolean!, id: String!): Boolean!
   changeActiveEducationLevel(active: Boolean!, id: String!): Boolean!
@@ -1832,6 +1900,7 @@ type Mutation {
   createCampus(data: NewCampus!): Campus!
   createCampusAdministrator(data: NewCampusAdministrator!): CampusAdministrator!
   createCampusCoordinator(data: NewCampusCoordinator!): CampusCoordinator!
+  createClassroomPlan(data: NewClassroomPlan!): ClassroomPlan!
   createCourse(data: NewCourse!): Course!
   createDocumentType(data: NewDocumentType!): DocumentType!
   createEducationLevel(data: NewEducationLevel!): EducationLevel!
@@ -1898,6 +1967,7 @@ type Mutation {
   deleteCampus(id: String!): Boolean!
   deleteCampusAdministrator(id: String!): Boolean!
   deleteCampusCoordinator(id: String!): Boolean!
+  deleteClassroomPlan(id: String!): Boolean!
   deleteCourse(id: String!): Boolean!
   deleteDocumentType(id: String!): Boolean!
   deleteEducationLevel(id: String!): Boolean!
@@ -1962,6 +2032,7 @@ type Mutation {
   updateCampus(data: NewCampus!, id: String!): Campus!
   updateCampusAdministrator(data: NewCampusAdministrator!, id: String!): CampusAdministrator!
   updateCampusCoordinator(data: NewCampusCoordinator!, id: String!): CampusCoordinator!
+  updateClassroomPlan(data: NewClassroomPlan!, id: String!): ClassroomPlan!
   updateCourse(data: NewCourse!, id: String!): Course!
   updateDocumentType(data: NewDocumentType!, id: String!): DocumentType!
   updateEducationLevel(data: NewEducationLevel!, id: String!): EducationLevel!
@@ -2131,6 +2202,33 @@ input NewCampusCoordinator {
   userId: String
 }
 
+input NewClassroomPlan {
+  academicPeriodId: String
+  academicStandardsId: [String!]
+  classroomPlanExpectedPerformances: [NewClassroomPlanExpectedPerformance!]
+  classroomPlanMethodologicalRoutes: [NewClassroomPlanMethodologicalRoute!]
+  classroomPlanPerformanceAppraisalStrategies: [NewClassroomPlanPerformanceAppraisalStrategy!]
+  endDate: DateTime
+  generalBasicLearningRightsId: [String!]
+  learningsId: [String!]
+  startDate: DateTime
+}
+
+input NewClassroomPlanExpectedPerformance {
+  evaluativeComponentId: String
+  evidenciceLearningsId: [String!]
+}
+
+input NewClassroomPlanMethodologicalRoute {
+  description: String
+  name: String
+}
+
+input NewClassroomPlanPerformanceAppraisalStrategy {
+  description: String
+  evaluativeComponentId: String
+}
+
 input NewCourse {
   academicDayId: String
   academicGradeId: String
@@ -2181,7 +2279,7 @@ input NewExperienceLearning {
   dateDelivery: DateTime
   description: String
   evaluativeComponentId: String
-  evidenciceLearningsId: [String!]
+  evidenceLearningsId: [String!]
   experienceLearningPerformanceLevel: [NewExperienceLearningPerformanceLevel!]
   experienceType: ExperienceType
   learningsId: [String!]
@@ -2449,8 +2547,11 @@ input NewRole {
 }
 
 input NewSchool {
+  curricularComponent: String
   daneCode: String
+  educationalModel: String
   name: String
+  pedagogicalModel: String
 }
 
 input NewSchoolAdministrator {
@@ -2827,6 +2928,22 @@ type Query {
     orderCreated: Boolean!
     schoolId: String!
   ): CampusCoordinatorConnection!
+  getAllClassroomPlan(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+    campusId: String!
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): ClassroomPlanConnection!
   getAllCourse(
     academicGradeId: String
 
@@ -3641,6 +3758,7 @@ type Query {
   getCampus(id: String!): Campus
   getCampusAdministrator(id: String!): CampusAdministrator
   getCampusCoordinator(id: String!): CampusCoordinator
+  getClassroomPlan(id: String!): ClassroomPlan
   getCourse(id: String!): Course
   getCurrentAcademicPeriod(schoolId: String!): AcademicPeriod
   getDocumentType(id: String!): DocumentType
@@ -3844,9 +3962,12 @@ type School implements IModelData {
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  curricularComponent: String
   daneCode: String
+  educationalModel: String
   id: ID!
   name: String
+  pedagogicalModel: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String

@@ -907,8 +907,8 @@ export class ExperienceLearningResolver {
     }
 
     @FieldResolver((_type) => [EvidenceLearning], { nullable: true })
-    async evidenciceLearnings(@Root() data: ExperienceLearning) {
-        let ids = data.evidenciceLearningsId;
+    async evidenceLearnings(@Root() data: ExperienceLearning) {
+        let ids = data.evidenceLearningsId;
         if (ids !== null && ids !== undefined) {
             let dataIds: any[] = [];
             ids.forEach(async (id: any) => {

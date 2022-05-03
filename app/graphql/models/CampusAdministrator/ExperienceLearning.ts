@@ -46,10 +46,10 @@ export class ExperienceLearning extends IModelCampusData {
 
     @Field(() => [String], { nullable: true })
     @Column({ nullable: true })
-    evidenciceLearningsId?: String[];
+    evidenceLearningsId?: String[];
 
     @Field(() => [EvidenceLearning], { nullable: true })
-    evidenciceLearnings?: EvidenceLearning[];
+    evidenceLearnings?: EvidenceLearning[];
 
     @Field({ nullable: true })
     @Column({ nullable: true })
