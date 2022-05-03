@@ -498,6 +498,8 @@ type CampusEdge {
 """The ClassroomPlan model"""
 type ClassroomPlan implements IModelCampusData {
   academicAsignature: AcademicAsignature
+  academicAsignatureCourse: AcademicAsignatureCourse
+  academicAsignatureCourseId: String
   academicAsignatureId: String
   academicGrade: AcademicGrade
   academicGradeId: String
@@ -1889,6 +1891,7 @@ type Mutation {
   createAcademicAsignature(data: NewAcademicAsignature!): AcademicAsignature!
   createAcademicAsignatureCourse(data: NewAcademicAsignatureCourse!): AcademicAsignatureCourse!
   createAcademicAsignatureCoursePeriodValuation(data: NewAcademicAsignatureCoursePeriodValuation!): AcademicAsignatureCoursePeriodValuation!
+  createAcademicAsignatureCoursePeriodValuationStudent(academicAsignatureCourseId: String!, academicPeriodId: String!, studentId: String!): Boolean!
   createAcademicAsignatureCoursePeriodValuationStudents(academicAsignatureCourseId: String!, academicPeriodId: String!, schoolId: String!): Boolean!
   createAcademicDay(data: NewAcademicDay!): AcademicDay!
   createAcademicGrade(data: NewAcademicGrade!): AcademicGrade!
@@ -1909,6 +1912,7 @@ type Mutation {
   createEvidenceLearning(data: NewEvidenceLearning!): EvidenceLearning!
   createExperienceLearning(data: NewExperienceLearning!): ExperienceLearning!
   createExperienceLearningAverageValuation(data: NewExperienceLearningAverageValuation!): ExperienceLearningAverageValuation!
+  createExperienceLearningAverageValuationStudent(academicAsignatureCourseId: String!, academicPeriodId: String!, evaluativeComponentId: String!, studentId: String!): Boolean!
   createExperienceLearningAverageValuationStudents(academicAsignatureCourseId: String!, academicPeriodId: String!, evaluativeComponentId: String!): Boolean!
   createExperienceLearningCoEvaluation(data: NewExperienceLearningCoEvaluation!): ExperienceLearningCoEvaluation!
   createExperienceLearningCoEvaluationStudents(id: String!): Boolean!
@@ -2203,6 +2207,9 @@ input NewCampusCoordinator {
 }
 
 input NewClassroomPlan {
+  academicAsignatureCourseId: String
+  academicAsignatureId: String
+  academicGradeId: String
   academicPeriodId: String
   academicStandardsId: [String!]
   classroomPlanExpectedPerformances: [NewClassroomPlanExpectedPerformance!]
@@ -2929,13 +2936,14 @@ type Query {
     schoolId: String!
   ): CampusCoordinatorConnection!
   getAllClassroomPlan(
+    academicAsignatureCourseId: String!
+
     """Paginate after opaque cursor"""
     after: String
     allData: Boolean!
 
     """Paginate before opaque cursor"""
     before: String
-    campusId: String!
 
     """Paginate first"""
     first: Float

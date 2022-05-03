@@ -638,6 +638,125 @@ export class ExperienceLearningResolver {
     }
 
     @Mutation(() => Boolean)
+    async createExperienceLearningAverageValuationStudent(
+        @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: string,
+        @Arg('academicPeriodId', () => String) academicPeriodId: string,
+        @Arg('evaluativeComponentId', () => String) evaluativeComponentId: string,
+        @Arg('studentId', () => String) studentId: string
+    ) {
+        const experienceLearnings = await this.repository.findBy({
+            where: {
+                evaluativeComponentId,
+                academicAsignatureCourseId,
+                academicPeriodId,
+                active: true,
+            }
+        });
+        if (experienceLearnings) {
+            const academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(academicAsignatureCourseId);
+            if (academicAsignatureCourse) {
+                const course = await this.repositoryCourse.findOneBy(academicAsignatureCourse.courseId);
+                if (course) {
+                    let studentAverage: ExperienceLearningAverageValuation;
+                    let average = 0;
+                    let evaluations = [];
+                    let studentAverageList = await this.repositoryExperienceLearningAverageValuation.findBy({
+                        where: {
+                            academicAsignatureCourseId,
+                            academicPeriodId,
+                            evaluativeComponentId,
+                            studentId,
+                        }
+                    })
+                    if (studentAverageList.length > 0) {
+                        studentAverage = studentAverageList[0];
+                    } else {
+                        studentAverage = new ExperienceLearningAverageValuation();
+                        studentAverage.version = 0;
+                        studentAverage.active = true;
+                        studentAverage.studentId = studentId;
+                        studentAverage.average = 0;
+                        studentAverage.evaluativeComponentId = evaluativeComponentId;
+                        studentAverage.academicPeriodId = academicPeriodId;
+                        studentAverage.academicAsignatureCourseId = academicAsignatureCourseId;
+                    }
+                    for (let experienceLearning of experienceLearnings) {
+                        switch (experienceLearning.experienceType) {
+                            case ExperienceType.COEVALUATION:
+                                evaluations = await this.repositoryExperienceLearningCoEvaluationValuation.findBy({
+                                    where: {
+                                        experienceLearningId: experienceLearning.id.toString(),
+                                        studentId
+                                    }
+                                })
+                                evaluations.forEach((evaluation) => {
+                                    average += evaluation?.assessment ? evaluation?.assessment : 0;
+                                })
+                                break;
+                            case ExperienceType.SELFAPPRAISAL:
+                                evaluations = await this.repositoryExperienceLearningSelfAssessmentValuation.findBy({
+                                    where: {
+                                        experienceLearningId: experienceLearning.id.toString(),
+                                        studentId
+                                    }
+                                })
+                                evaluations.forEach((evaluation) => {
+                                    average += evaluation?.assessment ? evaluation?.assessment : 0;
+                                })
+                                break;
+                            case ExperienceType.TRADITIONALVALUATION:
+                                evaluations = await this.repositoryExperienceLearningTraditionalValuation.findBy({
+                                    where: {
+                                        experienceLearningId: experienceLearning.id.toString(),
+                                        studentId
+                                    }
+                                })
+                                evaluations.forEach((evaluation) => {
+                                    average += evaluation?.assessment ? evaluation?.assessment : 0;
+                                })
+                                break;
+                            case ExperienceType.VALUATIONRUBRIC:
+                                evaluations = await this.repositoryExperienceLearningRubricValuation.findBy({
+                                    where: {
+                                        experienceLearningId: experienceLearning.id.toString(),
+                                        studentId
+                                    }
+                                })
+                                evaluations.forEach((evaluation) => {
+                                    average += evaluation?.assessment ? evaluation?.assessment : 0;
+                                })
+                                break;
+                            case ExperienceType.ONLINETEST:
+                                break;
+                        }
+                    }
+                    if (average != null && average > 0 && experienceLearnings.length > 0) {
+                        studentAverage.average = (average / experienceLearnings.length);
+                    } else {
+                        studentAverage.average = 0;
+                    }
+                    if (Number.isNaN(studentAverage.average)) {
+                        studentAverage.average = 0;
+                    }
+                    if (studentAverage.id) {
+                        studentAverage = await this.repositoryExperienceLearningAverageValuation.save({
+                            _id: new ObjectId(studentAverage.id.toString()),
+                            ...studentAverage,
+                            version: (studentAverage?.version as number) + 1,
+                        });
+                    } else {
+                        studentAverage = await this.repositoryExperienceLearningAverageValuation.save({
+                            ...studentAverage,
+                        });
+                    }
+                }
+            }
+            return true
+        }
+    }
+
+
+    @Mutation(() => Boolean)
     async createExperienceLearningAverageValuationStudents(
         @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: string,
         @Arg('academicPeriodId', () => String) academicPeriodId: string,
@@ -659,104 +778,95 @@ export class ExperienceLearningResolver {
                     const students = course.studentsId;
                     if (students) {
                         for (const student of students) {
-                            let studentAverage: ExperienceLearningAverageValuation;
-                            let average = 0;
-                            let evaluations = [];
-                            let studentAverageList = await this.repositoryExperienceLearningAverageValuation.findBy({
-                                where: {
-                                    academicAsignatureCourseId,
-                                    academicPeriodId,
-                                    evaluativeComponentId,
-                                    studentId: student,
-                                }
-                            })
-                            if (studentAverageList.length > 0) {
-                                studentAverage = studentAverageList[0];
-                            } else {
-                                studentAverage = new ExperienceLearningAverageValuation();
-                                studentAverage.version = 0;
-                                studentAverage.active = true;
-                                studentAverage.studentId = student;
-                                studentAverage.average = 0;
-                                studentAverage.evaluativeComponentId = evaluativeComponentId;
-                                studentAverage.academicPeriodId = academicPeriodId;
-                                studentAverage.academicAsignatureCourseId = academicAsignatureCourseId;
-                            }
-                            for (let experienceLearning of experienceLearnings) {
-                                switch (experienceLearning.experienceType) {
-                                    case ExperienceType.COEVALUATION:
-                                        evaluations = await this.repositoryExperienceLearningCoEvaluationValuation.findBy({
-                                            where: {
-                                                experienceLearningId: experienceLearning.id.toString(),
-                                                studentId: student
-                                            }
-                                        })
-                                        evaluations.forEach((evaluation) => {
-                                            average += evaluation?.assessment ? evaluation?.assessment : 0;
-                                        })
-                                        break;
-                                    case ExperienceType.SELFAPPRAISAL:
-                                        evaluations = await this.repositoryExperienceLearningSelfAssessmentValuation.findBy({
-                                            where: {
-                                                experienceLearningId: experienceLearning.id.toString(),
-                                                studentId: student
-                                            }
-                                        })
-                                        evaluations.forEach((evaluation) => {
-                                            average += evaluation?.assessment ? evaluation?.assessment : 0;
-                                        })
-                                        break;
-                                    case ExperienceType.TRADITIONALVALUATION:
-                                        evaluations = await this.repositoryExperienceLearningTraditionalValuation.findBy({
-                                            where: {
-                                                experienceLearningId: experienceLearning.id.toString(),
-                                                studentId: student
-                                            }
-                                        })
-                                        evaluations.forEach((evaluation) => {
-                                            average += evaluation?.assessment ? evaluation?.assessment : 0;
-                                        })
-                                        break;
-                                    case ExperienceType.VALUATIONRUBRIC:
-                                        evaluations = await this.repositoryExperienceLearningRubricValuation.findBy({
-                                            where: {
-                                                experienceLearningId: experienceLearning.id.toString(),
-                                                studentId: student
-                                            }
-                                        })
-                                        evaluations.forEach((evaluation) => {
-                                            average += evaluation?.assessment ? evaluation?.assessment : 0;
-                                        })
-                                        break;
-                                    case ExperienceType.ONLINETEST:
-                                        break;
-                                }
-                            }
-                            if (average != null && average > 0 && experienceLearnings.length > 0) {
-                                studentAverage.average = (average / experienceLearnings.length);
-                            } else {
-                                studentAverage.average = 0;
-                            }
-                            if (Number.isNaN(studentAverage.average)) {
-                                studentAverage.average = 0;
-                            }
-                            if (studentAverage.id) {
-                                studentAverage = await this.repositoryExperienceLearningAverageValuation.save({
-                                    _id: new ObjectId(studentAverage.id.toString()),
-                                    ...studentAverage,
-                                    version: (studentAverage?.version as number) + 1,
-                                });
-                            } else {
-                                studentAverage = await this.repositoryExperienceLearningAverageValuation.save({
-                                    ...studentAverage,
-                                });
-                            }
+                            this.createExperienceLearningAverageValuationStudent(academicAsignatureCourseId, academicPeriodId, evaluativeComponentId, student as string)
                         }
                     }
                     return true
                 }
             }
         }
+    }
+
+    @Mutation(() => Boolean)
+    async createAcademicAsignatureCoursePeriodValuationStudent(
+        @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: string,
+        @Arg('academicPeriodId', () => String) academicPeriodId: string,
+        @Arg('studentId', () => String) studentId: string
+    ) {
+        const academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(academicAsignatureCourseId);
+        let evaluativeComponents: EvaluativeComponent[] = [];
+        if (academicAsignatureCourse) {
+            evaluativeComponents = await this.repositoryEvaluativeComponent.findBy({
+                where: {
+                    academicAsignatureId: { $in: [academicAsignatureCourse.academicAsignatureId] },
+                    active: true
+                },
+            });
+            if (evaluativeComponents.length == 0) {
+                evaluativeComponents = await this.repositoryEvaluativeComponent.findBy({
+                    where: {
+                        default: true,
+                        active: true
+                    },
+                });
+            }
+        }
+        if (academicAsignatureCourse) {
+            const course = await this.repositoryCourse.findOneBy(academicAsignatureCourse.courseId);
+            if (course) {
+                let studentPeriodValuation: AcademicAsignatureCoursePeriodValuation;
+                let average = 0;
+                let studentPeriodValuationList = await this.repositoryAcademicAsignatureCoursePeriodValuation.findBy({
+                    where: {
+                        academicAsignatureCourseId,
+                        academicPeriodId,
+                        studentId,
+                    }
+                })
+                if (studentPeriodValuationList.length > 0) {
+                    studentPeriodValuation = studentPeriodValuationList[0];
+                } else {
+                    studentPeriodValuation = new ExperienceLearningAverageValuation();
+                    studentPeriodValuation.version = 0;
+                    studentPeriodValuation.active = true;
+                    studentPeriodValuation.studentId = studentId;
+                    studentPeriodValuation.academicPeriodId = academicPeriodId;
+                    studentPeriodValuation.academicAsignatureCourseId = academicAsignatureCourseId;
+                    studentPeriodValuation.assessment = 0;
+                }
+                for (let evaluativeComponent of evaluativeComponents) {
+                    const experienceLearningAverageValuation = await this.repositoryExperienceLearningAverageValuation.findBy({
+                        where: {
+                            academicAsignatureCourseId,
+                            academicPeriodId,
+                            studentId,
+                            evaluativeComponentId: evaluativeComponent.id.toString(),
+                        }
+                    })
+                    if (experienceLearningAverageValuation.length > 0) {
+                        const averageComponent = experienceLearningAverageValuation[0].average ? experienceLearningAverageValuation[0].average : 0;
+                        const weightComponent = evaluativeComponent.weight ? evaluativeComponent.weight : 0;
+                        average += (averageComponent * (weightComponent / 100))
+                    }
+                }
+                if (average) {
+                    studentPeriodValuation.assessment = average;
+                }
+                console.log(studentPeriodValuation)
+                if (studentPeriodValuation.id) {
+                    studentPeriodValuation = await this.repositoryAcademicAsignatureCoursePeriodValuation.save({
+                        _id: new ObjectId(studentPeriodValuation.id.toString()),
+                        ...studentPeriodValuation,
+                        version: (studentPeriodValuation?.version as number) + 1,
+                    });
+                } else {
+                    studentPeriodValuation = await this.repositoryAcademicAsignatureCoursePeriodValuation.save({
+                        ...studentPeriodValuation,
+                    });
+                }
+            }
+        }
+        return true;
     }
 
     @Mutation(() => Boolean)
@@ -789,51 +899,7 @@ export class ExperienceLearningResolver {
                 const students = course.studentsId;
                 if (students) {
                     for (const student of students) {
-                        let studentPeriodValuation: AcademicAsignatureCoursePeriodValuation;
-                        let average = 0;
-                        let studentPeriodValuationList = await this.repositoryAcademicAsignatureCoursePeriodValuation.findBy({
-                            where: {
-                                academicAsignatureCourseId,
-                                academicPeriodId,
-                                studentId: student,
-                            }
-                        })
-                        if (studentPeriodValuationList.length > 0) {
-                            studentPeriodValuation = studentPeriodValuationList[0];
-                        } else {
-                            studentPeriodValuation = new ExperienceLearningAverageValuation();
-                            studentPeriodValuation.version = 0;
-                            studentPeriodValuation.active = true;
-                            studentPeriodValuation.studentId = student;
-                            studentPeriodValuation.academicPeriodId = academicPeriodId;
-                            studentPeriodValuation.academicAsignatureCourseId = academicAsignatureCourseId;
-                        }
-                        for (let evaluativeComponent of evaluativeComponents) {
-                            const experienceLearningAverageValuation = await this.repositoryExperienceLearningAverageValuation.findBy({
-                                where: {
-                                    academicAsignatureCourseId,
-                                    academicPeriodId,
-                                    studentId: student,
-                                    evaluativeComponentId: evaluativeComponent.id.toString(),
-                                }
-                            })
-                            if (experienceLearningAverageValuation.length > 0) {
-                                const averageComponent = experienceLearningAverageValuation[0].average ? experienceLearningAverageValuation[0].average : 0;
-                                const weightComponent = evaluativeComponent.weight ? evaluativeComponent.weight : 0;
-                                average += (averageComponent * (weightComponent / 100))
-                            }
-                        }
-                        if (studentPeriodValuation.id) {
-                            studentPeriodValuation = await this.repositoryAcademicAsignatureCoursePeriodValuation.save({
-                                _id: new ObjectId(studentPeriodValuation.id.toString()),
-                                ...studentPeriodValuation,
-                                version: (studentPeriodValuation?.version as number) + 1,
-                            });
-                        } else {
-                            studentPeriodValuation = await this.repositoryAcademicAsignatureCoursePeriodValuation.save({
-                                ...studentPeriodValuation,
-                            });
-                        }
+                        this.createAcademicAsignatureCoursePeriodValuationStudent(academicAsignatureCourseId, academicPeriodId, student as string)
                     }
                 }
             }

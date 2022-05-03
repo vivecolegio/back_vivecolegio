@@ -9,7 +9,6 @@ import express from 'express';
 import gql from 'graphql-tag';
 import { graphqlUploadExpress } from 'graphql-upload';
 import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
-import Morgan from 'morgan';
 import 'reflect-metadata';
 import { buildSchemaSync, createResolversMap } from 'type-graphql';
 import { SERVER_NAME_APP, SERVER_PORT_APP } from '../config';
@@ -210,7 +209,7 @@ async function app() {
     const app = express();
     // Middlewares
     app.use(`/healthcheck-${SERVER_NAME}`, require('express-healthcheck')());
-    app.use(Morgan('common'));
+    //app.use(Morgan('common'));
     // app.use(Helmet());
     // app.use(Cors());
     app.use('/voyager', voyagerMiddleware({ endpointUrl: '/graphql' }));
