@@ -262,7 +262,7 @@ export class ClassroomPlanResolver {
 
     @FieldResolver((_type) => [AcademicStandard], { nullable: true })
     async academicStandards(@Root() data: ClassroomPlan) {
-        let ids = data.learningsId;
+        let ids = data.academicStandardsId;
         if (ids !== null && ids !== undefined) {
             let dataIds: any[] = [];
             ids.forEach(async (id: any) => {
@@ -276,7 +276,7 @@ export class ClassroomPlanResolver {
 
     @FieldResolver((_type) => [GeneralBasicLearningRight], { nullable: true })
     async generalBasicLearningRights(@Root() data: ClassroomPlan) {
-        let ids = data.learningsId;
+        let ids = data.generalBasicLearningRightsId;
         if (ids !== null && ids !== undefined) {
             let dataIds: any[] = [];
             ids.forEach(async (id: any) => {
