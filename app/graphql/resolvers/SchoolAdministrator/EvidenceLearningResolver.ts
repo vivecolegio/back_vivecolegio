@@ -116,6 +116,25 @@ export class EvidenceLearningResolver {
         return resultConn;
     }
 
+    @Query(() => EvidenceLearningConnection)
+    async getAllEvidenceLearningLearnigs(
+        @Args() args: ConnectionArgs,
+        @Arg('learningsId', () => [String], { nullable: true }) learningsId: [string],
+    ): Promise<EvidenceLearningConnection> {
+        let result;
+        result = await this.repository.findBy({
+            where: { learningId: { $in: learningsId } },
+            order: { active: true },
+        });
+        let resultConn = new EvidenceLearningConnection();
+        let resultConnection = connectionFromArraySlice(result, args, {
+            sliceStart: 0,
+            arrayLength: result.length,
+        });
+        resultConn = { ...resultConnection, totalCount: result.length };
+        return resultConn;
+    }
+
     @Mutation(() => EvidenceLearning)
     async createEvidenceLearning(
         @Arg('data') data: NewEvidenceLearning,
