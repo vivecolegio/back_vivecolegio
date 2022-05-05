@@ -2212,6 +2212,7 @@ input NewClassroomPlan {
   academicGradeId: String
   academicPeriodId: String
   academicStandardsId: [String!]
+  campusId: String
   classroomPlanExpectedPerformances: [NewClassroomPlanExpectedPerformance!]
   classroomPlanMethodologicalRoutes: [NewClassroomPlanMethodologicalRoute!]
   classroomPlanPerformanceAppraisalStrategies: [NewClassroomPlanPerformanceAppraisalStrategy!]
@@ -3050,6 +3051,20 @@ type Query {
     learningId: String
     orderCreated: Boolean!
     schoolId: String!
+  ): EvidenceLearningConnection!
+  getAllEvidenceLearningLearnigs(
+    """Paginate after opaque cursor"""
+    after: String
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    learningsId: [String!]
   ): EvidenceLearningConnection!
   getAllExperienceLearning(
     academicAsignatureCourseId: String

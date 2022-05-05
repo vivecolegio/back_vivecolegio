@@ -123,8 +123,7 @@ export class EvidenceLearningResolver {
     ): Promise<EvidenceLearningConnection> {
         let result;
         result = await this.repository.findBy({
-            where: { learningId: { $in: learningsId } },
-            order: { active: true },
+            where: { learningId: { $in: learningsId }, active: true },
         });
         let resultConn = new EvidenceLearningConnection();
         let resultConnection = connectionFromArraySlice(result, args, {
