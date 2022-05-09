@@ -7,5 +7,5 @@ export class NewClassroomPlanExpectedPerformance implements Partial<ClassroomPla
     evaluativeComponentId?: string;
 
     @Field(() => [String], { nullable: true })
-    evidenciceLearningsId?: String[];
+    evidenceLearningsId?: String[];
 }
