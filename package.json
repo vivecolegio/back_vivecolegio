@@ -18,17 +18,13 @@
     "server:server": "ts-node ./app/servers/index.ts",
     "server:gateway": "wait-on tcp:4001 && ts-node ./app/index",
     "sonar-scanner": "sonar-scanner",
-    "build:docker-gateway": "docker build -f Dockerfile.gateway -t lidertecnologicovivecolegios/backendvivecolegios-gateway .",
-    "push:docker-gateway": "docker push lidertecnologicovivecolegios/backendvivecolegios-gateway",
-    "build:docker-servers": "docker build -f Dockerfile.servers -t lidertecnologicovivecolegios/backendvivecolegios-servers .",
-    "push:docker-servers": "docker push lidertecnologicovivecolegios/backendvivecolegios-servers",
-    "build:docker-gateway-offline": "docker build -f Dockerfile.gateway -t lidertecnologicovivecolegios/backendvivecolegios-gateway-offline .",
-    "push:docker-gateway-offline": "docker push lidertecnologicovivecolegios/backendvivecolegios-gateway-offline",
-    "build:docker-servers-offline": "docker build -f Dockerfile.servers -t lidertecnologicovivecolegios/backendvivecolegios-servers-offline .",
-    "push:docker-servers-offline": "docker push lidertecnologicovivecolegios/backendvivecolegios-servers-offline"
+    "build:docker": "docker build -f Dockerfile -t lidertecnologicovivecolegios/backendvivecolegios .",
+    "push:docker": "docker push lidertecnologicovivecolegios/backendvivecolegios",
+    "build:docker-offline": "docker build -f Dockerfile -t lidertecnologicovivecolegios/backendvivecolegios-offline .",
+    "push:docker-offline": "docker push lidertecnologicovivecolegios/backendvivecolegios-offline"
   },
   "keywords": [],
-  "author": "VHM",
+  "author": "",
   "license": "MIT",
   "dependencies": {
     "@apollo/federation": "0.36.1",

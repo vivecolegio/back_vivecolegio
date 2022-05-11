@@ -18,7 +18,7 @@ async function app() {
     const gateway = new ApolloGateway({
       supergraphSdl: new IntrospectAndCompose({
         subgraphs: [
-          { name: 'servers', url: 'http://backendcolegio.vhmsoluciones.com:4001/graphql' },
+          { name: 'servers', url: 'http://localhost:4001/graphql' },
         ],
       }),
       buildService({ url }: any) {
@@ -114,7 +114,7 @@ async function app() {
     });
     app.listen({ port: port }, () =>
       console.log(
-        `🚀 Server ready and listening at ==> http://backendcolegio.vhmsoluciones.com:${port}${server.graphqlPath}`
+        `🚀 Server ready and listening at ==> http://vivecolegios.nortedesantander.gov.co:${port}${server.graphqlPath}`
       )
     );
   } catch (err) {

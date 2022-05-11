@@ -2224,7 +2224,7 @@ input NewClassroomPlan {
 
 input NewClassroomPlanExpectedPerformance {
   evaluativeComponentId: String
-  evidenciceLearningsId: [String!]
+  evidenceLearningsId: [String!]
 }
 
 input NewClassroomPlanMethodologicalRoute {

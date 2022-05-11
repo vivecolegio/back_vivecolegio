@@ -10,5 +10,6 @@ RUN yarn build
 RUN npm prune --production
 
 EXPOSE 4000
+EXPOSE 4001
 
-CMD ["node", "./dist/index.js"]
+CMD ["yarn", "start"]
