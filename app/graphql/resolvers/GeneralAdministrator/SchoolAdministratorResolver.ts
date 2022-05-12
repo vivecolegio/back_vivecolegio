@@ -115,10 +115,11 @@ export class SchoolAdministratorResolver {
   }
 
   @Mutation(() => Boolean)
-  public async createAllSchoolAdminsitrators() {
+  public async createAllInitialsSchoolAdministrators() {
     let schools = await this.repositorySchool.find();
     for (let school of schools) {
-      let schoolAdministrators = await this.repositorySchool.findBy({ active: true, schoolId: school.id.toString() })
+      let schoolAdministrators = await this.repository.findBy({ active: true, schoolId: { $in: [school.id.toString()] } })
+      console.log(schoolAdministrators.length);
       if (schoolAdministrators.length < 1) {
         let passwordHash = await bcrypt
           .hash(school.daneCode ? school.daneCode : "VIVE2022", BCRYPT_SALT_ROUNDS)

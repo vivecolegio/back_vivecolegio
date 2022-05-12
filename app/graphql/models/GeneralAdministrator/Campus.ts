@@ -13,6 +13,14 @@ export class Campus extends IModelData {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
+  daneCodeCampus?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  consecutive?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   schoolId?: string;
 
   @Field({ nullable: true })
@@ -20,7 +28,7 @@ export class Campus extends IModelData {
 }
 
 @ObjectType()
-export class CampusEdge extends EdgeType('Campus', Campus) {}
+export class CampusEdge extends EdgeType('Campus', Campus) { }
 
 @ObjectType()
-export class CampusConnection extends ConnectionType<CampusEdge>('Campus', CampusEdge) {}
+export class CampusConnection extends ConnectionType<CampusEdge>('Campus', CampusEdge) { }

@@ -402,9 +402,11 @@ type AuditLoginEdge {
 """The Campus model"""
 type Campus implements IModelData {
   active: Boolean
+  consecutive: String
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  daneCodeCampus: String
   id: ID!
   name: String
   school: School
@@ -1899,7 +1901,8 @@ type Mutation {
   createAcademicPeriod(data: NewAcademicPeriod!): AcademicPeriod!
   createAcademicSchedule(data: NewAcademicSchedule!): AcademicSchedule!
   createAcademicStandard(data: NewAcademicStandard!): AcademicStandard!
-  createAllSchoolAdminsitrators: Boolean!
+  createAllInitialsCampusAdministrators: Boolean!
+  createAllInitialsSchoolAdministrators: Boolean!
   createAuditLogin(data: NewAuditLogin!): AuditLogin!
   createCampus(data: NewCampus!): Campus!
   createCampusAdministrator(data: NewCampusAdministrator!): CampusAdministrator!
@@ -2189,6 +2192,8 @@ input NewAuditLogin {
 }
 
 input NewCampus {
+  consecutive: String
+  daneCodeCampus: String
   name: String
   schoolId: String
 }

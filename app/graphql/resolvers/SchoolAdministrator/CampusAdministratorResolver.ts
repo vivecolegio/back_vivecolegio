@@ -109,13 +109,47 @@ export class CampusAdministratorResolver {
     let resultUser = await this.repositoryUser.save(modelUser);
     const model = await this.repository.create({
       ...dataProcess,
-      userId: resultUser.id,
+      userId: resultUser.id.toString(),
       active: true,
       version: 0,
       createdByUserId,
     });
     let result = await this.repository.save(model);
     return result;
+  }
+
+  @Mutation(() => Boolean)
+  public async createAllInitialsCampusAdministrators() {
+    let campus = await this.repositoryCampus.find();
+    for (let campu of campus) {
+      let campusAdministrators = await this.repository.findBy({ active: true, campusId: { $in: [campu.id.toString()] } })
+      if (campusAdministrators.length < 1) {
+        let passwordHash = await bcrypt
+          .hash(campu.consecutive ? campu.consecutive : "VIVE2022", BCRYPT_SALT_ROUNDS)
+          .then(function (hashedPassword: any) {
+            return hashedPassword;
+          });
+        const modelUser = await this.repositoryUser.create({
+          name: 'Admin',
+          lastName: campu.name,
+          username: campu.consecutive,
+          password: passwordHash,
+          roleId: '61955190882a2fb6525a3075',
+          active: true,
+          version: 0,
+        });
+        let resultUser = await this.repositoryUser.save(modelUser);
+        const model = await this.repository.create({
+          schoolId: [campu.schoolId ? campu.schoolId : ""],
+          campusId: [campu.id.toString()],
+          userId: resultUser.id.toString(),
+          active: true,
+          version: 0,
+        });
+        let result = await this.repository.save(model);
+      }
+    }
+    return true;
   }
 
   @Mutation(() => CampusAdministrator)

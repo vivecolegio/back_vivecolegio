@@ -7,5 +7,11 @@ export class NewCampus implements Partial<Campus> {
   name?: string;
 
   @Field({ nullable: true })
+  daneCodeCampus?: string;
+
+  @Field({ nullable: true })
+  consecutive?: string;
+
+  @Field({ nullable: true })
   schoolId?: string;
 }
