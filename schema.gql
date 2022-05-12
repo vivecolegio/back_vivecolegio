@@ -1899,6 +1899,7 @@ type Mutation {
   createAcademicPeriod(data: NewAcademicPeriod!): AcademicPeriod!
   createAcademicSchedule(data: NewAcademicSchedule!): AcademicSchedule!
   createAcademicStandard(data: NewAcademicStandard!): AcademicStandard!
+  createAllSchoolAdminsitrators: Boolean!
   createAuditLogin(data: NewAuditLogin!): AuditLogin!
   createCampus(data: NewCampus!): Campus!
   createCampusAdministrator(data: NewCampusAdministrator!): CampusAdministrator!

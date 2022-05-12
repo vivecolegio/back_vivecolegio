@@ -105,13 +105,46 @@ export class SchoolAdministratorResolver {
     let resultUser = await this.repositoryUser.save(modelUser);
     const model = await this.repository.create({
       ...dataProcess,
-      userId: resultUser.id,
+      userId: resultUser.id.toString(),
       active: true,
       version: 0,
       createdByUserId,
     });
     let result = await this.repository.save(model);
     return result;
+  }
+
+  @Mutation(() => Boolean)
+  public async createAllSchoolAdminsitrators() {
+    let schools = await this.repositorySchool.find();
+    for (let school of schools) {
+      let schoolAdministrators = await this.repositorySchool.findBy({ active: true, schoolId: school.id.toString() })
+      if (schoolAdministrators.length < 1) {
+        let passwordHash = await bcrypt
+          .hash(school.daneCode ? school.daneCode : "VIVE2022", BCRYPT_SALT_ROUNDS)
+          .then(function (hashedPassword: any) {
+            return hashedPassword;
+          });
+        const modelUser = await this.repositoryUser.create({
+          name: 'Admin',
+          lastName: school.name,
+          username: school.daneCode,
+          password: passwordHash,
+          roleId: '6195519c882a2fb6525a3076',
+          active: true,
+          version: 0,
+        });
+        let resultUser = await this.repositoryUser.save(modelUser);
+        const model = await this.repository.create({
+          schoolId: [school.id.toString()],
+          userId: resultUser.id.toString(),
+          active: true,
+          version: 0,
+        });
+        let result = await this.repository.save(model);
+      }
+    }
+    return true;
   }
 
   @Mutation(() => SchoolAdministrator)
