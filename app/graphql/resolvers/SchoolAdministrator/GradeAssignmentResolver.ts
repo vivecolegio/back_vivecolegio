@@ -45,33 +45,66 @@ export class GradeAssignmentResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => String) schoolId: String,
+    @Arg('academicGradeId', () => String, { nullable: true }) academicGradeId: string,
   ): Promise<GradeAssignmentConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
-        result = await this.repository.findBy({
-          where: { schoolId },
-          order: { createdAt: 'DESC' },
-        });
+        if (academicGradeId) {
+          result = await this.repository.findBy({
+            where: { schoolId, academicGradeId },
+            order: { createdAt: 'DESC' },
+          });
+        } else {
+          result = await this.repository.findBy({
+            where: { schoolId },
+            order: { createdAt: 'DESC' },
+          });
+        }
       } else {
-        result = await this.repository.findBy({ where: { schoolId } });
+        if (academicGradeId) {
+          result = await this.repository.findBy({ where: { schoolId, academicGradeId } });
+        } else {
+          result = await this.repository.findBy({ where: { schoolId } });
+        }
       }
     } else {
       if (orderCreated) {
-        result = await this.repository.findBy({
-          where: {
-            schoolId,
-            active: true,
-          },
-          order: { createdAt: 'DESC' },
-        });
+        if (academicGradeId) {
+          result = await this.repository.findBy({
+            where: {
+              schoolId,
+              academicGradeId,
+              active: true,
+            },
+            order: { createdAt: 'DESC' },
+          });
+        } else {
+          result = await this.repository.findBy({
+            where: {
+              schoolId,
+              active: true,
+            },
+            order: { createdAt: 'DESC' },
+          });
+        }
       } else {
-        result = await this.repository.findBy({
-          where: {
-            schoolId,
-            active: true,
-          },
-        });
+        if (academicGradeId) {
+          result = await this.repository.findBy({
+            where: {
+              schoolId,
+              academicGradeId,
+              active: true,
+            },
+          });
+        } else {
+          result = await this.repository.findBy({
+            where: {
+              schoolId,
+              active: true,
+            },
+          });
+        }
       }
     }
     let resultConn = new GradeAssignmentConnection();

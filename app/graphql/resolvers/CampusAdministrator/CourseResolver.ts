@@ -46,15 +46,25 @@ export class CourseResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('campusId', () => String) campusId: String,
+    @Arg('schoolId', () => String, { nullable: true }) schoolId: String,
     @Arg('academicGradeId', () => String, { nullable: true }) academicGradeId: String,
   ): Promise<CourseConnection> {
     let result;
+    let campusDataIds: any[] = [];
+    if (schoolId) {
+      const campusData = await this.repositoryCampus.findBy({ schoolId, active: true });
+      campusData.forEach((campus: any) => {
+        campusDataIds.push(campus.id.toString());
+      });
+    } else {
+      campusDataIds.push(campusId);
+    }
     if (allData) {
       if (orderCreated) {
         if (academicGradeId) {
           result = await this.repository.findBy({
             where: {
-              campusId,
+              campusId: { $in: [campusDataIds] },
               academicGradeId
             },
             order: { createdAt: 'DESC' },
@@ -62,7 +72,7 @@ export class CourseResolver {
         } else {
           result = await this.repository.findBy({
             where: {
-              campusId,
+              campusId: { $in: [campusDataIds] },
             },
             order: { createdAt: 'DESC' },
           });
@@ -71,14 +81,14 @@ export class CourseResolver {
         if (academicGradeId) {
           result = await this.repository.findBy({
             where: {
-              campusId,
+              campusId: { $in: [campusDataIds] },
               academicGradeId
             },
           });
         } else {
           result = await this.repository.findBy({
             where: {
-              campusId,
+              campusId: { $in: [campusDataIds] },
             },
           });
         }
@@ -88,7 +98,7 @@ export class CourseResolver {
         if (academicGradeId) {
           result = await this.repository.findBy({
             where: {
-              campusId,
+              campusId: { $in: [campusDataIds] },
               academicGradeId,
               active: true,
             },
@@ -97,7 +107,7 @@ export class CourseResolver {
         } else {
           result = await this.repository.findBy({
             where: {
-              campusId,
+              campusId: { $in: [campusDataIds] },
               active: true,
             },
             order: { createdAt: 'DESC' },
@@ -107,7 +117,7 @@ export class CourseResolver {
         if (academicGradeId) {
           result = await this.repository.findBy({
             where: {
-              campusId,
+              campusId: { $in: [campusDataIds] },
               academicGradeId,
               active: true,
             },
@@ -115,7 +125,7 @@ export class CourseResolver {
         } else {
           result = await this.repository.findBy({
             where: {
-              campusId,
+              campusId: { $in: [campusDataIds] },
               active: true,
             },
           });

@@ -2726,6 +2726,7 @@ type Query {
   ): AcademicAreaConnection!
   getAllAcademicAsignature(
     academicAreaId: String
+    academicGradeId: String
 
     """Paginate after opaque cursor"""
     after: String
@@ -2976,6 +2977,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    schoolId: String
   ): CourseConnection!
   getAllDocumentType(
     """Paginate after opaque cursor"""
