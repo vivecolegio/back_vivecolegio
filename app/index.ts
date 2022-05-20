@@ -1,10 +1,12 @@
 import { ApolloGateway, IntrospectAndCompose } from '@apollo/gateway';
+import { Ipware } from '@fullerstack/nax-ipware';
 import FileUploadDataSource from '@profusion/apollo-federation-upload';
 import { ApolloServerPluginLandingPageLocalDefault, ApolloServerPluginLandingPageProductionDefault } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import Cors from 'cors';
 import Express from 'express';
 import { expressjwt } from 'express-jwt';
+import geoip from 'geoip-lite';
 import { graphqlUploadExpress } from 'graphql-upload';
 import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
 import path from 'path';
@@ -26,22 +28,7 @@ async function app() {
           url,
           willSendRequest({ request, context }: any) {
             request.http.headers.set('user', context.user ? JSON.stringify(context.user) : null);
-            request.http.headers.set('requestedUrl', context.requestedUrl ? JSON.stringify(context.requestedUrl) : null);
-
-            console.log('Headers: ' + JSON.stringify(context.req.headers));
-            console.log('IP: ' + JSON.stringify(context.req.ip));
-
-            // var geo = geoip.lookup(context.req.ip);
-
-            // console.log("Browser: " + context.req.headers["user-agent"]);
-            // console.log("Language: " + context.req.headers["accept-language"]);
-            // console.log("Country: " + (geo ? geo.country : "Unknown"));
-            // console.log("Region: " + (geo ? geo.region : "Unknown"));
-
-            // console.log(geo);
-            // request.http.headers.set('geo', geo);
-            //request.http.headers.set('geo', context.geo ? JSON.stringify(context.geo) : null);
-            //console.log(context);
+            request.http.headers.set('requestData', context.requestData ? JSON.stringify(context.requestData) : null);
           },
         });
       },
@@ -86,6 +73,7 @@ async function app() {
         }
       ],
     };
+    const ipware = new Ipware();
 
     const server = new ApolloServer({
       schema,
@@ -98,9 +86,17 @@ async function app() {
       ],
       introspection: true,
       context: (context: any) => {
-        const requestedUrl = context.req.protocol + "://" + context.req.get("host") + context.req.url;
         const user = context.req?.auth || null;
-        return { user, requestedUrl };
+        var geo = geoip.lookup(context.req.ip);
+        const requestData = {
+          ip: JSON.stringify(context.req.ip),
+          geo: geo,
+          browser: context.req.headers["user-agent"],
+          language: context.req.headers["accept-language"],
+          ipware: ipware.getClientIP(context.req),
+          ipwarePublic: ipware.getClientIP(context.req, { publicOnly: true })
+        }
+        return { user, requestData };
       },
     });
 

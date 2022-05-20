@@ -5,6 +5,12 @@ export interface IContext {
     exp: any;
     sub: any;
   };
-  geo: any;
-  requestedUrl: any;
+  requestData: {
+    ip: any;
+    geo: any;
+    browser: any;
+    language:any;
+    ipware: any;
+    ipwarePublic: any;
+  }
 }

@@ -174,15 +174,13 @@ async function app() {
         console.error(error);
       });
 
-    const server = new ApolloServer({
+    const server = new ApolloServer({ 
       //schema: applyMiddleware(federatedSchema, permissions),
       schema: federatedSchema,
       context: ({ req }: any) => {
         const user = req?.headers?.user ? JSON.parse(req?.headers?.user) : null;
-        const geo = req?.headers?.geo ? JSON.parse(req?.headers?.geo) : null;
-        const requestedUrl = req?.headers?.requestedUrl ? JSON.parse(req?.headers?.requestedUrl) : null;
-        console.log(req?.headers);
-        return { user, geo, requestedUrl };
+        const requestData = req?.headers?.requestData ? JSON.parse(req?.headers?.requestData) : null;
+        return { user, requestData };
       },
       introspection: true,
       plugins: [
