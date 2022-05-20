@@ -4,10 +4,9 @@ import { ApolloServerPluginLandingPageLocalDefault, ApolloServerPluginLandingPag
 import { ApolloServer } from 'apollo-server-express';
 import Cors from 'cors';
 import Express from 'express';
-import expressJwt from 'express-jwt';
+import { expressjwt } from 'express-jwt';
 import { graphqlUploadExpress } from 'graphql-upload';
 import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
-import Morgan from 'morgan';
 import path from 'path';
 import 'reflect-metadata';
 import { port, SERVER_NAME_APP, SERVER_PORT_APP } from './config/index';
@@ -27,6 +26,22 @@ async function app() {
           url,
           willSendRequest({ request, context }: any) {
             request.http.headers.set('user', context.user ? JSON.stringify(context.user) : null);
+            request.http.headers.set('requestedUrl', context.requestedUrl ? JSON.stringify(context.requestedUrl) : null);
+
+            console.log('Headers: ' + JSON.stringify(context.req.headers));
+            console.log('IP: ' + JSON.stringify(context.req.ip));
+
+            // var geo = geoip.lookup(context.req.ip);
+
+            // console.log("Browser: " + context.req.headers["user-agent"]);
+            // console.log("Language: " + context.req.headers["accept-language"]);
+            // console.log("Country: " + (geo ? geo.country : "Unknown"));
+            // console.log("Region: " + (geo ? geo.region : "Unknown"));
+
+            // console.log(geo);
+            // request.http.headers.set('geo', geo);
+            //request.http.headers.set('geo', context.geo ? JSON.stringify(context.geo) : null);
+            //console.log(context);
           },
         });
       },
@@ -83,8 +98,9 @@ async function app() {
       ],
       introspection: true,
       context: (context: any) => {
-        const user = context.req.user || null;
-        return { user };
+        const requestedUrl = context.req.protocol + "://" + context.req.get("host") + context.req.url;
+        const user = context.req?.auth || null;
+        return { user, requestedUrl };
       },
     });
 
@@ -92,7 +108,7 @@ async function app() {
 
     // Middlewares
     app.use(require('express-status-monitor')(configExpressStatusMonitor));
-    app.use(Morgan('common'));
+    //app.use(Morgan('common'));
     // app.use(Helmet({
     //   contentSecurityPolicy: false,
     // }));
@@ -104,7 +120,7 @@ async function app() {
     app.use('/public', Express.static(path.join(__dirname, '../public')));
     app.use(Express.json());
     app.use(
-      expressJwt({
+      expressjwt({
         secret: 'f1BtnWgD3VKY',
         algorithms: ['HS256'],
         credentialsRequired: false,

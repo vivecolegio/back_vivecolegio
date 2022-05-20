@@ -4,7 +4,7 @@ import { ApolloServerPluginLandingPageLocalDefault, ApolloServerPluginLandingPag
 import { ApolloServer } from 'apollo-server-express';
 import Cors from 'cors';
 import Express from 'express';
-import expressJwt from 'express-jwt';
+import { expressjwt } from 'express-jwt';
 import { graphqlUploadExpress } from 'graphql-upload';
 import Morgan from 'morgan';
 import path from 'path';
@@ -102,7 +102,7 @@ async function app() {
     app.use('/public', Express.static(path.join(__dirname, '../public')));
     app.use(Express.json());
     app.use(
-      expressJwt({
+      expressjwt({
         secret: 'f1BtnWgD3VKY',
         algorithms: ['HS256'],
         credentialsRequired: false,

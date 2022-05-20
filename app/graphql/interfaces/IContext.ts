@@ -5,4 +5,6 @@ export interface IContext {
     exp: any;
     sub: any;
   };
+  geo: any;
+  requestedUrl: any;
 }

@@ -179,7 +179,10 @@ async function app() {
       schema: federatedSchema,
       context: ({ req }: any) => {
         const user = req?.headers?.user ? JSON.parse(req?.headers?.user) : null;
-        return { user };
+        const geo = req?.headers?.geo ? JSON.parse(req?.headers?.geo) : null;
+        const requestedUrl = req?.headers?.requestedUrl ? JSON.parse(req?.headers?.requestedUrl) : null;
+        console.log(req?.headers);
+        return { user, geo, requestedUrl };
       },
       introspection: true,
       plugins: [

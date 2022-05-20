@@ -2088,6 +2088,7 @@ type Mutation {
   updateStudent(data: NewStudent!, id: String!): Student!
   updateTeacher(data: NewTeacher!, id: String!): Teacher!
   updateUser(data: NewUser!, id: String!): User!
+  userProfileUploadImage(file: Upload, id: String!): Boolean!
 }
 
 """The NavigationMethodTestOnline Register"""
@@ -2726,7 +2727,6 @@ type Query {
   ): AcademicAreaConnection!
   getAllAcademicAsignature(
     academicAreaId: String
-    academicGradeId: String
 
     """Paginate after opaque cursor"""
     after: String
@@ -3404,6 +3404,8 @@ type Query {
     orderCreated: Boolean!
   ): GeneralPerformanceLevelConnection!
   getAllGradeAssignment(
+    academicGradeId: String
+
     """Paginate after opaque cursor"""
     after: String
     allData: Boolean!

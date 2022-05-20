@@ -1,6 +1,5 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity, ManyToOne } from 'typeorm';
-import { Lazy } from '../../../types';
+import { Column, Entity } from 'typeorm';
 import { IModelData } from '../../interfaces/IModelData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { User } from './User';
@@ -8,9 +7,8 @@ import { User } from './User';
 @ObjectType({ description: 'The AuditLogin model', implements: IModelData })
 @Entity()
 export class AuditLogin extends IModelData {
-  @ManyToOne(() => User, (data) => data.id, { lazy: true })
-  @Field(() => User, { nullable: true })
-  user?: Lazy<User>;
+  @Field({ nullable: true })
+  user?: User;
 
   @Field({ nullable: true })
   @Column({ nullable: true })
@@ -38,10 +36,10 @@ export class AuditLogin extends IModelData {
 }
 
 @ObjectType()
-export class AuditLoginEdge extends EdgeType('AuditLogin', AuditLogin) {}
+export class AuditLoginEdge extends EdgeType('AuditLogin', AuditLogin) { }
 
 @ObjectType()
 export class AuditLoginConnection extends ConnectionType<AuditLoginEdge>(
   'AuditLogin',
   AuditLoginEdge
-) {}
+) { }
