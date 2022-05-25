@@ -369,10 +369,16 @@ type AcademicStandardEdge {
 type AuditLogin implements IModelData {
   active: Boolean
   auth: Boolean
+  browser: String
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  geo: String
   id: ID!
+  ip: String
+  ipware: String
+  ipwarePublic: String
+  language: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String

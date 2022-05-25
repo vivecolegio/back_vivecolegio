@@ -7,7 +7,7 @@ import ShortUniqueId from 'short-unique-id';
 import { finished } from 'stream/promises';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { CampusAdministratorRepository, CampusCoordinatorRepository, CampusRepository, DocumentTypeRepository, GenderRepository, GuardianRepository, MenuItemRepository, MenuRepository, RoleRepository, SchoolAdministratorRepository, SchoolRepository, StudentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
+import { AuditLoginRepository, CampusAdministratorRepository, CampusCoordinatorRepository, CampusRepository, DocumentTypeRepository, GenderRepository, GuardianRepository, MenuItemRepository, MenuRepository, RoleRepository, SchoolAdministratorRepository, SchoolRepository, StudentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
 import { IContext } from '../../interfaces/IContext';
@@ -26,6 +26,7 @@ import { CampusAdministrator } from '../../models/SchoolAdministrator/CampusAdmi
 import { CampusCoordinator } from '../../models/SchoolAdministrator/CampusCoordinator';
 import { Jwt } from '../../modelsUtils/Jwt';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
+import { AuditLogin } from './../../models/GeneralAdministrator/AuditLogin';
 import { Campus } from './../../models/GeneralAdministrator/Campus';
 
 const BCRYPT_SALT_ROUNDS = 12;
@@ -73,6 +74,9 @@ export class UserResolver {
 
   @InjectRepository(School)
   private repositorySchool = SchoolRepository;
+
+  @InjectRepository(AuditLogin)
+  private repositoryAuditLogin = AuditLoginRepository;
 
   @Query(() => User, { nullable: true })
   async getUser(@Arg('id', () => String) id: string) {
@@ -244,7 +248,7 @@ export class UserResolver {
   }
 
   @Mutation(() => Jwt)
-  async login(@Arg('username') username: string, @Arg('password') password: string) {
+  async login(@Arg('username') username: string, @Arg('password') password: string,  @Ctx() context: IContext) {
     let user = await this.repository.findOneBy({ where: { username } });
     let compare = await bcrypt.compare(password, user?.password as string);
     let jwtUtil = new Jwt();
@@ -362,6 +366,21 @@ export class UserResolver {
         jwtUtil.jwt = jwtS;
       }
     }
+    console.log(context);
+    const modelAuditLogin = await this.repositoryAuditLogin.create({
+      userId: user?.id.toString(),
+      username: username,
+      ip: context?.requestData?.ip,
+      geo: context?.requestData?.geo,
+      browser: context?.requestData?.browser,
+      language: context?.requestData?.language,
+      ipware: context?.requestData?.ipware,
+      ipwarePublic: context?.requestData?.ipwarePublic,
+      auth: compare,
+      active: true,
+      version: 0,
+    });
+    let resultAuditLogin = await this.repositoryAuditLogin.save(modelAuditLogin);
     return jwtUtil;
   }
 

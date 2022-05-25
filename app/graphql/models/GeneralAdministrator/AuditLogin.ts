@@ -20,15 +20,27 @@ export class AuditLogin extends IModelData {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  userIp?: string;
+  ip?: string;
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  userPort?: string;
+  geo?: string;
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  userAgent?: string;
+  browser?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  language?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  ipware?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  ipwarePublic?: string;
 
   @Field({ nullable: true })
   @Column({ nullable: true })

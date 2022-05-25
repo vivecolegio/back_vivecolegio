@@ -28,7 +28,7 @@ async function app() {
           url,
           willSendRequest({ request, context }: any) {
             request.http.headers.set('user', context.user ? JSON.stringify(context.user) : null);
-            request.http.headers.set('requestData', context.requestData ? JSON.stringify(context.requestData) : null);
+            request.http.headers.set('requestdata', context.requestdata ? JSON.stringify(context.requestdata) : null);
           },
         });
       },
@@ -88,7 +88,7 @@ async function app() {
       context: (context: any) => {
         const user = context.req?.auth || null;
         var geo = geoip.lookup(context.req.ip);
-        const requestData = {
+        const requestdata = {
           ip: JSON.stringify(context.req.ip),
           geo: geo,
           browser: context.req.headers["user-agent"],
@@ -96,7 +96,7 @@ async function app() {
           ipware: ipware.getClientIP(context.req),
           ipwarePublic: ipware.getClientIP(context.req, { publicOnly: true })
         }
-        return { user, requestData };
+        return { user, requestdata };
       },
     });
 

@@ -179,7 +179,7 @@ async function app() {
       schema: federatedSchema,
       context: ({ req }: any) => {
         const user = req?.headers?.user ? JSON.parse(req?.headers?.user) : null;
-        const requestData = req?.headers?.requestData ? JSON.parse(req?.headers?.requestData) : null;
+        const requestData = req?.headers?.requestdata ? JSON.parse(req?.headers?.requestdata) : null;
         return { user, requestData };
       },
       introspection: true,
