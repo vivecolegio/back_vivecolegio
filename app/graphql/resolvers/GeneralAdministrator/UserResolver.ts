@@ -188,6 +188,32 @@ export class UserResolver {
   }
 
   @Mutation(() => Boolean)
+  async changePasswordUser(
+    @Arg('password', () => String) password: string,
+    @Arg('id', () => String) id: string,
+    @Ctx() context: IContext
+  ): Promise<Boolean | null> {
+    let updatedByUserId = context?.user?.authorization?.id;
+    let result = await this.repository.findOneBy(id);
+    if (password != null) {
+      let passwordHash = await bcrypt
+        .hash(password, BCRYPT_SALT_ROUNDS)
+        .then(function (hashedPassword) {
+          return hashedPassword;
+        });
+        result = await this.repository.save({
+          _id: new ObjectId(id),
+          ...result,
+          password: passwordHash,
+          version: (result?.version as number) + 1,
+          updatedByUserId,
+        });
+        return true;
+    }
+    return false;
+  }
+
+  @Mutation(() => Boolean)
   async deleteUser(
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
@@ -516,7 +542,7 @@ export class UserResolver {
       result = await this.repository.save({
         _id: new ObjectId(id),
         ...result,
-        profilePhoto: out.path.split('.').pop(),
+        profilePhoto: out.path,
         updatedByUserId,
         version: (result?.version as number) + 1,
       });

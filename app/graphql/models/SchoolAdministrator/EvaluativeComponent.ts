@@ -1,7 +1,9 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Column, Entity } from 'typeorm';
+import { EvaluativeComponentType } from '../../enums/EvaluativeComponentType';
 import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
+import { AcademicArea } from './AcademicArea';
 import { AcademicAsignature } from './AcademicAsignature';
 
 @ObjectType({ description: 'The EvaluativeComponent model', implements: IModelSchoolData })
@@ -17,7 +19,11 @@ export class EvaluativeComponent extends IModelSchoolData {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  default?: true;
+  default?: Boolean;
+
+  @Field(()=> EvaluativeComponentType, { nullable: true })
+  @Column({ nullable: true })
+  type?: EvaluativeComponentType;
 
   @Field(() => [String], { nullable: true })
   @Column({ nullable: true })
@@ -25,6 +31,13 @@ export class EvaluativeComponent extends IModelSchoolData {
 
   @Field(() => [AcademicAsignature], { nullable: true })
   academicAsignatures?: AcademicAsignature[];
+  
+  @Field(() => [String], { nullable: true })
+  @Column({ nullable: true })
+  academicAreasId?: String[];
+
+  @Field(() => [AcademicArea], { nullable: true })
+  academicAreas?: AcademicArea[];
 
 }
 

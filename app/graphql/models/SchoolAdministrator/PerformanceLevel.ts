@@ -1,7 +1,9 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Column, Entity } from 'typeorm';
+import { PerformanceLevelType } from '../../enums/PerformanceLevelType';
 import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
+import { Campus } from '../GeneralAdministrator/Campus';
 import { GeneralPerformanceLevel } from '../GeneralAdministrator/GeneralPerformanceLevel';
 
 @ObjectType({ description: 'The PerformanceLevel model', implements: IModelSchoolData })
@@ -19,12 +21,23 @@ export class PerformanceLevel extends IModelSchoolData {
   @Column({ nullable: true })
   topScore?: number;
 
+  @Field(()=> PerformanceLevelType, { nullable: true })
+  @Column({ nullable: true })
+  type?: PerformanceLevelType;
+
   @Field({ nullable: true })
   @Column({ nullable: true })
   generalPerformanceLevelId?: string;
 
   @Field({ nullable: true })
   generalPerformanceLevel?: GeneralPerformanceLevel;
+
+  @Field(() => [String], { nullable: true })
+  @Column({ nullable: true })
+  campusId?: String[];
+
+  @Field(() => [Campus], { nullable: true })
+  campus?: Campus[];
 }
 
 @ObjectType()
