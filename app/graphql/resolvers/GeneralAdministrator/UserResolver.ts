@@ -285,7 +285,10 @@ export class UserResolver {
         expiresIn: '1d',
       });
       if (user) {
-        jwtUtil.name = user.name + ' ' + user.lastName;
+        jwtUtil.name = user.name;
+        jwtUtil.lastName = user.lastName;
+        jwtUtil.username = user.username;
+        jwtUtil.profilePhoto = user.profilePhoto;
         jwtUtil.userId = user.id;
         let role = (await this.repositoryRole.findOneBy(user.roleId)) as Role;
         user.roleId ? (jwtUtil.role = role) : null;
@@ -392,7 +395,6 @@ export class UserResolver {
         jwtUtil.jwt = jwtS;
       }
     }
-    console.log(context);
     const modelAuditLogin = await this.repositoryAuditLogin.create({
       userId: user?.id.toString(),
       username: username,

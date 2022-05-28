@@ -11,10 +11,19 @@ export class Jwt {
   jwt?: string;
 
   @Field({ nullable: true })
+  userId?: string;
+
+  @Field({ nullable: true })
   name?: string;
 
   @Field({ nullable: true })
-  userId?: string;
+  lastName?: string;
+
+  @Field({ nullable: true })
+  username?: string;
+
+  @Field({ nullable: true })
+  profilePhoto?: string;
 
   @Field((_type) => [School], { nullable: true })
   schools?: School[];
