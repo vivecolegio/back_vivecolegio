@@ -2,12 +2,13 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicAsignatureRepository, EvaluativeComponentRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAreaRepository, AcademicAsignatureRepository, EvaluativeComponentRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewEvaluativeComponent } from '../../inputs/SchoolAdministrator/NewEvaluativeComponent';
 import { IContext } from '../../interfaces/IContext';
 import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
+import { AcademicArea } from '../../models/SchoolAdministrator/AcademicArea';
 import { AcademicAsignature } from '../../models/SchoolAdministrator/AcademicAsignature';
 import {
   EvaluativeComponent,
@@ -28,6 +29,9 @@ export class EvaluativeComponentResolver {
 
   @InjectRepository(AcademicAsignature)
   private repositoryAcademicAsignature = AcademicAsignatureRepository;
+
+  @InjectRepository(AcademicArea)
+  private repositoryAcademicArea = AcademicAreaRepository;
 
   @Query(() => EvaluativeComponent, { nullable: true })
   async getEvaluativeComponent(@Arg('id', () => String) id: string) {
@@ -228,6 +232,20 @@ export class EvaluativeComponentResolver {
         dataIds.push(new ObjectId(id));
       });
       const result = await this.repositoryAcademicAsignature.findBy({ where: { _id: { $in: dataIds } } });
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => [AcademicArea], { nullable: true })
+  async academicAreas(@Root() data: EvaluativeComponent) {
+    let ids = data.academicAreasId;
+    if (ids !== null && ids !== undefined) {
+      let dataIds: any[] = [];
+      ids.forEach(async (id: any) => {
+        dataIds.push(new ObjectId(id));
+      });
+      const result = await this.repositoryAcademicArea.findBy({ where: { _id: { $in: dataIds } } });
       return result;
     }
     return null;

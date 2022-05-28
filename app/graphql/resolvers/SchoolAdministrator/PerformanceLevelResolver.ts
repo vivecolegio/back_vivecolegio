@@ -2,10 +2,11 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { GeneralPerformanceLevelRepository, PerformanceLevelRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
+import { CampusRepository, GeneralPerformanceLevelRepository, PerformanceLevelRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewPerformanceLevel } from '../../inputs/SchoolAdministrator/NewPerformanceLevel';
 import { IContext } from '../../interfaces/IContext';
+import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { GeneralPerformanceLevel } from '../../models/GeneralAdministrator/GeneralPerformanceLevel';
 import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
@@ -28,6 +29,9 @@ export class PerformanceLevelResolver {
 
   @InjectRepository(School)
   private repositorySchool = SchoolRepository;
+
+  @InjectRepository(Campus)
+  private repositoryCampus = CampusRepository;
 
   @Query(() => PerformanceLevel, { nullable: true })
   async getPerformanceLevel(@Arg('id', () => String) id: string) {
@@ -182,6 +186,20 @@ export class PerformanceLevelResolver {
     let id = data.schoolId;
     if (id !== null && id !== undefined) {
       const result = await this.repositorySchool.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => [Campus], { nullable: true })
+  async campus(@Root() data: PerformanceLevel) {
+    let ids = data.campusId;
+    if (ids !== null && ids !== undefined) {
+      let dataIds: any[] = [];
+      ids.forEach(async (id: any) => {
+        dataIds.push(new ObjectId(id));
+      });
+      const result = await this.repositoryCampus.findBy({ where: { _id: { $in: dataIds } } });
       return result;
     }
     return null;

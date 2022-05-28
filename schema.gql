@@ -383,10 +383,7 @@ type AuditLogin implements IModelData {
   updatedByUser: User
   updatedByUserId: String
   user: User
-  userAgent: String
   userId: String
-  userIp: String
-  userPort: String
   username: String
   version: Float
 }
@@ -721,6 +718,8 @@ type EmailEdge {
 
 """The EvaluativeComponent model"""
 type EvaluativeComponent implements IModelSchoolData {
+  academicAreas: [AcademicArea!]
+  academicAreasId: [String!]
   academicAsignatures: [AcademicAsignature!]
   academicAsignaturesId: [String!]
   active: Boolean
@@ -732,6 +731,7 @@ type EvaluativeComponent implements IModelSchoolData {
   name: String
   school: School
   schoolId: String
+  type: EvaluativeComponentType
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -751,6 +751,12 @@ type EvaluativeComponentEdge {
   """Used in `before` and `after` args"""
   cursor: String!
   node: EvaluativeComponent!
+}
+
+"""The EvaluativeComponentType Register"""
+enum EvaluativeComponentType {
+  AREA
+  ASIGNATURE
 }
 
 """The EvidenceLearning model"""
@@ -1895,6 +1901,7 @@ type Mutation {
   changeActiveStudent(active: Boolean!, id: String!): Boolean!
   changeActiveTeacher(active: Boolean!, id: String!): Boolean!
   changeActiveUser(active: Boolean!, id: String!): Boolean!
+  changePasswordUser(id: String!, password: String!): Boolean!
   createAcademicArea(data: NewAcademicArea!): AcademicArea!
   createAcademicAsignature(data: NewAcademicAsignature!): AcademicAsignature!
   createAcademicAsignatureCourse(data: NewAcademicAsignatureCourse!): AcademicAsignatureCourse!
@@ -2528,6 +2535,7 @@ input NewNotification {
 }
 
 input NewPerformanceLevel {
+  campusId: [String!]
   generalPerformanceLevelId: String
   minimumScore: Float
   name: String
@@ -2673,6 +2681,8 @@ type PageInfo {
 """The PerformanceLevel model"""
 type PerformanceLevel implements IModelSchoolData {
   active: Boolean
+  campus: [Campus!]
+  campusId: [String!]
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
@@ -2684,6 +2694,7 @@ type PerformanceLevel implements IModelSchoolData {
   school: School
   schoolId: String
   topScore: Float
+  type: PerformanceLevelType
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -2702,6 +2713,12 @@ type PerformanceLevelEdge {
   """Used in `before` and `after` args"""
   cursor: String!
   node: PerformanceLevel!
+}
+
+"""The PerformanceLevelType Register"""
+enum PerformanceLevelType {
+  QUALITATIVE
+  QUANTITATIVE
 }
 
 type Query {
