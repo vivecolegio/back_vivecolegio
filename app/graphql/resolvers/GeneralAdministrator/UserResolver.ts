@@ -418,108 +418,112 @@ export class UserResolver {
     let user = await this.repository.findOneBy(userId);
     let jwtUtil = new Jwt();
     if (user) {
-      jwtUtil.name = user.name + ' ' + user.lastName;
-      jwtUtil.userId = user.id;
-      let role = (await this.repositoryRole.findOneBy(user.roleId)) as Role;
-      user.roleId ? (jwtUtil.role = role) : null;
-      let campusId;
-      let schoolId;
-      if (role.isSchoolAdministrator) {
-        let userRole = await this.repositorySchoolAdministrator.findBy({
-          where: { userId: user.id.toString() },
-        });
-        if (userRole && userRole.length > 0) {
-          schoolId = userRole[0].schoolId;
+      jwtUtil.name = user.name;
+        jwtUtil.lastName = user.lastName;
+        jwtUtil.username = user.username;
+        jwtUtil.profilePhoto = user.profilePhoto;
+        jwtUtil.userId = user.id;
+        let role = (await this.repositoryRole.findOneBy(user.roleId)) as Role;
+        user.roleId ? (jwtUtil.role = role) : null;
+        let campusId;
+        let schoolId;
+        if (role.isSchoolAdministrator) {
+          let userRole = await this.repositorySchoolAdministrator.findBy({
+            where: { userId: user.id.toString() },
+          });
+          if (userRole && userRole.length > 0) {
+            schoolId = userRole[0].schoolId;
+          }
         }
-      }
-      if (role.isCampusAdministrator) {
-        let userRole = await this.repositoryCampusAdministrator.findBy({
-          where: { userId: user.id.toString() },
-        });
-        if (userRole && userRole.length > 0) {
-          schoolId = userRole[0].schoolId;
-          campusId = userRole[0].campusId;
+        if (role.isCampusAdministrator) {
+          let userRole = await this.repositoryCampusAdministrator.findBy({
+            where: { userId: user.id.toString() },
+          });
+          if (userRole && userRole.length > 0) {
+            schoolId = userRole[0].schoolId;
+            campusId = userRole[0].campusId;
+          }
         }
-      }
-      if (role.isCampusCoordinator) {
-        let userRole = await this.repositoryCampusCoordinator.findBy({
-          where: { userId: user.id.toString() },
-        });
-        if (userRole && userRole.length > 0) {
-          schoolId = userRole[0].schoolId;
-          campusId = userRole[0].campusId;
+        if (role.isCampusCoordinator) {
+          let userRole = await this.repositoryCampusCoordinator.findBy({
+            where: { userId: user.id.toString() },
+          });
+          if (userRole && userRole.length > 0) {
+            schoolId = userRole[0].schoolId;
+            campusId = userRole[0].campusId;
+          }
         }
-      }
-      if (role.isStudent) {
-        let userRole = await this.repositoryStudent.findBy({
-          where: { userId: user.id.toString() },
-        });
-        if (userRole && userRole.length > 0) {
-          schoolId = userRole[0].schoolId;
-          campusId = userRole[0].campusId;
+        if (role.isStudent) {
+          let userRole = await this.repositoryStudent.findBy({
+            where: { userId: user.id.toString() },
+          });
+          if (userRole && userRole.length > 0) {
+            schoolId = userRole[0].schoolId;
+            campusId = userRole[0].campusId;
+            jwtUtil.student = userRole[0];
+          }
         }
-      }
-      if (role.isTeacher) {
-        let userRole = await this.repositoryTeacher.findBy({
-          where: { userId: user.id.toString() },
-        });
-        if (userRole && userRole.length > 0) {
-          schoolId = userRole[0].schoolId;
-          campusId = userRole[0].campusId;
+        if (role.isTeacher) {
+          let userRole = await this.repositoryTeacher.findBy({
+            where: { userId: user.id.toString() },
+          });
+          if (userRole && userRole.length > 0) {
+            schoolId = userRole[0].schoolId;
+            campusId = userRole[0].campusId;
+          }
         }
-      }
-      if (role.isGuardian) {
-        let userRole = await this.repositoryGuardian.findBy({
-          where: { userId: user.id.toString() },
-        });
-        if (userRole && userRole.length > 0) {
-          schoolId = userRole[0].schoolId;
-          campusId = userRole[0].campusId;
+        if (role.isGuardian) {
+          let userRole = await this.repositoryGuardian.findBy({
+            where: { userId: user.id.toString() },
+          });
+          if (userRole && userRole.length > 0) {
+            schoolId = userRole[0].schoolId;
+            campusId = userRole[0].campusId;
+          }
         }
-      }
-      let campus;
-      let school;
-      if (campusId !== undefined) {
-        let campusIds: any[] = [];
-        campusId.forEach((id: any) => {
-          campusIds.push(new ObjectId(id))
-        })
-        campus = await this.repositoryCampus.findBy({
-          where: { _id: { $in: campusIds } },
-        });
-      }
-      if (schoolId) {
-        let schoolIds: any[] = [];
-        schoolId.forEach((id: any) => {
-          schoolIds.push(new ObjectId(id))
-        })
-        school = await this.repositorySchool.findBy({
-          where: { _id: { $in: schoolIds } },
-        });
-      }
-      if (campus && campus !== undefined) {
-        jwtUtil.campus = campus;
-      }
-      if (school && school !== undefined) {
-        jwtUtil.schools = school;
-      }
-      if (user.roleId) {
-        let menus = await this.repositoryMenu.findBy({
-          where: { rolesId: { $in: [user.roleId] }, active: true },
-          order: { order: 'ASC' },
-        });
-        for (let index = 0; index < menus.length; index++) {
-          let menusItems = await this.repositoryMenuItem.findBy({
-            where: {
-              menuId: menus[index].id.toString(),
-              rolesId: { $in: [user?.roleId] },
-              active: true,
-            },
+        let campus;
+        let school;
+        if (campusId !== undefined) {
+          let campusIds: any[] = [];
+          campusId.forEach((id: any) => {
+            campusIds.push(new ObjectId(id))
+          })
+          campus = await this.repositoryCampus.findBy({
+            where: { _id: { $in: campusIds } },
+          });
+        }
+        if (schoolId) {
+          let schoolIds: any[] = [];
+          schoolId.forEach((id: any) => {
+            schoolIds.push(new ObjectId(id))
+          })
+          school = await this.repositorySchool.findBy({
+            where: { _id: { $in: schoolIds } },
+          });
+        }
+        if (campus && campus !== undefined) {
+          jwtUtil.campus = campus;
+        }
+        if (school && school !== undefined) {
+          jwtUtil.schools = school;
+        }
+        if (user.roleId) {
+          let menus = await this.repositoryMenu.findBy({
+            where: { rolesId: { $in: [user.roleId] }, active: true },
             order: { order: 'ASC' },
           });
-          menus[index].menuItemsLogin = menusItems as [MenuItem];
-        }
-        jwtUtil.roleMenus = menus as [Menu];
+          for (let index = 0; index < menus.length; index++) {
+            let menusItems = await this.repositoryMenuItem.findBy({
+              where: {
+                menuId: menus[index].id.toString(),
+                rolesId: { $in: [user?.roleId] },
+                active: true,
+              },
+              order: { order: 'ASC' },
+            });
+            menus[index].menuItemsLogin = menusItems as [MenuItem];
+          }
+          jwtUtil.roleMenus = menus as [Menu];
       }
     }
     return jwtUtil;
