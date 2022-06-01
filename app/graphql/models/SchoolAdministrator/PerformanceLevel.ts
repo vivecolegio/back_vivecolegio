@@ -1,5 +1,6 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Column, Entity } from 'typeorm';
+import { PerformanceLevelCategory } from '../../enums/PerformanceLevelCategory';
 import { PerformanceLevelType } from '../../enums/PerformanceLevelType';
 import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
@@ -21,9 +22,13 @@ export class PerformanceLevel extends IModelSchoolData {
   @Column({ nullable: true })
   topScore?: number;
 
-  @Field(()=> PerformanceLevelType, { nullable: true })
+  @Field(() => PerformanceLevelType, { nullable: true })
   @Column({ nullable: true })
   type?: PerformanceLevelType;
+
+  @Field(() => PerformanceLevelCategory, { nullable: true })
+  @Column({ nullable: true })
+  category?: PerformanceLevelCategory;
 
   @Field({ nullable: true })
   @Column({ nullable: true })

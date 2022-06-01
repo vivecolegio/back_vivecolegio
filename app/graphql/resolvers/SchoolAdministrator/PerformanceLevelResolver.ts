@@ -2,8 +2,16 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { CampusRepository, GeneralPerformanceLevelRepository, PerformanceLevelRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  CampusRepository,
+  GeneralPerformanceLevelRepository,
+  PerformanceLevelRepository,
+  SchoolRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
+import { PerformanceLevelCategory } from '../../enums/PerformanceLevelCategory';
+import { PerformanceLevelType } from '../../enums/PerformanceLevelType';
 import { NewPerformanceLevel } from '../../inputs/SchoolAdministrator/NewPerformanceLevel';
 import { IContext } from '../../interfaces/IContext';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
@@ -12,7 +20,7 @@ import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import {
   PerformanceLevel,
-  PerformanceLevelConnection
+  PerformanceLevelConnection,
 } from '../../models/SchoolAdministrator/PerformanceLevel';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
@@ -44,7 +52,7 @@ export class PerformanceLevelResolver {
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
-    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('schoolId', () => String) schoolId: String
   ): Promise<PerformanceLevelConnection> {
     let result;
     if (allData) {
@@ -90,6 +98,15 @@ export class PerformanceLevelResolver {
   ): Promise<PerformanceLevel> {
     let dataProcess: NewPerformanceLevel = removeEmptyStringElements(data);
     let createdByUserId = context?.user?.authorization?.id;
+    if (dataProcess?.type == PerformanceLevelType.QUALITATIVE) {
+      dataProcess.minimumScore = undefined;
+      dataProcess.topScore = undefined;
+    }
+    if (dataProcess?.campusId && dataProcess?.campusId?.length > 0) {
+      dataProcess.category = PerformanceLevelCategory.CAMPUS;
+    } else {
+      dataProcess.category = PerformanceLevelCategory.SCHOOL;
+    }
     const model = await this.repository.create({
       ...dataProcess,
       active: true,
@@ -109,6 +126,15 @@ export class PerformanceLevelResolver {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOneBy(id);
+    if (dataProcess?.type == PerformanceLevelType.QUALITATIVE) {
+      dataProcess.minimumScore = undefined;
+      dataProcess.topScore = undefined;
+    }
+    if (dataProcess?.campusId && dataProcess?.campusId?.length > 0) {
+      dataProcess.category = PerformanceLevelCategory.CAMPUS;
+    } else {
+      dataProcess.category = PerformanceLevelCategory.SCHOOL;
+    }
     result = await this.repository.save({
       _id: new ObjectId(id),
       ...result,

@@ -726,7 +726,6 @@ type EvaluativeComponent implements IModelSchoolData {
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
-  default: Boolean
   id: ID!
   name: String
   school: School
@@ -757,6 +756,7 @@ type EvaluativeComponentEdge {
 enum EvaluativeComponentType {
   AREA
   ASIGNATURE
+  GENERAL
 }
 
 """The EvidenceLearning model"""
@@ -1613,12 +1613,15 @@ type InboxEdge {
 type Jwt {
   campus: [Campus!]
   jwt: String
+  lastName: String
   name: String
+  profilePhoto: String
   role: Role
   roleMenus: [Menu!]
   schools: [School!]
   student: Student
   userId: String
+  username: String
 }
 
 """The Learning model"""
@@ -2287,8 +2290,12 @@ input NewEmail {
 }
 
 input NewEvaluativeComponent {
+  academicAreasId: [String!]
+  academicAsignaturesId: [String!]
+  default: Boolean
   name: String
   schoolId: String
+  type: EvaluativeComponentType
   weight: Float
 }
 
@@ -2536,11 +2543,13 @@ input NewNotification {
 
 input NewPerformanceLevel {
   campusId: [String!]
+  category: PerformanceLevelCategory
   generalPerformanceLevelId: String
   minimumScore: Float
   name: String
   schoolId: String
   topScore: Float
+  type: PerformanceLevelType
 }
 
 input NewQuestionBankTestOnline {
@@ -2683,6 +2692,7 @@ type PerformanceLevel implements IModelSchoolData {
   active: Boolean
   campus: [Campus!]
   campusId: [String!]
+  category: PerformanceLevelCategory
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
@@ -2699,6 +2709,12 @@ type PerformanceLevel implements IModelSchoolData {
   updatedByUser: User
   updatedByUserId: String
   version: Float
+}
+
+"""The PerformanceLevelCategory Register"""
+enum PerformanceLevelCategory {
+  CAMPUS
+  SCHOOL
 }
 
 type PerformanceLevelConnection {

@@ -2,7 +2,13 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicAsignatureRepository, AcademicGradeRepository, GradeAssignmentRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  AcademicAsignatureRepository,
+  AcademicGradeRepository,
+  GradeAssignmentRepository,
+  SchoolRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewGradeAssignment } from '../../inputs/SchoolAdministrator/NewGradeAssignment';
 import { IContext } from '../../interfaces/IContext';
@@ -12,7 +18,7 @@ import { AcademicAsignature } from '../../models/SchoolAdministrator/AcademicAsi
 import { AcademicGrade } from '../../models/SchoolAdministrator/AcademicGrade';
 import {
   GradeAssignment,
-  GradeAssignmentConnection
+  GradeAssignmentConnection,
 } from '../../models/SchoolAdministrator/GradeAssignment';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
@@ -45,65 +51,108 @@ export class GradeAssignmentResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => String) schoolId: String,
-    @Arg('academicGradeId', () => String, { nullable: true }) academicGradeId: string,
+    @Arg('academicAsignatureId', () => String, { nullable: true }) academicAsignatureId: string,
+    @Arg('academicGradeId', () => String, { nullable: true }) academicGradeId: string
   ): Promise<GradeAssignmentConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
-        if (academicGradeId) {
+        if (academicAsignatureId && academicGradeId) {
           result = await this.repository.findBy({
-            where: { schoolId, academicGradeId },
+            where: { schoolId, academicAsignatureId, academicGradeId },
             order: { createdAt: 'DESC' },
           });
         } else {
-          result = await this.repository.findBy({
-            where: { schoolId },
-            order: { createdAt: 'DESC' },
-          });
+          if (academicAsignatureId) {
+            result = await this.repository.findBy({
+              where: { schoolId, academicAsignatureId },
+              order: { createdAt: 'DESC' },
+            });
+          } else {
+            result = await this.repository.findBy({
+              where: { schoolId, academicGradeId },
+              order: { createdAt: 'DESC' },
+            });
+          }
         }
       } else {
-        if (academicGradeId) {
-          result = await this.repository.findBy({ where: { schoolId, academicGradeId } });
+        if (academicAsignatureId && academicGradeId) {
+          result = await this.repository.findBy({
+            where: { schoolId, academicAsignatureId, academicGradeId },
+          });
         } else {
-          result = await this.repository.findBy({ where: { schoolId } });
+          if (academicAsignatureId) {
+            result = await this.repository.findBy({
+              where: { schoolId, academicAsignatureId },
+            });
+          } else {
+            result = await this.repository.findBy({
+              where: { schoolId, academicGradeId },
+            });
+          }
         }
       }
     } else {
       if (orderCreated) {
-        if (academicGradeId) {
+        if (academicAsignatureId && academicGradeId) {
           result = await this.repository.findBy({
             where: {
               schoolId,
+              academicAsignatureId,
               academicGradeId,
               active: true,
             },
             order: { createdAt: 'DESC' },
           });
         } else {
-          result = await this.repository.findBy({
-            where: {
-              schoolId,
-              active: true,
-            },
-            order: { createdAt: 'DESC' },
-          });
+          if (academicAsignatureId) {
+            result = await this.repository.findBy({
+              where: {
+                schoolId,
+                academicAsignatureId,
+                active: true,
+              },
+              order: { createdAt: 'DESC' },
+            });
+          } else {
+            result = await this.repository.findBy({
+              where: {
+                schoolId,
+                academicGradeId,
+                active: true,
+              },
+              order: { createdAt: 'DESC' },
+            });
+          }
         }
       } else {
-        if (academicGradeId) {
+        if (academicAsignatureId && academicGradeId) {
           result = await this.repository.findBy({
             where: {
               schoolId,
+              academicAsignatureId,
               academicGradeId,
               active: true,
             },
           });
         } else {
-          result = await this.repository.findBy({
-            where: {
-              schoolId,
-              active: true,
-            },
-          });
+          if (academicAsignatureId) {
+            result = await this.repository.findBy({
+              where: {
+                schoolId,
+                academicAsignatureId,
+                active: true,
+              },
+            });
+          } else {
+            result = await this.repository.findBy({
+              where: {
+                schoolId,
+                academicGradeId,
+                active: true,
+              },
+            });
+          }
         }
       }
     }

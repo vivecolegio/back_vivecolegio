@@ -17,11 +17,7 @@ export class EvaluativeComponent extends IModelSchoolData {
   @Column({ nullable: true })
   weight?: number;
 
-  @Field({ nullable: true })
-  @Column({ nullable: true })
-  default?: Boolean;
-
-  @Field(()=> EvaluativeComponentType, { nullable: true })
+  @Field(() => EvaluativeComponentType, { nullable: true })
   @Column({ nullable: true })
   type?: EvaluativeComponentType;
 
@@ -31,21 +27,20 @@ export class EvaluativeComponent extends IModelSchoolData {
 
   @Field(() => [AcademicAsignature], { nullable: true })
   academicAsignatures?: AcademicAsignature[];
-  
+
   @Field(() => [String], { nullable: true })
   @Column({ nullable: true })
   academicAreasId?: String[];
 
   @Field(() => [AcademicArea], { nullable: true })
   academicAreas?: AcademicArea[];
-
 }
 
 @ObjectType()
-export class EvaluativeComponentEdge extends EdgeType('EvaluativeComponent', EvaluativeComponent) { }
+export class EvaluativeComponentEdge extends EdgeType('EvaluativeComponent', EvaluativeComponent) {}
 
 @ObjectType()
 export class EvaluativeComponentConnection extends ConnectionType<EvaluativeComponentEdge>(
   'EvaluativeComponent',
   EvaluativeComponentEdge
-) { }
+) {}
