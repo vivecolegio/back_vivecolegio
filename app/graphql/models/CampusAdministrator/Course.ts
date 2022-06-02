@@ -4,11 +4,11 @@ import { IModelCampusData } from '../../interfaces/IModelCampusData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { AcademicGrade } from '../SchoolAdministrator/AcademicGrade';
 import { AcademicDay } from './AcademicDay';
+import { Teacher } from './Teacher';
 
 @ObjectType({ description: 'The Course model', implements: IModelCampusData })
 @Entity()
 export class Course extends IModelCampusData {
-
   @Field({ nullable: true })
   @Column({ nullable: true })
   academicGradeId?: string;
@@ -34,10 +34,17 @@ export class Course extends IModelCampusData {
   @Field(() => [String], { nullable: true })
   @Column({ nullable: true })
   studentsId?: String[];
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  teacherId?: string;
+
+  @Field({ nullable: true })
+  teacher?: Teacher;
 }
 
 @ObjectType()
-export class CourseEdge extends EdgeType('Course', Course) { }
+export class CourseEdge extends EdgeType('Course', Course) {}
 
 @ObjectType()
-export class CourseConnection extends ConnectionType<CourseEdge>('Course', CourseEdge) { }
+export class CourseConnection extends ConnectionType<CourseEdge>('Course', CourseEdge) {}

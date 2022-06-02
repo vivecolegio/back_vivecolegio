@@ -9,38 +9,44 @@ import { Teacher } from './Teacher';
 @ObjectType({ description: 'The AcademicAsignatureCourse model', implements: IModelCampusData })
 @Entity()
 export class AcademicAsignatureCourse extends IModelCampusData {
-    @Field({ nullable: true })
-    @Column({ nullable: true })
-    academicAsignatureId?: string;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  hourlyIntensity?: number;
 
-    @Field({ nullable: true })
-    academicAsignature?: AcademicAsignature;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  academicAsignatureId?: string;
 
-    @Field({ nullable: true })
-    @Column({ nullable: true })
-    courseId?: string;
+  @Field({ nullable: true })
+  academicAsignature?: AcademicAsignature;
 
-    @Field({ nullable: true })
-    course?: Course;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  courseId?: string;
 
-    @Field({ nullable: true })
-    @Column({ nullable: true })
-    weight?: number;
+  @Field({ nullable: true })
+  course?: Course;
 
-    @Field({ nullable: true })
-    @Column({ nullable: true })
-    teacherId?: string;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  weight?: number;
 
-    @Field({ nullable: true })
-    teacher?: Teacher;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  teacherId?: string;
 
+  @Field({ nullable: true })
+  teacher?: Teacher;
 }
 
 @ObjectType()
-export class AcademicAsignatureCourseEdge extends EdgeType('AcademicAsignatureCourse', AcademicAsignatureCourse) { }
+export class AcademicAsignatureCourseEdge extends EdgeType(
+  'AcademicAsignatureCourse',
+  AcademicAsignatureCourse
+) {}
 
 @ObjectType()
 export class AcademicAsignatureCourseConnection extends ConnectionType<AcademicAsignatureCourseEdge>(
-    'AcademicAsignatureCourse',
-    AcademicAsignatureCourseEdge
-) { }
+  'AcademicAsignatureCourse',
+  AcademicAsignatureCourseEdge
+) {}

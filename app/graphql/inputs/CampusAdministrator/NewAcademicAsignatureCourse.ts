@@ -3,18 +3,21 @@ import { AcademicAsignatureCourse } from '../../models/CampusAdministrator/Acade
 
 @InputType()
 export class NewAcademicAsignatureCourse implements Partial<AcademicAsignatureCourse> {
-    @Field({ nullable: true })
-    campusId?: string;
+  @Field({ nullable: true })
+  hourlyIntensity?: number;
 
-    @Field({ nullable: true })
-    academicAsignatureId?: string;
+  @Field({ nullable: true })
+  campusId?: string;
 
-    @Field({ nullable: true })
-    courseId?: string;
+  @Field({ nullable: true })
+  academicAsignatureId?: string;
 
-    @Field({ nullable: true })
-    weight?: number;
+  @Field({ nullable: true })
+  courseId?: string;
 
-    @Field({ nullable: true })
-    teacherId?: string;
+  @Field({ nullable: true })
+  weight?: number;
+
+  @Field({ nullable: true })
+  teacherId?: string;
 }

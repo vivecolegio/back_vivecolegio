@@ -10,7 +10,11 @@ import { AcademicGrade } from './AcademicGrade';
 export class GradeAssignment extends IModelSchoolData {
   @Field({ nullable: true })
   @Column({ nullable: true })
-  hourlyintensity?: number;
+  minHourlyIntensity?: number;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  maxHourlyIntensity?: number;
 
   @Field({ nullable: true })
   @Column({ nullable: true })

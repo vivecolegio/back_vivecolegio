@@ -4,7 +4,10 @@ import { GradeAssignment } from '../../models/SchoolAdministrator/GradeAssignmen
 @InputType()
 export class NewGradeAssignment implements Partial<GradeAssignment> {
   @Field({ nullable: true })
-  hourlyintensity?: number;
+  minHourlyIntensity?: number;
+
+  @Field({ nullable: true })
+  maxHourlyIntensity?: number;
 
   @Field({ nullable: true })
   academicGradeId?: string;
