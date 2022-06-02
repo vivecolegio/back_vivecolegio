@@ -2,14 +2,18 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { GeneralAcademicAreaRepository, GeneralAcademicAsignatureRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  GeneralAcademicAreaRepository,
+  GeneralAcademicAsignatureRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewGeneralAcademicAsignature } from '../../inputs/GeneralAdministrator/NewGeneralAcademicAsignature';
 import { IContext } from '../../interfaces/IContext';
 import { GeneralAcademicArea } from '../../models/GeneralAdministrator/GeneralAcademicArea';
 import {
   GeneralAcademicAsignature,
-  GeneralAcademicAsignatureConnection
+  GeneralAcademicAsignatureConnection,
 } from '../../models/GeneralAdministrator/GeneralAcademicAsignature';
 import { User } from '../../models/GeneralAdministrator/User';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
@@ -35,31 +39,64 @@ export class GeneralAcademicAsignatureResolver {
   async getAllGeneralAcademicAsignature(
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
-    @Arg('orderCreated', () => Boolean) orderCreated: Boolean
+    @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
+    @Arg('generalAcademicAreaId', () => String, { nullable: true }) generalAcademicAreaId: string
   ): Promise<GeneralAcademicAsignatureConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
-        result = await this.repository.findBy({
-          order: { createdAt: 'DESC' },
-        });
+        if (generalAcademicAreaId) {
+          result = await this.repository.findBy({
+            where: { generalAcademicAreaId },
+            order: { createdAt: 'DESC' },
+          });
+        } else {
+          result = await this.repository.findBy({
+            order: { createdAt: 'DESC' },
+          });
+        }
       } else {
-        result = await this.repository.find();
+        if (generalAcademicAreaId) {
+          result = await this.repository.findBy({
+            where: { generalAcademicAreaId },
+          });
+        } else {
+          result = await this.repository.findBy({});
+        }
       }
     } else {
       if (orderCreated) {
-        result = await this.repository.findBy({
-          where: {
-            active: true,
-          },
-          order: { createdAt: 'DESC' },
-        });
+        if (generalAcademicAreaId) {
+          result = await this.repository.findBy({
+            where: {
+              generalAcademicAreaId,
+              active: true,
+            },
+            order: { createdAt: 'DESC' },
+          });
+        } else {
+          result = await this.repository.findBy({
+            where: {
+              active: true,
+            },
+            order: { createdAt: 'DESC' },
+          });
+        }
       } else {
-        result = await this.repository.findBy({
-          where: {
-            active: true,
-          },
-        });
+        if (generalAcademicAreaId) {
+          result = await this.repository.findBy({
+            where: {
+              generalAcademicAreaId,
+              active: true,
+            },
+          });
+        } else {
+          result = await this.repository.findBy({
+            where: {
+              active: true,
+            },
+          });
+        }
       }
     }
     let resultConn = new GeneralAcademicAsignatureConnection();
