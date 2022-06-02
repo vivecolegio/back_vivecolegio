@@ -8,6 +8,7 @@ import {
   CampusRepository,
   CourseRepository,
   StudentRepository,
+  TeacherRepository,
   UserRepository,
 } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
@@ -15,6 +16,7 @@ import { NewCourse } from '../../inputs/CampusAdministrator/NewCourse';
 import { IContext } from '../../interfaces/IContext';
 import { AcademicDay } from '../../models/CampusAdministrator/AcademicDay';
 import { Course, CourseConnection } from '../../models/CampusAdministrator/Course';
+import { Teacher } from '../../models/CampusAdministrator/Teacher';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { Student } from '../../models/GeneralAdministrator/Student';
 import { User } from '../../models/GeneralAdministrator/User';
@@ -40,6 +42,9 @@ export class CourseResolver {
 
   @InjectRepository(AcademicDay)
   private repositoryAcademicDay = AcademicDayRepository;
+
+  @InjectRepository(Teacher)
+  private repositoryTeacher = TeacherRepository;
 
   @Query(() => Course, { nullable: true })
   async getCourse(@Arg('id', () => String) id: string) {
@@ -272,6 +277,16 @@ export class CourseResolver {
         dataIds.push(new ObjectId(id));
       });
       const result = await this.repositoryStudent.findBy({ where: { _id: { $in: dataIds } } });
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => Teacher, { nullable: true })
+  async teacher(@Root() data: Course) {
+    let id = data.teacherId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryTeacher.findOneBy(id);
       return result;
     }
     return null;
