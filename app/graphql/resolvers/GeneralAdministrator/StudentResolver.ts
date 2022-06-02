@@ -267,19 +267,27 @@ export class StudentResolver {
 
   @FieldResolver((_type) => School, { nullable: true })
   async school(@Root() data: Student) {
-    let id = data.schoolId;
-    if (id !== null && id !== undefined) {
-      const result = await this.repositorySchool.findBy({ where: { _id: { $in: id } } });
+    let ids = data.schoolId;
+    if (ids !== null && ids !== undefined) {
+      let dataIds: any[] = [];
+      ids.forEach(async (id: any) => {
+        dataIds.push(new ObjectId(id));
+      });
+      const result = await this.repositorySchool.findBy({ where: { _id: { $in: dataIds } } });
       return result;
     }
     return null;
   }
 
-  @FieldResolver((_type) => Campus, { nullable: true })
+  @FieldResolver((_type) => [Campus], { nullable: true })
   async campus(@Root() data: Student) {
-    let id = data.campusId;
-    if (id !== null && id !== undefined) {
-      const result = await this.repositoryCampus.findBy({ where: { _id: { $in: id } } });
+    let ids = data.campusId;
+    if (ids !== null && ids !== undefined) {
+      let dataIds: any[] = [];
+      ids.forEach(async (id: any) => {
+        dataIds.push(new ObjectId(id));
+      });
+      const result = await this.repositoryCampus.findBy({ where: { _id: { $in: dataIds } } });
       return result;
     }
     return null;

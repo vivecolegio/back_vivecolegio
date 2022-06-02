@@ -3796,7 +3796,7 @@ type Query {
 
     """Paginate before opaque cursor"""
     before: String
-    campusId: String!
+    campusId: String
 
     """Paginate first"""
     first: Float
@@ -3804,7 +3804,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
-    schoolId: String!
+    schoolId: String
   ): StudentConnection!
   getAllTeacher(
     """Paginate after opaque cursor"""

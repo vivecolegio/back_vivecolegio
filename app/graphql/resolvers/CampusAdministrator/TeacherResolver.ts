@@ -183,7 +183,7 @@ export class TeacherResolver {
                   .then(function (hashedPassword: any) {
                     return hashedPassword;
                   });
-                console.log(docente.fechanacimiento);
+                let fechaNacimiento = docente.fechanacimiento?.split('/');
                 const modelUser = await this.repositoryUser.create({
                   name: docente.empleado,
                   lastName: '',
@@ -192,8 +192,12 @@ export class TeacherResolver {
                   documentTypeId: '60cfc792445f133f9e261eae',
                   genderId:
                     docente.sexo == 'F' ? '60cfc51e445f133f9e261ead' : '60ecc36d6c716a21bee51e00',
-                  birthdate: docente.fechanacimiento
-                    ? new Date(docente.fechanacimiento)
+                  birthdate: fechaNacimiento
+                    ? new Date(
+                        Number(fechaNacimiento[2]),
+                        Number(fechaNacimiento[1]) - 1,
+                        Number(fechaNacimiento[0])
+                      )
                     : undefined,
                   phone: docente.telefono,
                   email: docente.email,
@@ -201,7 +205,7 @@ export class TeacherResolver {
                   active: true,
                   version: 0,
                 });
-                console.log(modelUser);
+                console.log(campus);
                 ///let resultUser = await this.repositoryUser.save(modelUser);
                 // const model = await this.repository.create({
                 //   schoolId: [school.id.toString()],
@@ -219,36 +223,6 @@ export class TeacherResolver {
     }
 
     return true;
-    // let schools = await this.repositorySchool.find();
-    // for (let school of schools) {
-    //   let schoolAdministrators = await this.repository.findBy({ active: true, schoolId: { $in: [school.id.toString()] } })
-    //   console.log(schoolAdministrators.length);
-    //   if (schoolAdministrators.length < 1) {
-    //     let passwordHash = await bcrypt
-    //       .hash(school.daneCode ? school.daneCode : "VIVE2022", BCRYPT_SALT_ROUNDS)
-    //       .then(function (hashedPassword: any) {
-    //         return hashedPassword;
-    //       });
-    //     const modelUser = await this.repositoryUser.create({
-    //       name: 'Admin',
-    //       lastName: school.name,
-    //       username: school.daneCode,
-    //       password: passwordHash,
-    //       roleId: '6195519c882a2fb6525a3076',
-    //       active: true,
-    //       version: 0,
-    //     });
-    //     let resultUser = await this.repositoryUser.save(modelUser);
-    //     const model = await this.repository.create({
-    //       schoolId: [school.id.toString()],
-    //       userId: resultUser.id.toString(),
-    //       active: true,
-    //       version: 0,
-    //     });
-    //     let result = await this.repository.save(model);
-    //   }
-    // }
-    // return true;
   }
 
   @Mutation(() => Teacher)
@@ -352,9 +326,13 @@ export class TeacherResolver {
 
   @FieldResolver((_type) => School, { nullable: true })
   async school(@Root() data: Teacher) {
-    let id = data.schoolId;
-    if (id !== null && id !== undefined) {
-      const result = await this.repositorySchool.findBy({ where: { _id: { $in: id } } });
+    let ids = data.schoolId;
+    if (ids !== null && ids !== undefined) {
+      let dataIds: any[] = [];
+      ids.forEach(async (id: any) => {
+        dataIds.push(new ObjectId(id));
+      });
+      const result = await this.repositorySchool.findBy({ where: { _id: { $in: dataIds } } });
       return result;
     }
     return null;
@@ -362,9 +340,13 @@ export class TeacherResolver {
 
   @FieldResolver((_type) => [Campus], { nullable: true })
   async campus(@Root() data: Teacher) {
-    let id = data.campusId;
-    if (id !== null && id !== undefined) {
-      const result = await this.repositoryCampus.findBy({ where: { _id: { $in: id } } });
+    let ids = data.campusId;
+    if (ids !== null && ids !== undefined) {
+      let dataIds: any[] = [];
+      ids.forEach(async (id: any) => {
+        dataIds.push(new ObjectId(id));
+      });
+      const result = await this.repositoryCampus.findBy({ where: { _id: { $in: dataIds } } });
       return result;
     }
     return null;
