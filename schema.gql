@@ -84,6 +84,7 @@ type AcademicAsignatureCourse implements IModelCampusData {
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  hourlyIntensity: Float
   id: ID!
   teacher: Teacher
   teacherId: String
@@ -586,6 +587,8 @@ type Course implements IModelCampusData {
   order: String
   students: [Student!]
   studentsId: [String!]
+  teacher: Teacher
+  teacherId: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -1481,8 +1484,9 @@ type GradeAssignment implements IModelSchoolData {
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
-  hourlyintensity: Float
   id: ID!
+  maxHourlyIntensity: Float
+  minHourlyIntensity: Float
   school: School
   schoolId: String
   updatedAt: DateTime
@@ -1919,6 +1923,7 @@ type Mutation {
   createAcademicStandard(data: NewAcademicStandard!): AcademicStandard!
   createAllInitialsCampusAdministrators: Boolean!
   createAllInitialsSchoolAdministrators: Boolean!
+  createAllInitialsTeachers: Boolean!
   createAuditLogin(data: NewAuditLogin!): AuditLogin!
   createCampus(data: NewCampus!): Campus!
   createCampusAdministrator(data: NewCampusAdministrator!): CampusAdministrator!
@@ -2137,6 +2142,7 @@ input NewAcademicAsignatureCourse {
   academicAsignatureId: String
   campusId: String
   courseId: String
+  hourlyIntensity: Float
   teacherId: String
   weight: Float
 }
@@ -2267,6 +2273,7 @@ input NewCourse {
   name: String
   order: String
   studentsId: [String!]
+  teacherId: String
 }
 
 input NewDocumentType {
@@ -2453,7 +2460,8 @@ input NewGeneralPerformanceLevel {
 input NewGradeAssignment {
   academicAsignatureId: String
   academicGradeId: String
-  hourlyintensity: Float
+  maxHourlyIntensity: Float
+  minHourlyIntensity: Float
   schoolId: String
 }
 
@@ -2789,7 +2797,8 @@ type Query {
 
     """Paginate before opaque cursor"""
     before: String
-    campusId: String!
+    campusId: String
+    courseId: String
 
     """Paginate first"""
     first: Float
@@ -2859,7 +2868,7 @@ type Query {
 
     """Paginate before opaque cursor"""
     before: String
-    campusId: String!
+    campusId: String
 
     """Paginate first"""
     first: Float
@@ -3359,6 +3368,7 @@ type Query {
 
     """Paginate first"""
     first: Float
+    generalAcademicAreaId: String
 
     """Paginate last"""
     last: Float
