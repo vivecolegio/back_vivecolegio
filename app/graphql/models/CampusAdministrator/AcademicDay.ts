@@ -11,16 +11,20 @@ export class AcademicDay extends IModelCampusData {
   @Column({ nullable: true })
   name?: string;
 
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  nameSIMAT?: string;
+
   @Field(() => [Day], { nullable: true })
   @Column({ nullable: true })
   day?: [Day];
 }
 
 @ObjectType()
-export class AcademicDayEdge extends EdgeType('AcademicDay', AcademicDay) { }
+export class AcademicDayEdge extends EdgeType('AcademicDay', AcademicDay) {}
 
 @ObjectType()
 export class AcademicDayConnection extends ConnectionType<AcademicDayEdge>(
   'AcademicDay',
   AcademicDayEdge
-) { }
+) {}

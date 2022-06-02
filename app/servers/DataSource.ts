@@ -21,6 +21,7 @@ import { QuestionBankTestOnline } from '../graphql/models/CampusAdministrator/Qu
 import { QuestionCategoryTestOnline } from '../graphql/models/CampusAdministrator/QuestionCategoryTestOnline';
 import { QuestionTestOnline } from '../graphql/models/CampusAdministrator/QuestionTestOnline';
 import { Teacher } from '../graphql/models/CampusAdministrator/Teacher';
+import { Estudiantes } from '../graphql/models/Data/Estudiantes';
 import { PlantaDocente } from '../graphql/models/Data/PlantaDocente';
 import { AuditLogin } from '../graphql/models/GeneralAdministrator/AuditLogin';
 import { Campus } from '../graphql/models/GeneralAdministrator/Campus';
@@ -63,6 +64,8 @@ import { Modality } from '../graphql/models/SchoolAdministrator/Modality';
 import { PerformanceLevel } from '../graphql/models/SchoolAdministrator/PerformanceLevel';
 import { SchoolYear } from '../graphql/models/SchoolAdministrator/SchoolYear';
 import { Specialty } from '../graphql/models/SchoolAdministrator/Specialty';
+import { Cursos } from './../graphql/models/Data/Cursos';
+import { Jornadas } from './../graphql/models/Data/Jornadas';
 
 export const dataSource = new DataSource({
   type: 'mongodb',
@@ -132,6 +135,9 @@ export const dataSource = new DataSource({
     QuestionCategoryTestOnline,
     ClassroomPlan,
     PlantaDocente,
+    Estudiantes,
+    Jornadas,
+    Cursos,
   ],
   synchronize: true,
   logger: 'advanced-console',
@@ -231,3 +237,6 @@ export const QuestionCategoryTestOnlineRepository = dataSource.getMongoRepositor
 );
 export const ClassroomPlanRepository = dataSource.getMongoRepository(ClassroomPlan);
 export const PlantaDocenteRepository = dataSource.getMongoRepository(PlantaDocente);
+export const EstudiantesRepository = dataSource.getMongoRepository(Estudiantes);
+export const JornadasRepository = dataSource.getMongoRepository(Jornadas);
+export const CursosRepository = dataSource.getMongoRepository(Cursos);

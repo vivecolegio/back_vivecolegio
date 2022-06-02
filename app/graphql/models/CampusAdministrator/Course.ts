@@ -41,6 +41,18 @@ export class Course extends IModelCampusData {
 
   @Field({ nullable: true })
   teacher?: Teacher;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  jornadaSIMAT?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  gradoCodSIMAT?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  grupoSIMAT?: string;
 }
 
 @ObjectType()

@@ -205,16 +205,19 @@ export class TeacherResolver {
                   active: true,
                   version: 0,
                 });
-                console.log(campus);
-                ///let resultUser = await this.repositoryUser.save(modelUser);
-                // const model = await this.repository.create({
-                //   schoolId: [school.id.toString()],
-                //   campusId: [campus[0].id.toString()],
-                //   userId: resultUser.id.toString(),
-                //   active: true,
-                //   version: 0,
-                // });
-                // let result = await this.repository.save(model);
+                //console.log(modelUser);
+                let resultUser = await this.repositoryUser.save(modelUser);
+                const model = await this.repository.create({
+                  schoolId: [school.id.toString()],
+                  campusId: [campus[0].id.toString()],
+                  userId: resultUser.id.toString(),
+                  active: true,
+                  version: 0,
+                });
+                //console.log(model);
+                let result = await this.repository.save(model);
+                count += 1;
+                console.log(count);
               }
             }
           }

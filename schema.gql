@@ -162,6 +162,7 @@ type AcademicDay implements IModelCampusData {
   day: [Day!]
   id: ID!
   name: String
+  nameSIMAT: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -582,7 +583,10 @@ type Course implements IModelCampusData {
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  gradoCodSIMAT: String
+  grupoSIMAT: String
   id: ID!
+  jornadaSIMAT: String
   name: String
   order: String
   students: [Student!]
@@ -1921,7 +1925,9 @@ type Mutation {
   createAcademicPeriod(data: NewAcademicPeriod!): AcademicPeriod!
   createAcademicSchedule(data: NewAcademicSchedule!): AcademicSchedule!
   createAcademicStandard(data: NewAcademicStandard!): AcademicStandard!
+  createAllInitialsAcademicDay: Boolean!
   createAllInitialsCampusAdministrators: Boolean!
+  createAllInitialsCourse: Boolean!
   createAllInitialsSchoolAdministrators: Boolean!
   createAllInitialsTeachers: Boolean!
   createAuditLogin(data: NewAuditLogin!): AuditLogin!
