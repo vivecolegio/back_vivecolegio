@@ -178,6 +178,82 @@ export class CourseResolver {
   }
 
   @Mutation(() => Boolean)
+  public async updateGradeAllInitialsCourse() {
+    let schools = await this.repositorySchool.find();
+    let count = 0;
+    for (let school of schools) {
+      let campus = await this.repositoryCampus.findBy({
+        where: { schoolId: school.id.toString() },
+      });
+      for (let campu of campus) {
+        let courses = await this.repository.findBy({
+          where: { academicGradeId: undefined, campusId: campu.id.toString() },
+        });
+        for (let course of courses) {
+          let generalAcademicGradeId = '';
+          switch (course.gradoCodSIMAT) {
+            case '0':
+              generalAcademicGradeId = '627deedcb3635b55532fbd00';
+              break;
+            case '1':
+              generalAcademicGradeId = '6256093f78f3395f6ca958eb';
+              break;
+            case '2':
+              generalAcademicGradeId = '62560c9078f3395f6ca958f4';
+              break;
+            case '3':
+              generalAcademicGradeId = '62560c9678f3395f6ca958f5';
+              break;
+            case '4':
+              generalAcademicGradeId = '62560c9b78f3395f6ca958f6';
+              break;
+            case '5':
+              generalAcademicGradeId = '62560ca278f3395f6ca958f7';
+              break;
+            case '6':
+              generalAcademicGradeId = '627dee7eb3635b55532fbcfa';
+              break;
+            case '7':
+              generalAcademicGradeId = '627dee88b3635b55532fbcfb';
+              break;
+            case '8':
+              generalAcademicGradeId = '627dee90b3635b55532fbcfc';
+              break;
+            case '9':
+              generalAcademicGradeId = '627dee97b3635b55532fbcfd';
+              break;
+            case '10':
+              generalAcademicGradeId = '627deeb4b3635b55532fbcfe';
+              break;
+            case '11':
+              generalAcademicGradeId = '627deebcb3635b55532fbcff';
+              break;
+          }
+
+          let academicGrade = await this.repositoryAcademicGrade.findBy({
+            where: {
+              schoolId: school.id.toString(),
+              generalAcademicGradeId,
+              active: true,
+            },
+          });
+          if (academicGrade.length === 1) {
+            const result = await this.repository.save({
+              _id: new ObjectId(course.id.toString()),
+              ...course,
+              academicGradeId: academicGrade[0].id.toString(),
+              version: (course?.version as number) + 1,
+            });
+            count += 1;
+            console.log(count);
+          }
+        }
+      }
+    }
+    return true;
+  }
+
+  @Mutation(() => Boolean)
   public async createAllInitialsCourse() {
     let schools = await this.repositorySchool.find();
     let count = 0;

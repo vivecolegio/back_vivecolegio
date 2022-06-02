@@ -2093,6 +2093,7 @@ type Mutation {
   updateGeneralAcademicStandard(data: NewGeneralAcademicStandard!, id: String!): GeneralAcademicStandard!
   updateGeneralBasicLearningRight(data: NewGeneralBasicLearningRight!, id: String!): GeneralBasicLearningRight!
   updateGeneralPerformanceLevel(data: NewGeneralPerformanceLevel!, id: String!): GeneralPerformanceLevel!
+  updateGradeAllInitialsCourse: Boolean!
   updateGradeAssignment(data: NewGradeAssignment!, id: String!): GradeAssignment!
   updateGuardian(data: NewGuardian!, id: String!): Guardian!
   updateInbox(data: NewInbox!, id: String!): Inbox!
