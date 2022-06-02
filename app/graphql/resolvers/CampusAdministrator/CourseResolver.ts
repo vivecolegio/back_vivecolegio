@@ -178,6 +178,42 @@ export class CourseResolver {
   }
 
   @Mutation(() => Boolean)
+  public async updateGradeAcademicDayAllInitialsCourse() {
+    let schools = await this.repositorySchool.find();
+    let count = 0;
+    for (let school of schools) {
+      let campus = await this.repositoryCampus.findBy({
+        where: { schoolId: school.id.toString() },
+      });
+      for (let campu of campus) {
+        let courses = await this.repository.findBy({
+          where: { academicDayId: undefined, campusId: campu.id.toString() },
+        });
+        for (let course of courses) {
+          let academicDay = await this.repositoryAcademicDay.findBy({
+            where: {
+              campusId: campu.id.toString(),
+              nameSIMAT: course.jornadaSIMAT,
+              active: true,
+            },
+          });
+          if (academicDay.length === 1) {
+            const result = await this.repository.save({
+              _id: new ObjectId(course.id.toString()),
+              ...course,
+              academicDayId: academicDay[0].id.toString(),
+              version: (course?.version as number) + 1,
+            });
+            count += 1;
+            console.log(count);
+          }
+        }
+      }
+    }
+    return true;
+  }
+
+  @Mutation(() => Boolean)
   public async updateGradeAllInitialsCourse() {
     let schools = await this.repositorySchool.find();
     let count = 0;
@@ -229,7 +265,6 @@ export class CourseResolver {
               generalAcademicGradeId = '627deebcb3635b55532fbcff';
               break;
           }
-
           let academicGrade = await this.repositoryAcademicGrade.findBy({
             where: {
               schoolId: school.id.toString(),
