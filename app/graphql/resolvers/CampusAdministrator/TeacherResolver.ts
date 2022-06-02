@@ -99,7 +99,6 @@ export class TeacherResolver {
         }
       } else {
         if (campusId) {
-          console.log('aca');
           result = await this.repository.findBy({
             where: {
               schoolId: { $in: schoolId },
@@ -107,7 +106,6 @@ export class TeacherResolver {
               active: true,
             },
           });
-          console.log(result, schoolId, campusId);
         } else {
           result = await this.repository.findBy({
             where: {
@@ -185,13 +183,15 @@ export class TeacherResolver {
                   .then(function (hashedPassword: any) {
                     return hashedPassword;
                   });
+                console.log(docente.fechanacimiento);
                 const modelUser = await this.repositoryUser.create({
                   name: docente.empleado,
                   lastName: '',
                   username: docente.documento,
                   password: passwordHash,
                   documentTypeId: '60cfc792445f133f9e261eae',
-                  genderId: docente.sexo,
+                  genderId:
+                    docente.sexo == 'F' ? '60cfc51e445f133f9e261ead' : '60ecc36d6c716a21bee51e00',
                   birthdate: docente.fechanacimiento
                     ? new Date(docente.fechanacimiento)
                     : undefined,

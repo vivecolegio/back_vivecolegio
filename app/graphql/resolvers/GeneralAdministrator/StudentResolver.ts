@@ -3,7 +3,14 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicGradeRepository, CampusRepository, CourseRepository, SchoolRepository, StudentRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  AcademicGradeRepository,
+  CampusRepository,
+  CourseRepository,
+  SchoolRepository,
+  StudentRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewStudent } from '../../inputs/GeneralAdministrator/NewStudent';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
@@ -49,37 +56,69 @@ export class StudentResolver {
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
-    @Arg('schoolId', () => String) schoolId: String,
-    @Arg('campusId', () => String) campusId: String,
+    @Arg('schoolId', () => String, { nullable: true }) schoolId: String,
+    @Arg('campusId', () => String, { nullable: true }) campusId: String
   ): Promise<StudentConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
-        result = await this.repository.findBy({
-          where: { schoolId, campusId },
-          order: { createdAt: 'DESC' },
-        });
+        if (campusId) {
+          result = await this.repository.findBy({
+            where: { schoolId, campusId },
+            order: { createdAt: 'DESC' },
+          });
+        } else {
+          result = await this.repository.findBy({
+            where: { schoolId },
+            order: { createdAt: 'DESC' },
+          });
+        }
       } else {
-        result = await this.repository.findBy({ where: { schoolId, campusId } });
+        if (campusId) {
+          result = await this.repository.findBy({
+            where: { schoolId, campusId },
+          });
+        } else {
+          result = await this.repository.findBy({ where: { schoolId } });
+        }
       }
     } else {
       if (orderCreated) {
-        result = await this.repository.findBy({
-          where: {
-            schoolId,
-            campusId,
-            active: true,
-          },
-          order: { createdAt: 'DESC' },
-        });
+        if (campusId) {
+          result = await this.repository.findBy({
+            where: {
+              schoolId,
+              campusId,
+              active: true,
+            },
+            order: { createdAt: 'DESC' },
+          });
+        } else {
+          result = await this.repository.findBy({
+            where: {
+              schoolId,
+              active: true,
+            },
+            order: { createdAt: 'DESC' },
+          });
+        }
       } else {
-        result = await this.repository.findBy({
-          where: {
-            schoolId,
-            campusId,
-            active: true,
-          },
-        });
+        if (campusId) {
+          result = await this.repository.findBy({
+            where: {
+              schoolId,
+              campusId,
+              active: true,
+            },
+          });
+        } else {
+          result = await this.repository.findBy({
+            where: {
+              schoolId,
+              active: true,
+            },
+          });
+        }
       }
     }
     let resultConn = new StudentConnection();
@@ -146,7 +185,7 @@ export class StudentResolver {
       let course = await this.repositoryCourse.findOneBy(data.courseId);
       let studentsId = course?.studentsId;
       if (studentsId == undefined || studentsId == null) {
-        studentsId = []
+        studentsId = [];
       }
       studentsId?.push(id);
       let resultCourse = await this.repositoryCourse.save({
