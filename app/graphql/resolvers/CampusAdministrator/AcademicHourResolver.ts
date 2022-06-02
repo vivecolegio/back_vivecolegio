@@ -45,47 +45,50 @@ export class AcademicHourResolver {
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
-    @Arg('campusId', () => String) campusId: String,
+    @Arg('campusId', () => String, { nullable: true }) campusId: String,
     @Arg('academicDayId', () => String, { nullable: true }) academicDayId: String
   ): Promise<AcademicHourConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
-        if (academicDayId) {
+        if (campusId && academicDayId) {
           result = await this.repository.findBy({
-            where: {
-              campusId,
-              academicDayId,
-            },
+            where: { campusId, academicDayId },
             order: { createdAt: 'DESC' },
           });
         } else {
-          result = await this.repository.findBy({
-            where: {
-              campusId,
-            },
-            order: { createdAt: 'DESC' },
-          });
+          if (campusId) {
+            result = await this.repository.findBy({
+              where: { campusId },
+              order: { createdAt: 'DESC' },
+            });
+          } else {
+            result = await this.repository.findBy({
+              where: { academicDayId },
+              order: { createdAt: 'DESC' },
+            });
+          }
         }
       } else {
-        if (academicDayId) {
+        if (campusId && academicDayId) {
           result = await this.repository.findBy({
-            where: {
-              campusId,
-              academicDayId,
-            },
+            where: { campusId, academicDayId },
           });
         } else {
-          result = await this.repository.findBy({
-            where: {
-              campusId,
-            },
-          });
+          if (campusId) {
+            result = await this.repository.findBy({
+              where: { campusId },
+            });
+          } else {
+            result = await this.repository.findBy({
+              where: { academicDayId },
+            });
+          }
         }
       }
     } else {
       if (orderCreated) {
-        if (academicDayId) {
+        if (campusId && academicDayId) {
           result = await this.repository.findBy({
             where: {
               campusId,
@@ -95,16 +98,26 @@ export class AcademicHourResolver {
             order: { createdAt: 'DESC' },
           });
         } else {
-          result = await this.repository.findBy({
-            where: {
-              campusId,
-              active: true,
-            },
-            order: { createdAt: 'DESC' },
-          });
+          if (campusId) {
+            result = await this.repository.findBy({
+              where: {
+                campusId,
+                active: true,
+              },
+              order: { createdAt: 'DESC' },
+            });
+          } else {
+            result = await this.repository.findBy({
+              where: {
+                academicDayId,
+                active: true,
+              },
+              order: { createdAt: 'DESC' },
+            });
+          }
         }
       } else {
-        if (academicDayId) {
+        if (campusId && academicDayId) {
           result = await this.repository.findBy({
             where: {
               campusId,
@@ -113,12 +126,21 @@ export class AcademicHourResolver {
             },
           });
         } else {
-          result = await this.repository.findBy({
-            where: {
-              campusId,
-              active: true,
-            },
-          });
+          if (campusId) {
+            result = await this.repository.findBy({
+              where: {
+                campusId,
+                active: true,
+              },
+            });
+          } else {
+            result = await this.repository.findBy({
+              where: {
+                academicDayId,
+                active: true,
+              },
+            });
+          }
         }
       }
     }
