@@ -2,14 +2,19 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicDayRepository, AcademicHourRepository, CampusRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  AcademicDayRepository,
+  AcademicHourRepository,
+  CampusRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicHour } from '../../inputs/CampusAdministrator/NewAcademicHour';
 import { IContext } from '../../interfaces/IContext';
 import { AcademicDay } from '../../models/CampusAdministrator/AcademicDay';
 import {
   AcademicHour,
-  AcademicHourConnection
+  AcademicHourConnection,
 } from '../../models/CampusAdministrator/AcademicHour';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { User } from '../../models/GeneralAdministrator/User';
@@ -41,7 +46,7 @@ export class AcademicHourResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('campusId', () => String) campusId: String,
-    @Arg('academicDayId', () => String, { nullable: true }) academicDayId: String,
+    @Arg('academicDayId', () => String, { nullable: true }) academicDayId: String
   ): Promise<AcademicHourConnection> {
     let result;
     if (allData) {
@@ -50,14 +55,14 @@ export class AcademicHourResolver {
           result = await this.repository.findBy({
             where: {
               campusId,
-              academicDayId
+              academicDayId,
             },
             order: { createdAt: 'DESC' },
           });
         } else {
           result = await this.repository.findBy({
             where: {
-              campusId
+              campusId,
             },
             order: { createdAt: 'DESC' },
           });
@@ -67,13 +72,13 @@ export class AcademicHourResolver {
           result = await this.repository.findBy({
             where: {
               campusId,
-              academicDayId
+              academicDayId,
             },
           });
         } else {
           result = await this.repository.findBy({
             where: {
-              campusId
+              campusId,
             },
           });
         }
@@ -85,7 +90,7 @@ export class AcademicHourResolver {
             where: {
               campusId,
               academicDayId,
-              active: true
+              active: true,
             },
             order: { createdAt: 'DESC' },
           });
@@ -93,7 +98,7 @@ export class AcademicHourResolver {
           result = await this.repository.findBy({
             where: {
               campusId,
-              active: true
+              active: true,
             },
             order: { createdAt: 'DESC' },
           });
@@ -104,14 +109,14 @@ export class AcademicHourResolver {
             where: {
               campusId,
               academicDayId,
-              active: true
+              active: true,
             },
           });
         } else {
           result = await this.repository.findBy({
             where: {
               campusId,
-              active: true
+              active: true,
             },
           });
         }

@@ -2,7 +2,11 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicDayRepository, CampusRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  AcademicDayRepository,
+  CampusRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicDay } from '../../inputs/CampusAdministrator/NewAcademicDay';
 import { IContext } from '../../interfaces/IContext';
@@ -34,20 +38,30 @@ export class AcademicDayResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('campusId', () => String) campusId: String,
+    @Arg('schoolId', () => String, { nullable: true }) schoolId: String
   ): Promise<AcademicDayConnection> {
     let result;
+    let campusDataIds: any[] = [];
+    if (schoolId) {
+      const campusData = await this.repositoryCampus.findBy({ schoolId, active: true });
+      campusData.forEach((campus: any) => {
+        campusDataIds.push(campus.id.toString());
+      });
+    } else {
+      campusDataIds.push(campusId);
+    }
     if (allData) {
       if (orderCreated) {
         result = await this.repository.findBy({
           where: {
-            campusId
+            campusId: { $in: campusDataIds },
           },
           order: { createdAt: 'DESC' },
         });
       } else {
         result = await this.repository.findBy({
           where: {
-            campusId
+            campusId: { $in: campusDataIds },
           },
         });
       }
@@ -55,7 +69,7 @@ export class AcademicDayResolver {
       if (orderCreated) {
         result = await this.repository.findBy({
           where: {
-            campusId,
+            campusId: { $in: campusDataIds },
             active: true,
           },
           order: { createdAt: 'DESC' },
@@ -63,7 +77,7 @@ export class AcademicDayResolver {
       } else {
         result = await this.repository.findBy({
           where: {
-            campusId,
+            campusId: { $in: campusDataIds },
             active: true,
           },
         });

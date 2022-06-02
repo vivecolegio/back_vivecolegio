@@ -2832,6 +2832,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    schoolId: String
   ): AcademicDayConnection!
   getAllAcademicGrade(
     """Paginate after opaque cursor"""
@@ -2866,6 +2867,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    schoolId: String
   ): AcademicHourConnection!
   getAllAcademicPeriod(
     """Paginate after opaque cursor"""
@@ -3443,6 +3445,7 @@ type Query {
     orderCreated: Boolean!
   ): GeneralPerformanceLevelConnection!
   getAllGradeAssignment(
+    academicAsignatureId: String
     academicGradeId: String
 
     """Paginate after opaque cursor"""

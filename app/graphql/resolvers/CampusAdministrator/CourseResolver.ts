@@ -2,7 +2,14 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicDayRepository, AcademicGradeRepository, CampusRepository, CourseRepository, StudentRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  AcademicDayRepository,
+  AcademicGradeRepository,
+  CampusRepository,
+  CourseRepository,
+  StudentRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewCourse } from '../../inputs/CampusAdministrator/NewCourse';
 import { IContext } from '../../interfaces/IContext';
@@ -47,7 +54,7 @@ export class CourseResolver {
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('campusId', () => String) campusId: String,
     @Arg('schoolId', () => String, { nullable: true }) schoolId: String,
-    @Arg('academicGradeId', () => String, { nullable: true }) academicGradeId: String,
+    @Arg('academicGradeId', () => String, { nullable: true }) academicGradeId: String
   ): Promise<CourseConnection> {
     let result;
     let campusDataIds: any[] = [];
@@ -64,15 +71,15 @@ export class CourseResolver {
         if (academicGradeId) {
           result = await this.repository.findBy({
             where: {
-              campusId: { $in: [campusDataIds] },
-              academicGradeId
+              campusId: { $in: campusDataIds },
+              academicGradeId,
             },
             order: { createdAt: 'DESC' },
           });
         } else {
           result = await this.repository.findBy({
             where: {
-              campusId: { $in: [campusDataIds] },
+              campusId: { $in: campusDataIds },
             },
             order: { createdAt: 'DESC' },
           });
@@ -81,14 +88,14 @@ export class CourseResolver {
         if (academicGradeId) {
           result = await this.repository.findBy({
             where: {
-              campusId: { $in: [campusDataIds] },
-              academicGradeId
+              campusId: { $in: campusDataIds },
+              academicGradeId,
             },
           });
         } else {
           result = await this.repository.findBy({
             where: {
-              campusId: { $in: [campusDataIds] },
+              campusId: { $in: campusDataIds },
             },
           });
         }
@@ -98,7 +105,7 @@ export class CourseResolver {
         if (academicGradeId) {
           result = await this.repository.findBy({
             where: {
-              campusId: { $in: [campusDataIds] },
+              campusId: { $in: campusDataIds },
               academicGradeId,
               active: true,
             },
@@ -107,7 +114,7 @@ export class CourseResolver {
         } else {
           result = await this.repository.findBy({
             where: {
-              campusId: { $in: [campusDataIds] },
+              campusId: { $in: campusDataIds },
               active: true,
             },
             order: { createdAt: 'DESC' },
@@ -117,7 +124,7 @@ export class CourseResolver {
         if (academicGradeId) {
           result = await this.repository.findBy({
             where: {
-              campusId: { $in: [campusDataIds] },
+              campusId: { $in: campusDataIds },
               academicGradeId,
               active: true,
             },
@@ -125,7 +132,7 @@ export class CourseResolver {
         } else {
           result = await this.repository.findBy({
             where: {
-              campusId: { $in: [campusDataIds] },
+              campusId: { $in: campusDataIds },
               active: true,
             },
           });
@@ -255,7 +262,6 @@ export class CourseResolver {
     }
     return null;
   }
-
 
   @FieldResolver((_type) => [Student], { nullable: true })
   async students(@Root() data: Course) {
