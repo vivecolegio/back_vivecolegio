@@ -3,7 +3,12 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { CampusAdministratorRepository, CampusRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  CampusAdministratorRepository,
+  CampusRepository,
+  SchoolRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
 import { NewCampusAdministrator } from '../../inputs/SchoolAdministrator/NewCampusAdministrator';
@@ -13,7 +18,7 @@ import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import {
   CampusAdministrator,
-  CampusAdministratorConnection
+  CampusAdministratorConnection,
 } from '../../models/SchoolAdministrator/CampusAdministrator';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
@@ -44,7 +49,7 @@ export class CampusAdministratorResolver {
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
-    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('schoolId', () => String) schoolId: String
   ): Promise<CampusAdministratorConnection> {
     let result;
     if (allData) {
@@ -92,9 +97,9 @@ export class CampusAdministratorResolver {
     let dataUserProcess: NewUser = removeEmptyStringElements(dataProcess.newUser);
     let createdByUserId = context?.user?.authorization?.id;
     delete dataProcess.newUser;
-    if (dataUserProcess.password != null) {
+    if (dataUserProcess.documentNumber != null) {
       let passwordHash = await bcrypt
-        .hash(dataUserProcess.password, BCRYPT_SALT_ROUNDS)
+        .hash(dataUserProcess.documentNumber, BCRYPT_SALT_ROUNDS)
         .then(function (hashedPassword: any) {
           return hashedPassword;
         });
@@ -122,10 +127,13 @@ export class CampusAdministratorResolver {
   public async createAllInitialsCampusAdministrators() {
     let campus = await this.repositoryCampus.find();
     for (let campu of campus) {
-      let campusAdministrators = await this.repository.findBy({ active: true, campusId: { $in: [campu.id.toString()] } })
+      let campusAdministrators = await this.repository.findBy({
+        active: true,
+        campusId: { $in: [campu.id.toString()] },
+      });
       if (campusAdministrators.length < 1) {
         let passwordHash = await bcrypt
-          .hash(campu.consecutive ? campu.consecutive : "VIVE2022", BCRYPT_SALT_ROUNDS)
+          .hash(campu.consecutive ? campu.consecutive : 'VIVE2022', BCRYPT_SALT_ROUNDS)
           .then(function (hashedPassword: any) {
             return hashedPassword;
           });
@@ -140,7 +148,7 @@ export class CampusAdministratorResolver {
         });
         let resultUser = await this.repositoryUser.save(modelUser);
         const model = await this.repository.create({
-          schoolId: [campu.schoolId ? campu.schoolId : ""],
+          schoolId: [campu.schoolId ? campu.schoolId : ''],
           campusId: [campu.id.toString()],
           userId: resultUser.id.toString(),
           active: true,

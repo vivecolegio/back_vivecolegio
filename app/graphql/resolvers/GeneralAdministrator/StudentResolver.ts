@@ -136,9 +136,9 @@ export class StudentResolver {
     let dataUserProcess: NewUser = removeEmptyStringElements(dataProcess.newUser);
     let createdByUserId = context?.user?.authorization?.id;
     delete dataProcess.newUser;
-    if (dataUserProcess.password != null) {
+    if (dataUserProcess.documentNumber != null) {
       let passwordHash = await bcrypt
-        .hash(dataUserProcess.password, BCRYPT_SALT_ROUNDS)
+        .hash(dataUserProcess.documentNumber, BCRYPT_SALT_ROUNDS)
         .then(function (hashedPassword: any) {
           return hashedPassword;
         });
