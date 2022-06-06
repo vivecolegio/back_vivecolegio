@@ -3,6 +3,7 @@ import { Column, Entity } from 'typeorm';
 import { IModelCampusData } from '../../interfaces/IModelCampusData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { AcademicAsignature } from '../SchoolAdministrator/AcademicAsignature';
+import { GradeAssignment } from '../SchoolAdministrator/GradeAssignment';
 import { Course } from './Course';
 import { Teacher } from './Teacher';
 
@@ -37,6 +38,13 @@ export class AcademicAsignatureCourse extends IModelCampusData {
 
   @Field({ nullable: true })
   teacher?: Teacher;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  gradeAssignmentId?: string;
+
+  @Field({ nullable: true })
+  gradeAssignment?: GradeAssignment;
 }
 
 @ObjectType()

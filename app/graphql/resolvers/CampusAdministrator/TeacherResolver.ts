@@ -166,13 +166,18 @@ export class TeacherResolver {
         where: { school_id: school.id.toString() },
       });
       for (let docente of data) {
-        if (docente.documento && docente.school_id && docente.sede_dane) {
+        if (
+          docente.documento &&
+          docente.school_id &&
+          docente.sede_dane &&
+          docente.cargo === 'Docente'
+        ) {
           if (
             docente.documento.length > 1 &&
             docente.school_id.length > 1 &&
             docente.sede_dane.length > 1
           ) {
-            let user = await this.repositoryUser.findBy({ documentNumber: docente.documento });
+            let user = await this.repositoryUser.findBy({ username: docente.documento });
             if (user.length === 0) {
               let campus = await this.repositoryCampus.findBy({
                 where: { consecutive: docente.sede_dane },
@@ -189,6 +194,7 @@ export class TeacherResolver {
                   lastName: '',
                   username: docente.documento,
                   password: passwordHash,
+                  documentNumber: docente.documento,
                   documentTypeId: '60cfc792445f133f9e261eae',
                   genderId:
                     docente.sexo == 'F' ? '60cfc51e445f133f9e261ead' : '60ecc36d6c716a21bee51e00',
@@ -224,7 +230,6 @@ export class TeacherResolver {
         }
       }
     }
-
     return true;
   }
 

@@ -8,6 +8,7 @@ import {
   CampusRepository,
   CourseRepository,
   ExperienceLearningRepository,
+  GradeAssignmentRepository,
   TeacherRepository,
   UserRepository,
 } from '../../../servers/DataSource';
@@ -24,6 +25,7 @@ import { Teacher } from '../../models/CampusAdministrator/Teacher';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicAsignature } from '../../models/SchoolAdministrator/AcademicAsignature';
+import { GradeAssignment } from '../../models/SchoolAdministrator/GradeAssignment';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
 @Resolver(AcademicAsignatureCourse)
@@ -48,6 +50,9 @@ export class AcademicAsignatureCourseResolver {
 
   @InjectRepository(ExperienceLearning)
   private repositoryExperienceLearning = ExperienceLearningRepository;
+
+  @InjectRepository(GradeAssignment)
+  private repositoryGradeAssignment = GradeAssignmentRepository;
 
   @Query(() => AcademicAsignatureCourse, { nullable: true })
   async getAcademicAsignatureCourse(@Arg('id', () => String) id: string) {
@@ -309,6 +314,16 @@ export class AcademicAsignatureCourseResolver {
     let id = data.teacherId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryTeacher.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => GradeAssignment, { nullable: true })
+  async gradeAssignment(@Root() data: AcademicAsignatureCourse) {
+    let id = data.gradeAssignmentId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryGradeAssignment.findOneBy(id);
       return result;
     }
     return null;

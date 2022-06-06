@@ -20,4 +20,7 @@ export class NewAcademicAsignatureCourse implements Partial<AcademicAsignatureCo
 
   @Field({ nullable: true })
   teacherId?: string;
+
+  @Field({ nullable: true })
+  gradeAssignmentId?: string;
 }

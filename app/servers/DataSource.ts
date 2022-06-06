@@ -43,6 +43,7 @@ import { Municipality } from '../graphql/models/GeneralAdministrator/Municipalit
 import { Notification } from '../graphql/models/GeneralAdministrator/Notification';
 import { Role } from '../graphql/models/GeneralAdministrator/Role';
 import { School } from '../graphql/models/GeneralAdministrator/School';
+import { SchoolAdministrative } from '../graphql/models/GeneralAdministrator/SchoolAdministrative';
 import { SchoolAdministrator } from '../graphql/models/GeneralAdministrator/SchoolAdministrator';
 import { Student } from '../graphql/models/GeneralAdministrator/Student';
 import { User } from '../graphql/models/GeneralAdministrator/User';
@@ -138,6 +139,7 @@ export const dataSource = new DataSource({
     Estudiantes,
     Jornadas,
     Cursos,
+    SchoolAdministrative,
   ],
   synchronize: true,
   logger: 'advanced-console',
@@ -240,3 +242,4 @@ export const PlantaDocenteRepository = dataSource.getMongoRepository(PlantaDocen
 export const EstudiantesRepository = dataSource.getMongoRepository(Estudiantes);
 export const JornadasRepository = dataSource.getMongoRepository(Jornadas);
 export const CursosRepository = dataSource.getMongoRepository(Cursos);
+export const SchoolAdministrativeRepository = dataSource.getMongoRepository(SchoolAdministrative);

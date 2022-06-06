@@ -2,7 +2,7 @@ import { buildSubgraphSchema } from '@apollo/federation';
 import { printSubgraphSchema } from '@apollo/subgraph';
 import {
   ApolloServerPluginLandingPageLocalDefault,
-  ApolloServerPluginLandingPageProductionDefault
+  ApolloServerPluginLandingPageProductionDefault,
 } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import express from 'express';
@@ -37,6 +37,7 @@ import { AuditLoginResolver } from '../graphql/resolvers/GeneralAdministrator/Au
 import { GenderResolver } from '../graphql/resolvers/GeneralAdministrator/GenderResolver';
 import { GeneralAcademicAsignatureResolver } from '../graphql/resolvers/GeneralAdministrator/GeneralAcademicAsignatureResolver';
 import { GeneralBasicLearningRightResolver } from '../graphql/resolvers/GeneralAdministrator/GeneralBasicLearningRightResolver';
+import { SchoolAdministrativeResolver } from '../graphql/resolvers/GeneralAdministrator/SchoolAdministrativeResolver';
 import { EvidenceLearningResolver } from '../graphql/resolvers/SchoolAdministrator/EvidenceLearningResolver';
 import { ForumInteractionResolver } from '../graphql/resolvers/SchoolAdministrator/ForumInteractionResolver';
 import { ForumResolver } from '../graphql/resolvers/SchoolAdministrator/ForumResolver';
@@ -152,7 +153,8 @@ async function app() {
         QuestionTestOnlineResolver,
         ClassroomPlanPerformanceAppraisalStrategyResolver,
         ClassroomPlanExpectedPerformanceResolver,
-        ClassroomPlanResolver
+        ClassroomPlanResolver,
+        SchoolAdministrativeResolver,
       ],
       emitSchemaFile: true,
       validate: false,
@@ -174,12 +176,14 @@ async function app() {
         console.error(error);
       });
 
-    const server = new ApolloServer({ 
+    const server = new ApolloServer({
       //schema: applyMiddleware(federatedSchema, permissions),
       schema: federatedSchema,
       context: ({ req }: any) => {
         const user = req?.headers?.user ? JSON.parse(req?.headers?.user) : null;
-        const requestData = req?.headers?.requestdata ? JSON.parse(req?.headers?.requestdata) : null;
+        const requestData = req?.headers?.requestdata
+          ? JSON.parse(req?.headers?.requestdata)
+          : null;
         return { user, requestData };
       },
       introspection: true,
@@ -253,7 +257,6 @@ async function app() {
         `🚀 Server ${SERVER_NAME} Ready and Listening at ==> http://localhost:${PORT}${server.graphqlPath}`
       );
     });
-
   } catch (err) {
     console.error(err);
   }

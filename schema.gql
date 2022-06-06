@@ -84,6 +84,8 @@ type AcademicAsignatureCourse implements IModelCampusData {
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  gradeAssignment: GradeAssignment
+  gradeAssignmentId: String
   hourlyIntensity: Float
   id: ID!
   teacher: Teacher
@@ -1906,6 +1908,7 @@ type Mutation {
   changeActiveQuestionTestOnline(active: Boolean!, id: String!): Boolean!
   changeActiveRole(active: Boolean!, id: String!): Boolean!
   changeActiveSchool(active: Boolean!, id: String!): Boolean!
+  changeActiveSchoolAdministrative(active: Boolean!, id: String!): Boolean!
   changeActiveSchoolAdministrator(active: Boolean!, id: String!): Boolean!
   changeActiveSchoolYear(active: Boolean!, id: String!): Boolean!
   changeActiveSpecialty(active: Boolean!, id: String!): Boolean!
@@ -1928,6 +1931,7 @@ type Mutation {
   createAllInitialsAcademicDay: Boolean!
   createAllInitialsCampusAdministrators: Boolean!
   createAllInitialsCourse: Boolean!
+  createAllInitialsSchoolAdministratives: Boolean!
   createAllInitialsSchoolAdministrators: Boolean!
   createAllInitialsTeachers: Boolean!
   createAuditLogin(data: NewAuditLogin!): AuditLogin!
@@ -1983,6 +1987,7 @@ type Mutation {
   createQuestionTestOnline(data: NewQuestionTestOnline!): QuestionTestOnline!
   createRole(data: NewRole!): Role!
   createSchool(data: NewSchool!): School!
+  createSchoolAdministrative(data: NewSchoolAdministrative!): SchoolAdministrative!
   createSchoolAdministrator(data: NewSchoolAdministrator!): SchoolAdministrator!
   createSchoolYear(data: NewSchoolYear!): SchoolYear!
   createSpecialty(data: NewSpecialty!): Specialty!
@@ -2044,6 +2049,7 @@ type Mutation {
   deleteQuestionTestOnline(id: String!): Boolean!
   deleteRole(id: String!): Boolean!
   deleteSchool(id: String!): Boolean!
+  deleteSchoolAdministrative(id: String!): Boolean!
   deleteSchoolAdministrator(id: String!): Boolean!
   deleteSchoolYear(id: String!): Boolean!
   deleteSpecialty(id: String!): Boolean!
@@ -2111,6 +2117,7 @@ type Mutation {
   updateQuestionTestOnline(data: NewQuestionTestOnline!, id: String!): QuestionTestOnline!
   updateRole(data: NewRole!, id: String!): Role!
   updateSchool(data: NewSchool!, id: String!): School!
+  updateSchoolAdministrative(data: NewSchoolAdministrative!, id: String!): SchoolAdministrative!
   updateSchoolAdministrator(data: NewSchoolAdministrator!, id: String!): SchoolAdministrator!
   updateSchoolYear(data: NewSchoolYear!, id: String!): SchoolYear!
   updateSpecialty(data: NewSpecialty!, id: String!): Specialty!
@@ -2150,6 +2157,7 @@ input NewAcademicAsignatureCourse {
   academicAsignatureId: String
   campusId: String
   courseId: String
+  gradeAssignmentId: String
   hourlyIntensity: Float
   teacherId: String
   weight: Float
@@ -2606,6 +2614,12 @@ input NewSchool {
   educationalModel: String
   name: String
   pedagogicalModel: String
+}
+
+input NewSchoolAdministrative {
+  newUser: NewUser
+  schoolId: [String!]
+  userId: String
 }
 
 input NewSchoolAdministrator {
@@ -3778,6 +3792,22 @@ type Query {
     last: Float
     orderCreated: Boolean!
   ): SchoolConnection!
+  getAllSchoolAdministrative(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+    schoolId: String!
+  ): SchoolAdministrativeConnection!
   getAllSchoolAdministrator(
     """Paginate after opaque cursor"""
     after: String
@@ -3937,6 +3967,7 @@ type Query {
   getQuestionTestOnline(id: String!): QuestionTestOnline
   getRole(id: String!): Role
   getSchool(id: String!): School
+  getSchoolAdministrative(id: String!): SchoolAdministrative
   getSchoolAdministrator(id: String!): SchoolAdministrator
   getSchoolYear(id: String!): SchoolYear
   getSpecialty(id: String!): Specialty
@@ -4108,6 +4139,39 @@ type School implements IModelData {
   updatedByUser: User
   updatedByUserId: String
   version: Float
+}
+
+"""The SchoolAdministrative model"""
+type SchoolAdministrative implements IModelData {
+  active: Boolean
+  campus: [Campus!]
+  campusId: [String!]
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  id: ID!
+  school: [School!]
+  schoolId: [String!]
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  user: User
+  userId: String
+  version: Float
+}
+
+type SchoolAdministrativeConnection {
+  edges: [SchoolAdministrativeEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type SchoolAdministrativeEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: SchoolAdministrative!
 }
 
 """The SchoolAdministrator model"""
