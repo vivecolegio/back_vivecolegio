@@ -2,7 +2,14 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicAreaRepository, AcademicAsignatureRepository, GeneralAcademicAsignatureRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  AcademicAreaRepository,
+  AcademicAsignatureRepository,
+  GeneralAcademicAsignatureRepository,
+  GradeAssignmentRepository,
+  SchoolRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicAsignature } from '../../inputs/SchoolAdministrator/NewAcademicAsignature';
 import { IContext } from '../../interfaces/IContext';
@@ -12,8 +19,9 @@ import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicArea } from '../../models/SchoolAdministrator/AcademicArea';
 import {
   AcademicAsignature,
-  AcademicAsignatureConnection
+  AcademicAsignatureConnection,
 } from '../../models/SchoolAdministrator/AcademicAsignature';
+import { GradeAssignment } from '../../models/SchoolAdministrator/GradeAssignment';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
 @Resolver(AcademicAsignature)
@@ -33,6 +41,9 @@ export class AcademicAsignatureResolver {
   @InjectRepository(GeneralAcademicAsignature)
   private repositoryGeneralAcademicAsignature = GeneralAcademicAsignatureRepository;
 
+  @InjectRepository(GradeAssignment)
+  private repositoryGradeAssignment = GradeAssignmentRepository;
+
   @Query(() => AcademicAsignature, { nullable: true })
   async getAcademicAsignature(@Arg('id', () => String) id: string) {
     const result = await this.repository.findOneBy(id);
@@ -45,7 +56,7 @@ export class AcademicAsignatureResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => String) schoolId: String,
-    @Arg('academicAreaId', () => String, { nullable: true }) academicAreaId: string,
+    @Arg('academicAreaId', () => String, { nullable: true }) academicAreaId: string
   ): Promise<AcademicAsignatureConnection> {
     let result;
     if (allData) {
@@ -92,7 +103,8 @@ export class AcademicAsignatureResolver {
         if (academicAreaId) {
           result = await this.repository.findBy({
             where: {
-              schoolId, academicAreaId,
+              schoolId,
+              academicAreaId,
               active: true,
             },
           });
@@ -106,6 +118,43 @@ export class AcademicAsignatureResolver {
         }
       }
     }
+    let resultConn = new AcademicAsignatureConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
+  }
+
+  @Query(() => AcademicAsignatureConnection)
+  async getAllAcademicAsignatureNotAssignedInAcademicGrade(
+    @Args() args: ConnectionArgs,
+    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('academicGradeId', () => String) academicGradeId: string
+  ): Promise<AcademicAsignatureConnection> {
+    let gradeAssignmentAsignatureIds: any[] = [];
+    let gradeAssignmentsAcademicGrade = await this.repositoryGradeAssignment.findBy({
+      where: {
+        schoolId,
+        academicGradeId,
+        active: true,
+      },
+    });
+    gradeAssignmentsAcademicGrade.forEach((gradeAssignmentAcademicGrade: any) => {
+      gradeAssignmentAsignatureIds.push(
+        new ObjectId(gradeAssignmentAcademicGrade.academicAsignatureId)
+      );
+    });
+    console.log(gradeAssignmentAsignatureIds);
+    let result;
+    result = await this.repository.findBy({
+      where: {
+        _id: { $nin: gradeAssignmentAsignatureIds },
+        schoolId,
+        active: true,
+      },
+    });
     let resultConn = new AcademicAsignatureConnection();
     let resultConnection = connectionFromArraySlice(result, args, {
       sliceStart: 0,

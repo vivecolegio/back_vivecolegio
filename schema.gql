@@ -2093,6 +2093,7 @@ type Mutation {
   updateGeneralAcademicStandard(data: NewGeneralAcademicStandard!, id: String!): GeneralAcademicStandard!
   updateGeneralBasicLearningRight(data: NewGeneralBasicLearningRight!, id: String!): GeneralBasicLearningRight!
   updateGeneralPerformanceLevel(data: NewGeneralPerformanceLevel!, id: String!): GeneralPerformanceLevel!
+  updateGradeAcademicDayAllInitialsCourse: Boolean!
   updateGradeAllInitialsCourse: Boolean!
   updateGradeAssignment(data: NewGradeAssignment!, id: String!): GradeAssignment!
   updateGuardian(data: NewGuardian!, id: String!): Guardian!
@@ -2833,6 +2834,22 @@ type Query {
     orderCreated: Boolean!
     studentId: String
   ): AcademicAsignatureCoursePeriodValuationConnection!
+  getAllAcademicAsignatureNotAssignedInAcademicGrade(
+    academicGradeId: String!
+
+    """Paginate after opaque cursor"""
+    after: String
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    schoolId: String!
+  ): AcademicAsignatureConnection!
   getAllAcademicDay(
     """Paginate after opaque cursor"""
     after: String
@@ -3034,6 +3051,20 @@ type Query {
     last: Float
     orderCreated: Boolean!
     schoolId: String
+  ): CourseConnection!
+  getAllCourseTeacher(
+    """Paginate after opaque cursor"""
+    after: String
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    teacherId: String!
   ): CourseConnection!
   getAllDocumentType(
     """Paginate after opaque cursor"""
@@ -3478,6 +3509,20 @@ type Query {
     last: Float
     orderCreated: Boolean!
     schoolId: String!
+  ): GradeAssignmentConnection!
+  getAllGradeAssignmentNotAssignedInCourse(
+    """Paginate after opaque cursor"""
+    after: String
+
+    """Paginate before opaque cursor"""
+    before: String
+    courseId: String!
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
   ): GradeAssignmentConnection!
   getAllGuardian(
     """Paginate after opaque cursor"""

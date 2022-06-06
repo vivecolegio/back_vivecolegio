@@ -3,8 +3,10 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import {
+  AcademicAsignatureCourseRepository,
   AcademicAsignatureRepository,
   AcademicGradeRepository,
+  CourseRepository,
   GradeAssignmentRepository,
   SchoolRepository,
   UserRepository,
@@ -12,6 +14,8 @@ import {
 import { removeEmptyStringElements } from '../../../types';
 import { NewGradeAssignment } from '../../inputs/SchoolAdministrator/NewGradeAssignment';
 import { IContext } from '../../interfaces/IContext';
+import { AcademicAsignatureCourse } from '../../models/CampusAdministrator/AcademicAsignatureCourse';
+import { Course } from '../../models/CampusAdministrator/Course';
 import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicAsignature } from '../../models/SchoolAdministrator/AcademicAsignature';
@@ -38,6 +42,12 @@ export class GradeAssignmentResolver {
 
   @InjectRepository(School)
   private repositorySchool = SchoolRepository;
+
+  @InjectRepository(AcademicAsignatureCourse)
+  private repositoryAcademicAsignatureCourse = AcademicAsignatureCourseRepository;
+
+  @InjectRepository(Course)
+  private repositoryCourse = CourseRepository;
 
   @Query(() => GradeAssignment, { nullable: true })
   async getGradeAssignment(@Arg('id', () => String) id: string) {
@@ -155,6 +165,44 @@ export class GradeAssignmentResolver {
           }
         }
       }
+    }
+    let resultConn = new GradeAssignmentConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
+  }
+
+  @Query(() => GradeAssignmentConnection)
+  async getAllGradeAssignmentNotAssignedInCourse(
+    @Args() args: ConnectionArgs,
+    @Arg('courseId', () => String) courseId: string
+  ): Promise<GradeAssignmentConnection> {
+    let course = await this.repositoryCourse.findOneBy(courseId);
+    let result: any[] = [];
+    if (course) {
+      let academicAsignatureCourseAsignatureIds: any[] = [];
+      let academicAsignaturesCourseAsignature =
+        await this.repositoryAcademicAsignatureCourse.findBy({
+          where: {
+            courseId,
+            active: true,
+          },
+        });
+      academicAsignaturesCourseAsignature.forEach((academicAsignatureCourseAsignature: any) => {
+        academicAsignatureCourseAsignatureIds.push(
+          academicAsignatureCourseAsignature.academicAsignatureId
+        );
+      });
+      result = await this.repository.findBy({
+        where: {
+          academicGradeId: course.academicGradeId,
+          academicAsignatureId: { $nin: academicAsignatureCourseAsignatureIds },
+          active: true,
+        },
+      });
     }
     let resultConn = new GradeAssignmentConnection();
     let resultConnection = connectionFromArraySlice(result, args, {

@@ -163,6 +163,27 @@ export class CourseResolver {
     return resultConn;
   }
 
+  @Query(() => CourseConnection)
+  async getAllCourseTeacher(
+    @Args() args: ConnectionArgs,
+    @Arg('teacherId', () => String) teacherId: String
+  ): Promise<CourseConnection> {
+    let result = await this.repository.findBy({
+      where: {
+        teacherId,
+        active: true,
+      },
+      order: { createdAt: 'DESC' },
+    });
+    let resultConn = new CourseConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
+  }
+
   @Mutation(() => Course)
   async createCourse(@Arg('data') data: NewCourse, @Ctx() context: IContext): Promise<Course> {
     let dataProcess: NewCourse = removeEmptyStringElements(data);
@@ -223,7 +244,7 @@ export class CourseResolver {
       });
       for (let campu of campus) {
         let courses = await this.repository.findBy({
-          where: { academicGradeId: undefined, campusId: campu.id.toString() },
+          where: { academicGradeId: undefined, campusId: campu.id.toString(), active: true },
         });
         for (let course of courses) {
           let generalAcademicGradeId = '';
@@ -336,6 +357,13 @@ export class CourseResolver {
                 //console.log(model);
                 count += 1;
                 console.log(count);
+              } else {
+                let result = await this.repository.save({
+                  _id: new ObjectId(course[0].id.toString()),
+                  ...course[0],
+                  active: true,
+                  version: (course[0]?.version as number) + 1,
+                });
               }
             }
           }
