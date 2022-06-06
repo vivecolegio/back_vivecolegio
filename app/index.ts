@@ -1,7 +1,10 @@
 import { ApolloGateway, IntrospectAndCompose } from '@apollo/gateway';
 import { Ipware } from '@fullerstack/nax-ipware';
 import FileUploadDataSource from '@profusion/apollo-federation-upload';
-import { ApolloServerPluginLandingPageLocalDefault, ApolloServerPluginLandingPageProductionDefault } from 'apollo-server-core';
+import {
+  ApolloServerPluginLandingPageLocalDefault,
+  ApolloServerPluginLandingPageProductionDefault,
+} from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import Cors from 'cors';
 import Express from 'express';
@@ -9,6 +12,7 @@ import { expressjwt } from 'express-jwt';
 import geoip from 'geoip-lite';
 import { graphqlUploadExpress } from 'graphql-upload';
 import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
+import Morgan from 'morgan';
 import path from 'path';
 import 'reflect-metadata';
 import { port, SERVER_NAME_APP, SERVER_PORT_APP } from './config/index';
@@ -19,16 +23,17 @@ async function app() {
   try {
     const gateway = new ApolloGateway({
       supergraphSdl: new IntrospectAndCompose({
-        subgraphs: [
-          { name: 'servers', url: 'http://localhost:4001/graphql' },
-        ],
+        subgraphs: [{ name: 'servers', url: 'http://localhost:4001/graphql' }],
       }),
       buildService({ url }: any) {
         return new FileUploadDataSource({
           url,
           willSendRequest({ request, context }: any) {
             request.http.headers.set('user', context.user ? JSON.stringify(context.user) : null);
-            request.http.headers.set('requestdata', context.requestdata ? JSON.stringify(context.requestdata) : null);
+            request.http.headers.set(
+              'requestdata',
+              context.requestdata ? JSON.stringify(context.requestdata) : null
+            );
           },
         });
       },
@@ -70,7 +75,7 @@ async function app() {
           host: 'localhost',
           path: `/healthcheck-${SERVER_NAME_APP}`,
           port: `${SERVER_PORT_APP}`,
-        }
+        },
       ],
     };
     const ipware = new Ipware();
@@ -91,11 +96,11 @@ async function app() {
         const requestdata = {
           ip: JSON.stringify(context.req.ip),
           geo: geo,
-          browser: context.req.headers["user-agent"],
-          language: context.req.headers["accept-language"],
+          browser: context.req.headers['user-agent'],
+          language: context.req.headers['accept-language'],
           ipware: ipware.getClientIP(context.req),
-          ipwarePublic: ipware.getClientIP(context.req, { publicOnly: true })
-        }
+          ipwarePublic: ipware.getClientIP(context.req, { publicOnly: true }),
+        };
         return { user, requestdata };
       },
     });
@@ -104,7 +109,7 @@ async function app() {
 
     // Middlewares
     app.use(require('express-status-monitor')(configExpressStatusMonitor));
-    //app.use(Morgan('common'));
+    app.use(Morgan('common'));
     // app.use(Helmet({
     //   contentSecurityPolicy: false,
     // }));
@@ -112,7 +117,7 @@ async function app() {
     app.use(expressHealthApi({ apiPath: '/health' }));
     app.use('/voyager', voyagerMiddleware({ endpointUrl: '/graphql' }));
 
-    app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }))
+    app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }));
     app.use('/public', Express.static(path.join(__dirname, '../public')));
     app.use(Express.json());
     app.use(
