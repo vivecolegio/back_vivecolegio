@@ -2,14 +2,25 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { CampusRepository, ExperienceLearningRepository, ExperienceLearningRubricCriteriaRepository, ExperienceLearningRubricCriteriaValuationRepository, ExperienceLearningRubricValuationRepository, StudentRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  CampusRepository,
+  ExperienceLearningRepository,
+  ExperienceLearningRubricCriteriaRepository,
+  ExperienceLearningRubricCriteriaValuationRepository,
+  ExperienceLearningRubricValuationRepository,
+  StudentRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewExperienceLearningRubricValuation } from '../../inputs/CampusAdministrator/NewExperienceLearningRubricValuation';
 import { IContext } from '../../interfaces/IContext';
 import { ExperienceLearning } from '../../models/CampusAdministrator/ExperienceLearning';
 import { ExperienceLearningRubricCriteria } from '../../models/CampusAdministrator/ExperienceLearningRubricCriteria';
 import { ExperienceLearningRubricCriteriaValuation } from '../../models/CampusAdministrator/ExperienceLearningRubricCriteriaValuation';
-import { ExperienceLearningRubricValuation, ExperienceLearningRubricValuationConnection } from '../../models/CampusAdministrator/ExperienceLearningRubricValuation';
+import {
+  ExperienceLearningRubricValuation,
+  ExperienceLearningRubricValuationConnection,
+} from '../../models/CampusAdministrator/ExperienceLearningRubricValuation';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { Student } from '../../models/GeneralAdministrator/Student';
 import { User } from '../../models/GeneralAdministrator/User';
@@ -17,230 +28,245 @@ import { ConnectionArgs } from '../../pagination/relaySpecs';
 
 @Resolver(ExperienceLearningRubricValuation)
 export class ExperienceLearningRubricValuationResolver {
-    @InjectRepository(ExperienceLearningRubricValuation)
-    private repository = ExperienceLearningRubricValuationRepository;
+  @InjectRepository(ExperienceLearningRubricValuation)
+  private repository = ExperienceLearningRubricValuationRepository;
 
-    @InjectRepository(User)
-    private repositoryUser = UserRepository;
+  @InjectRepository(User)
+  private repositoryUser = UserRepository;
 
-    @InjectRepository(Campus)
-    private repositoryCampus = CampusRepository;
+  @InjectRepository(Campus)
+  private repositoryCampus = CampusRepository;
 
-    @InjectRepository(ExperienceLearning)
-    private repositoryExperienceLearning = ExperienceLearningRepository;
+  @InjectRepository(ExperienceLearning)
+  private repositoryExperienceLearning = ExperienceLearningRepository;
 
-    @InjectRepository(Student)
-    private repositoryStudent = StudentRepository;
+  @InjectRepository(Student)
+  private repositoryStudent = StudentRepository;
 
-    @InjectRepository(ExperienceLearningRubricCriteriaValuation)
-    private repositoryExperienceLearningRubricCriteriaValuation = ExperienceLearningRubricCriteriaValuationRepository;
+  @InjectRepository(ExperienceLearningRubricCriteriaValuation)
+  private repositoryExperienceLearningRubricCriteriaValuation = ExperienceLearningRubricCriteriaValuationRepository;
 
-    @InjectRepository(ExperienceLearningRubricCriteria)
-    private repositoryExperienceLearningRubricCriteria = ExperienceLearningRubricCriteriaRepository;
+  @InjectRepository(ExperienceLearningRubricCriteria)
+  private repositoryExperienceLearningRubricCriteria = ExperienceLearningRubricCriteriaRepository;
 
-    @Query(() => ExperienceLearningRubricValuation, { nullable: true })
-    async getExperienceLearningRubricValuation(@Arg('id', () => String) id: string) {
-        const result = await this.repository.findOneBy(id);
-        return result;
-    }
+  @Query(() => ExperienceLearningRubricValuation, { nullable: true })
+  async getExperienceLearningRubricValuation(@Arg('id', () => String) id: string) {
+    const result = await this.repository.findOneBy(id);
+    return result;
+  }
 
-    @Query(() => ExperienceLearningRubricValuationConnection)
-    async getAllExperienceLearningRubricValuation(
-        @Args() args: ConnectionArgs,
-        @Arg('allData', () => Boolean) allData: Boolean,
-        @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
-        @Arg('experienceLearningId', () => String) experienceLearningId: String
-    ): Promise<ExperienceLearningRubricValuationConnection> {
-        let result;
-        if (allData) {
-            if (orderCreated) {
-                result = await this.repository.findBy({
-                    where: {
-                        experienceLearningId,
-                    },
-                    order: { createdAt: 'DESC' },
-                });
-            } else {
-                result = await this.repository.findBy({
-                    where: {
-                        experienceLearningId,
-                    },
-                });
-            }
-        } else {
-            if (orderCreated) {
-                result = await this.repository.findBy({
-                    where: {
-                        experienceLearningId,
-                        active: true,
-                    },
-                    order: { createdAt: 'DESC' },
-                });
-
-            } else {
-                result = await this.repository.findBy({
-                    where: {
-                        experienceLearningId,
-                        active: true,
-                    },
-                });
-            }
-        }
-        let resultConn = new ExperienceLearningRubricValuationConnection();
-        let resultConnection = connectionFromArraySlice(result, args, {
-            sliceStart: 0,
-            arrayLength: result.length,
+  @Query(() => ExperienceLearningRubricValuationConnection)
+  async getAllExperienceLearningRubricValuation(
+    @Args() args: ConnectionArgs,
+    @Arg('allData', () => Boolean) allData: Boolean,
+    @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
+    @Arg('experienceLearningId', () => String) experienceLearningId: String
+  ): Promise<ExperienceLearningRubricValuationConnection> {
+    let result;
+    if (allData) {
+      if (orderCreated) {
+        result = await this.repository.findBy({
+          where: {
+            experienceLearningId,
+          },
+          order: { createdAt: 'DESC' },
         });
-        resultConn = { ...resultConnection, totalCount: result.length };
-        return resultConn;
-    }
-
-    @Mutation(() => ExperienceLearningRubricValuation)
-    async createExperienceLearningRubricValuation(@Arg('data') data: NewExperienceLearningRubricValuation, @Ctx() context: IContext): Promise<ExperienceLearningRubricValuation> {
-        let dataProcess: NewExperienceLearningRubricValuation = removeEmptyStringElements(data);
-        let createdByUserId = context?.user?.authorization?.id;
-        const model = await this.repository.create({
-            ...dataProcess,
+      } else {
+        result = await this.repository.findBy({
+          where: {
+            experienceLearningId,
+          },
+        });
+      }
+    } else {
+      if (orderCreated) {
+        result = await this.repository.findBy({
+          where: {
+            experienceLearningId,
             active: true,
-            version: 0,
-            createdByUserId,
+          },
+          order: { createdAt: 'DESC' },
         });
-        let result = await this.repository.save(model);
-        return result;
-    }
-
-    @Mutation(() => ExperienceLearningRubricValuation)
-    async updateAssessmentExperienceLearningRubricValuation(
-        @Arg('id', () => String) id: string,
-        @Ctx() context: IContext
-    ): Promise<ExperienceLearningRubricValuation | null> {
-        let updatedByUserId = context?.user?.authorization?.id;
-        let result = await this.repository.findOneBy(id);
-        let experienceLearningRubricCriterias = await this.repositoryExperienceLearningRubricCriteria.findBy({
-            experienceLearningId: result?.experienceLearningId, active: true,
+      } else {
+        result = await this.repository.findBy({
+          where: {
+            experienceLearningId,
+            active: true,
+          },
         });
-        let assessment = 0;
-        for (let experienceLearningRubricCriteria of experienceLearningRubricCriterias) {
-            let experienceLearningRubricCriteriaValuations = await this.repositoryExperienceLearningRubricCriteriaValuation.findBy({
-                where: { experienceLearningRubricCriteriaId: experienceLearningRubricCriteria?.id.toString(), active: true, studentId: result?.studentId }
-            })
-            if (experienceLearningRubricCriteriaValuations.length > 0) {
-                if (experienceLearningRubricCriteria && experienceLearningRubricCriteria.weight && experienceLearningRubricCriteriaValuations[0].assessment) {
-                    let assessmentWeight = (experienceLearningRubricCriteria.weight * experienceLearningRubricCriteriaValuations[0].assessment) / 100;
-                    assessment += assessmentWeight;
-                }
-            }
-        }
-        result = await this.repository.save({
-            _id: new ObjectId(id),
-            ...result,
-            assessment,
-            version: (result?.version as number) + 1,
-            updatedByUserId,
+      }
+    }
+    let resultConn = new ExperienceLearningRubricValuationConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
+  }
+
+  @Mutation(() => ExperienceLearningRubricValuation)
+  async createExperienceLearningRubricValuation(
+    @Arg('data') data: NewExperienceLearningRubricValuation,
+    @Ctx() context: IContext
+  ): Promise<ExperienceLearningRubricValuation> {
+    let dataProcess: NewExperienceLearningRubricValuation = removeEmptyStringElements(data);
+    let createdByUserId = context?.user?.authorization?.id;
+    const model = await this.repository.create({
+      ...dataProcess,
+      active: true,
+      version: 0,
+      createdByUserId,
+    });
+    let result = await this.repository.save(model);
+    return result;
+  }
+
+  @Mutation(() => ExperienceLearningRubricValuation)
+  async updateAssessmentExperienceLearningRubricValuation(
+    @Arg('id', () => String) id: string,
+    @Ctx() context: IContext
+  ): Promise<ExperienceLearningRubricValuation | null> {
+    let updatedByUserId = context?.user?.authorization?.id;
+    let result = await this.repository.findOneBy(id);
+    let experienceLearningRubricCriterias =
+      await this.repositoryExperienceLearningRubricCriteria.findBy({
+        experienceLearningId: result?.experienceLearningId,
+        active: true,
+      });
+    let assessment = 0;
+    for (let experienceLearningRubricCriteria of experienceLearningRubricCriterias) {
+      let experienceLearningRubricCriteriaValuations =
+        await this.repositoryExperienceLearningRubricCriteriaValuation.findBy({
+          where: {
+            experienceLearningRubricCriteriaId: experienceLearningRubricCriteria?.id.toString(),
+            active: true,
+            studentId: result?.studentId,
+          },
         });
-        return result;
-    }
-
-    @Mutation(() => ExperienceLearningRubricValuation)
-    async updateExperienceLearningRubricValuation(
-        @Arg('data') data: NewExperienceLearningRubricValuation,
-        @Arg('id', () => String) id: string,
-        @Ctx() context: IContext
-    ): Promise<ExperienceLearningRubricValuation | null> {
-        let dataProcess = removeEmptyStringElements(data);
-        let updatedByUserId = context?.user?.authorization?.id;
-        let result = await this.repository.findOneBy(id);
-        console.log(dataProcess);
-        result = await this.repository.save({
-            _id: new ObjectId(id),
-            ...result,
-            ...dataProcess,
-            version: (result?.version as number) + 1,
-            updatedByUserId,
-        });
-        return result;
-    }
-
-    @Mutation(() => Boolean)
-    async changeActiveExperienceLearningRubricValuation(
-        @Arg('active', () => Boolean) active: boolean,
-        @Arg('id', () => String) id: string,
-        @Ctx() context: IContext
-    ): Promise<Boolean | null> {
-        let updatedByUserId = context?.user?.authorization?.id;
-        let result = await this.repository.findOneBy(id);
-        result = await this.repository.save({
-            _id: new ObjectId(id),
-            ...result,
-            active: active,
-            version: (result?.version as number) + 1,
-            updatedByUserId,
-        });
-        if (result.id) {
-            return true;
-        } else {
-            return false;
+      if (experienceLearningRubricCriteriaValuations.length > 0) {
+        if (
+          experienceLearningRubricCriteria &&
+          experienceLearningRubricCriteria.weight &&
+          experienceLearningRubricCriteriaValuations[0].assessment
+        ) {
+          let assessmentWeight =
+            (experienceLearningRubricCriteria.weight *
+              experienceLearningRubricCriteriaValuations[0].assessment) /
+            100;
+          assessment += assessmentWeight;
         }
+      }
     }
+    result = await this.repository.save({
+      _id: new ObjectId(id),
+      ...result,
+      assessment,
+      version: (result?.version as number) + 1,
+      updatedByUserId,
+    });
+    return result;
+  }
 
-    @Mutation(() => Boolean)
-    async deleteExperienceLearningRubricValuation(
-        @Arg('id', () => String) id: string,
-        @Ctx() context: IContext
-    ): Promise<Boolean | null> {
-        let data = await this.repository.findOneBy(id);
-        let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
-        return result?.result?.ok === 1 ?? true;
+  @Mutation(() => ExperienceLearningRubricValuation)
+  async updateExperienceLearningRubricValuation(
+    @Arg('data') data: NewExperienceLearningRubricValuation,
+    @Arg('id', () => String) id: string,
+    @Ctx() context: IContext
+  ): Promise<ExperienceLearningRubricValuation | null> {
+    let dataProcess = removeEmptyStringElements(data);
+    let updatedByUserId = context?.user?.authorization?.id;
+    let result = await this.repository.findOneBy(id);
+    //console.log(dataProcess);
+    result = await this.repository.save({
+      _id: new ObjectId(id),
+      ...result,
+      ...dataProcess,
+      version: (result?.version as number) + 1,
+      updatedByUserId,
+    });
+    return result;
+  }
+
+  @Mutation(() => Boolean)
+  async changeActiveExperienceLearningRubricValuation(
+    @Arg('active', () => Boolean) active: boolean,
+    @Arg('id', () => String) id: string,
+    @Ctx() context: IContext
+  ): Promise<Boolean | null> {
+    let updatedByUserId = context?.user?.authorization?.id;
+    let result = await this.repository.findOneBy(id);
+    result = await this.repository.save({
+      _id: new ObjectId(id),
+      ...result,
+      active: active,
+      version: (result?.version as number) + 1,
+      updatedByUserId,
+    });
+    if (result.id) {
+      return true;
+    } else {
+      return false;
     }
+  }
 
-    @FieldResolver((_type) => User, { nullable: true })
-    async createdByUser(@Root() data: ExperienceLearningRubricValuation) {
-        let id = data.createdByUserId;
-        if (id !== null && id !== undefined) {
-            const result = await this.repositoryUser.findOneBy(id);
-            return result;
-        }
-        return null;
+  @Mutation(() => Boolean)
+  async deleteExperienceLearningRubricValuation(
+    @Arg('id', () => String) id: string,
+    @Ctx() context: IContext
+  ): Promise<Boolean | null> {
+    let data = await this.repository.findOneBy(id);
+    let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
+    return result?.result?.ok === 1 ?? true;
+  }
+
+  @FieldResolver((_type) => User, { nullable: true })
+  async createdByUser(@Root() data: ExperienceLearningRubricValuation) {
+    let id = data.createdByUserId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryUser.findOneBy(id);
+      return result;
     }
+    return null;
+  }
 
-    @FieldResolver((_type) => User, { nullable: true })
-    async updatedByUser(@Root() data: ExperienceLearningRubricValuation) {
-        let id = data.updatedByUserId;
-        if (id !== null && id !== undefined) {
-            const result = await this.repositoryUser.findOneBy(id);
-            return result;
-        }
-        return null;
+  @FieldResolver((_type) => User, { nullable: true })
+  async updatedByUser(@Root() data: ExperienceLearningRubricValuation) {
+    let id = data.updatedByUserId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryUser.findOneBy(id);
+      return result;
     }
+    return null;
+  }
 
-    @FieldResolver((_type) => Campus, { nullable: true })
-    async campus(@Root() data: ExperienceLearningRubricValuation) {
-        let id = data.campusId;
-        if (id !== null && id !== undefined) {
-            const result = await this.repositoryCampus.findOneBy(id);
-            return result;
-        }
-        return null;
+  @FieldResolver((_type) => Campus, { nullable: true })
+  async campus(@Root() data: ExperienceLearningRubricValuation) {
+    let id = data.campusId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryCampus.findOneBy(id);
+      return result;
     }
+    return null;
+  }
 
-    @FieldResolver((_type) => ExperienceLearning, { nullable: true })
-    async experienceLearning(@Root() data: ExperienceLearningRubricValuation) {
-        let id = data.experienceLearningId;
-        if (id !== null && id !== undefined) {
-            const result = await this.repositoryExperienceLearning.findOneBy(id);
-            return result;
-        }
-        return null;
+  @FieldResolver((_type) => ExperienceLearning, { nullable: true })
+  async experienceLearning(@Root() data: ExperienceLearningRubricValuation) {
+    let id = data.experienceLearningId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryExperienceLearning.findOneBy(id);
+      return result;
     }
+    return null;
+  }
 
-    @FieldResolver((_type) => Student, { nullable: true })
-    async student(@Root() data: ExperienceLearningRubricValuation) {
-        let id = data.studentId;
-        if (id !== null && id !== undefined) {
-            const result = await this.repositoryStudent.findOneBy(id);
-            return result;
-        }
-        return null;
+  @FieldResolver((_type) => Student, { nullable: true })
+  async student(@Root() data: ExperienceLearningRubricValuation) {
+    let id = data.studentId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryStudent.findOneBy(id);
+      return result;
     }
-
+    return null;
+  }
 }

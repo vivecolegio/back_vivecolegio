@@ -852,7 +852,7 @@ export class ExperienceLearningResolver {
                 if (average) {
                     studentPeriodValuation.assessment = average;
                 }
-                console.log(studentPeriodValuation)
+                //console.log(studentPeriodValuation)
                 if (studentPeriodValuation.id) {
                     studentPeriodValuation = await this.repositoryAcademicAsignatureCoursePeriodValuation.save({
                         _id: new ObjectId(studentPeriodValuation.id.toString()),

@@ -7,7 +7,23 @@ import ShortUniqueId from 'short-unique-id';
 import { finished } from 'stream/promises';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AuditLoginRepository, CampusAdministratorRepository, CampusCoordinatorRepository, CampusRepository, DocumentTypeRepository, GenderRepository, GuardianRepository, MenuItemRepository, MenuRepository, RoleRepository, SchoolAdministratorRepository, SchoolRepository, StudentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  AuditLoginRepository,
+  CampusAdministratorRepository,
+  CampusCoordinatorRepository,
+  CampusRepository,
+  DocumentTypeRepository,
+  GenderRepository,
+  GuardianRepository,
+  MenuItemRepository,
+  MenuRepository,
+  RoleRepository,
+  SchoolAdministratorRepository,
+  SchoolRepository,
+  StudentRepository,
+  TeacherRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
 import { IContext } from '../../interfaces/IContext';
@@ -201,14 +217,14 @@ export class UserResolver {
         .then(function (hashedPassword) {
           return hashedPassword;
         });
-        result = await this.repository.save({
-          _id: new ObjectId(id),
-          ...result,
-          password: passwordHash,
-          version: (result?.version as number) + 1,
-          updatedByUserId,
-        });
-        return true;
+      result = await this.repository.save({
+        _id: new ObjectId(id),
+        ...result,
+        password: passwordHash,
+        version: (result?.version as number) + 1,
+        updatedByUserId,
+      });
+      return true;
     }
     return false;
   }
@@ -274,7 +290,11 @@ export class UserResolver {
   }
 
   @Mutation(() => Jwt)
-  async login(@Arg('username') username: string, @Arg('password') password: string,  @Ctx() context: IContext) {
+  async login(
+    @Arg('username') username: string,
+    @Arg('password') password: string,
+    @Ctx() context: IContext
+  ) {
     let user = await this.repository.findOneBy({ where: { username } });
     let compare = await bcrypt.compare(password, user?.password as string);
     let jwtUtil = new Jwt();
@@ -353,8 +373,8 @@ export class UserResolver {
         if (campusId !== undefined) {
           let campusIds: any[] = [];
           campusId.forEach((id: any) => {
-            campusIds.push(new ObjectId(id))
-          })
+            campusIds.push(new ObjectId(id));
+          });
           campus = await this.repositoryCampus.findBy({
             where: { _id: { $in: campusIds } },
           });
@@ -362,8 +382,8 @@ export class UserResolver {
         if (schoolId) {
           let schoolIds: any[] = [];
           schoolId.forEach((id: any) => {
-            schoolIds.push(new ObjectId(id))
-          })
+            schoolIds.push(new ObjectId(id));
+          });
           school = await this.repositorySchool.findBy({
             where: { _id: { $in: schoolIds } },
           });
@@ -419,119 +439,123 @@ export class UserResolver {
     let jwtUtil = new Jwt();
     if (user) {
       jwtUtil.name = user.name;
-        jwtUtil.lastName = user.lastName;
-        jwtUtil.username = user.username;
-        jwtUtil.profilePhoto = user.profilePhoto;
-        jwtUtil.userId = user.id;
-        let role = (await this.repositoryRole.findOneBy(user.roleId)) as Role;
-        user.roleId ? (jwtUtil.role = role) : null;
-        let campusId;
-        let schoolId;
-        if (role.isSchoolAdministrator) {
-          let userRole = await this.repositorySchoolAdministrator.findBy({
-            where: { userId: user.id.toString() },
-          });
-          if (userRole && userRole.length > 0) {
-            schoolId = userRole[0].schoolId;
-          }
+      jwtUtil.lastName = user.lastName;
+      jwtUtil.username = user.username;
+      jwtUtil.profilePhoto = user.profilePhoto;
+      jwtUtil.userId = user.id;
+      let role = (await this.repositoryRole.findOneBy(user.roleId)) as Role;
+      user.roleId ? (jwtUtil.role = role) : null;
+      let campusId;
+      let schoolId;
+      if (role.isSchoolAdministrator) {
+        let userRole = await this.repositorySchoolAdministrator.findBy({
+          where: { userId: user.id.toString() },
+        });
+        if (userRole && userRole.length > 0) {
+          schoolId = userRole[0].schoolId;
         }
-        if (role.isCampusAdministrator) {
-          let userRole = await this.repositoryCampusAdministrator.findBy({
-            where: { userId: user.id.toString() },
-          });
-          if (userRole && userRole.length > 0) {
-            schoolId = userRole[0].schoolId;
-            campusId = userRole[0].campusId;
-          }
+      }
+      if (role.isCampusAdministrator) {
+        let userRole = await this.repositoryCampusAdministrator.findBy({
+          where: { userId: user.id.toString() },
+        });
+        if (userRole && userRole.length > 0) {
+          schoolId = userRole[0].schoolId;
+          campusId = userRole[0].campusId;
         }
-        if (role.isCampusCoordinator) {
-          let userRole = await this.repositoryCampusCoordinator.findBy({
-            where: { userId: user.id.toString() },
-          });
-          if (userRole && userRole.length > 0) {
-            schoolId = userRole[0].schoolId;
-            campusId = userRole[0].campusId;
-          }
+      }
+      if (role.isCampusCoordinator) {
+        let userRole = await this.repositoryCampusCoordinator.findBy({
+          where: { userId: user.id.toString() },
+        });
+        if (userRole && userRole.length > 0) {
+          schoolId = userRole[0].schoolId;
+          campusId = userRole[0].campusId;
         }
-        if (role.isStudent) {
-          let userRole = await this.repositoryStudent.findBy({
-            where: { userId: user.id.toString() },
-          });
-          if (userRole && userRole.length > 0) {
-            schoolId = userRole[0].schoolId;
-            campusId = userRole[0].campusId;
-            jwtUtil.student = userRole[0];
-          }
+      }
+      if (role.isStudent) {
+        let userRole = await this.repositoryStudent.findBy({
+          where: { userId: user.id.toString() },
+        });
+        if (userRole && userRole.length > 0) {
+          schoolId = userRole[0].schoolId;
+          campusId = userRole[0].campusId;
+          jwtUtil.student = userRole[0];
         }
-        if (role.isTeacher) {
-          let userRole = await this.repositoryTeacher.findBy({
-            where: { userId: user.id.toString() },
-          });
-          if (userRole && userRole.length > 0) {
-            schoolId = userRole[0].schoolId;
-            campusId = userRole[0].campusId;
-          }
+      }
+      if (role.isTeacher) {
+        let userRole = await this.repositoryTeacher.findBy({
+          where: { userId: user.id.toString() },
+        });
+        if (userRole && userRole.length > 0) {
+          schoolId = userRole[0].schoolId;
+          campusId = userRole[0].campusId;
         }
-        if (role.isGuardian) {
-          let userRole = await this.repositoryGuardian.findBy({
-            where: { userId: user.id.toString() },
-          });
-          if (userRole && userRole.length > 0) {
-            schoolId = userRole[0].schoolId;
-            campusId = userRole[0].campusId;
-          }
+      }
+      if (role.isGuardian) {
+        let userRole = await this.repositoryGuardian.findBy({
+          where: { userId: user.id.toString() },
+        });
+        if (userRole && userRole.length > 0) {
+          schoolId = userRole[0].schoolId;
+          campusId = userRole[0].campusId;
         }
-        let campus;
-        let school;
-        if (campusId !== undefined) {
-          let campusIds: any[] = [];
-          campusId.forEach((id: any) => {
-            campusIds.push(new ObjectId(id))
-          })
-          campus = await this.repositoryCampus.findBy({
-            where: { _id: { $in: campusIds } },
-          });
-        }
-        if (schoolId) {
-          let schoolIds: any[] = [];
-          schoolId.forEach((id: any) => {
-            schoolIds.push(new ObjectId(id))
-          })
-          school = await this.repositorySchool.findBy({
-            where: { _id: { $in: schoolIds } },
-          });
-        }
-        if (campus && campus !== undefined) {
-          jwtUtil.campus = campus;
-        }
-        if (school && school !== undefined) {
-          jwtUtil.schools = school;
-        }
-        if (user.roleId) {
-          let menus = await this.repositoryMenu.findBy({
-            where: { rolesId: { $in: [user.roleId] }, active: true },
+      }
+      let campus;
+      let school;
+      if (campusId !== undefined) {
+        let campusIds: any[] = [];
+        campusId.forEach((id: any) => {
+          campusIds.push(new ObjectId(id));
+        });
+        campus = await this.repositoryCampus.findBy({
+          where: { _id: { $in: campusIds } },
+        });
+      }
+      if (schoolId) {
+        let schoolIds: any[] = [];
+        schoolId.forEach((id: any) => {
+          schoolIds.push(new ObjectId(id));
+        });
+        school = await this.repositorySchool.findBy({
+          where: { _id: { $in: schoolIds } },
+        });
+      }
+      if (campus && campus !== undefined) {
+        jwtUtil.campus = campus;
+      }
+      if (school && school !== undefined) {
+        jwtUtil.schools = school;
+      }
+      if (user.roleId) {
+        let menus = await this.repositoryMenu.findBy({
+          where: { rolesId: { $in: [user.roleId] }, active: true },
+          order: { order: 'ASC' },
+        });
+        for (let index = 0; index < menus.length; index++) {
+          let menusItems = await this.repositoryMenuItem.findBy({
+            where: {
+              menuId: menus[index].id.toString(),
+              rolesId: { $in: [user?.roleId] },
+              active: true,
+            },
             order: { order: 'ASC' },
           });
-          for (let index = 0; index < menus.length; index++) {
-            let menusItems = await this.repositoryMenuItem.findBy({
-              where: {
-                menuId: menus[index].id.toString(),
-                rolesId: { $in: [user?.roleId] },
-                active: true,
-              },
-              order: { order: 'ASC' },
-            });
-            menus[index].menuItemsLogin = menusItems as [MenuItem];
-          }
-          jwtUtil.roleMenus = menus as [Menu];
+          menus[index].menuItemsLogin = menusItems as [MenuItem];
+        }
+        jwtUtil.roleMenus = menus as [Menu];
       }
     }
     return jwtUtil;
   }
 
   @Mutation(() => Boolean)
-  async userProfileUploadImage(@Arg('id', () => String) id: string, @Arg("file", () => GraphQLUpload, { nullable: true }) file: FileUpload, @Ctx() context: IContext) {
-    console.log(context);
+  async userProfileUploadImage(
+    @Arg('id', () => String) id: string,
+    @Arg('file', () => GraphQLUpload, { nullable: true }) file: FileUpload,
+    @Ctx() context: IContext
+  ) {
+    //console.log(context);
     let updatedByUserId = context?.user?.authorization?.id;
     if (file?.filename) {
       var fs = require('fs');
@@ -541,7 +565,13 @@ export class UserResolver {
       }
       const stream = file?.createReadStream();
       const uid = new ShortUniqueId({ length: 14 });
-      const out = fs.createWriteStream(dir + "/" + uid() + "." + file?.filename.slice((file?.filename.lastIndexOf(".") - 1 >>> 0) + 2));
+      const out = fs.createWriteStream(
+        dir +
+          '/' +
+          uid() +
+          '.' +
+          file?.filename.slice(((file?.filename.lastIndexOf('.') - 1) >>> 0) + 2)
+      );
       stream.pipe(out);
       await finished(out);
       let result = await this.repository.findOneBy(id);
@@ -559,8 +589,11 @@ export class UserResolver {
   }
 
   @Mutation(() => Boolean)
-  async singleUpload(@Arg('id', () => String) id: string, @Arg("file", () => GraphQLUpload, { nullable: true }) file: FileUpload) {
-    console.log(file)
+  async singleUpload(
+    @Arg('id', () => String) id: string,
+    @Arg('file', () => GraphQLUpload, { nullable: true }) file: FileUpload
+  ) {
+    //console.log(file);
     if (file?.filename) {
       var fs = require('fs');
       var dir = './public/uploads/users/profile/' + id;
@@ -568,7 +601,7 @@ export class UserResolver {
         fs.mkdirSync(dir, { recursive: true });
       }
       const stream = file?.createReadStream();
-      const out = fs.createWriteStream(dir + "/" + file?.filename);
+      const out = fs.createWriteStream(dir + '/' + file?.filename);
       stream.pipe(out);
       await finished(out);
       // return { filename, mimetype, encoding };

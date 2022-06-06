@@ -217,7 +217,7 @@ export class TeacherResolver {
                 //console.log(model);
                 let result = await this.repository.save(model);
                 count += 1;
-                console.log(count);
+                //console.log(count);
               }
             }
           }

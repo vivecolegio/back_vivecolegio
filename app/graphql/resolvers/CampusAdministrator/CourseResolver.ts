@@ -226,7 +226,7 @@ export class CourseResolver {
               version: (course?.version as number) + 1,
             });
             count += 1;
-            console.log(count);
+            //console.log(count);
           }
         }
       }
@@ -301,7 +301,7 @@ export class CourseResolver {
               version: (course?.version as number) + 1,
             });
             count += 1;
-            console.log(count);
+            //console.log(count);
           }
         }
       }
@@ -356,7 +356,7 @@ export class CourseResolver {
                 let result = await this.repository.save(model);
                 //console.log(model);
                 count += 1;
-                console.log(count);
+                //console.log(count);
               } else {
                 let result = await this.repository.save({
                   _id: new ObjectId(course[0].id.toString()),

@@ -126,7 +126,7 @@ export class SchoolAdministratorResolver {
         active: true,
         schoolId: { $in: [school.id.toString()] },
       });
-      console.log(schoolAdministrators.length);
+      //console.log(schoolAdministrators.length);
       if (schoolAdministrators.length < 1) {
         let passwordHash = await bcrypt
           .hash(school.daneCode ? school.daneCode : 'VIVE2022', BCRYPT_SALT_ROUNDS)

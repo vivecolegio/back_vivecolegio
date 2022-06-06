@@ -3,7 +3,13 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { CampusRepository, GuardianRepository, SchoolRepository, StudentRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  CampusRepository,
+  GuardianRepository,
+  SchoolRepository,
+  StudentRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewGuardian } from '../../inputs/CampusAdministrator/NewGuardian';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
@@ -46,7 +52,7 @@ export class GuardianResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => [String]) schoolId: String[],
-    @Arg('campusId', () => [String], { nullable: true }) campusId: String[],
+    @Arg('campusId', () => [String], { nullable: true }) campusId: String[]
   ): Promise<GuardianConnection> {
     let result;
     if (allData) {
@@ -64,7 +70,9 @@ export class GuardianResolver {
         }
       } else {
         if (campusId) {
-          result = await this.repository.findBy({ where: { schoolId: { $in: [schoolId] }, campusId: { $in: [campusId] } } });
+          result = await this.repository.findBy({
+            where: { schoolId: { $in: [schoolId] }, campusId: { $in: [campusId] } },
+          });
         } else {
           result = await this.repository.findBy({ where: { schoolId: { $in: [schoolId] } } });
         }
@@ -117,24 +125,23 @@ export class GuardianResolver {
     return resultConn;
   }
 
-
   @Query(() => GuardianConnection)
   async getAllSearchGuardian(
     @Args() args: ConnectionArgs,
     @Arg('documentTypeId', () => String) documentTypeId: string,
-    @Arg('documentNumber', () => String) documentNumber: string,
+    @Arg('documentNumber', () => String) documentNumber: string
   ): Promise<GuardianConnection> {
     let result;
     result = await this.repositoryUser.findBy({
-      where: { documentTypeId, documentNumber: new RegExp(documentNumber), active: true, },
+      where: { documentTypeId, documentNumber: new RegExp(documentNumber), active: true },
       order: { createdAt: 'DESC' },
     });
     if (result.length > 0) {
       let ids: any[] = [];
       result.forEach((data: Guardian) => {
-        ids.push(new ObjectId(data.id))
-        console.log(data.id)
-      })
+        ids.push(new ObjectId(data.id));
+        //console.log(data.id)
+      });
       result = await this.repository.findBy({
         where: { userId: { $in: ids } },
       });

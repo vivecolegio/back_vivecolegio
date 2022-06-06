@@ -146,7 +146,6 @@ export class AcademicAsignatureResolver {
         new ObjectId(gradeAssignmentAcademicGrade.academicAsignatureId)
       );
     });
-    console.log(gradeAssignmentAsignatureIds);
     let result;
     result = await this.repository.findBy({
       where: {
