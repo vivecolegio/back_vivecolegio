@@ -140,7 +140,6 @@ export class SchoolAdministrativeResolver {
         if (
           administrativo.documento &&
           administrativo.school_id &&
-          administrativo.sede_dane &&
           administrativo.cargo !== 'Docente'
         ) {
           if (administrativo.documento.length > 1 && administrativo.school_id.length > 1) {
