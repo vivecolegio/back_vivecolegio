@@ -7,6 +7,7 @@ import {
   AcademicGradeRepository,
   CampusRepository,
   CourseRepository,
+  EstudiantesRepository,
   SchoolRepository,
   StudentRepository,
   UserRepository,
@@ -22,6 +23,7 @@ import { Student, StudentConnection } from '../../models/GeneralAdministrator/St
 import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicGrade } from '../../models/SchoolAdministrator/AcademicGrade';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
+import { Estudiantes } from './../../models/Data/Estudiantes';
 
 const BCRYPT_SALT_ROUNDS = 12;
 
@@ -44,6 +46,9 @@ export class StudentResolver {
 
   @InjectRepository(Course)
   private repositoryCourse = CourseRepository;
+
+  @InjectRepository(Estudiantes)
+  private repositoryEstudiantes = EstudiantesRepository;
 
   @Query(() => Student, { nullable: true })
   async getStudent(@Arg('id', () => String) id: string) {
@@ -130,6 +135,33 @@ export class StudentResolver {
     return resultConn;
   }
 
+  @Query(() => StudentConnection)
+  async getAllStudentAcademicGradeIdWithoutCourse(
+    @Args() args: ConnectionArgs,
+    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('campusId', () => String) campusId: String,
+    @Arg('academicGradeId', () => String) academicGradeId: String
+  ): Promise<StudentConnection> {
+    let result;
+    result = await this.repository.findBy({
+      where: {
+        schoolId,
+        campusId,
+        academicGradeId,
+        courseId: null,
+        active: true,
+      },
+      order: { createdAt: 'DESC' },
+    });
+    let resultConn = new StudentConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
+  }
+
   @Mutation(() => Student)
   async createStudent(@Arg('data') data: NewStudent, @Ctx() context: IContext): Promise<Student> {
     let dataProcess: NewStudent = removeEmptyStringElements(data);
@@ -162,76 +194,139 @@ export class StudentResolver {
     return result;
   }
 
-  // @Mutation(() => Boolean)
-  // public async createAllInitialsStudents() {
-  //   let schools = await this.repositorySchool.find();
-  //   let count = 0;
-  //   for (let school of schools) {
-  //     let data = await this.repositoryPlantaDocente.findBy({
-  //       where: { school_id: school.id.toString() },
-  //     });
-  //     for (let docente of data) {
-  //       if (docente.documento && docente.school_id && docente.sede_dane) {
-  //         if (
-  //           docente.documento.length > 1 &&
-  //           docente.school_id.length > 1 &&
-  //           docente.sede_dane.length > 1
-  //         ) {
-  //           let user = await this.repositoryUser.findBy({ documentNumber: docente.documento });
-  //           if (user.length === 0) {
-  //             let campus = await this.repositoryCampus.findBy({
-  //               where: { consecutive: docente.sede_dane },
-  //             });
-  //             if (campus.length === 1) {
-  //               let passwordHash = await bcrypt
-  //                 .hash(docente.documento ? docente.documento : 'VIVE2022', BCRYPT_SALT_ROUNDS)
-  //                 .then(function (hashedPassword: any) {
-  //                   return hashedPassword;
-  //                 });
-  //               let fechaNacimiento = docente.fechanacimiento?.split('/');
-  //               const modelUser = await this.repositoryUser.create({
-  //                 name: docente.empleado,
-  //                 lastName: '',
-  //                 username: docente.documento,
-  //                 password: passwordHash,
-  //                 documentTypeId: '60cfc792445f133f9e261eae',
-  //                 genderId:
-  //                   docente.sexo == 'F' ? '60cfc51e445f133f9e261ead' : '60ecc36d6c716a21bee51e00',
-  //                 birthdate: fechaNacimiento
-  //                   ? new Date(
-  //                       Number(fechaNacimiento[2]),
-  //                       Number(fechaNacimiento[1]) - 1,
-  //                       Number(fechaNacimiento[0])
-  //                     )
-  //                   : undefined,
-  //                 phone: docente.telefono,
-  //                 email: docente.email,
-  //                 roleId: '619551da882a2fb6525a3079',
-  //                 active: true,
-  //                 version: 0,
-  //               });
-  //               //console.log(modelUser);
-  //               let resultUser = await this.repositoryUser.save(modelUser);
-  //               const model = await this.repository.create({
-  //                 schoolId: [school.id.toString()],
-  //                 campusId: [campus[0].id.toString()],
-  //                 userId: resultUser.id.toString(),
-  //                 active: true,
-  //                 version: 0,
-  //               });
-  //               //console.log(model);
-  //               let result = await this.repository.save(model);
-  //               count += 1;
-  //               console.log(count);
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-
-  //   return true;
-  // }
+  @Mutation(() => Boolean)
+  public async createAllInitialsStudents() {
+    let schools = await this.repositorySchool.find();
+    let count = 0;
+    for (let school of schools) {
+      let data = await this.repositoryEstudiantes.findBy({
+        where: { dane: school.daneCode },
+      });
+      for (let estudiante of data) {
+        if (
+          estudiante.jornada &&
+          estudiante.consecutivo &&
+          estudiante.dane &&
+          estudiante.grado_cod &&
+          estudiante.grupo
+        ) {
+          if (
+            estudiante.jornada.length > 1 &&
+            estudiante.consecutivo.length > 1 &&
+            estudiante.dane.length > 1 &&
+            estudiante.grado_cod.length > 0 &&
+            estudiante.grupo.length > 0
+          ) {
+            let user = await this.repositoryUser.findBy({ username: estudiante.doc });
+            if (user.length === 0) {
+              let campus = await this.repositoryCampus.findBy({
+                where: { consecutive: estudiante.consecutivo },
+              });
+              if (campus.length === 1) {
+                let course = await this.repositoryCourse.findBy({
+                  jornadaSIMAT: estudiante.jornada,
+                  gradoCodSIMAT: estudiante.grado_cod,
+                  grupoSIMAT: estudiante.grupo,
+                  campusId: campus[0].id.toString(),
+                  active: true,
+                });
+                let academicGradeId = undefined;
+                let courseId = undefined;
+                if (course.length === 1) {
+                  academicGradeId = course[0].academicGradeId;
+                  courseId = course[0].id.toString();
+                }
+                let documentTypeId = '';
+                switch (estudiante.tipodoc) {
+                  case 'RC:REGISTRO CIVIL DE NACIMIENTO':
+                    documentTypeId = '629eb3e109a7e271df669986';
+                    break;
+                  case 'NES:NÚMERO ESTABLECIDO POR LA SECRETARÍA':
+                    documentTypeId = '629eb3f909a7e271df669987';
+                    break;
+                  case 'TI:TARJETA DE IDENTIDAD':
+                    documentTypeId = '61d5624837ab8e89c425f48a';
+                    break;
+                  case 'CC:CÉDULA DE CIUDADANÍA':
+                    documentTypeId = '60cfc792445f133f9e261eae';
+                    break;
+                  case 'CE:CÉDULA DE EXTRANJERÍA':
+                    documentTypeId = '629eb40a09a7e271df669988';
+                    break;
+                  case 'NUIP:NÚMERO UNICO DE IDENTIFICACIÓN PERSONAL':
+                    documentTypeId = '629eb42a09a7e271df669989';
+                    break;
+                  case 'PEP:PERMISO ESPECIAL DE PERMANENCIA':
+                    documentTypeId = '629eb51e09a7e271df66998e';
+                    break;
+                  case 'PPT: PERMISO DE PROTECCIÃ¿N TEMPORAL':
+                    documentTypeId = '629eb44109a7e271df66998a';
+                    break;
+                  case 'TMF: TARJETA DE MOVILIDAD FRONTERIZA':
+                    documentTypeId = '629eb45209a7e271df66998b';
+                    break;
+                  case 'NIP:NÚMERO DE IDENTIFICACIÓN PERSONAL':
+                    documentTypeId = '629eb46609a7e271df66998c';
+                    break;
+                  case 'VISA':
+                    documentTypeId = '629eb47009a7e271df66998d';
+                    break;
+                }
+                let passwordHash = await bcrypt
+                  .hash(estudiante.doc ? estudiante.doc : 'VIVE2022', BCRYPT_SALT_ROUNDS)
+                  .then(function (hashedPassword: any) {
+                    return hashedPassword;
+                  });
+                let fechaNacimiento = estudiante.fecha_nacimiento?.split('/');
+                const modelUser = await this.repositoryUser.create({
+                  name: estudiante.nombre1
+                    ? estudiante.nombre1
+                    : '' + ' ' + estudiante.nombre2
+                    ? estudiante.nombre2
+                    : '',
+                  lastName: estudiante.apellido1 + ' ' + estudiante.apellido2,
+                  username: estudiante.doc,
+                  password: passwordHash,
+                  documentTypeId,
+                  documentNumber: estudiante.doc,
+                  genderId:
+                    estudiante.genero == 'FEMENINO'
+                      ? '60cfc51e445f133f9e261ead'
+                      : '60ecc36d6c716a21bee51e00',
+                  birthdate: fechaNacimiento
+                    ? new Date(
+                        Number(fechaNacimiento[2]),
+                        Number(fechaNacimiento[1]) - 1,
+                        Number(fechaNacimiento[0])
+                      )
+                    : undefined,
+                  roleId: '619551d1882a2fb6525a3078',
+                  active: true,
+                  version: 0,
+                });
+                console.log(modelUser, school, campus, course);
+                //let resultUser = await this.repositoryUser.save(modelUser);
+                // const model = await this.repository.create({
+                //   schoolId: [school.id.toString()],
+                //   campusId: [campus[0].id.toString()],
+                //   academicGradeId,
+                //   courseId,
+                //   userId: resultUser.id.toString(),
+                //   active: true,
+                //   version: 0,
+                // });
+                //console.log(model);
+                //let result = await this.repository.save(model);
+                count += 1;
+                console.log(count);
+              }
+            }
+          }
+        }
+      }
+    }
+    return true;
+  }
 
   @Mutation(() => Student)
   async updateStudent(
@@ -259,6 +354,21 @@ export class StudentResolver {
         studentsId = [];
       }
       studentsId?.push(id);
+      let resultCourse = await this.repositoryCourse.save({
+        _id: new ObjectId(data.courseId),
+        ...course,
+        studentsId,
+        version: (result?.version as number) + 1,
+      });
+    } else {
+      let course = await this.repositoryCourse.findOneBy(result?.courseId);
+      let studentsId = course?.studentsId;
+      if (studentsId == undefined || studentsId == null) {
+        studentsId = [];
+      }
+      studentsId?.filter((student) => {
+        return student != id;
+      });
       let resultCourse = await this.repositoryCourse.save({
         _id: new ObjectId(data.courseId),
         ...course,

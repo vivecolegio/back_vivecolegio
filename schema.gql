@@ -1933,6 +1933,7 @@ type Mutation {
   createAllInitialsCourse: Boolean!
   createAllInitialsSchoolAdministratives: Boolean!
   createAllInitialsSchoolAdministrators: Boolean!
+  createAllInitialsStudents: Boolean!
   createAllInitialsTeachers: Boolean!
   createAuditLogin(data: NewAuditLogin!): AuditLogin!
   createCampus(data: NewCampus!): Campus!
@@ -2602,6 +2603,7 @@ input NewRole {
   isCampusAdministrator: Boolean
   isCampusCoordinator: Boolean
   isGuardian: Boolean
+  isSchoolAdministrative: Boolean
   isSchoolAdministrator: Boolean
   isStudent: Boolean
   isTeacher: Boolean
@@ -3888,6 +3890,23 @@ type Query {
     orderCreated: Boolean!
     schoolId: String
   ): StudentConnection!
+  getAllStudentAcademicGradeIdWithoutCourse(
+    academicGradeId: String!
+
+    """Paginate after opaque cursor"""
+    after: String
+
+    """Paginate before opaque cursor"""
+    before: String
+    campusId: String!
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    schoolId: String!
+  ): StudentConnection!
   getAllTeacher(
     """Paginate after opaque cursor"""
     after: String
@@ -4099,6 +4118,7 @@ type Role implements IModelData {
   isCampusAdministrator: Boolean
   isCampusCoordinator: Boolean
   isGuardian: Boolean
+  isSchoolAdministrative: Boolean
   isSchoolAdministrator: Boolean
   isStudent: Boolean
   isTeacher: Boolean
