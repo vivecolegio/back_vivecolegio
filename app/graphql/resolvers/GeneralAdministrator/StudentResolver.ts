@@ -10,7 +10,7 @@ import {
   EstudiantesRepository,
   SchoolRepository,
   StudentRepository,
-  UserRepository,
+  UserRepository
 } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewStudent } from '../../inputs/GeneralAdministrator/NewStudent';
@@ -282,8 +282,8 @@ export class StudentResolver {
                   name: estudiante.nombre1
                     ? estudiante.nombre1
                     : '' + ' ' + estudiante.nombre2
-                    ? estudiante.nombre2
-                    : '',
+                      ? estudiante.nombre2
+                      : '',
                   lastName: estudiante.apellido1 + ' ' + estudiante.apellido2,
                   username: estudiante.doc,
                   password: passwordHash,
@@ -295,10 +295,10 @@ export class StudentResolver {
                       : '60ecc36d6c716a21bee51e00',
                   birthdate: fechaNacimiento
                     ? new Date(
-                        Number(fechaNacimiento[2]),
-                        Number(fechaNacimiento[1]) - 1,
-                        Number(fechaNacimiento[0])
-                      )
+                      Number(fechaNacimiento[2]),
+                      Number(fechaNacimiento[1]) - 1,
+                      Number(fechaNacimiento[0])
+                    )
                     : undefined,
                   roleId: '619551d1882a2fb6525a3078',
                   active: true,
@@ -366,8 +366,8 @@ export class StudentResolver {
       if (studentsId == undefined || studentsId == null) {
         studentsId = [];
       }
-      studentsId?.filter((student) => {
-        return student != id;
+      studentsId = studentsId?.filter((student) => {
+        return student !== id;
       });
       let resultCourse = await this.repositoryCourse.save({
         _id: new ObjectId(data.courseId),
