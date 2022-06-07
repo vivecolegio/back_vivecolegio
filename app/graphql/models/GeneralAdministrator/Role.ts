@@ -16,6 +16,10 @@ export class Role extends IModelData {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
+  isSchoolAdministrative?: boolean;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   isCampusAdministrator?: boolean;
 
   @Field({ nullable: true })

@@ -10,6 +10,9 @@ export class NewRole implements Partial<Role> {
   isSchoolAdministrator?: boolean;
 
   @Field({ nullable: true })
+  isSchoolAdministrative?: boolean;
+
+  @Field({ nullable: true })
   isCampusAdministrator?: boolean;
 
   @Field({ nullable: true })

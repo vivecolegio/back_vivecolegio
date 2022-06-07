@@ -80,6 +80,15 @@ export class RoleResolver {
           order: { createdAt: 'DESC' },
         });
         break;
+      case 'SchoolAdministrative':
+        result = await this.repository.findBy({
+          where: {
+            active: true,
+            isSchoolAdministrative: true,
+          },
+          order: { createdAt: 'DESC' },
+        });
+        break;
       case 'CampusAdministrator':
         result = await this.repository.findBy({
           where: {
