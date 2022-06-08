@@ -22,7 +22,7 @@ import {
   SchoolRepository,
   StudentRepository,
   TeacherRepository,
-  UserRepository,
+  UserRepository
 } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
@@ -357,6 +357,7 @@ export class UserResolver {
           if (userRole && userRole.length > 0) {
             schoolId = userRole[0].schoolId;
             campusId = userRole[0].campusId;
+            jwtUtil.teacher = userRole[0];
           }
         }
         if (role.isGuardian) {
@@ -567,10 +568,10 @@ export class UserResolver {
       const uid = new ShortUniqueId({ length: 14 });
       const out = fs.createWriteStream(
         dir +
-          '/' +
-          uid() +
-          '.' +
-          file?.filename.slice(((file?.filename.lastIndexOf('.') - 1) >>> 0) + 2)
+        '/' +
+        uid() +
+        '.' +
+        file?.filename.slice(((file?.filename.lastIndexOf('.') - 1) >>> 0) + 2)
       );
       stream.pipe(out);
       await finished(out);
