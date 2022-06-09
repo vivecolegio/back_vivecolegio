@@ -373,6 +373,46 @@ export class CourseResolver {
     return true;
   }
 
+  @Mutation(() => Boolean)
+  public async updateStudentsAllInitialsCourse() {
+    let schools = await this.repositorySchool.find();
+    let count = 0;
+    for (let school of schools) {
+      let campus = await this.repositoryCampus.findBy({
+        where: { schoolId: school.id.toString() },
+      });
+      for (let campu of campus) {
+        let courses = await this.repository.findBy({
+          where: {
+            campusId: campu.id.toString(),
+          },
+        });
+        for (let course of courses) {
+          let students = await this.repositoryStudent.findBy({
+            where: {
+              courseId: course.id.toString(),
+            },
+          });
+          let studentsId = course?.studentsId;
+          if (studentsId == undefined || studentsId == null) {
+            studentsId = [];
+          }
+          for (let student of students) {
+            studentsId?.push(student.id.toString());
+          }
+          let resultCourse = await this.repository.save({
+            _id: new ObjectId(course.id.toString()),
+            ...course,
+            studentsId,
+            version: (course?.version as number) + 1,
+          });
+          count += 1;
+          console.log(count);
+        }
+      }
+    }
+  }
+
   @Mutation(() => Course)
   async updateCourse(
     @Arg('data') data: NewCourse,

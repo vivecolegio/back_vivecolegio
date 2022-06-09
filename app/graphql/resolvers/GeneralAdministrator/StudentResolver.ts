@@ -191,6 +191,20 @@ export class StudentResolver {
       createdByUserId,
     });
     let result = await this.repository.save(model);
+    if (result.courseId) {
+      let course = await this.repositoryCourse.findOneBy(result.courseId);
+      let studentsId = course?.studentsId;
+      if (studentsId == undefined || studentsId == null) {
+        studentsId = [];
+      }
+      studentsId?.push(result.id.toString());
+      let resultCourse = await this.repositoryCourse.save({
+        _id: new ObjectId(result.courseId),
+        ...course,
+        studentsId,
+        version: (result?.version as number) + 1,
+      });
+    }
     return result;
   }
 
@@ -200,7 +214,7 @@ export class StudentResolver {
     let count = 0;
     for (let school of schools) {
       let data = await this.repositoryEstudiantes.findBy({
-        where: { dane: school.daneCode },
+        where: { dane: school.daneCode, procesado: null },
       });
       for (let estudiante of data) {
         if (
@@ -304,22 +318,32 @@ export class StudentResolver {
                   active: true,
                   version: 0,
                 });
-                console.log(modelUser, school, campus, course);
-                //let resultUser = await this.repositoryUser.save(modelUser);
-                // const model = await this.repository.create({
-                //   schoolId: [school.id.toString()],
-                //   campusId: [campus[0].id.toString()],
-                //   academicGradeId,
-                //   courseId,
-                //   userId: resultUser.id.toString(),
-                //   active: true,
-                //   version: 0,
-                // });
-                //console.log(model);
-                //let result = await this.repository.save(model);
+                let resultUser = await this.repositoryUser.save(modelUser);
+                const model = await this.repository.create({
+                  schoolId: [school.id.toString()],
+                  campusId: [campus[0].id.toString()],
+                  academicGradeId,
+                  courseId,
+                  userId: resultUser.id.toString(),
+                  active: true,
+                  version: 0,
+                });
+                let result = await this.repository.save(model);
                 count += 1;
+                const model2 = await this.repositoryEstudiantes.create({
+                  ...estudiante,
+                  procesado: true,
+                });
+                let result2 = await this.repositoryEstudiantes.save(model2);
                 console.log(count);
               }
+            } else {
+              const model = await this.repositoryEstudiantes.create({
+                ...estudiante,
+                procesado: true,
+              });
+              //console.log(model);
+              let result = await this.repositoryEstudiantes.save(model);
             }
           }
         }

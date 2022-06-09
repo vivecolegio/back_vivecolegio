@@ -168,6 +168,7 @@ export class SchoolAdministrativeResolver {
                 lastName: '',
                 username: administrativo.documento,
                 password: passwordHash,
+                documentNumber: administrativo.documento,
                 documentTypeId: '60cfc792445f133f9e261eae',
                 genderId:
                   administrativo.sexo == 'F'
@@ -200,6 +201,23 @@ export class SchoolAdministrativeResolver {
               count += 1;
               console.log(count);
               //}
+            } else {
+              for (let use of user) {
+                await this.repositoryUser.save({
+                  _id: new ObjectId(use.id.toString()),
+                  ...use,
+                  documentNumber: use.username,
+                  version: (use?.version as number) + 1,
+                });
+              }
+              const model = await this.repositoryPlantaDocente.create({
+                ...administrativo,
+                procesado: true,
+              });
+              count += 1;
+              //console.log(model);
+              let result = await this.repositoryPlantaDocente.save(model);
+              console.log('procesados ' + count);
             }
           }
         }

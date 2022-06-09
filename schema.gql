@@ -2123,6 +2123,7 @@ type Mutation {
   updateSchoolYear(data: NewSchoolYear!, id: String!): SchoolYear!
   updateSpecialty(data: NewSpecialty!, id: String!): Specialty!
   updateStudent(data: NewStudent!, id: String!): Student!
+  updateStudentsAllInitialsCourse: Boolean!
   updateTeacher(data: NewTeacher!, id: String!): Teacher!
   updateUser(data: NewUser!, id: String!): User!
   userProfileUploadImage(file: Upload, id: String!): Boolean!

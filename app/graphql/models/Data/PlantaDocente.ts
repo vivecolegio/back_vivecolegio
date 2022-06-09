@@ -49,6 +49,10 @@ export class PlantaDocente extends IModelData {
   @Field({ nullable: true })
   @Column({ nullable: true })
   direccion?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  procesado?: boolean;
 }
 
 @ObjectType()

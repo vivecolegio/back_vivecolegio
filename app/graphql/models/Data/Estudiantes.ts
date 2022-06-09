@@ -57,6 +57,10 @@ export class Estudiantes extends IModelData {
   @Field({ nullable: true })
   @Column({ nullable: true })
   fecha_nacimiento?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  procesado?: boolean;
 }
 
 @ObjectType()

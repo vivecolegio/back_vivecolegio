@@ -163,7 +163,7 @@ export class TeacherResolver {
     let count = 0;
     for (let school of schools) {
       let data = await this.repositoryPlantaDocente.findBy({
-        where: { school_id: school.id.toString() },
+        where: { school_id: school.id.toString(), procesado: null },
       });
       for (let docente of data) {
         if (
@@ -225,6 +225,23 @@ export class TeacherResolver {
                 count += 1;
                 //console.log(count);
               }
+            } else {
+              for (let use of user) {
+                await this.repositoryUser.save({
+                  _id: new ObjectId(use.id.toString()),
+                  ...use,
+                  documentNumber: use.username,
+                  version: (use?.version as number) + 1,
+                });
+              }
+              const model = await this.repositoryPlantaDocente.create({
+                ...docente,
+                procesado: true,
+              });
+              count += 1;
+              //console.log(model);
+              let result = await this.repositoryPlantaDocente.save(model);
+              console.log('procesados ' + count);
             }
           }
         }
