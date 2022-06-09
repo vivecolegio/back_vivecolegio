@@ -10,7 +10,7 @@ import {
   EstudiantesRepository,
   SchoolRepository,
   StudentRepository,
-  UserRepository
+  UserRepository,
 } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewStudent } from '../../inputs/GeneralAdministrator/NewStudent';
@@ -162,6 +162,32 @@ export class StudentResolver {
     return resultConn;
   }
 
+  @Query(() => StudentConnection)
+  async getAllStudentAcademicGrade(
+    @Args() args: ConnectionArgs,
+    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('campusId', () => String) campusId: String,
+    @Arg('academicGradeId', () => String) academicGradeId: String
+  ): Promise<StudentConnection> {
+    let result;
+    result = await this.repository.findBy({
+      where: {
+        schoolId,
+        campusId,
+        academicGradeId,
+        active: true,
+      },
+      order: { createdAt: 'DESC' },
+    });
+    let resultConn = new StudentConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
+  }
+
   @Mutation(() => Student)
   async createStudent(@Arg('data') data: NewStudent, @Ctx() context: IContext): Promise<Student> {
     let dataProcess: NewStudent = removeEmptyStringElements(data);
@@ -296,8 +322,8 @@ export class StudentResolver {
                   name: estudiante.nombre1
                     ? estudiante.nombre1
                     : '' + ' ' + estudiante.nombre2
-                      ? estudiante.nombre2
-                      : '',
+                    ? estudiante.nombre2
+                    : '',
                   lastName: estudiante.apellido1 + ' ' + estudiante.apellido2,
                   username: estudiante.doc,
                   password: passwordHash,
@@ -309,10 +335,10 @@ export class StudentResolver {
                       : '60ecc36d6c716a21bee51e00',
                   birthdate: fechaNacimiento
                     ? new Date(
-                      Number(fechaNacimiento[2]),
-                      Number(fechaNacimiento[1]) - 1,
-                      Number(fechaNacimiento[0])
-                    )
+                        Number(fechaNacimiento[2]),
+                        Number(fechaNacimiento[1]) - 1,
+                        Number(fechaNacimiento[0])
+                      )
                     : undefined,
                   roleId: '619551d1882a2fb6525a3078',
                   active: true,

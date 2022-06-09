@@ -22,7 +22,7 @@ import {
   SchoolRepository,
   StudentRepository,
   TeacherRepository,
-  UserRepository
+  UserRepository,
 } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
@@ -211,6 +211,32 @@ export class UserResolver {
   ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOneBy(id);
+    if (password != null) {
+      let passwordHash = await bcrypt
+        .hash(password, BCRYPT_SALT_ROUNDS)
+        .then(function (hashedPassword) {
+          return hashedPassword;
+        });
+      result = await this.repository.save({
+        _id: new ObjectId(id),
+        ...result,
+        password: passwordHash,
+        version: (result?.version as number) + 1,
+        updatedByUserId,
+      });
+      return true;
+    }
+    return false;
+  }
+
+  @Mutation(() => Boolean)
+  async resetPasswordUser(
+    @Arg('id', () => String) id: string,
+    @Ctx() context: IContext
+  ): Promise<Boolean | null> {
+    let updatedByUserId = context?.user?.authorization?.id;
+    let result = await this.repository.findOneBy(id);
+    let password = result?.documentNumber;
     if (password != null) {
       let passwordHash = await bcrypt
         .hash(password, BCRYPT_SALT_ROUNDS)
@@ -568,10 +594,10 @@ export class UserResolver {
       const uid = new ShortUniqueId({ length: 14 });
       const out = fs.createWriteStream(
         dir +
-        '/' +
-        uid() +
-        '.' +
-        file?.filename.slice(((file?.filename.lastIndexOf('.') - 1) >>> 0) + 2)
+          '/' +
+          uid() +
+          '.' +
+          file?.filename.slice(((file?.filename.lastIndexOf('.') - 1) >>> 0) + 2)
       );
       stream.pipe(out);
       await finished(out);
