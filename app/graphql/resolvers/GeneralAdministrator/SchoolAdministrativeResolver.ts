@@ -134,7 +134,7 @@ export class SchoolAdministrativeResolver {
     let count = 0;
     for (let school of schools) {
       let data = await this.repositoryPlantaDocente.findBy({
-        where: { school_id: school.id.toString() },
+        where: { school_id: school.id.toString(), procesado: null },
       });
       for (let administrativo of data) {
         if (

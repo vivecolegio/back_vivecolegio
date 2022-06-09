@@ -2059,6 +2059,7 @@ type Mutation {
   deleteTeacher(id: String!): Boolean!
   deleteUser(id: String!): Boolean!
   login(password: String!, username: String!): Jwt!
+  resetPasswordUser(id: String!): Boolean!
   singleUpload(file: Upload, id: String!): Boolean!
   updateAcademicArea(data: NewAcademicArea!, id: String!): AcademicArea!
   updateAcademicAsignature(data: NewAcademicAsignature!, id: String!): AcademicAsignature!
@@ -3891,6 +3892,23 @@ type Query {
     last: Float
     orderCreated: Boolean!
     schoolId: String
+  ): StudentConnection!
+  getAllStudentAcademicGrade(
+    academicGradeId: String!
+
+    """Paginate after opaque cursor"""
+    after: String
+
+    """Paginate before opaque cursor"""
+    before: String
+    campusId: String!
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    schoolId: String!
   ): StudentConnection!
   getAllStudentAcademicGradeIdWithoutCourse(
     academicGradeId: String!
