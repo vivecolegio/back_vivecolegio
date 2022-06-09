@@ -1630,6 +1630,7 @@ type Jwt {
   roleMenus: [Menu!]
   schools: [School!]
   student: Student
+  teacher: Teacher
   userId: String
   username: String
 }
