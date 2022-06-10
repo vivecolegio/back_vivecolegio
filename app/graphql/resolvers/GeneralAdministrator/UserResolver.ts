@@ -321,141 +321,143 @@ export class UserResolver {
     @Arg('password') password: string,
     @Ctx() context: IContext
   ) {
-    let user = await this.repository.findOneBy({ where: { username } });
-    let compare = await bcrypt.compare(password, user?.password as string);
     let jwtUtil = new Jwt();
-    if (compare) {
-      let jwtS = jsonwebtoken.sign({ authorization: { id: user?.id } }, 'f1BtnWgD3VKY', {
-        algorithm: 'HS256',
-        subject: username,
-        expiresIn: '1d',
-      });
-      if (user) {
-        jwtUtil.name = user.name;
-        jwtUtil.lastName = user.lastName;
-        jwtUtil.username = user.username;
-        jwtUtil.profilePhoto = user.profilePhoto;
-        jwtUtil.userId = user.id;
-        let role = (await this.repositoryRole.findOneBy(user.roleId)) as Role;
-        user.roleId ? (jwtUtil.role = role) : null;
-        let campusId;
-        let schoolId;
-        if (role.isSchoolAdministrator) {
-          let userRole = await this.repositorySchoolAdministrator.findBy({
-            where: { userId: user.id.toString() },
-          });
-          if (userRole && userRole.length > 0) {
-            schoolId = userRole[0].schoolId;
+    let user = await this.repository.findOneBy({ where: { username, active: true } });
+    if (user) {
+      let compare = await bcrypt.compare(password, user?.password as string);
+      if (compare) {
+        let jwtS = jsonwebtoken.sign({ authorization: { id: user?.id } }, 'f1BtnWgD3VKY', {
+          algorithm: 'HS256',
+          subject: username,
+          expiresIn: '1d',
+        });
+        if (user) {
+          jwtUtil.name = user.name;
+          jwtUtil.lastName = user.lastName;
+          jwtUtil.username = user.username;
+          jwtUtil.profilePhoto = user.profilePhoto;
+          jwtUtil.userId = user.id;
+          let role = (await this.repositoryRole.findOneBy(user.roleId)) as Role;
+          user.roleId ? (jwtUtil.role = role) : null;
+          let campusId;
+          let schoolId;
+          if (role.isSchoolAdministrator) {
+            let userRole = await this.repositorySchoolAdministrator.findBy({
+              where: { userId: user.id.toString() },
+            });
+            if (userRole && userRole.length > 0) {
+              schoolId = userRole[0].schoolId;
+            }
           }
-        }
-        if (role.isCampusAdministrator) {
-          let userRole = await this.repositoryCampusAdministrator.findBy({
-            where: { userId: user.id.toString() },
-          });
-          if (userRole && userRole.length > 0) {
-            schoolId = userRole[0].schoolId;
-            campusId = userRole[0].campusId;
+          if (role.isCampusAdministrator) {
+            let userRole = await this.repositoryCampusAdministrator.findBy({
+              where: { userId: user.id.toString() },
+            });
+            if (userRole && userRole.length > 0) {
+              schoolId = userRole[0].schoolId;
+              campusId = userRole[0].campusId;
+            }
           }
-        }
-        if (role.isCampusCoordinator) {
-          let userRole = await this.repositoryCampusCoordinator.findBy({
-            where: { userId: user.id.toString() },
-          });
-          if (userRole && userRole.length > 0) {
-            schoolId = userRole[0].schoolId;
-            campusId = userRole[0].campusId;
+          if (role.isCampusCoordinator) {
+            let userRole = await this.repositoryCampusCoordinator.findBy({
+              where: { userId: user.id.toString() },
+            });
+            if (userRole && userRole.length > 0) {
+              schoolId = userRole[0].schoolId;
+              campusId = userRole[0].campusId;
+            }
           }
-        }
-        if (role.isStudent) {
-          let userRole = await this.repositoryStudent.findBy({
-            where: { userId: user.id.toString() },
-          });
-          if (userRole && userRole.length > 0) {
-            schoolId = userRole[0].schoolId;
-            campusId = userRole[0].campusId;
-            jwtUtil.student = userRole[0];
+          if (role.isStudent) {
+            let userRole = await this.repositoryStudent.findBy({
+              where: { userId: user.id.toString() },
+            });
+            if (userRole && userRole.length > 0) {
+              schoolId = userRole[0].schoolId;
+              campusId = userRole[0].campusId;
+              jwtUtil.student = userRole[0];
+            }
           }
-        }
-        if (role.isTeacher) {
-          let userRole = await this.repositoryTeacher.findBy({
-            where: { userId: user.id.toString() },
-          });
-          if (userRole && userRole.length > 0) {
-            schoolId = userRole[0].schoolId;
-            campusId = userRole[0].campusId;
-            jwtUtil.teacher = userRole[0];
+          if (role.isTeacher) {
+            let userRole = await this.repositoryTeacher.findBy({
+              where: { userId: user.id.toString() },
+            });
+            if (userRole && userRole.length > 0) {
+              schoolId = userRole[0].schoolId;
+              campusId = userRole[0].campusId;
+              jwtUtil.teacher = userRole[0];
+            }
           }
-        }
-        if (role.isGuardian) {
-          let userRole = await this.repositoryGuardian.findBy({
-            where: { userId: user.id.toString() },
-          });
-          if (userRole && userRole.length > 0) {
-            schoolId = userRole[0].schoolId;
-            campusId = userRole[0].campusId;
+          if (role.isGuardian) {
+            let userRole = await this.repositoryGuardian.findBy({
+              where: { userId: user.id.toString() },
+            });
+            if (userRole && userRole.length > 0) {
+              schoolId = userRole[0].schoolId;
+              campusId = userRole[0].campusId;
+            }
           }
-        }
-        let campus;
-        let school;
-        if (campusId !== undefined) {
-          let campusIds: any[] = [];
-          campusId.forEach((id: any) => {
-            campusIds.push(new ObjectId(id));
-          });
-          campus = await this.repositoryCampus.findBy({
-            where: { _id: { $in: campusIds } },
-          });
-        }
-        if (schoolId) {
-          let schoolIds: any[] = [];
-          schoolId.forEach((id: any) => {
-            schoolIds.push(new ObjectId(id));
-          });
-          school = await this.repositorySchool.findBy({
-            where: { _id: { $in: schoolIds } },
-          });
-        }
-        if (campus && campus !== undefined) {
-          jwtUtil.campus = campus;
-        }
-        if (school && school !== undefined) {
-          jwtUtil.schools = school;
-        }
-        if (user.roleId) {
-          let menus = await this.repositoryMenu.findBy({
-            where: { rolesId: { $in: [user.roleId] }, active: true },
-            order: { order: 'ASC' },
-          });
-          for (let index = 0; index < menus.length; index++) {
-            let menusItems = await this.repositoryMenuItem.findBy({
-              where: {
-                menuId: menus[index].id.toString(),
-                rolesId: { $in: [user?.roleId] },
-                active: true,
-              },
+          let campus;
+          let school;
+          if (campusId !== undefined) {
+            let campusIds: any[] = [];
+            campusId.forEach((id: any) => {
+              campusIds.push(new ObjectId(id));
+            });
+            campus = await this.repositoryCampus.findBy({
+              where: { _id: { $in: campusIds } },
+            });
+          }
+          if (schoolId) {
+            let schoolIds: any[] = [];
+            schoolId.forEach((id: any) => {
+              schoolIds.push(new ObjectId(id));
+            });
+            school = await this.repositorySchool.findBy({
+              where: { _id: { $in: schoolIds } },
+            });
+          }
+          if (campus && campus !== undefined) {
+            jwtUtil.campus = campus;
+          }
+          if (school && school !== undefined) {
+            jwtUtil.schools = school;
+          }
+          if (user.roleId) {
+            let menus = await this.repositoryMenu.findBy({
+              where: { rolesId: { $in: [user.roleId] }, active: true },
               order: { order: 'ASC' },
             });
-            menus[index].menuItemsLogin = menusItems as [MenuItem];
+            for (let index = 0; index < menus.length; index++) {
+              let menusItems = await this.repositoryMenuItem.findBy({
+                where: {
+                  menuId: menus[index].id.toString(),
+                  rolesId: { $in: [user?.roleId] },
+                  active: true,
+                },
+                order: { order: 'ASC' },
+              });
+              menus[index].menuItemsLogin = menusItems as [MenuItem];
+            }
+            jwtUtil.roleMenus = menus as [Menu];
           }
-          jwtUtil.roleMenus = menus as [Menu];
+          jwtUtil.jwt = jwtS;
         }
-        jwtUtil.jwt = jwtS;
       }
+      const modelAuditLogin = await this.repositoryAuditLogin.create({
+        userId: user?.id.toString(),
+        username: username,
+        ip: context?.requestData?.ip,
+        geo: context?.requestData?.geo,
+        browser: context?.requestData?.browser,
+        language: context?.requestData?.language,
+        ipware: context?.requestData?.ipware,
+        ipwarePublic: context?.requestData?.ipwarePublic,
+        auth: compare,
+        active: true,
+        version: 0,
+      });
+      let resultAuditLogin = await this.repositoryAuditLogin.save(modelAuditLogin);
     }
-    const modelAuditLogin = await this.repositoryAuditLogin.create({
-      userId: user?.id.toString(),
-      username: username,
-      ip: context?.requestData?.ip,
-      geo: context?.requestData?.geo,
-      browser: context?.requestData?.browser,
-      language: context?.requestData?.language,
-      ipware: context?.requestData?.ipware,
-      ipwarePublic: context?.requestData?.ipwarePublic,
-      auth: compare,
-      active: true,
-      version: 0,
-    });
-    let resultAuditLogin = await this.repositoryAuditLogin.save(modelAuditLogin);
     return jwtUtil;
   }
 
