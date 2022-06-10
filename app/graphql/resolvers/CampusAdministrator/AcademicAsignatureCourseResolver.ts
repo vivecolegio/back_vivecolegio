@@ -173,6 +173,27 @@ export class AcademicAsignatureCourseResolver {
     return resultConn;
   }
 
+  @Query(() => AcademicAsignatureCourseConnection)
+  async getAllAcademicAsignatureCourseTeacher(
+    @Args() args: ConnectionArgs,
+    @Arg('teacherId', () => String) teacherId: String
+  ): Promise<AcademicAsignatureCourseConnection> {
+    let result;
+    result = await this.repository.findBy({
+      where: {
+        teacherId,
+        active: true,
+      },
+    });
+    let resultConn = new AcademicAsignatureCourseConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
+  }
+
   @Mutation(() => AcademicAsignatureCourse)
   async createAcademicAsignatureCourse(
     @Arg('data') data: NewAcademicAsignatureCourse,
