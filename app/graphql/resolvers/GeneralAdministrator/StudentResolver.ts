@@ -166,19 +166,30 @@ export class StudentResolver {
   async getAllStudentAcademicGrade(
     @Args() args: ConnectionArgs,
     @Arg('schoolId', () => String) schoolId: String,
-    @Arg('campusId', () => String) campusId: String,
+    @Arg('campusId', () => String, { nullable: true }) campusId: String,
     @Arg('academicGradeId', () => String) academicGradeId: String
   ): Promise<StudentConnection> {
     let result;
-    result = await this.repository.findBy({
-      where: {
-        schoolId,
-        campusId,
-        academicGradeId,
-        active: true,
-      },
-      order: { createdAt: 'DESC' },
-    });
+    if (campusId) {
+      result = await this.repository.findBy({
+        where: {
+          schoolId,
+          campusId,
+          academicGradeId,
+          active: true,
+        },
+        order: { createdAt: 'DESC' },
+      });
+    } else {
+      result = await this.repository.findBy({
+        where: {
+          schoolId,
+          academicGradeId,
+          active: true,
+        },
+        order: { createdAt: 'DESC' },
+      });
+    }
     let resultConn = new StudentConnection();
     let resultConnection = connectionFromArraySlice(result, args, {
       sliceStart: 0,
