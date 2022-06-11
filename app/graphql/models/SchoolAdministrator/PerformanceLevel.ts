@@ -6,6 +6,7 @@ import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { Campus } from '../GeneralAdministrator/Campus';
 import { GeneralPerformanceLevel } from '../GeneralAdministrator/GeneralPerformanceLevel';
+import { AcademicGrade } from './AcademicGrade';
 
 @ObjectType({ description: 'The PerformanceLevel model', implements: IModelSchoolData })
 @Entity()
@@ -43,6 +44,13 @@ export class PerformanceLevel extends IModelSchoolData {
 
   @Field(() => [Campus], { nullable: true })
   campus?: Campus[];
+
+  @Field(() => [String], { nullable: true })
+  @Column({ nullable: true })
+  academicGradesId?: String[];
+
+  @Field(() => [AcademicGrade], { nullable: true })
+  academicGrades?: AcademicGrade[];
 }
 
 @ObjectType()

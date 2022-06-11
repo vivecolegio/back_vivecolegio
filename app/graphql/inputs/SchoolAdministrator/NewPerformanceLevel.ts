@@ -24,6 +24,9 @@ export class NewPerformanceLevel implements Partial<PerformanceLevel> {
   category?: PerformanceLevelCategory;
 
   @Field(() => [String], { nullable: true })
+  academicGradesId?: String[];
+
+  @Field(() => [String], { nullable: true })
   campusId?: String[];
 
   @Field({ nullable: true })

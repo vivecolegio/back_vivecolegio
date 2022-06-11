@@ -3,6 +3,7 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import {
+  AcademicGradeRepository,
   CampusRepository,
   GeneralPerformanceLevelRepository,
   PerformanceLevelRepository,
@@ -23,6 +24,7 @@ import {
   PerformanceLevelConnection,
 } from '../../models/SchoolAdministrator/PerformanceLevel';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
+import { AcademicGrade } from './../../models/SchoolAdministrator/AcademicGrade';
 
 @Resolver(PerformanceLevel)
 export class PerformanceLevelResolver {
@@ -40,6 +42,9 @@ export class PerformanceLevelResolver {
 
   @InjectRepository(Campus)
   private repositoryCampus = CampusRepository;
+
+  @InjectRepository(AcademicGrade)
+  private repositoryAcademicGrade = AcademicGradeRepository;
 
   @Query(() => PerformanceLevel, { nullable: true })
   async getPerformanceLevel(@Arg('id', () => String) id: string) {
@@ -226,6 +231,22 @@ export class PerformanceLevelResolver {
         dataIds.push(new ObjectId(id));
       });
       const result = await this.repositoryCampus.findBy({ where: { _id: { $in: dataIds } } });
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => [AcademicGrade], { nullable: true })
+  async academicGrades(@Root() data: PerformanceLevel) {
+    let ids = data.academicGradesId;
+    if (ids !== null && ids !== undefined) {
+      let dataIds: any[] = [];
+      ids.forEach(async (id: any) => {
+        dataIds.push(new ObjectId(id));
+      });
+      const result = await this.repositoryAcademicGrade.findBy({
+        where: { _id: { $in: dataIds } },
+      });
       return result;
     }
     return null;

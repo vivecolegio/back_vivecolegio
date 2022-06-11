@@ -617,6 +617,18 @@ export class UserResolver {
     }
   }
 
+  @Query(() => Boolean)
+  async getValidationDocumentNumberUser(
+    @Arg('documentNumber', () => String) documentNumber: string
+  ) {
+    const result = await this.repository.findBy({ documentNumber });
+    if (result.length < 1) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   @Mutation(() => Boolean)
   async singleUpload(
     @Arg('id', () => String) id: string,
