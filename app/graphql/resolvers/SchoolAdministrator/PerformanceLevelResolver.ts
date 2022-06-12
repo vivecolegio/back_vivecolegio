@@ -123,7 +123,7 @@ export class PerformanceLevelResolver {
           result = await this.repository.findBy({
             where: {
               campusId: { $in: [course.campusId] },
-              academicGradeId: { $in: [course.academicGradeId] },
+              academicGradesId: { $in: [course.academicGradeId] },
               schoolId: campus.schoolId,
               active: true,
             },
@@ -141,7 +141,7 @@ export class PerformanceLevelResolver {
             if (result.length === 0) {
               result = await this.repository.findBy({
                 where: {
-                  academicGradeId: { $in: [course.academicGradeId] },
+                  academicGradesId: { $in: [course.academicGradeId] },
                   schoolId: campus.schoolId,
                   active: true,
                 },

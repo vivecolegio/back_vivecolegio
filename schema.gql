@@ -3168,6 +3168,21 @@ type Query {
     orderCreated: Boolean!
     schoolId: String!
   ): EvaluativeComponentConnection!
+  getAllEvaluativeComponentAcademicAsignatureCourse(
+    academicAsignatureCourseId: String!
+
+    """Paginate after opaque cursor"""
+    after: String
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+  ): EvaluativeComponentConnection!
   getAllEvidenceLearning(
     """Paginate after opaque cursor"""
     after: String
