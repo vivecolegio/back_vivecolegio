@@ -413,6 +413,52 @@ export class CourseResolver {
     }
   }
 
+  @Mutation(() => Boolean)
+  async updateCodeStudentsCourse(
+    @Arg('id', () => String) id: string,
+    @Ctx() context: IContext
+  ): Promise<Boolean | null> {
+    let course = await this.repository.findOneBy(id);
+    if (course) {
+      let students = await this.repositoryStudent.findBy({
+        where: {
+          courseId: course.id.toString(),
+        },
+      });
+      let usersId = [];
+      for (let student of students) {
+        usersId?.push(new ObjectId(student.userId));
+      }
+      let users = await this.repositoryUser.findBy({
+        where: { _id: { $in: usersId }, active: true },
+        order: { lastName: 'ASC' },
+      });
+      if (users && users.length > 0) {
+        let code = 1;
+        for (let user of users) {
+          let student = await this.repositoryStudent.findBy({
+            where: {
+              courseId: course.id.toString(),
+              userId: user.id.toString(),
+              active: true,
+            },
+          });
+          console.log(course.id.toString(), '-', user.id.toString());
+          if (student) {
+            await this.repositoryStudent.save({
+              _id: new ObjectId(student[0].id.toString()),
+              ...student[0],
+              code,
+              version: (student[0]?.version as number) + 1,
+            });
+            code += 1;
+          }
+        }
+      }
+    }
+    return true;
+  }
+
   @Mutation(() => Course)
   async updateCourse(
     @Arg('data') data: NewCourse,

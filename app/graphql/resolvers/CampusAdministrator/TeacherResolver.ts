@@ -148,7 +148,7 @@ export class TeacherResolver {
     let resultUser = await this.repositoryUser.save(modelUser);
     const model = await this.repository.create({
       ...dataProcess,
-      userId: resultUser.id,
+      userId: resultUser.id.toString(),
       active: true,
       version: 0,
       createdByUserId,

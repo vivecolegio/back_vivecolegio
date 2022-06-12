@@ -3,7 +3,12 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { CampusCoordinatorRepository, CampusRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  CampusCoordinatorRepository,
+  CampusRepository,
+  SchoolRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
 import { NewCampusCoordinator } from '../../inputs/SchoolAdministrator/NewCampusCoordinator';
@@ -13,7 +18,7 @@ import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import {
   CampusCoordinator,
-  CampusCoordinatorConnection
+  CampusCoordinatorConnection,
 } from '../../models/SchoolAdministrator/CampusCoordinator';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
@@ -44,7 +49,7 @@ export class CampusCoordinatorResolver {
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
-    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('schoolId', () => String) schoolId: String
   ): Promise<CampusCoordinatorConnection> {
     let result;
     if (allData) {
@@ -109,7 +114,7 @@ export class CampusCoordinatorResolver {
     let resultUser = await this.repositoryUser.save(modelUser);
     const model = await this.repository.create({
       ...dataProcess,
-      userId: resultUser.id,
+      userId: resultUser.id.toString(),
       active: true,
       version: 0,
       createdByUserId,

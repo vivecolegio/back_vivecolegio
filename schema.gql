@@ -2078,6 +2078,7 @@ type Mutation {
   updateCampusAdministrator(data: NewCampusAdministrator!, id: String!): CampusAdministrator!
   updateCampusCoordinator(data: NewCampusCoordinator!, id: String!): CampusCoordinator!
   updateClassroomPlan(data: NewClassroomPlan!, id: String!): ClassroomPlan!
+  updateCodeStudentsCourse(id: String!): Boolean!
   updateCourse(data: NewCourse!, id: String!): Course!
   updateDocumentType(data: NewDocumentType!, id: String!): DocumentType!
   updateEducationLevel(data: NewEducationLevel!, id: String!): EducationLevel!
