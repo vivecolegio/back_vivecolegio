@@ -6,54 +6,54 @@ import { NewExperienceLearningPerformanceLevel } from './NewExperienceLearningPe
 
 @InputType()
 export class NewExperienceLearning implements Partial<ExperienceLearning> {
-    @Field({ nullable: true })
-    campusId?: string;
+  @Field({ nullable: true })
+  campusId?: string;
 
-    @Field({ nullable: true })
-    title?: string;
+  @Field({ nullable: true })
+  title?: string;
 
-    @Field({ nullable: true })
-    academicAsignatureCourseId?: string;
+  @Field({ nullable: true })
+  academicAsignatureCourseId?: string;
 
-    @Field({ nullable: true })
-    description?: string;
+  @Field({ nullable: true })
+  description?: string;
 
-    @Field(() => ExperienceType, { nullable: true })
-    experienceType?: ExperienceType;
+  @Field(() => ExperienceType, { nullable: true })
+  experienceType?: ExperienceType;
 
-    @Field({ nullable: true })
-    dateDelivery?: Date;
+  @Field({ nullable: true })
+  dateDelivery?: Date;
 
-    @Field(() => [String], { nullable: true })
-    learningsId?: String[];
+  @Field(() => [String], { nullable: true })
+  learningsId?: String[];
 
-    @Field(() => [String], { nullable: true })
-    evidenceLearningsId?: String[];
+  @Field(() => [String], { nullable: true })
+  evidenceLearningsId?: String[];
 
-    @Field({ nullable: true })
-    academicPeriodId?: string;
+  @Field({ nullable: true })
+  academicPeriodId?: string;
 
-    @Field({ nullable: true })
-    evaluativeComponentId?: string;
+  @Field(() => [String], { nullable: true })
+  evaluativeComponentsId?: String[];
 
-    @Field({ nullable: true })
-    onlineDelivery?: Boolean;
+  @Field({ nullable: true })
+  onlineDelivery?: Boolean;
 
-    @Field({ nullable: true })
-    criteria?: String;
+  @Field({ nullable: true })
+  criteria?: String;
 
-    @Field(() => [NewExperienceLearningPerformanceLevel], { nullable: true })
-    experienceLearningPerformanceLevel?: NewExperienceLearningPerformanceLevel[];
+  @Field(() => [NewExperienceLearningPerformanceLevel], { nullable: true })
+  experienceLearningPerformanceLevel?: NewExperienceLearningPerformanceLevel[];
 
-    @Field({ nullable: true })
-    openTestDate?: Date;
+  @Field({ nullable: true })
+  openTestDate?: Date;
 
-    @Field({ nullable: true })
-    closeTestDate?: Date;
+  @Field({ nullable: true })
+  closeTestDate?: Date;
 
-    @Field(() => NavigationMethodTestOnline, { nullable: true })
-    navigationMethod?: NavigationMethodTestOnline;
+  @Field(() => NavigationMethodTestOnline, { nullable: true })
+  navigationMethod?: NavigationMethodTestOnline;
 
-    @Field({ nullable: true })
-    shuffleQuestions?: Boolean;
+  @Field({ nullable: true })
+  shuffleQuestions?: Boolean;
 }

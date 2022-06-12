@@ -817,8 +817,8 @@ type ExperienceLearning implements IModelCampusData {
   criteria: String
   dateDelivery: DateTime
   description: String
-  evaluativeComponent: EvaluativeComponent
-  evaluativeComponentId: String
+  evaluativeComponents: [EvaluativeComponent!]
+  evaluativeComponentsId: [String!]
   evidenceLearnings: [EvidenceLearning!]
   evidenceLearningsId: [String!]
   experienceLearningPerformanceLevel: [ExperienceLearningPerformanceLevel!]
@@ -1628,6 +1628,7 @@ type Jwt {
   profilePhoto: String
   role: Role
   roleMenus: [Menu!]
+  schoolYear: SchoolYear
   schools: [School!]
   student: Student
   teacher: Teacher
@@ -2340,7 +2341,7 @@ input NewExperienceLearning {
   criteria: String
   dateDelivery: DateTime
   description: String
-  evaluativeComponentId: String
+  evaluativeComponentsId: [String!]
   evidenceLearningsId: [String!]
   experienceLearningPerformanceLevel: [NewExperienceLearningPerformanceLevel!]
   experienceType: ExperienceType
@@ -2570,6 +2571,7 @@ input NewNotification {
 }
 
 input NewPerformanceLevel {
+  academicGradesId: [String!]
   campusId: [String!]
   category: PerformanceLevelCategory
   generalPerformanceLevelId: String
@@ -2724,6 +2726,8 @@ type PageInfo {
 
 """The PerformanceLevel model"""
 type PerformanceLevel implements IModelSchoolData {
+  academicGrades: [AcademicGrade!]
+  academicGradesId: [String!]
   active: Boolean
   campus: [Campus!]
   campusId: [String!]
@@ -2781,6 +2785,7 @@ type Query {
   getAcademicGrade(id: String!): AcademicGrade
   getAcademicHour(id: String!): AcademicHour
   getAcademicPeriod(id: String!): AcademicPeriod
+  getAcademicPeriodSchoolYear(schoolId: String!, schoolYearId: String!): AcademicPeriod
   getAcademicSchedule(id: String!): AcademicSchedule
   getAcademicStandard(id: String!): AcademicStandard
   getAllAcademicArea(
@@ -2853,6 +2858,20 @@ type Query {
     orderCreated: Boolean!
     studentId: String
   ): AcademicAsignatureCoursePeriodValuationConnection!
+  getAllAcademicAsignatureCourseTeacher(
+    """Paginate after opaque cursor"""
+    after: String
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    teacherId: String!
+  ): AcademicAsignatureCourseConnection!
   getAllAcademicAsignatureNotAssignedInAcademicGrade(
     academicGradeId: String!
 
@@ -3705,6 +3724,21 @@ type Query {
     orderCreated: Boolean!
     schoolId: String!
   ): PerformanceLevelConnection!
+  getAllPerformanceLevelAcademicAsignatureCourse(
+    academicAsignatureCourseId: String!
+
+    """Paginate after opaque cursor"""
+    after: String
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+  ): PerformanceLevelConnection!
   getAllQuestionBankTestOnline(
     """Paginate after opaque cursor"""
     after: String
@@ -3901,7 +3935,7 @@ type Query {
 
     """Paginate before opaque cursor"""
     before: String
-    campusId: String!
+    campusId: String
 
     """Paginate first"""
     first: Float
@@ -4013,6 +4047,7 @@ type Query {
   getStudent(id: String!): Student
   getTeacher(id: String!): Teacher
   getUser(id: String!): User
+  getValidationDocumentNumberUser(documentNumber: String!): Boolean!
   getValuationStudents(id: String!): [ExperienceLearningValuation!]
   me: Jwt!
 }

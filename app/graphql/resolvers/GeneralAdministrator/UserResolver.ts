@@ -20,6 +20,7 @@ import {
   RoleRepository,
   SchoolAdministratorRepository,
   SchoolRepository,
+  SchoolYearRepository,
   StudentRepository,
   TeacherRepository,
   UserRepository,
@@ -40,6 +41,7 @@ import { Student } from '../../models/GeneralAdministrator/Student';
 import { User, UserConnection } from '../../models/GeneralAdministrator/User';
 import { CampusAdministrator } from '../../models/SchoolAdministrator/CampusAdministrator';
 import { CampusCoordinator } from '../../models/SchoolAdministrator/CampusCoordinator';
+import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { Jwt } from '../../modelsUtils/Jwt';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 import { AuditLogin } from './../../models/GeneralAdministrator/AuditLogin';
@@ -93,6 +95,9 @@ export class UserResolver {
 
   @InjectRepository(AuditLogin)
   private repositoryAuditLogin = AuditLoginRepository;
+
+  @InjectRepository(SchoolYear)
+  private repositorySchoolYear = SchoolYearRepository;
 
   @Query(() => User, { nullable: true })
   async getUser(@Arg('id', () => String) id: string) {
@@ -415,6 +420,20 @@ export class UserResolver {
             school = await this.repositorySchool.findBy({
               where: { _id: { $in: schoolIds } },
             });
+            if (school && school.length === 1) {
+              const currentDate = new Date();
+              const currentYear = await this.repositorySchoolYear.findBy({
+                where: {
+                  schoolId: school[0].id.toString(),
+                  active: true,
+                  startDate: { $lte: currentDate },
+                  endDate: { $gte: currentDate },
+                },
+              });
+              if (currentYear.length > 0) {
+                jwtUtil.schoolYear = currentYear[0];
+              }
+            }
           }
           if (campus && campus !== undefined) {
             jwtUtil.campus = campus;
@@ -549,6 +568,20 @@ export class UserResolver {
         school = await this.repositorySchool.findBy({
           where: { _id: { $in: schoolIds } },
         });
+        if (school && school.length === 1) {
+          const currentDate = new Date();
+          const currentYear = await this.repositorySchoolYear.findBy({
+            where: {
+              schoolId: school[0].id.toString(),
+              active: true,
+              startDate: { $lte: currentDate },
+              endDate: { $gte: currentDate },
+            },
+          });
+          if (currentYear.length > 0) {
+            jwtUtil.schoolYear = currentYear[0];
+          }
+        }
       }
       if (campus && campus !== undefined) {
         jwtUtil.campus = campus;

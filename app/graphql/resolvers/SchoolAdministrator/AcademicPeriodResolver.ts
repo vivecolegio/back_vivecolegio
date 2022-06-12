@@ -2,7 +2,12 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicPeriodRepository, SchoolRepository, SchoolYearRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  AcademicPeriodRepository,
+  SchoolRepository,
+  SchoolYearRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicPeriod } from '../../inputs/SchoolAdministrator/NewAcademicPeriod';
 import { IContext } from '../../interfaces/IContext';
@@ -10,7 +15,7 @@ import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import {
   AcademicPeriod,
-  AcademicPeriodConnection
+  AcademicPeriodConnection,
 } from '../../models/SchoolAdministrator/AcademicPeriod';
 import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
@@ -39,13 +44,41 @@ export class AcademicPeriodResolver {
   async getCurrentAcademicPeriod(@Arg('schoolId', () => String) schoolId: string) {
     const currentDate = new Date();
     let result = null;
-    const currentYear = await this.repositorySchoolYear.findBy({ where: { schoolId, active: true, startDate: { $lte: currentDate }, endDate: { $gte: currentDate } } })
+    const currentYear = await this.repositorySchoolYear.findBy({
+      where: {
+        schoolId,
+        active: true,
+        startDate: { $lte: currentDate },
+        endDate: { $gte: currentDate },
+      },
+    });
     if (currentYear.length > 0) {
-      const currentAcademicPeriod = await this.repository.findBy({ where: { schoolYearId: currentYear[0].id.toString(), startDate: { $lte: currentDate }, endDate: { $gte: currentDate } } });
+      const currentAcademicPeriod = await this.repository.findBy({
+        where: {
+          schoolYearId: currentYear[0].id.toString(),
+          startDate: { $lte: currentDate },
+          endDate: { $gte: currentDate },
+        },
+      });
       if (currentAcademicPeriod) {
         result = currentAcademicPeriod[0];
       }
     }
+    return result;
+  }
+
+  @Query(() => AcademicPeriod, { nullable: true })
+  async getAcademicPeriodSchoolYear(
+    @Arg('schoolId', () => String) schoolId: string,
+    @Arg('schoolYearId', () => String) schoolYearId: string
+  ) {
+    let result = await this.repository.findBy({
+      where: {
+        schoolYearId: schoolYearId,
+        schoolId: schoolId,
+        active: true,
+      },
+    });
     return result;
   }
 
@@ -55,7 +88,7 @@ export class AcademicPeriodResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => String) schoolId: String,
-    @Arg('orderCustom', () => Boolean, { nullable: true }) orderCustom: Boolean,
+    @Arg('orderCustom', () => Boolean, { nullable: true }) orderCustom: Boolean
   ): Promise<AcademicPeriodConnection> {
     let result;
     if (allData) {
@@ -96,7 +129,7 @@ export class AcademicPeriodResolver {
             schoolId,
             active: true,
           },
-          order: { order: 1 }
+          order: { order: 1 },
         });
       }
     }

@@ -5,6 +5,7 @@ import { Menu } from '../models/GeneralAdministrator/Menu';
 import { Role } from '../models/GeneralAdministrator/Role';
 import { School } from '../models/GeneralAdministrator/School';
 import { Student } from '../models/GeneralAdministrator/Student';
+import { SchoolYear } from '../models/SchoolAdministrator/SchoolYear';
 
 @ObjectType({ description: 'The User model' })
 export class Jwt {
@@ -43,4 +44,7 @@ export class Jwt {
 
   @Field({ nullable: true })
   teacher?: Teacher;
+
+  @Field({ nullable: true })
+  schoolYear?: SchoolYear;
 }

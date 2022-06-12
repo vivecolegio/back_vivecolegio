@@ -3,8 +3,10 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import {
+  AcademicAsignatureCourseRepository,
   AcademicGradeRepository,
   CampusRepository,
+  CourseRepository,
   GeneralPerformanceLevelRepository,
   PerformanceLevelRepository,
   SchoolRepository,
@@ -15,6 +17,8 @@ import { PerformanceLevelCategory } from '../../enums/PerformanceLevelCategory';
 import { PerformanceLevelType } from '../../enums/PerformanceLevelType';
 import { NewPerformanceLevel } from '../../inputs/SchoolAdministrator/NewPerformanceLevel';
 import { IContext } from '../../interfaces/IContext';
+import { AcademicAsignatureCourse } from '../../models/CampusAdministrator/AcademicAsignatureCourse';
+import { Course } from '../../models/CampusAdministrator/Course';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { GeneralPerformanceLevel } from '../../models/GeneralAdministrator/GeneralPerformanceLevel';
 import { School } from '../../models/GeneralAdministrator/School';
@@ -45,6 +49,12 @@ export class PerformanceLevelResolver {
 
   @InjectRepository(AcademicGrade)
   private repositoryAcademicGrade = AcademicGradeRepository;
+
+  @InjectRepository(AcademicAsignatureCourse)
+  private repositoryAcademicAsignatureCourse = AcademicAsignatureCourseRepository;
+
+  @InjectRepository(Course)
+  private repositoryCourse = CourseRepository;
 
   @Query(() => PerformanceLevel, { nullable: true })
   async getPerformanceLevel(@Arg('id', () => String) id: string) {
@@ -85,6 +95,70 @@ export class PerformanceLevelResolver {
             active: true,
           },
         });
+      }
+    }
+    let resultConn = new PerformanceLevelConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
+  }
+
+  @Query(() => PerformanceLevelConnection)
+  async getAllPerformanceLevelAcademicAsignatureCourse(
+    @Args() args: ConnectionArgs,
+    @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: String
+  ): Promise<PerformanceLevelConnection> {
+    let result: any[] = [];
+    let academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(
+      academicAsignatureCourseId
+    );
+    if (academicAsignatureCourse) {
+      let course = await this.repositoryCourse.findOneBy(academicAsignatureCourse.courseId);
+      if (course) {
+        let campus = await this.repositoryCampus.findOneBy(course.campusId);
+        if (campus) {
+          result = await this.repository.findBy({
+            where: {
+              campusId: { $in: [course.campusId] },
+              academicGradeId: { $in: [course.academicGradeId] },
+              schoolId: campus.schoolId,
+              active: true,
+            },
+            order: { createdAt: 'DESC' },
+          });
+          if (result.length === 0) {
+            result = await this.repository.findBy({
+              where: {
+                campusId: { $in: [course.campusId] },
+                schoolId: campus.schoolId,
+                active: true,
+              },
+              order: { createdAt: 'DESC' },
+            });
+            if (result.length === 0) {
+              result = await this.repository.findBy({
+                where: {
+                  academicGradeId: { $in: [course.academicGradeId] },
+                  schoolId: campus.schoolId,
+                  active: true,
+                },
+                order: { createdAt: 'DESC' },
+              });
+              if (result.length === 0) {
+                result = await this.repository.findBy({
+                  where: {
+                    schoolId: campus.schoolId,
+                    active: true,
+                  },
+                  order: { createdAt: 'DESC' },
+                });
+              }
+            }
+          }
+        }
       }
     }
     let resultConn = new PerformanceLevelConnection();

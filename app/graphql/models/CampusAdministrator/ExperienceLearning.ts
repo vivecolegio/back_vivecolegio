@@ -14,92 +14,91 @@ import { ExperienceLearningPerformanceLevel } from './ExperienceLearningPerforma
 @ObjectType({ description: 'The ExperienceLearning model', implements: IModelCampusData })
 @Entity()
 export class ExperienceLearning extends IModelCampusData {
-    @Field({ nullable: true })
-    @Column({ nullable: true })
-    title?: string;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  title?: string;
 
-    @Field({ nullable: true })
-    @Column({ nullable: true })
-    academicAsignatureCourseId?: string;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  academicAsignatureCourseId?: string;
 
-    @Field({ nullable: true })
-    academicAsignatureCourse?: AcademicAsignatureCourse;
+  @Field({ nullable: true })
+  academicAsignatureCourse?: AcademicAsignatureCourse;
 
-    @Field({ nullable: true })
-    @Column({ nullable: true })
-    description?: string;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  description?: string;
 
-    @Field(() => ExperienceType, { nullable: true })
-    @Column({ nullable: true })
-    experienceType?: ExperienceType;
+  @Field(() => ExperienceType, { nullable: true })
+  @Column({ nullable: true })
+  experienceType?: ExperienceType;
 
-    @Field({ nullable: true })
-    @Column({ nullable: true })
-    dateDelivery?: Date;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  dateDelivery?: Date;
 
-    @Field(() => [String], { nullable: true })
-    @Column({ nullable: true })
-    learningsId?: String[];
+  @Field(() => [String], { nullable: true })
+  @Column({ nullable: true })
+  learningsId?: String[];
 
-    @Field(() => [Learning], { nullable: true })
-    learnigs?: Learning[];
+  @Field(() => [Learning], { nullable: true })
+  learnigs?: Learning[];
 
-    @Field(() => [String], { nullable: true })
-    @Column({ nullable: true })
-    evidenceLearningsId?: String[];
+  @Field(() => [String], { nullable: true })
+  @Column({ nullable: true })
+  evidenceLearningsId?: String[];
 
-    @Field(() => [EvidenceLearning], { nullable: true })
-    evidenceLearnings?: EvidenceLearning[];
+  @Field(() => [EvidenceLearning], { nullable: true })
+  evidenceLearnings?: EvidenceLearning[];
 
-    @Field({ nullable: true })
-    @Column({ nullable: true })
-    academicPeriodId?: string;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  academicPeriodId?: string;
 
-    @Field({ nullable: true })
-    academicPeriod?: AcademicPeriod;
+  @Field({ nullable: true })
+  academicPeriod?: AcademicPeriod;
 
-    @Field({ nullable: true })
-    @Column({ nullable: true })
-    evaluativeComponentId?: string;
+  @Field(() => [String], { nullable: true })
+  @Column({ nullable: true })
+  evaluativeComponentsId?: String[];
 
-    @Field({ nullable: true })
-    evaluativeComponent?: EvaluativeComponent;
+  @Field(() => [EvaluativeComponent], { nullable: true })
+  evaluativeComponents?: EvaluativeComponent;
 
-    @Field({ nullable: true })
-    @Column({ nullable: true })
-    onlineDelivery?: Boolean;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  onlineDelivery?: Boolean;
 
-    @Field({ nullable: true })
-    @Column({ nullable: true })
-    criteria?: String;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  criteria?: String;
 
-    @Field(() => [ExperienceLearningPerformanceLevel], { nullable: true })
-    @Column({ nullable: true })
-    experienceLearningPerformanceLevel?: ExperienceLearningPerformanceLevel[];
+  @Field(() => [ExperienceLearningPerformanceLevel], { nullable: true })
+  @Column({ nullable: true })
+  experienceLearningPerformanceLevel?: ExperienceLearningPerformanceLevel[];
 
-    @Field({ nullable: true })
-    @Column({ nullable: true })
-    openTestDate?: Date;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  openTestDate?: Date;
 
-    @Field({ nullable: true })
-    @Column({ nullable: true })
-    closeTestDate?: Date;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  closeTestDate?: Date;
 
-    @Field(() => NavigationMethodTestOnline, { nullable: true })
-    @Column({ nullable: true })
-    navigationMethod?: NavigationMethodTestOnline;
+  @Field(() => NavigationMethodTestOnline, { nullable: true })
+  @Column({ nullable: true })
+  navigationMethod?: NavigationMethodTestOnline;
 
-    @Field({ nullable: true })
-    @Column({ nullable: true })
-    shuffleQuestions?: Boolean;
-
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  shuffleQuestions?: Boolean;
 }
 
 @ObjectType()
-export class ExperienceLearningEdge extends EdgeType('ExperienceLearning', ExperienceLearning) { }
+export class ExperienceLearningEdge extends EdgeType('ExperienceLearning', ExperienceLearning) {}
 
 @ObjectType()
 export class ExperienceLearningConnection extends ConnectionType<ExperienceLearningEdge>(
-    'ExperienceLearning',
-    ExperienceLearningEdge
-) { }
+  'ExperienceLearning',
+  ExperienceLearningEdge
+) {}
