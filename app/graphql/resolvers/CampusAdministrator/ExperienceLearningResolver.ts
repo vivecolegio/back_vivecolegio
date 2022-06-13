@@ -371,27 +371,31 @@ export class ExperienceLearningResolver {
         const course = await this.repositoryCourse.findOneBy(academicAsignatureCourse.courseId);
         if (course) {
           const students = course.studentsId;
-          students?.forEach(async (student) => {
-            let experienceLearningTraditionalValuation =
-              await this.repositoryExperienceLearningTraditionalValuation.findBy({
-                where: {
+          if (students) {
+            for (let student of students) {
+              let experienceLearningTraditionalValuation =
+                await this.repositoryExperienceLearningTraditionalValuation.findBy({
+                  where: {
+                    experienceLearningId: id,
+                    studentId: student,
+                  },
+                });
+              if (experienceLearningTraditionalValuation.length == 0) {
+                let createdByUserId = context?.user?.authorization?.id;
+                const model = await this.repositoryExperienceLearningTraditionalValuation.create({
                   experienceLearningId: id,
                   studentId: student,
-                },
-              });
-            if (experienceLearningTraditionalValuation.length == 0) {
-              let createdByUserId = context?.user?.authorization?.id;
-              const model = await this.repositoryExperienceLearningTraditionalValuation.create({
-                experienceLearningId: id,
-                studentId: student,
-                assessment: undefined,
-                active: true,
-                version: 0,
-                createdByUserId,
-              });
-              let result = await this.repositoryExperienceLearningTraditionalValuation.save(model);
+                  assessment: undefined,
+                  active: true,
+                  version: 0,
+                  createdByUserId,
+                });
+                let result = await this.repositoryExperienceLearningTraditionalValuation.save(
+                  model
+                );
+              }
             }
-          });
+          }
         }
       }
     }

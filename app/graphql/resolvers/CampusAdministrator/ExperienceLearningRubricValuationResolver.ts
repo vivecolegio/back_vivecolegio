@@ -8,6 +8,7 @@ import {
   ExperienceLearningRubricCriteriaRepository,
   ExperienceLearningRubricCriteriaValuationRepository,
   ExperienceLearningRubricValuationRepository,
+  PerformanceLevelRepository,
   StudentRepository,
   UserRepository,
 } from '../../../servers/DataSource';
@@ -24,6 +25,7 @@ import {
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { Student } from '../../models/GeneralAdministrator/Student';
 import { User } from '../../models/GeneralAdministrator/User';
+import { PerformanceLevel } from '../../models/SchoolAdministrator/PerformanceLevel';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
 @Resolver(ExperienceLearningRubricValuation)
@@ -48,6 +50,9 @@ export class ExperienceLearningRubricValuationResolver {
 
   @InjectRepository(ExperienceLearningRubricCriteria)
   private repositoryExperienceLearningRubricCriteria = ExperienceLearningRubricCriteriaRepository;
+
+  @InjectRepository(PerformanceLevel)
+  private repositoryPerformanceLevel = PerformanceLevelRepository;
 
   @Query(() => ExperienceLearningRubricValuation, { nullable: true })
   async getExperienceLearningRubricValuation(@Arg('id', () => String) id: string) {
@@ -265,6 +270,16 @@ export class ExperienceLearningRubricValuationResolver {
     let id = data.studentId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryStudent.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => PerformanceLevel, { nullable: true })
+  async performanceLevel(@Root() data: ExperienceLearningRubricValuation) {
+    let id = data.performanceLevelId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryPerformanceLevel.findOneBy(id);
       return result;
     }
     return null;

@@ -3,34 +3,49 @@ import { Column, Entity } from 'typeorm';
 import { IModelCampusData } from '../../interfaces/IModelCampusData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { Student } from '../GeneralAdministrator/Student';
+import { PerformanceLevel } from '../SchoolAdministrator/PerformanceLevel';
 import { ExperienceLearning } from './ExperienceLearning';
 
-@ObjectType({ description: 'The ExperienceLearningTraditionalValuation model', implements: IModelCampusData })
+@ObjectType({
+  description: 'The ExperienceLearningTraditionalValuation model',
+  implements: IModelCampusData,
+})
 @Entity()
 export class ExperienceLearningTraditionalValuation extends IModelCampusData {
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  experienceLearningId?: string;
 
-    @Field({ nullable: true })
-    @Column({ nullable: true })
-    experienceLearningId?: string;
+  @Field({ nullable: true })
+  experienceLearning?: ExperienceLearning;
 
-    @Field({ nullable: true })
-    experienceLearning?: ExperienceLearning;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  studentId?: String;
 
-    @Field({ nullable: true })
-    @Column({ nullable: true })
-    studentId?: String;
+  @Field({ nullable: true })
+  student?: Student;
 
-    @Field({ nullable: true })
-    student?: Student;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  assessment?: number;
 
-    @Field({ nullable: true })
-    @Column({ nullable: true })
-    assessment?: number;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  performanceLevelId?: String;
 
+  @Field(() => PerformanceLevel, { nullable: true })
+  performanceLevel?: PerformanceLevel;
 }
 
 @ObjectType()
-export class ExperienceLearningTraditionalValuationEdge extends EdgeType('ExperienceLearningTraditionalValuation', ExperienceLearningTraditionalValuation) { }
+export class ExperienceLearningTraditionalValuationEdge extends EdgeType(
+  'ExperienceLearningTraditionalValuation',
+  ExperienceLearningTraditionalValuation
+) {}
 
 @ObjectType()
-export class ExperienceLearningTraditionalValuationConnection extends ConnectionType<ExperienceLearningTraditionalValuationEdge>('ExperienceLearningTraditionalValuation', ExperienceLearningTraditionalValuationEdge) { }
+export class ExperienceLearningTraditionalValuationConnection extends ConnectionType<ExperienceLearningTraditionalValuationEdge>(
+  'ExperienceLearningTraditionalValuation',
+  ExperienceLearningTraditionalValuationEdge
+) {}

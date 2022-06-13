@@ -2,290 +2,318 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicAsignatureCourseRepository, AcademicPeriodRepository, CampusRepository, EvaluativeComponentRepository, ExperienceLearningAverageValuationRepository, StudentRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  AcademicAsignatureCourseRepository,
+  AcademicPeriodRepository,
+  CampusRepository,
+  EvaluativeComponentRepository,
+  ExperienceLearningAverageValuationRepository,
+  PerformanceLevelRepository,
+  StudentRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewExperienceLearningAverageValuation } from '../../inputs/CampusAdministrator/NewExperienceLearningAverageValuation';
 import { IContext } from '../../interfaces/IContext';
 import { AcademicAsignatureCourse } from '../../models/CampusAdministrator/AcademicAsignatureCourse';
-import { ExperienceLearningAverageValuation, ExperienceLearningAverageValuationConnection } from '../../models/CampusAdministrator/ExperienceLearningAverageValuation';
+import {
+  ExperienceLearningAverageValuation,
+  ExperienceLearningAverageValuationConnection,
+} from '../../models/CampusAdministrator/ExperienceLearningAverageValuation';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { Student } from '../../models/GeneralAdministrator/Student';
 import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicPeriod } from '../../models/SchoolAdministrator/AcademicPeriod';
 import { EvaluativeComponent } from '../../models/SchoolAdministrator/EvaluativeComponent';
+import { PerformanceLevel } from '../../models/SchoolAdministrator/PerformanceLevel';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
 @Resolver(ExperienceLearningAverageValuation)
 export class ExperienceLearningAverageValuationResolver {
-    @InjectRepository(ExperienceLearningAverageValuation)
-    private repository = ExperienceLearningAverageValuationRepository;
+  @InjectRepository(ExperienceLearningAverageValuation)
+  private repository = ExperienceLearningAverageValuationRepository;
 
-    @InjectRepository(User)
-    private repositoryUser = UserRepository;
+  @InjectRepository(User)
+  private repositoryUser = UserRepository;
 
-    @InjectRepository(Campus)
-    private repositoryCampus = CampusRepository;
+  @InjectRepository(Campus)
+  private repositoryCampus = CampusRepository;
 
-    @InjectRepository(AcademicAsignatureCourse)
-    private repositoryAcademicAsignatureCourse = AcademicAsignatureCourseRepository;
+  @InjectRepository(AcademicAsignatureCourse)
+  private repositoryAcademicAsignatureCourse = AcademicAsignatureCourseRepository;
 
-    @InjectRepository(AcademicPeriod)
-    private repositoryAcademicPeriod = AcademicPeriodRepository;
+  @InjectRepository(AcademicPeriod)
+  private repositoryAcademicPeriod = AcademicPeriodRepository;
 
-    @InjectRepository(EvaluativeComponent)
-    private repositoryEvaluativeComponent = EvaluativeComponentRepository;
+  @InjectRepository(EvaluativeComponent)
+  private repositoryEvaluativeComponent = EvaluativeComponentRepository;
 
-    @InjectRepository(Student)
-    private repositoryStudent = StudentRepository;
+  @InjectRepository(Student)
+  private repositoryStudent = StudentRepository;
 
-    @Query(() => ExperienceLearningAverageValuation, { nullable: true })
-    async getExperienceLearningAverageValuation(@Arg('id', () => String) id: string) {
-        const result = await this.repository.findOneBy(id);
-        return result;
-    }
+  @InjectRepository(PerformanceLevel)
+  private repositoryPerformanceLevel = PerformanceLevelRepository;
 
-    @Query(() => ExperienceLearningAverageValuationConnection)
-    async getAllExperienceLearningAverageValuation(
-        @Args() args: ConnectionArgs,
-        @Arg('allData', () => Boolean) allData: Boolean,
-        @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
-        @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: String,
-        @Arg('academicPeriodId', () => String) academicPeriodId: String,
-        @Arg('evaluativeComponentId', () => String) evaluativeComponentId: String,
-        @Arg('studentId', () => String, { nullable: true }) studentId: String,
-    ): Promise<ExperienceLearningAverageValuationConnection> {
-        let result;
-        if (allData) {
-            if (orderCreated) {
-                if (academicAsignatureCourseId && academicPeriodId && evaluativeComponentId && studentId) {
-                    result = await this.repository.findBy({
-                        where: {
-                            academicAsignatureCourseId,
-                            academicPeriodId,
-                            evaluativeComponentId,
-                            studentId
-                        },
-                        order: { createdAt: 'DESC' },
-                    });
-                } else {
-                    result = await this.repository.findBy({
-                        where: {
-                            academicAsignatureCourseId,
-                            academicPeriodId,
-                            evaluativeComponentId
-                        },
-                        order: { createdAt: 'DESC' },
-                    });
-                }
-            } else {
-                if (academicAsignatureCourseId && academicPeriodId && evaluativeComponentId && studentId) {
-                    result = await this.repository.findBy({
-                        where: {
-                            academicAsignatureCourseId,
-                            academicPeriodId,
-                            evaluativeComponentId,
-                            studentId
-                        },
-                    });
-                } else {
-                    result = await this.repository.findBy({
-                        where: {
-                            academicAsignatureCourseId,
-                            academicPeriodId,
-                            evaluativeComponentId
-                        },
-                    });
-                }
-            }
+  @Query(() => ExperienceLearningAverageValuation, { nullable: true })
+  async getExperienceLearningAverageValuation(@Arg('id', () => String) id: string) {
+    const result = await this.repository.findOneBy(id);
+    return result;
+  }
+
+  @Query(() => ExperienceLearningAverageValuationConnection)
+  async getAllExperienceLearningAverageValuation(
+    @Args() args: ConnectionArgs,
+    @Arg('allData', () => Boolean) allData: Boolean,
+    @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
+    @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: String,
+    @Arg('academicPeriodId', () => String) academicPeriodId: String,
+    @Arg('evaluativeComponentId', () => String) evaluativeComponentId: String,
+    @Arg('studentId', () => String, { nullable: true }) studentId: String
+  ): Promise<ExperienceLearningAverageValuationConnection> {
+    let result;
+    if (allData) {
+      if (orderCreated) {
+        if (academicAsignatureCourseId && academicPeriodId && evaluativeComponentId && studentId) {
+          result = await this.repository.findBy({
+            where: {
+              academicAsignatureCourseId,
+              academicPeriodId,
+              evaluativeComponentId,
+              studentId,
+            },
+            order: { createdAt: 'DESC' },
+          });
         } else {
-            if (orderCreated) {
-                if (academicAsignatureCourseId && academicPeriodId && evaluativeComponentId && studentId) {
-                    result = await this.repository.findBy({
-                        where: {
-                            academicAsignatureCourseId,
-                            academicPeriodId,
-                            evaluativeComponentId,
-                            studentId,
-                            active: true,
-                        },
-                        order: { createdAt: 'DESC' },
-                    });
-                } else {
-                    result = await this.repository.findBy({
-                        where: {
-                            academicAsignatureCourseId,
-                            academicPeriodId,
-                            evaluativeComponentId,
-                            active: true,
-                        },
-                        order: { createdAt: 'DESC' },
-                    });
-                }
-            } else {
-                if (academicAsignatureCourseId && academicPeriodId && evaluativeComponentId && studentId) {
-                    result = await this.repository.findBy({
-                        where: {
-                            academicAsignatureCourseId,
-                            academicPeriodId,
-                            evaluativeComponentId,
-                            studentId,
-                            active: true,
-                        },
-                    });
-                } else {
-                    result = await this.repository.findBy({
-                        where: {
-                            academicAsignatureCourseId,
-                            academicPeriodId,
-                            evaluativeComponentId,
-                            active: true,
-                        },
-                    });
-                }
-            }
+          result = await this.repository.findBy({
+            where: {
+              academicAsignatureCourseId,
+              academicPeriodId,
+              evaluativeComponentId,
+            },
+            order: { createdAt: 'DESC' },
+          });
         }
-        let resultConn = new ExperienceLearningAverageValuationConnection();
-        let resultConnection = connectionFromArraySlice(result, args, {
-            sliceStart: 0,
-            arrayLength: result.length,
-        });
-        resultConn = { ...resultConnection, totalCount: result.length };
-        return resultConn;
-    }
-
-    @Mutation(() => ExperienceLearningAverageValuation)
-    async createExperienceLearningAverageValuation(@Arg('data') data: NewExperienceLearningAverageValuation, @Ctx() context: IContext): Promise<ExperienceLearningAverageValuation> {
-        let dataProcess: NewExperienceLearningAverageValuation = removeEmptyStringElements(data);
-        let createdByUserId = context?.user?.authorization?.id;
-        const model = await this.repository.create({
-            ...dataProcess,
-            active: true,
-            version: 0,
-            createdByUserId,
-        });
-        let result = await this.repository.save(model);
-        return result;
-    }
-
-    @Mutation(() => ExperienceLearningAverageValuation)
-    async updateExperienceLearningAverageValuation(
-        @Arg('data') data: NewExperienceLearningAverageValuation,
-        @Arg('id', () => String) id: string,
-        @Ctx() context: IContext
-    ): Promise<ExperienceLearningAverageValuation | null> {
-        let dataProcess = removeEmptyStringElements(data);
-        let updatedByUserId = context?.user?.authorization?.id;
-        let result = await this.repository.findOneBy(id);
-        result = await this.repository.save({
-            _id: new ObjectId(id),
-            ...result,
-            ...dataProcess,
-            version: (result?.version as number) + 1,
-            updatedByUserId,
-        });
-        return result;
-    }
-
-    @Mutation(() => Boolean)
-    async changeActiveExperienceLearningAverageValuation(
-        @Arg('active', () => Boolean) active: boolean,
-        @Arg('id', () => String) id: string,
-        @Ctx() context: IContext
-    ): Promise<Boolean | null> {
-        let updatedByUserId = context?.user?.authorization?.id;
-        let result = await this.repository.findOneBy(id);
-        result = await this.repository.save({
-            _id: new ObjectId(id),
-            ...result,
-            active: active,
-            version: (result?.version as number) + 1,
-            updatedByUserId,
-        });
-        if (result.id) {
-            return true;
+      } else {
+        if (academicAsignatureCourseId && academicPeriodId && evaluativeComponentId && studentId) {
+          result = await this.repository.findBy({
+            where: {
+              academicAsignatureCourseId,
+              academicPeriodId,
+              evaluativeComponentId,
+              studentId,
+            },
+          });
         } else {
-            return false;
+          result = await this.repository.findBy({
+            where: {
+              academicAsignatureCourseId,
+              academicPeriodId,
+              evaluativeComponentId,
+            },
+          });
         }
-    }
-
-    @Mutation(() => Boolean)
-    async deleteExperienceLearningAverageValuation(
-        @Arg('id', () => String) id: string,
-        @Ctx() context: IContext
-    ): Promise<Boolean | null> {
-        let data = await this.repository.findOneBy(id);
-        let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
-        return result?.result?.ok === 1 ?? true;
-    }
-
-    @FieldResolver((_type) => User, { nullable: true })
-    async createdByUser(@Root() data: ExperienceLearningAverageValuation) {
-        let id = data.createdByUserId;
-        if (id !== null && id !== undefined) {
-            const result = await this.repositoryUser.findOneBy(id);
-            return result;
+      }
+    } else {
+      if (orderCreated) {
+        if (academicAsignatureCourseId && academicPeriodId && evaluativeComponentId && studentId) {
+          result = await this.repository.findBy({
+            where: {
+              academicAsignatureCourseId,
+              academicPeriodId,
+              evaluativeComponentId,
+              studentId,
+              active: true,
+            },
+            order: { createdAt: 'DESC' },
+          });
+        } else {
+          result = await this.repository.findBy({
+            where: {
+              academicAsignatureCourseId,
+              academicPeriodId,
+              evaluativeComponentId,
+              active: true,
+            },
+            order: { createdAt: 'DESC' },
+          });
         }
-        return null;
-    }
-
-    @FieldResolver((_type) => User, { nullable: true })
-    async updatedByUser(@Root() data: ExperienceLearningAverageValuation) {
-        let id = data.updatedByUserId;
-        if (id !== null && id !== undefined) {
-            const result = await this.repositoryUser.findOneBy(id);
-            return result;
+      } else {
+        if (academicAsignatureCourseId && academicPeriodId && evaluativeComponentId && studentId) {
+          result = await this.repository.findBy({
+            where: {
+              academicAsignatureCourseId,
+              academicPeriodId,
+              evaluativeComponentId,
+              studentId,
+              active: true,
+            },
+          });
+        } else {
+          result = await this.repository.findBy({
+            where: {
+              academicAsignatureCourseId,
+              academicPeriodId,
+              evaluativeComponentId,
+              active: true,
+            },
+          });
         }
-        return null;
+      }
     }
+    let resultConn = new ExperienceLearningAverageValuationConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
+  }
 
-    @FieldResolver((_type) => Campus, { nullable: true })
-    async campus(@Root() data: ExperienceLearningAverageValuation) {
-        let id = data.campusId;
-        if (id !== null && id !== undefined) {
-            const result = await this.repositoryCampus.findOneBy(id);
-            return result;
-        }
-        return null;
+  @Mutation(() => ExperienceLearningAverageValuation)
+  async createExperienceLearningAverageValuation(
+    @Arg('data') data: NewExperienceLearningAverageValuation,
+    @Ctx() context: IContext
+  ): Promise<ExperienceLearningAverageValuation> {
+    let dataProcess: NewExperienceLearningAverageValuation = removeEmptyStringElements(data);
+    let createdByUserId = context?.user?.authorization?.id;
+    const model = await this.repository.create({
+      ...dataProcess,
+      active: true,
+      version: 0,
+      createdByUserId,
+    });
+    let result = await this.repository.save(model);
+    return result;
+  }
+
+  @Mutation(() => ExperienceLearningAverageValuation)
+  async updateExperienceLearningAverageValuation(
+    @Arg('data') data: NewExperienceLearningAverageValuation,
+    @Arg('id', () => String) id: string,
+    @Ctx() context: IContext
+  ): Promise<ExperienceLearningAverageValuation | null> {
+    let dataProcess = removeEmptyStringElements(data);
+    let updatedByUserId = context?.user?.authorization?.id;
+    let result = await this.repository.findOneBy(id);
+    result = await this.repository.save({
+      _id: new ObjectId(id),
+      ...result,
+      ...dataProcess,
+      version: (result?.version as number) + 1,
+      updatedByUserId,
+    });
+    return result;
+  }
+
+  @Mutation(() => Boolean)
+  async changeActiveExperienceLearningAverageValuation(
+    @Arg('active', () => Boolean) active: boolean,
+    @Arg('id', () => String) id: string,
+    @Ctx() context: IContext
+  ): Promise<Boolean | null> {
+    let updatedByUserId = context?.user?.authorization?.id;
+    let result = await this.repository.findOneBy(id);
+    result = await this.repository.save({
+      _id: new ObjectId(id),
+      ...result,
+      active: active,
+      version: (result?.version as number) + 1,
+      updatedByUserId,
+    });
+    if (result.id) {
+      return true;
+    } else {
+      return false;
     }
+  }
 
-    @FieldResolver((_type) => AcademicAsignatureCourse, { nullable: true })
-    async academicAsignatureCourse(@Root() data: ExperienceLearningAverageValuation) {
-        let id = data.academicAsignatureCourseId;
-        if (id !== null && id !== undefined) {
-            const result = await this.repositoryAcademicAsignatureCourse.findOneBy(id);
-            return result;
-        }
-        return null;
+  @Mutation(() => Boolean)
+  async deleteExperienceLearningAverageValuation(
+    @Arg('id', () => String) id: string,
+    @Ctx() context: IContext
+  ): Promise<Boolean | null> {
+    let data = await this.repository.findOneBy(id);
+    let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
+    return result?.result?.ok === 1 ?? true;
+  }
+
+  @FieldResolver((_type) => User, { nullable: true })
+  async createdByUser(@Root() data: ExperienceLearningAverageValuation) {
+    let id = data.createdByUserId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryUser.findOneBy(id);
+      return result;
     }
+    return null;
+  }
 
-    @FieldResolver((_type) => AcademicPeriod, { nullable: true })
-    async academicPeriod(@Root() data: ExperienceLearningAverageValuation) {
-        let id = data.academicPeriodId;
-        if (id !== null && id !== undefined) {
-            const result = await this.repositoryAcademicPeriod.findOneBy(id);
-            return result;
-        }
-        return null;
+  @FieldResolver((_type) => User, { nullable: true })
+  async updatedByUser(@Root() data: ExperienceLearningAverageValuation) {
+    let id = data.updatedByUserId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryUser.findOneBy(id);
+      return result;
     }
+    return null;
+  }
 
-    @FieldResolver((_type) => EvaluativeComponent, { nullable: true })
-    async evaluativeComponent(@Root() data: ExperienceLearningAverageValuation) {
-        let id = data.evaluativeComponentId;
-        if (id !== null && id !== undefined) {
-            const result = await this.repositoryEvaluativeComponent.findOneBy(id);
-            return result;
-        }
-        return null;
+  @FieldResolver((_type) => Campus, { nullable: true })
+  async campus(@Root() data: ExperienceLearningAverageValuation) {
+    let id = data.campusId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryCampus.findOneBy(id);
+      return result;
     }
+    return null;
+  }
 
-    @FieldResolver((_type) => Student, { nullable: true })
-    async student(@Root() data: ExperienceLearningAverageValuation) {
-        let id = data.studentId;
-        if (id !== null && id !== undefined) {
-            const result = await this.repositoryStudent.findOneBy(id);
-            return result;
-        }
-        return null;
+  @FieldResolver((_type) => AcademicAsignatureCourse, { nullable: true })
+  async academicAsignatureCourse(@Root() data: ExperienceLearningAverageValuation) {
+    let id = data.academicAsignatureCourseId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryAcademicAsignatureCourse.findOneBy(id);
+      return result;
     }
+    return null;
+  }
 
+  @FieldResolver((_type) => AcademicPeriod, { nullable: true })
+  async academicPeriod(@Root() data: ExperienceLearningAverageValuation) {
+    let id = data.academicPeriodId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryAcademicPeriod.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => EvaluativeComponent, { nullable: true })
+  async evaluativeComponent(@Root() data: ExperienceLearningAverageValuation) {
+    let id = data.evaluativeComponentId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryEvaluativeComponent.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => Student, { nullable: true })
+  async student(@Root() data: ExperienceLearningAverageValuation) {
+    let id = data.studentId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryStudent.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => PerformanceLevel, { nullable: true })
+  async performanceLevel(@Root() data: ExperienceLearningAverageValuation) {
+    let id = data.performanceLevelId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryPerformanceLevel.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
 }
