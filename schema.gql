@@ -2786,7 +2786,21 @@ type Query {
   getAcademicGrade(id: String!): AcademicGrade
   getAcademicHour(id: String!): AcademicHour
   getAcademicPeriod(id: String!): AcademicPeriod
-  getAcademicPeriodSchoolYear(schoolId: String!, schoolYearId: String!): AcademicPeriod
+  getAcademicPeriodSchoolYear(
+    """Paginate after opaque cursor"""
+    after: String
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    schoolId: String!
+    schoolYearId: String!
+  ): AcademicPeriodConnection!
   getAcademicSchedule(id: String!): AcademicSchedule
   getAcademicStandard(id: String!): AcademicStandard
   getAllAcademicArea(

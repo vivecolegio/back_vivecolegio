@@ -67,8 +67,9 @@ export class AcademicPeriodResolver {
     return result;
   }
 
-  @Query(() => AcademicPeriod, { nullable: true })
+  @Query(() => AcademicPeriodConnection)
   async getAcademicPeriodSchoolYear(
+    @Args() args: ConnectionArgs,
     @Arg('schoolId', () => String) schoolId: string,
     @Arg('schoolYearId', () => String) schoolYearId: string
   ) {
@@ -79,7 +80,13 @@ export class AcademicPeriodResolver {
         active: true,
       },
     });
-    return result;
+    let resultConn = new AcademicPeriodConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
   }
 
   @Query(() => AcademicPeriodConnection)
