@@ -79,6 +79,7 @@ export class AcademicPeriodResolver {
         schoolId: schoolId,
         active: true,
       },
+      order: { order: 1 },
     });
     let resultConn = new AcademicPeriodConnection();
     let resultConnection = connectionFromArraySlice(result, args, {
