@@ -272,7 +272,7 @@ export class AcademicAsignatureCourseResolver {
       where: {
         academicAsignatureCourseId: id,
         academicPeriodId,
-        evaluativeComponentId,
+        evaluativeComponentsId: { $in: [evaluativeComponentId] },
         active: true,
       },
       order: { createdAt: 'ASC' },
