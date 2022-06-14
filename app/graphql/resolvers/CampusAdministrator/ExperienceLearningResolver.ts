@@ -416,30 +416,34 @@ export class ExperienceLearningResolver {
         const course = await this.repositoryCourse.findOneBy(academicAsignatureCourse.courseId);
         if (course) {
           const students = course.studentsId;
-          students?.forEach(async (student) => {
-            let experienceLearningSelfAssessmentValuation =
-              await this.repositoryExperienceLearningSelfAssessmentValuation.findBy({
-                where: {
-                  experienceLearningId: id,
-                  studentId: student,
-                },
-              });
-            if (experienceLearningSelfAssessmentValuation.length == 0) {
-              let createdByUserId = context?.user?.authorization?.id;
-              const model = await this.repositoryExperienceLearningSelfAssessmentValuation.create({
-                experienceLearningId: id,
-                studentId: student,
-                assessment: undefined,
-                observations: undefined,
-                active: true,
-                version: 0,
-                createdByUserId,
-              });
-              let result = await this.repositoryExperienceLearningSelfAssessmentValuation.save(
-                model
-              );
+          if (students) {
+            for (let student of students) {
+              let experienceLearningSelfAssessmentValuation =
+                await this.repositoryExperienceLearningSelfAssessmentValuation.findBy({
+                  where: {
+                    experienceLearningId: id,
+                    studentId: student,
+                  },
+                });
+              if (experienceLearningSelfAssessmentValuation.length == 0) {
+                let createdByUserId = context?.user?.authorization?.id;
+                const model = await this.repositoryExperienceLearningSelfAssessmentValuation.create(
+                  {
+                    experienceLearningId: id,
+                    studentId: student,
+                    assessment: undefined,
+                    observations: undefined,
+                    active: true,
+                    version: 0,
+                    createdByUserId,
+                  }
+                );
+                let result = await this.repositoryExperienceLearningSelfAssessmentValuation.save(
+                  model
+                );
+              }
             }
-          });
+          }
         }
       }
     }
@@ -460,35 +464,39 @@ export class ExperienceLearningResolver {
         const course = await this.repositoryCourse.findOneBy(academicAsignatureCourse.courseId);
         if (course) {
           const coEvaluators = course.studentsId;
-          coEvaluators?.forEach(async (coEvaluator) => {
-            const students = course.studentsId;
-            students?.forEach(async (student) => {
-              if (coEvaluator != student) {
-                let experienceLearningCoEvaluation =
-                  await this.repositoryExperienceLearningCoEvaluation.findBy({
-                    where: {
-                      coEvaluatorId: coEvaluator,
-                      experienceLearningId: id,
-                      studentId: student,
-                    },
-                  });
-                if (experienceLearningCoEvaluation.length == 0) {
-                  let createdByUserId = context?.user?.authorization?.id;
-                  const model = await this.repositoryExperienceLearningCoEvaluation.create({
-                    experienceLearningId: id,
-                    coEvaluatorId: coEvaluator,
-                    studentId: student,
-                    assessment: undefined,
-                    observations: undefined,
-                    active: true,
-                    version: 0,
-                    createdByUserId,
-                  });
-                  let result = await this.repositoryExperienceLearningCoEvaluation.save(model);
+          if (coEvaluators) {
+            for (let coEvaluator of coEvaluators) {
+              const students = course.studentsId;
+              if (students) {
+                for (let student of students) {
+                  if (coEvaluator != student) {
+                    let experienceLearningCoEvaluation =
+                      await this.repositoryExperienceLearningCoEvaluation.findBy({
+                        where: {
+                          coEvaluatorId: coEvaluator,
+                          experienceLearningId: id,
+                          studentId: student,
+                        },
+                      });
+                    if (experienceLearningCoEvaluation.length == 0) {
+                      let createdByUserId = context?.user?.authorization?.id;
+                      const model = await this.repositoryExperienceLearningCoEvaluation.create({
+                        experienceLearningId: id,
+                        coEvaluatorId: coEvaluator,
+                        studentId: student,
+                        assessment: undefined,
+                        observations: undefined,
+                        active: true,
+                        version: 0,
+                        createdByUserId,
+                      });
+                      let result = await this.repositoryExperienceLearningCoEvaluation.save(model);
+                    }
+                  }
                 }
               }
-            });
-          });
+            }
+          }
         }
       }
     }
@@ -511,82 +519,88 @@ export class ExperienceLearningResolver {
         const course = await this.repositoryCourse.findOneBy(academicAsignatureCourse.courseId);
         if (course) {
           const students = course.studentsId;
-          students?.forEach(async (student) => {
-            let experienceLearningCoEvaluationValuation =
-              await this.repositoryExperienceLearningCoEvaluationValuation.findBy({
-                where: {
-                  experienceLearningId: id,
-                  studentId: student,
-                },
-              });
-            let experienceLearningCoEvaluations =
-              await this.repositoryExperienceLearningCoEvaluation.findBy({
-                where: {
-                  experienceLearningId: id,
-                  studentId: student,
-                },
-              });
-            if (experienceLearningCoEvaluationValuation.length == 0) {
-              if (experienceLearningCoEvaluations.length > 0) {
-                let assessment = 0;
-                let count = 0;
-                experienceLearningCoEvaluations.forEach((experienceLearningCoEvaluation) => {
-                  assessment += experienceLearningCoEvaluation.assessment
-                    ? experienceLearningCoEvaluation.assessment
-                    : 0;
-                  if (experienceLearningCoEvaluation.assessment) {
-                    count++;
-                  }
+          if (students) {
+            for (let student of students) {
+              let experienceLearningCoEvaluationValuation =
+                await this.repositoryExperienceLearningCoEvaluationValuation.findBy({
+                  where: {
+                    experienceLearningId: id,
+                    studentId: student,
+                  },
                 });
-                assessment = assessment / count;
-                const model = await this.repositoryExperienceLearningCoEvaluationValuation.create({
-                  experienceLearningId: id,
-                  studentId: student,
-                  assessment,
-                  active: true,
-                  version: 0,
-                  createdByUserId,
+              let experienceLearningCoEvaluations =
+                await this.repositoryExperienceLearningCoEvaluation.findBy({
+                  where: {
+                    experienceLearningId: id,
+                    studentId: student,
+                  },
                 });
-                let result = await this.repositoryExperienceLearningCoEvaluationValuation.save(
-                  model
-                );
+              if (experienceLearningCoEvaluationValuation.length == 0) {
+                if (experienceLearningCoEvaluations.length > 0) {
+                  let assessment = 0;
+                  let count = 0;
+                  experienceLearningCoEvaluations.forEach((experienceLearningCoEvaluation) => {
+                    assessment += experienceLearningCoEvaluation.assessment
+                      ? experienceLearningCoEvaluation.assessment
+                      : 0;
+                    if (experienceLearningCoEvaluation.assessment) {
+                      count++;
+                    }
+                  });
+                  assessment = assessment / count;
+                  const model = await this.repositoryExperienceLearningCoEvaluationValuation.create(
+                    {
+                      experienceLearningId: id,
+                      studentId: student,
+                      assessment,
+                      active: true,
+                      version: 0,
+                      createdByUserId,
+                    }
+                  );
+                  let result = await this.repositoryExperienceLearningCoEvaluationValuation.save(
+                    model
+                  );
+                } else {
+                  const model = await this.repositoryExperienceLearningCoEvaluationValuation.create(
+                    {
+                      experienceLearningId: id,
+                      studentId: student,
+                      assessment: undefined,
+                      active: true,
+                      version: 0,
+                      createdByUserId,
+                    }
+                  );
+                  let result = await this.repositoryExperienceLearningCoEvaluationValuation.save(
+                    model
+                  );
+                }
               } else {
-                const model = await this.repositoryExperienceLearningCoEvaluationValuation.create({
-                  experienceLearningId: id,
-                  studentId: student,
-                  assessment: undefined,
-                  active: true,
-                  version: 0,
-                  createdByUserId,
-                });
-                let result = await this.repositoryExperienceLearningCoEvaluationValuation.save(
-                  model
-                );
-              }
-            } else {
-              if (experienceLearningCoEvaluations.length > 0) {
-                let assessment = 0;
-                let count = 0;
-                experienceLearningCoEvaluations.forEach((experienceLearningCoEvaluation) => {
-                  assessment += experienceLearningCoEvaluation.assessment
-                    ? experienceLearningCoEvaluation.assessment
-                    : 0;
-                  if (experienceLearningCoEvaluation.assessment) {
-                    count++;
-                  }
-                });
-                assessment = assessment / count;
-                let data = experienceLearningCoEvaluationValuation[0];
-                let result = await this.repositoryExperienceLearningCoEvaluationValuation.save({
-                  _id: data.id,
-                  ...data,
-                  assessment,
-                  version: (data?.version as number) + 1,
-                  updatedByUserId,
-                });
+                if (experienceLearningCoEvaluations.length > 0) {
+                  let assessment = 0;
+                  let count = 0;
+                  experienceLearningCoEvaluations.forEach((experienceLearningCoEvaluation) => {
+                    assessment += experienceLearningCoEvaluation.assessment
+                      ? experienceLearningCoEvaluation.assessment
+                      : 0;
+                    if (experienceLearningCoEvaluation.assessment) {
+                      count++;
+                    }
+                  });
+                  assessment = assessment / count;
+                  let data = experienceLearningCoEvaluationValuation[0];
+                  let result = await this.repositoryExperienceLearningCoEvaluationValuation.save({
+                    _id: data.id,
+                    ...data,
+                    assessment,
+                    version: (data?.version as number) + 1,
+                    updatedByUserId,
+                  });
+                }
               }
             }
-          });
+          }
         }
       }
     }
@@ -615,50 +629,51 @@ export class ExperienceLearningResolver {
         const course = await this.repositoryCourse.findOneBy(academicAsignatureCourse.courseId);
         if (course) {
           const students = course.studentsId;
-          students?.forEach(async (student) => {
-            for (let experienceLearningRubricCriteria of experienceLearningRubricCriterias) {
-              let experienceLearningRubricCriteriaValuation =
-                await this.repositoryExperienceLearningRubricCriteriaValuation.findBy({
+          if (students) {
+            for (let student of students) {
+              for (let experienceLearningRubricCriteria of experienceLearningRubricCriterias) {
+                let experienceLearningRubricCriteriaValuation =
+                  await this.repositoryExperienceLearningRubricCriteriaValuation.findBy({
+                    where: {
+                      experienceLearningRubricCriteriaId:
+                        experienceLearningRubricCriteria.id.toString(),
+                      studentId: student,
+                    },
+                  });
+                if (experienceLearningRubricCriteriaValuation.length == 0) {
+                  const model =
+                    await this.repositoryExperienceLearningRubricCriteriaValuation.create({
+                      experienceLearningRubricCriteriaId:
+                        experienceLearningRubricCriteria.id.toString(),
+                      studentId: student,
+                      active: true,
+                      version: 0,
+                      createdByUserId,
+                    });
+                  let result = await this.repositoryExperienceLearningRubricCriteriaValuation.save(
+                    model
+                  );
+                }
+              }
+              let experienceLearningRubricValuation =
+                await this.repositoryExperienceLearningRubricValuation.findBy({
                   where: {
-                    experienceLearningRubricCriteriaId:
-                      experienceLearningRubricCriteria.id.toString(),
+                    experienceLearningId: id,
                     studentId: student,
                   },
                 });
-              if (experienceLearningRubricCriteriaValuation.length == 0) {
-                const model = await this.repositoryExperienceLearningRubricCriteriaValuation.create(
-                  {
-                    experienceLearningRubricCriteriaId:
-                      experienceLearningRubricCriteria.id.toString(),
-                    studentId: student,
-                    active: true,
-                    version: 0,
-                    createdByUserId,
-                  }
-                );
-                let result = await this.repositoryExperienceLearningRubricCriteriaValuation.save(
-                  model
-                );
-              }
-            }
-            let experienceLearningRubricValuation =
-              await this.repositoryExperienceLearningRubricValuation.findBy({
-                where: {
+              if (experienceLearningRubricValuation.length == 0) {
+                const model = await this.repositoryExperienceLearningRubricValuation.create({
                   experienceLearningId: id,
                   studentId: student,
-                },
-              });
-            if (experienceLearningRubricValuation.length == 0) {
-              const model = await this.repositoryExperienceLearningRubricValuation.create({
-                experienceLearningId: id,
-                studentId: student,
-                active: true,
-                version: 0,
-                createdByUserId,
-              });
-              let result = await this.repositoryExperienceLearningRubricValuation.save(model);
+                  active: true,
+                  version: 0,
+                  createdByUserId,
+                });
+                let result = await this.repositoryExperienceLearningRubricValuation.save(model);
+              }
             }
-          });
+          }
         }
       }
     }

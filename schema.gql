@@ -853,6 +853,8 @@ type ExperienceLearningAverageValuation implements IModelCampusData {
   evaluativeComponent: EvaluativeComponent
   evaluativeComponentId: String
   id: ID!
+  performanceLevel: PerformanceLevel
+  performanceLevelId: String
   student: Student
   studentId: String
   updatedAt: DateTime
@@ -890,6 +892,8 @@ type ExperienceLearningCoEvaluation implements IModelCampusData {
   experienceLearningId: String
   id: ID!
   observations: String
+  performanceLevel: PerformanceLevel
+  performanceLevelId: String
   student: Student
   studentId: String
   updatedAt: DateTime
@@ -924,6 +928,8 @@ type ExperienceLearningCoEvaluationValuation implements IModelCampusData {
   experienceLearning: ExperienceLearning
   experienceLearningId: String
   id: ID!
+  performanceLevel: PerformanceLevel
+  performanceLevelId: String
   student: Student
   studentId: String
   updatedAt: DateTime
@@ -1022,6 +1028,8 @@ type ExperienceLearningRubricCriteriaValuation implements IModelCampusData {
   experienceLearningRubricCriteria: ExperienceLearningRubricCriteria
   experienceLearningRubricCriteriaId: String
   id: ID!
+  performanceLevel: PerformanceLevel
+  performanceLevelId: String
   student: Student
   studentId: String
   updatedAt: DateTime
@@ -1057,6 +1065,8 @@ type ExperienceLearningRubricValuation implements IModelCampusData {
   experienceLearningId: String
   id: ID!
   observations: String
+  performanceLevel: PerformanceLevel
+  performanceLevelId: String
   student: Student
   studentId: String
   updatedAt: DateTime
@@ -1092,6 +1102,8 @@ type ExperienceLearningSelfAssessmentValuation implements IModelCampusData {
   experienceLearningId: String
   id: ID!
   observations: String
+  performanceLevel: PerformanceLevel
+  performanceLevelId: String
   student: Student
   studentId: String
   updatedAt: DateTime
@@ -2361,6 +2373,7 @@ input NewExperienceLearningAverageValuation {
   academicPeriodId: String
   average: Float
   evaluativeComponentId: String
+  performanceLevelId: String
   studentId: String
 }
 
@@ -2370,6 +2383,7 @@ input NewExperienceLearningCoEvaluation {
   coEvaluatorId: String
   experienceLearningId: String
   observations: String
+  performanceLevelId: String
   studentId: String
 }
 
@@ -2377,6 +2391,7 @@ input NewExperienceLearningCoEvaluationValuation {
   assessment: Float
   campusId: String
   experienceLearningId: String
+  performanceLevelId: String
   studentId: String
 }
 
@@ -2401,6 +2416,7 @@ input NewExperienceLearningRubricCriteriaPerformanceLevel {
 input NewExperienceLearningRubricCriteriaValuation {
   assessment: Float
   experienceLearningRubricCriteriaId: String
+  performanceLevelId: String
   studentId: String
 }
 
@@ -2408,6 +2424,7 @@ input NewExperienceLearningRubricValuation {
   assessment: Float
   experienceLearningId: String
   observations: String
+  performanceLevelId: String
   studentId: String
 }
 
@@ -2416,6 +2433,7 @@ input NewExperienceLearningSelfAssessmentValuation {
   campusId: String
   experienceLearningId: String
   observations: String
+  performanceLevelId: String
   studentId: String
 }
 
@@ -2423,6 +2441,7 @@ input NewExperienceLearningTraditionalValuation {
   assessment: Float
   campusId: String
   experienceLearningId: String
+  performanceLevelId: String
   studentId: String
 }
 
