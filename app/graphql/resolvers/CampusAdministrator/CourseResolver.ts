@@ -443,12 +443,11 @@ export class CourseResolver {
               active: true,
             },
           });
-          console.log(course.id.toString(), '-', user.id.toString());
-          if (student) {
+          if (student && student.length === 1) {
             await this.repositoryStudent.save({
               _id: new ObjectId(student[0].id.toString()),
               ...student[0],
-              code,
+              code: code as number,
               version: (student[0]?.version as number) + 1,
             });
             code += 1;
