@@ -215,6 +215,7 @@ export class StudentResolver {
     }
     const modelUser = await this.repositoryUser.create({
       ...dataUserProcess,
+      username: dataUserProcess.documentNumber,
       active: true,
       version: 0,
       createdByUserId,
