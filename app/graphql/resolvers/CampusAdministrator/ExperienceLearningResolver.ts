@@ -21,7 +21,7 @@ import {
   ExperienceLearningSelfAssessmentValuationRepository,
   ExperienceLearningTraditionalValuationRepository,
   LearningRepository,
-  UserRepository,
+  UserRepository
 } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { ExperienceType } from '../../enums/ExperienceType';
@@ -32,7 +32,7 @@ import { AcademicAsignatureCoursePeriodValuation } from '../../models/CampusAdmi
 import { Course } from '../../models/CampusAdministrator/Course';
 import {
   ExperienceLearning,
-  ExperienceLearningConnection,
+  ExperienceLearningConnection
 } from '../../models/CampusAdministrator/ExperienceLearning';
 import { ExperienceLearningAverageValuation } from '../../models/CampusAdministrator/ExperienceLearningAverageValuation';
 import { ExperienceLearningCoEvaluation } from '../../models/CampusAdministrator/ExperienceLearningCoEvaluation';
@@ -723,8 +723,8 @@ export class ExperienceLearningResolver {
             },
           });
           break;
-        case ExperienceType.ONLINETEST:
-          break;
+        // case ExperienceType.ONLINETEST:
+        //   break;
       }
     }
     return result;
@@ -823,8 +823,8 @@ export class ExperienceLearningResolver {
                   average += evaluation?.assessment ? evaluation?.assessment : 0;
                 });
                 break;
-              case ExperienceType.ONLINETEST:
-                break;
+              // case ExperienceType.ONLINETEST:
+              //   break;
             }
           }
           if (average != null && average > 0 && experienceLearnings.length > 0) {
