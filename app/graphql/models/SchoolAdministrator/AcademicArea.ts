@@ -1,10 +1,11 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { GeneralAcademicArea } from '../GeneralAdministrator/GeneralAcademicArea';
 import { AcademicGrade } from './AcademicGrade';
 
+@Index("index_full", ["generalAcademicAreaId", "academicGradeId", "schoolId"])
 @ObjectType({ description: 'The AcademicArea model', implements: IModelSchoolData })
 @Entity()
 export class AcademicArea extends IModelSchoolData {
@@ -16,6 +17,7 @@ export class AcademicArea extends IModelSchoolData {
   @Column({ nullable: true })
   abbreviation?: string;
 
+  @Index("index_generalAcademicAreaId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   generalAcademicAreaId?: string;
@@ -23,6 +25,7 @@ export class AcademicArea extends IModelSchoolData {
   @Field({ nullable: true })
   generalAcademicArea?: GeneralAcademicArea;
 
+  @Index("index_academicGradeId")
   @Field(() => [String], { nullable: true })
   @Column({ nullable: true })
   academicGradeId?: [string];

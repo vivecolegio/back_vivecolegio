@@ -1,9 +1,10 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { SchoolYear } from './SchoolYear';
 
+@Index("index_full", ["schoolYearId", "schoolId"])
 @ObjectType({ description: 'The AcademicPeriod model', implements: IModelSchoolData })
 @Entity()
 export class AcademicPeriod extends IModelSchoolData {
@@ -11,6 +12,7 @@ export class AcademicPeriod extends IModelSchoolData {
   @Column({ nullable: true })
   name?: string;
 
+  @Index("index_schoolYearId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   schoolYearId?: string;

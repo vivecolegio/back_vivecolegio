@@ -1,5 +1,5 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, Index, ManyToOne } from 'typeorm';
 import { Lazy } from '../../../types';
 import { IModelData } from '../../interfaces/IModelData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
@@ -7,6 +7,7 @@ import { Menu } from './Menu';
 import { Module } from './Module';
 import { Role } from './Role';
 
+@Index("index_full", ["menuId", "moduleId", "rolesId"])
 @ObjectType({ description: 'The MenuItem model', implements: IModelData })
 @Entity()
 export class MenuItem extends IModelData {
@@ -26,6 +27,7 @@ export class MenuItem extends IModelData {
   @Field(() => Menu, { nullable: true })
   menu?: Lazy<Menu>;
 
+  @Index("index_menuId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   menuId?: string;
@@ -34,10 +36,12 @@ export class MenuItem extends IModelData {
   @Field(() => Module, { nullable: true })
   module?: Lazy<Module>;
 
+  @Index("index_moduleId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   moduleId?: string;
 
+  @Index("index_rolesId")
   @Field(() => [String], { nullable: true })
   @Column({ nullable: true })
   rolesId?: String[];

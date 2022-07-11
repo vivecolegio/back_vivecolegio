@@ -1,15 +1,17 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { IModelCampusData } from '../../interfaces/IModelCampusData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { Student } from '../GeneralAdministrator/Student';
 import { AcademicPeriod } from '../SchoolAdministrator/AcademicPeriod';
 import { AcademicAsignatureCourse } from './AcademicAsignatureCourse';
 
+@Index("index_full", ["academicAsignatureCourseId", "academicPeriodId", "studentId", "campusId"])
 @ObjectType({ description: 'The AcademicAsignatureCoursePeriodValuation model', implements: IModelCampusData })
 @Entity()
 export class AcademicAsignatureCoursePeriodValuation extends IModelCampusData {
 
+    @Index("index_academicAsignatureCourseId")
     @Field({ nullable: true })
     @Column({ nullable: true })
     academicAsignatureCourseId?: string;
@@ -17,6 +19,7 @@ export class AcademicAsignatureCoursePeriodValuation extends IModelCampusData {
     @Field({ nullable: true })
     academicAsignatureCourse?: AcademicAsignatureCourse;
 
+    @Index("index_academicPeriodId")
     @Field({ nullable: true })
     @Column({ nullable: true })
     academicPeriodId?: string;
@@ -24,6 +27,7 @@ export class AcademicAsignatureCoursePeriodValuation extends IModelCampusData {
     @Field({ nullable: true })
     academicPeriod?: AcademicPeriod;
 
+    @Index("index_studentId")
     @Field({ nullable: true })
     @Column({ nullable: true })
     studentId?: String;

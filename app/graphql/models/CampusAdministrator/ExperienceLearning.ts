@@ -1,5 +1,5 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { ExperienceType } from '../../enums/ExperienceType';
 import { NavigationMethodTestOnline } from '../../enums/NavigationMethodTestOnline';
 import { IModelCampusData } from '../../interfaces/IModelCampusData';
@@ -11,6 +11,9 @@ import { Learning } from '../SchoolAdministrator/Learning';
 import { AcademicAsignatureCourse } from './AcademicAsignatureCourse';
 import { ExperienceLearningPerformanceLevel } from './ExperienceLearningPerformanceLevel';
 
+@Index("index_full_evidenceLearnings", ["academicAsignatureCourseId", "evidenceLearningsId", "academicPeriodId", "campusId"])
+@Index("index_full_learnings", ["academicAsignatureCourseId", "learningsId", "academicPeriodId", "campusId"])
+@Index("index_full_evaluativeComponents", ["academicAsignatureCourseId", "academicPeriodId", "evaluativeComponentsId", "campusId"])
 @ObjectType({ description: 'The ExperienceLearning model', implements: IModelCampusData })
 @Entity()
 export class ExperienceLearning extends IModelCampusData {
@@ -18,6 +21,7 @@ export class ExperienceLearning extends IModelCampusData {
   @Column({ nullable: true })
   title?: string;
 
+  @Index("index_academicAsignatureCourseId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   academicAsignatureCourseId?: string;
@@ -37,6 +41,7 @@ export class ExperienceLearning extends IModelCampusData {
   @Column({ nullable: true })
   dateDelivery?: Date;
 
+  @Index("index_learningsId")
   @Field(() => [String], { nullable: true })
   @Column({ nullable: true })
   learningsId?: String[];
@@ -44,6 +49,7 @@ export class ExperienceLearning extends IModelCampusData {
   @Field(() => [Learning], { nullable: true })
   learnigs?: Learning[];
 
+  @Index("index_evidenceLearningsId")
   @Field(() => [String], { nullable: true })
   @Column({ nullable: true })
   evidenceLearningsId?: String[];
@@ -51,6 +57,7 @@ export class ExperienceLearning extends IModelCampusData {
   @Field(() => [EvidenceLearning], { nullable: true })
   evidenceLearnings?: EvidenceLearning[];
 
+  @Index("index_academicPeriodId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   academicPeriodId?: string;
@@ -58,6 +65,7 @@ export class ExperienceLearning extends IModelCampusData {
   @Field({ nullable: true })
   academicPeriod?: AcademicPeriod;
 
+  @Index("index_evaluativeComponentsId")
   @Field(() => [String], { nullable: true })
   @Column({ nullable: true })
   evaluativeComponentsId?: String[];
@@ -95,10 +103,10 @@ export class ExperienceLearning extends IModelCampusData {
 }
 
 @ObjectType()
-export class ExperienceLearningEdge extends EdgeType('ExperienceLearning', ExperienceLearning) {}
+export class ExperienceLearningEdge extends EdgeType('ExperienceLearning', ExperienceLearning) { }
 
 @ObjectType()
 export class ExperienceLearningConnection extends ConnectionType<ExperienceLearningEdge>(
   'ExperienceLearning',
   ExperienceLearningEdge
-) {}
+) { }

@@ -5,7 +5,6 @@ import { EvidenceLearning } from '../SchoolAdministrator/EvidenceLearning';
 
 @ObjectType({ description: 'The ClassroomPlanExpectedPerformance model' })
 export class ClassroomPlanExpectedPerformance {
-
     @Field({ nullable: true })
     @Column({ nullable: true })
     evaluativeComponentId?: string;

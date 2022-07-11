@@ -1,17 +1,19 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { IModelCampusData } from '../../interfaces/IModelCampusData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { Student } from '../GeneralAdministrator/Student';
 import { PerformanceLevel } from '../SchoolAdministrator/PerformanceLevel';
 import { ExperienceLearning } from './ExperienceLearning';
 
+@Index("index_full", ["experienceLearningId", "studentId", "performanceLevelId", "campusId"])
 @ObjectType({
   description: 'The ExperienceLearningCoEvaluationValuation model',
   implements: IModelCampusData,
 })
 @Entity()
 export class ExperienceLearningCoEvaluationValuation extends IModelCampusData {
+  @Index("index_experienceLearningId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   experienceLearningId?: string;
@@ -19,6 +21,7 @@ export class ExperienceLearningCoEvaluationValuation extends IModelCampusData {
   @Field({ nullable: true })
   experienceLearning?: ExperienceLearning;
 
+  @Index("index_studentId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   studentId?: String;
@@ -30,6 +33,7 @@ export class ExperienceLearningCoEvaluationValuation extends IModelCampusData {
   @Column({ nullable: true })
   assessment?: number;
 
+  @Index("index_performanceLevelId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   performanceLevelId?: String;
@@ -42,10 +46,10 @@ export class ExperienceLearningCoEvaluationValuation extends IModelCampusData {
 export class ExperienceLearningCoEvaluationValuationEdge extends EdgeType(
   'ExperienceLearningCoEvaluationValuation',
   ExperienceLearningCoEvaluationValuation
-) {}
+) { }
 
 @ObjectType()
 export class ExperienceLearningCoEvaluationValuationConnection extends ConnectionType<ExperienceLearningCoEvaluationValuationEdge>(
   'ExperienceLearningCoEvaluationValuation',
   ExperienceLearningCoEvaluationValuationEdge
-) {}
+) { }

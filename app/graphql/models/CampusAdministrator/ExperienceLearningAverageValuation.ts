@@ -1,5 +1,5 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { IModelCampusData } from '../../interfaces/IModelCampusData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { Student } from '../GeneralAdministrator/Student';
@@ -8,12 +8,14 @@ import { EvaluativeComponent } from '../SchoolAdministrator/EvaluativeComponent'
 import { PerformanceLevel } from '../SchoolAdministrator/PerformanceLevel';
 import { AcademicAsignatureCourse } from './AcademicAsignatureCourse';
 
+@Index("index_full", ["academicAsignatureCourseId", "academicPeriodId", "studentId", "evaluativeComponentId", "performanceLevelId", "campusId"])
 @ObjectType({
   description: 'The ExperienceLearningAverageValuation model',
   implements: IModelCampusData,
 })
 @Entity()
 export class ExperienceLearningAverageValuation extends IModelCampusData {
+  @Index("index_academicAsignatureCourseId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   academicAsignatureCourseId?: string;
@@ -21,6 +23,7 @@ export class ExperienceLearningAverageValuation extends IModelCampusData {
   @Field({ nullable: true })
   academicAsignatureCourse?: AcademicAsignatureCourse;
 
+  @Index("index_academicPeriodId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   academicPeriodId?: string;
@@ -28,6 +31,7 @@ export class ExperienceLearningAverageValuation extends IModelCampusData {
   @Field({ nullable: true })
   academicPeriod?: AcademicPeriod;
 
+  @Index("index_studentId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   studentId?: String;
@@ -39,6 +43,7 @@ export class ExperienceLearningAverageValuation extends IModelCampusData {
   @Column({ nullable: true })
   average?: number;
 
+  @Index("index_evaluativeComponentId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   evaluativeComponentId?: string;
@@ -46,6 +51,7 @@ export class ExperienceLearningAverageValuation extends IModelCampusData {
   @Field({ nullable: true })
   evaluativeComponent?: EvaluativeComponent;
 
+  @Index("index_performanceLevelId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   performanceLevelId?: String;
@@ -58,10 +64,10 @@ export class ExperienceLearningAverageValuation extends IModelCampusData {
 export class ExperienceLearningAverageValuationEdge extends EdgeType(
   'ExperienceLearningAverageValuation',
   ExperienceLearningAverageValuation
-) {}
+) { }
 
 @ObjectType()
 export class ExperienceLearningAverageValuationConnection extends ConnectionType<ExperienceLearningAverageValuationEdge>(
   'ExperienceLearningAverageValuation',
   ExperienceLearningAverageValuationEdge
-) {}
+) { }

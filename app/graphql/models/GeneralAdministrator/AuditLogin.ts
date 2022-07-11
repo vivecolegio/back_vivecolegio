@@ -1,5 +1,5 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { IModelData } from '../../interfaces/IModelData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { User } from './User';
@@ -10,6 +10,7 @@ export class AuditLogin extends IModelData {
   @Field({ nullable: true })
   user?: User;
 
+  @Index("index_userId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   userId?: string;

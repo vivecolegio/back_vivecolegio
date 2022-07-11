@@ -1,5 +1,5 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { IModelCampusData } from '../../interfaces/IModelCampusData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { GeneralBasicLearningRight } from '../GeneralAdministrator/GeneralBasicLearningRight';
@@ -13,6 +13,9 @@ import { ClassroomPlanExpectedPerformance } from './ClassroomPlanExpectedPerform
 import { ClassroomPlanMethodologicalRoute } from './ClassroomPlanMethodologicalRoute';
 import { ClassroomPlanPerformanceAppraisalStrategy } from './ClassroomPlanPerformanceAppraisalStrategy';
 
+@Index("index_full_academicStandards", ["academicPeriodId", "academicAsignatureId", "academicGradeId", "academicAsignatureCourseId", "academicStandardsId", "campusId"])
+@Index("index_full_learnings", ["academicPeriodId", "academicAsignatureId", "academicGradeId", "academicAsignatureCourseId", "learningsId", "campusId"])
+@Index("index_full_generalBasicLearningRights", ["academicPeriodId", "academicAsignatureId", "academicGradeId", "academicAsignatureCourseId", "generalBasicLearningRightsId", "campusId"])
 @ObjectType({ description: 'The ClassroomPlan model', implements: IModelCampusData })
 @Entity()
 export class ClassroomPlan extends IModelCampusData {
@@ -25,6 +28,7 @@ export class ClassroomPlan extends IModelCampusData {
     @Column({ nullable: true })
     endDate?: Date;
 
+    @Index("index_academicPeriodId")
     @Field({ nullable: true })
     @Column({ nullable: true })
     academicPeriodId?: string;
@@ -32,6 +36,7 @@ export class ClassroomPlan extends IModelCampusData {
     @Field({ nullable: true })
     academicPeriod?: AcademicPeriod;
 
+    @Index("index_academicAsignatureId")
     @Field({ nullable: true })
     @Column({ nullable: true })
     academicAsignatureId?: string;
@@ -39,6 +44,7 @@ export class ClassroomPlan extends IModelCampusData {
     @Field({ nullable: true })
     academicAsignature?: AcademicAsignature;
 
+    @Index("index_academicGradeId")
     @Field({ nullable: true })
     @Column({ nullable: true })
     academicGradeId?: string;
@@ -46,6 +52,7 @@ export class ClassroomPlan extends IModelCampusData {
     @Field({ nullable: true })
     academicGrade?: AcademicGrade;
 
+    @Index("index_academicAsignatureCourseId")
     @Field({ nullable: true })
     @Column({ nullable: true })
     academicAsignatureCourseId?: string;
@@ -53,6 +60,7 @@ export class ClassroomPlan extends IModelCampusData {
     @Field({ nullable: true })
     academicAsignatureCourse?: AcademicAsignatureCourse;
 
+    @Index("index_learningsId")
     @Field(() => [String], { nullable: true })
     @Column({ nullable: true })
     learningsId?: String[];
@@ -60,6 +68,7 @@ export class ClassroomPlan extends IModelCampusData {
     @Field(() => [Learning], { nullable: true })
     learnigs?: Learning[];
 
+    @Index("index_academicStandardsId")
     @Field(() => [String], { nullable: true })
     @Column({ nullable: true })
     academicStandardsId?: String[];
@@ -67,6 +76,7 @@ export class ClassroomPlan extends IModelCampusData {
     @Field(() => [AcademicStandard], { nullable: true })
     academicStandards?: AcademicStandard[];
 
+    @Index("index_generalBasicLearningRightsId")
     @Field(() => [String], { nullable: true })
     @Column({ nullable: true })
     generalBasicLearningRightsId?: String[];

@@ -1,5 +1,5 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { PerformanceLevelCategory } from '../../enums/PerformanceLevelCategory';
 import { PerformanceLevelType } from '../../enums/PerformanceLevelType';
 import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
@@ -8,6 +8,7 @@ import { Campus } from '../GeneralAdministrator/Campus';
 import { GeneralPerformanceLevel } from '../GeneralAdministrator/GeneralPerformanceLevel';
 import { AcademicGrade } from './AcademicGrade';
 
+@Index("index_full", ["generalPerformanceLevelId", "campusId", "academicGradesId", "schoolId"])
 @ObjectType({ description: 'The PerformanceLevel model', implements: IModelSchoolData })
 @Entity()
 export class PerformanceLevel extends IModelSchoolData {
@@ -31,6 +32,7 @@ export class PerformanceLevel extends IModelSchoolData {
   @Column({ nullable: true })
   category?: PerformanceLevelCategory;
 
+  @Index("index_generalPerformanceLevelId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   generalPerformanceLevelId?: string;
@@ -38,6 +40,7 @@ export class PerformanceLevel extends IModelSchoolData {
   @Field({ nullable: true })
   generalPerformanceLevel?: GeneralPerformanceLevel;
 
+  @Index("index_campusId")
   @Field(() => [String], { nullable: true })
   @Column({ nullable: true })
   campusId?: String[];
@@ -45,6 +48,7 @@ export class PerformanceLevel extends IModelSchoolData {
   @Field(() => [Campus], { nullable: true })
   campus?: Campus[];
 
+  @Index("index_academicGradesId")
   @Field(() => [String], { nullable: true })
   @Column({ nullable: true })
   academicGradesId?: String[];
@@ -54,10 +58,10 @@ export class PerformanceLevel extends IModelSchoolData {
 }
 
 @ObjectType()
-export class PerformanceLevelEdge extends EdgeType('PerformanceLevel', PerformanceLevel) {}
+export class PerformanceLevelEdge extends EdgeType('PerformanceLevel', PerformanceLevel) { }
 
 @ObjectType()
 export class PerformanceLevelConnection extends ConnectionType<PerformanceLevelEdge>(
   'PerformanceLevel',
   PerformanceLevelEdge
-) {}
+) { }

@@ -1,14 +1,15 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { QuestionTypeTestOnline } from '../../enums/QuestionTypeTestOnline';
 import { IModelCampusData } from '../../interfaces/IModelCampusData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { QuestionCategoryTestOnline } from './QuestionCategoryTestOnline';
 
+@Index("index_full", ["questionCategoryTestOnlineId", "campusId"])
 @ObjectType({ description: 'The QuestionTestOnline model', implements: IModelCampusData })
 @Entity()
 export class QuestionTestOnline extends IModelCampusData {
-
+    @Index("index_questionCategoryTestOnlineId")
     @Field({ nullable: true })
     @Column({ nullable: true })
     questionCategoryTestOnlineId?: string;

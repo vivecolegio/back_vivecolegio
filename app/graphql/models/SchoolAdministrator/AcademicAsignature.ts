@@ -1,10 +1,12 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { GeneralAcademicAsignature } from '../GeneralAdministrator/GeneralAcademicAsignature';
 import { AcademicArea } from './AcademicArea';
 import { AcademicGrade } from './AcademicGrade';
+
+@Index("index_full", ["academicAreaId", "academicGradeId", "generalAcademicAsignatureId", "schoolId"])
 @ObjectType({ description: 'The AcademicAsignature model', implements: IModelSchoolData })
 @Entity()
 export class AcademicAsignature extends IModelSchoolData {
@@ -28,6 +30,7 @@ export class AcademicAsignature extends IModelSchoolData {
   @Column({ nullable: true })
   maxWeight?: number;
 
+  @Index("index_academicAreaId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   academicAreaId?: string;
@@ -35,6 +38,7 @@ export class AcademicAsignature extends IModelSchoolData {
   @Field({ nullable: true })
   academicArea?: AcademicArea;
 
+  @Index("index_academicGradeId")
   @Field(() => [String], { nullable: true })
   @Column({ nullable: true })
   academicGradeId?: [string];
@@ -42,6 +46,7 @@ export class AcademicAsignature extends IModelSchoolData {
   @Field(() => [AcademicGrade], { nullable: true })
   academicGrade?: [AcademicGrade];
 
+  @Index("index_generalAcademicAsignatureId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   generalAcademicAsignatureId?: string;

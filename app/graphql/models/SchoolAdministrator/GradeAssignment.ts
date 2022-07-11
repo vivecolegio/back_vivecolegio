@@ -1,10 +1,11 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { AcademicAsignature } from './AcademicAsignature';
 import { AcademicGrade } from './AcademicGrade';
 
+@Index("index_full", ["academicGradeId", "academicAsignatureId", "schoolId"])
 @ObjectType({ description: 'The GradeAssignment model', implements: IModelSchoolData })
 @Entity()
 export class GradeAssignment extends IModelSchoolData {
@@ -16,6 +17,7 @@ export class GradeAssignment extends IModelSchoolData {
   @Column({ nullable: true })
   maxHourlyIntensity?: number;
 
+  @Index("index_academicGradeId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   academicGradeId?: string;
@@ -23,6 +25,7 @@ export class GradeAssignment extends IModelSchoolData {
   @Field({ nullable: true })
   academicGrade?: AcademicGrade;
 
+  @Index("index_academicAsignatureId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   academicAsignatureId?: string;
@@ -32,10 +35,10 @@ export class GradeAssignment extends IModelSchoolData {
 }
 
 @ObjectType()
-export class GradeAssignmentEdge extends EdgeType('GradeAssignment', GradeAssignment) {}
+export class GradeAssignmentEdge extends EdgeType('GradeAssignment', GradeAssignment) { }
 
 @ObjectType()
 export class GradeAssignmentConnection extends ConnectionType<GradeAssignmentEdge>(
   'GradeAssignment',
   GradeAssignmentEdge
-) {}
+) { }

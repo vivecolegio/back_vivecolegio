@@ -1,12 +1,14 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { IModelCampusData } from '../../interfaces/IModelCampusData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { AcademicDay } from './AcademicDay';
 
+@Index("index_full", ["academicDayId", "campusId"])
 @ObjectType({ description: 'The AcademicHour model', implements: IModelCampusData })
 @Entity()
 export class AcademicHour extends IModelCampusData {
+  @Index("index_academicDayId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   academicDayId?: string;

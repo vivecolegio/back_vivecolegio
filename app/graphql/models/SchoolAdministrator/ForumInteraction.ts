@@ -1,9 +1,10 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { Forum } from './Forum';
 
+@Index("index_full", ["forumId", "schoolId"])
 @ObjectType({ description: 'The ForumInteraction model', implements: IModelSchoolData })
 @Entity()
 export class ForumInteraction extends IModelSchoolData {
@@ -11,6 +12,7 @@ export class ForumInteraction extends IModelSchoolData {
     @Column({ nullable: true })
     comment?: string;
 
+    @Index("index_forumId")
     @Field(() => String, { nullable: true })
     @Column({ nullable: true })
     forumId?: string;

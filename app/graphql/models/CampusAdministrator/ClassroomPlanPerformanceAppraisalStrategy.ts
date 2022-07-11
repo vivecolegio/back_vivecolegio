@@ -4,7 +4,6 @@ import { EvaluativeComponent } from '../SchoolAdministrator/EvaluativeComponent'
 
 @ObjectType({ description: 'The ClassroomPlanPerformanceAppraisalStrategy model' })
 export class ClassroomPlanPerformanceAppraisalStrategy {
-
     @Field({ nullable: true })
     @Column({ nullable: true })
     evaluativeComponentId?: string;

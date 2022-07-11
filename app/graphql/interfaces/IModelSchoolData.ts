@@ -1,5 +1,5 @@
 import { Field, ID, InterfaceType } from 'type-graphql';
-import { Column, CreateDateColumn, ObjectIdColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Index, ObjectIdColumn, UpdateDateColumn } from 'typeorm';
 import { School } from '../models/GeneralAdministrator/School';
 
 @InterfaceType()
@@ -8,6 +8,7 @@ export abstract class IModelSchoolData {
   @ObjectIdColumn()
   id!: string;
 
+  @Index("index_schoolId")
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
   schoolId?: string;

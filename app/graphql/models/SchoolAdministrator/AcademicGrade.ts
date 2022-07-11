@@ -1,5 +1,5 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { GeneralAcademicCycle } from '../GeneralAdministrator/GeneralAcademicCycle';
@@ -7,6 +7,7 @@ import { GeneralAcademicGrade } from '../GeneralAdministrator/GeneralAcademicGra
 import { EducationLevel } from './EducationLevel';
 import { Specialty } from './Specialty';
 
+@Index("index_full", ["educationLevelId", "specialtyId", "generalAcademicCycleId", "generalAcademicGradeId", "schoolId"])
 @ObjectType({ description: 'The AcademicGrade model', implements: IModelSchoolData })
 @Entity()
 export class AcademicGrade extends IModelSchoolData {
@@ -14,6 +15,7 @@ export class AcademicGrade extends IModelSchoolData {
   @Column({ nullable: true })
   name?: string;
 
+  @Index("index_educationLevelId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   educationLevelId?: string;
@@ -21,6 +23,7 @@ export class AcademicGrade extends IModelSchoolData {
   @Field({ nullable: true })
   educationLevel?: EducationLevel;
 
+  @Index("index_specialtyId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   specialtyId?: string;
@@ -28,6 +31,7 @@ export class AcademicGrade extends IModelSchoolData {
   @Field({ nullable: true })
   specialty?: Specialty;
 
+  @Index("index_generalAcademicCycleId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   generalAcademicCycleId?: string;
@@ -35,6 +39,7 @@ export class AcademicGrade extends IModelSchoolData {
   @Field({ nullable: true })
   generalAcademicCycle?: GeneralAcademicCycle;
 
+  @Index("index_generalAcademicGradeId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   generalAcademicGradeId?: string;

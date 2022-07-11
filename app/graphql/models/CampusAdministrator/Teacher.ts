@@ -1,5 +1,5 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { IModelData } from '../../interfaces/IModelData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { Campus } from '../GeneralAdministrator/Campus';
@@ -7,9 +7,12 @@ import { School } from '../GeneralAdministrator/School';
 import { User } from '../GeneralAdministrator/User';
 import { AcademicAsignature } from '../SchoolAdministrator/AcademicAsignature';
 
+@Index("index_full_school", ["schoolId", "userId", "academicAsignatureId"])
+@Index("index_full_campus", ["campusId", "userId", "academicAsignatureId"])
 @ObjectType({ description: 'The Teacher model', implements: IModelData })
 @Entity()
 export class Teacher extends IModelData {
+  @Index("index_schoolId")
   @Field(() => [String], { nullable: true })
   @Column({ nullable: true })
   schoolId?: String[];
@@ -17,6 +20,7 @@ export class Teacher extends IModelData {
   @Field(() => [School], { nullable: true })
   school?: School[];
 
+  @Index("index_campusId")
   @Field(() => [String], { nullable: true })
   @Column({ nullable: true })
   campusId?: String[];
@@ -24,6 +28,7 @@ export class Teacher extends IModelData {
   @Field(() => [Campus], { nullable: true })
   campus?: Campus[];
 
+  @Index("index_userId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   userId?: string;
@@ -31,6 +36,7 @@ export class Teacher extends IModelData {
   @Field({ nullable: true })
   user?: User;
 
+  @Index("index_academicAsignatureId")
   @Field(() => [String], { nullable: true })
   @Column({ nullable: true })
   academicAsignatureId?: [string];

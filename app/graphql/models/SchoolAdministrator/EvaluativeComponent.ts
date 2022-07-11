@@ -1,11 +1,13 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { EvaluativeComponentType } from '../../enums/EvaluativeComponentType';
 import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { AcademicArea } from './AcademicArea';
 import { AcademicAsignature } from './AcademicAsignature';
 
+@Index("index_full_academicAsignatures", ["academicAsignaturesId", "schoolId"])
+@Index("index_full_academicAreas", ["academicAreasId", "schoolId"])
 @ObjectType({ description: 'The EvaluativeComponent model', implements: IModelSchoolData })
 @Entity()
 export class EvaluativeComponent extends IModelSchoolData {
@@ -21,6 +23,7 @@ export class EvaluativeComponent extends IModelSchoolData {
   @Column({ nullable: true })
   type?: EvaluativeComponentType;
 
+  @Index("index_academicAsignaturesId")
   @Field(() => [String], { nullable: true })
   @Column({ nullable: true })
   academicAsignaturesId?: String[];
@@ -28,6 +31,7 @@ export class EvaluativeComponent extends IModelSchoolData {
   @Field(() => [AcademicAsignature], { nullable: true })
   academicAsignatures?: AcademicAsignature[];
 
+  @Index("index_academicAreasId")
   @Field(() => [String], { nullable: true })
   @Column({ nullable: true })
   academicAreasId?: String[];
@@ -37,10 +41,10 @@ export class EvaluativeComponent extends IModelSchoolData {
 }
 
 @ObjectType()
-export class EvaluativeComponentEdge extends EdgeType('EvaluativeComponent', EvaluativeComponent) {}
+export class EvaluativeComponentEdge extends EdgeType('EvaluativeComponent', EvaluativeComponent) { }
 
 @ObjectType()
 export class EvaluativeComponentConnection extends ConnectionType<EvaluativeComponentEdge>(
   'EvaluativeComponent',
   EvaluativeComponentEdge
-) {}
+) { }

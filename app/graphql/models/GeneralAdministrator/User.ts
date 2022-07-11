@@ -3,9 +3,10 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   ManyToOne,
   ObjectIdColumn,
-  UpdateDateColumn,
+  UpdateDateColumn
 } from 'typeorm';
 import { Lazy } from '../../../types';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
@@ -13,6 +14,7 @@ import { DocumentType } from './DocumentType';
 import { Gender } from './Gender';
 import { Role } from './Role';
 
+@Index("index_full", ["username", "genderId", "documentTypeId", "roleId"])
 @ObjectType({ description: 'The User model' })
 @Entity()
 export class User {
@@ -58,6 +60,7 @@ export class User {
   @Column({ nullable: true })
   lastName?: string;
 
+  @Index("index_username")
   @Field({ nullable: true })
   @Column({ nullable: true })
   username?: string;
@@ -66,6 +69,7 @@ export class User {
   @Field((_type) => Gender, { nullable: true })
   gender?: Gender;
 
+  @Index("index_genderId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   genderId?: string;
@@ -74,6 +78,7 @@ export class User {
   @Field((_type) => DocumentType, { nullable: true })
   documentType?: DocumentType;
 
+  @Index("index_documentTypeId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   documentTypeId?: string;
@@ -106,13 +111,14 @@ export class User {
   @Field(() => Role, { nullable: true })
   role?: Lazy<Role>;
 
+  @Index("index_roleId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   roleId?: string;
 }
 
 @ObjectType()
-export class UserEdge extends EdgeType('User', User) {}
+export class UserEdge extends EdgeType('User', User) { }
 
 @ObjectType()
-export class UserConnection extends ConnectionType<UserEdge>('User', UserEdge) {}
+export class UserConnection extends ConnectionType<UserEdge>('User', UserEdge) { }

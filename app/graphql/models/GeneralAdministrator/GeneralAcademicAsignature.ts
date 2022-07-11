@@ -1,5 +1,5 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { IModelData } from '../../interfaces/IModelData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { GeneralAcademicArea } from './GeneralAcademicArea';
@@ -11,6 +11,7 @@ export class GeneralAcademicAsignature extends IModelData {
   @Column({ nullable: true })
   name?: string;
 
+  @Index("index_generalAcademicAreaId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   generalAcademicAreaId?: string;
@@ -23,10 +24,10 @@ export class GeneralAcademicAsignature extends IModelData {
 export class GeneralAcademicAsignatureEdge extends EdgeType(
   'GeneralAcademicAsignature',
   GeneralAcademicAsignature
-) {}
+) { }
 
 @ObjectType()
 export class GeneralAcademicAsignatureConnection extends ConnectionType<GeneralAcademicAsignatureEdge>(
   'GeneralAcademicAsignature',
   GeneralAcademicAsignatureEdge
-) {}
+) { }

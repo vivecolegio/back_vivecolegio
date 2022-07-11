@@ -1,9 +1,10 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { Modality } from './Modality';
 
+@Index("index_full", ["modalityId", "schoolId"])
 @ObjectType({ description: 'The Specialty model', implements: IModelSchoolData })
 @Entity()
 export class Specialty extends IModelSchoolData {
@@ -15,6 +16,7 @@ export class Specialty extends IModelSchoolData {
   @Column({ nullable: true })
   name?: string;
 
+  @Index("index_modality")
   @Field({ nullable: true })
   @Column({ nullable: true })
   modalityId?: string;
@@ -24,10 +26,10 @@ export class Specialty extends IModelSchoolData {
 }
 
 @ObjectType()
-export class SpecialtyEdge extends EdgeType('Specialty', Specialty) {}
+export class SpecialtyEdge extends EdgeType('Specialty', Specialty) { }
 
 @ObjectType()
 export class SpecialtyConnection extends ConnectionType<SpecialtyEdge>(
   'Specialty',
   SpecialtyEdge
-) {}
+) { }

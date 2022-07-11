@@ -1,5 +1,5 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { GeneralBasicLearningRight } from '../GeneralAdministrator/GeneralBasicLearningRight';
@@ -8,7 +8,7 @@ import { AcademicGrade } from './AcademicGrade';
 import { AcademicPeriod } from './AcademicPeriod';
 import { AcademicStandard } from './AcademicStandard';
 
-
+@Index("index_full", ["academicAsignatureId", "generalBasicLearningRightId", "academicStandardId", "academicGradeId", "academicPeriodsId", "schoolId"])
 @ObjectType({ description: 'The Learning model', implements: IModelSchoolData })
 @Entity()
 export class Learning extends IModelSchoolData {
@@ -16,6 +16,7 @@ export class Learning extends IModelSchoolData {
     @Column({ nullable: true })
     statement?: string;
 
+    @Index("index_academicAsignatureId")
     @Field({ nullable: true })
     @Column({ nullable: true })
     academicAsignatureId?: string;
@@ -23,6 +24,7 @@ export class Learning extends IModelSchoolData {
     @Field({ nullable: true })
     academicAsignature?: AcademicAsignature;
 
+    @Index("index_generalBasicLearningRightId")
     @Field({ nullable: true })
     @Column({ nullable: true })
     generalBasicLearningRightId?: string;
@@ -30,6 +32,7 @@ export class Learning extends IModelSchoolData {
     @Field({ nullable: true })
     generalBasicLearningRight?: GeneralBasicLearningRight;
 
+    @Index("index_academicStandardId")
     @Field({ nullable: true })
     @Column({ nullable: true })
     academicStandardId?: string;
@@ -37,6 +40,7 @@ export class Learning extends IModelSchoolData {
     @Field({ nullable: true })
     academicStandard?: AcademicStandard;
 
+    @Index("index_academicGradeId")
     @Field({ nullable: true })
     @Column({ nullable: true })
     academicGradeId?: string;
@@ -44,6 +48,7 @@ export class Learning extends IModelSchoolData {
     @Field({ nullable: true })
     academicGrade?: AcademicGrade;
 
+    @Index("index_academicPeriodsId")
     @Field(() => [String], { nullable: true })
     @Column({ nullable: true })
     academicPeriodsId?: String[];;

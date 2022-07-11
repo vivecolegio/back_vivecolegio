@@ -1,5 +1,5 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { IModelData } from '../../interfaces/IModelData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { School } from './School';
@@ -19,6 +19,7 @@ export class Campus extends IModelData {
   @Column({ nullable: true })
   consecutive?: string;
 
+  @Index("index_schoolId")
   @Field({ nullable: true })
   @Column({ nullable: true })
   schoolId?: string;
