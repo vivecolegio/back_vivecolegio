@@ -3,7 +3,7 @@ import { Ipware } from '@fullerstack/nax-ipware';
 import FileUploadDataSource from '@profusion/apollo-federation-upload';
 import {
   ApolloServerPluginLandingPageLocalDefault,
-  ApolloServerPluginLandingPageProductionDefault,
+  ApolloServerPluginLandingPageProductionDefault
 } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import Cors from 'cors';
@@ -17,7 +17,9 @@ import path from 'path';
 import 'reflect-metadata';
 import { port, SERVER_NAME_APP, SERVER_PORT_APP } from './config/index';
 
+const cluster = require('cluster');
 const expressHealthApi = require('express-health-api');
+const numCPUs = require('os').cpus().length;
 
 async function app() {
   try {
@@ -136,14 +138,29 @@ async function app() {
     server.start().then(() => {
       server.applyMiddleware({ app });
     });
-    app.listen({ port: port }, () =>
+    app.listen({ port: port }, () => {
       console.log(
         `🚀 Server ready and listening at ==> http://vivecolegios.nortedesantander.gov.co:${port}${server.graphqlPath}`
-      )
-    );
+      );
+      console.log(`Worker ${process.pid} started`);
+    });
   } catch (err) {
     console.error(err);
   }
 }
 
-app();
+if (cluster.isMaster) {
+  console.log(`Master ${process.pid} is running`);
+  // Fork workers.
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
+  // This event is firs when worker died
+  cluster.on('exit', (worker: { process: { pid: any; }; }, code: any, signal: any) => {
+    console.log(`worker ${worker.process.pid} died`);
+  });
+}
+// For Worker
+else {
+  app();
+}

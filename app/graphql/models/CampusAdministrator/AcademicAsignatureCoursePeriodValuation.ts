@@ -4,9 +4,10 @@ import { IModelCampusData } from '../../interfaces/IModelCampusData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { Student } from '../GeneralAdministrator/Student';
 import { AcademicPeriod } from '../SchoolAdministrator/AcademicPeriod';
+import { PerformanceLevel } from '../SchoolAdministrator/PerformanceLevel';
 import { AcademicAsignatureCourse } from './AcademicAsignatureCourse';
 
-@Index("index_full", ["academicAsignatureCourseId", "academicPeriodId", "studentId", "campusId"])
+@Index("index_full", ["academicAsignatureCourseId", "academicPeriodId", "studentId", "performanceLevelId", "campusId"])
 @ObjectType({ description: 'The AcademicAsignatureCoursePeriodValuation model', implements: IModelCampusData })
 @Entity()
 export class AcademicAsignatureCoursePeriodValuation extends IModelCampusData {
@@ -38,6 +39,14 @@ export class AcademicAsignatureCoursePeriodValuation extends IModelCampusData {
     @Field({ nullable: true })
     @Column({ nullable: true })
     assessment?: number;
+
+    @Index("index_performanceLevelId")
+    @Field({ nullable: true })
+    @Column({ nullable: true })
+    performanceLevelId?: String;
+
+    @Field(() => PerformanceLevel, { nullable: true })
+    performanceLevel?: PerformanceLevel;
 
 }
 

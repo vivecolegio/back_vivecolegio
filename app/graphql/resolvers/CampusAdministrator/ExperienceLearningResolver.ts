@@ -51,6 +51,7 @@ import { EvaluativeComponent } from '../../models/SchoolAdministrator/Evaluative
 import { EvidenceLearning } from '../../models/SchoolAdministrator/EvidenceLearning';
 import { Learning } from '../../models/SchoolAdministrator/Learning';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
+import { PerformanceLevelResolver } from '../SchoolAdministrator/PerformanceLevelResolver';
 
 @Resolver(ExperienceLearning)
 export class ExperienceLearningResolver {
@@ -110,6 +111,8 @@ export class ExperienceLearningResolver {
 
   @InjectRepository(AcademicAsignature)
   private repositoryAcademicAsignature = AcademicAsignatureRepository;
+
+  private performanceLevelResolver = new PerformanceLevelResolver();
 
   @Query(() => ExperienceLearning, { nullable: true })
   async getExperienceLearning(@Arg('id', () => String) id: string) {
@@ -775,6 +778,7 @@ export class ExperienceLearningResolver {
             studentAverage.academicPeriodId = academicPeriodId;
             studentAverage.academicAsignatureCourseId = academicAsignatureCourseId;
           }
+          let countExperienceLearningAssessment = 0;
           for (let experienceLearning of experienceLearnings) {
             switch (experienceLearning.experienceType) {
               case ExperienceType.COEVALUATION:
@@ -785,7 +789,10 @@ export class ExperienceLearningResolver {
                   },
                 });
                 evaluations.forEach((evaluation) => {
-                  average += evaluation?.assessment ? evaluation?.assessment : 0;
+                  if (evaluation?.assessment) {
+                    average += evaluation?.assessment;
+                    countExperienceLearningAssessment++;
+                  }
                 });
                 break;
               case ExperienceType.SELFAPPRAISAL:
@@ -798,7 +805,10 @@ export class ExperienceLearningResolver {
                   }
                 );
                 evaluations.forEach((evaluation) => {
-                  average += evaluation?.assessment ? evaluation?.assessment : 0;
+                  if (evaluation?.assessment) {
+                    average += evaluation?.assessment;
+                    countExperienceLearningAssessment++;
+                  }
                 });
                 break;
               case ExperienceType.TRADITIONALVALUATION:
@@ -809,7 +819,10 @@ export class ExperienceLearningResolver {
                   },
                 });
                 evaluations.forEach((evaluation) => {
-                  average += evaluation?.assessment ? evaluation?.assessment : 0;
+                  if (evaluation?.assessment) {
+                    average += evaluation?.assessment;
+                    countExperienceLearningAssessment++;
+                  }
                 });
                 break;
               case ExperienceType.VALUATIONRUBRIC:
@@ -820,15 +833,18 @@ export class ExperienceLearningResolver {
                   },
                 });
                 evaluations.forEach((evaluation) => {
-                  average += evaluation?.assessment ? evaluation?.assessment : 0;
+                  if (evaluation?.assessment) {
+                    average += evaluation?.assessment;
+                    countExperienceLearningAssessment++;
+                  }
                 });
                 break;
               // case ExperienceType.ONLINETEST:
               //   break;
             }
           }
-          if (average != null && average > 0 && experienceLearnings.length > 0) {
-            studentAverage.average = average / experienceLearnings.length;
+          if (average != null && average > 0 && countExperienceLearningAssessment > 0) {
+            studentAverage.average = average / countExperienceLearningAssessment;
           } else {
             studentAverage.average = 0;
           }
@@ -947,6 +963,8 @@ export class ExperienceLearningResolver {
       if (course) {
         let studentPeriodValuation: AcademicAsignatureCoursePeriodValuation;
         let average = 0;
+        let perf = null;
+        let performanceLevelId = undefined;
         let studentPeriodValuationList =
           await this.repositoryAcademicAsignatureCoursePeriodValuation.findBy({
             where: {
@@ -967,6 +985,7 @@ export class ExperienceLearningResolver {
           studentPeriodValuation.assessment = 0;
         }
         for (let evaluativeComponent of evaluativeComponents) {
+          await this.createExperienceLearningAverageValuationStudent(academicAsignatureCourseId, academicPeriodId, evaluativeComponent.id.toString(), studentId);
           const experienceLearningAverageValuation =
             await this.repositoryExperienceLearningAverageValuation.findBy({
               where: {
@@ -985,6 +1004,19 @@ export class ExperienceLearningResolver {
           }
         }
         studentPeriodValuation.assessment = average;
+        let performanceLevels = await this.performanceLevelResolver.getAllPerformanceLevelAcademicAsignatureCourse({}, academicAsignatureCourseId + "")
+        perf = performanceLevels?.edges?.find((c: any) => {
+          return average < c.node.topScore && average >= c.node.minimumScore;
+        });
+        if (perf === undefined) {
+          perf = performanceLevels?.edges?.find((c: any) => {
+            return average <= c.node.topScore && average > c.node.minimumScore;
+          });
+        }
+        if (perf && perf?.node?.id) {
+          performanceLevelId = perf.node.id
+        }
+        studentPeriodValuation.performanceLevelId = performanceLevelId;
         if (studentPeriodValuation.id) {
           studentPeriodValuation =
             await this.repositoryAcademicAsignatureCoursePeriodValuation.save({
@@ -1012,49 +1044,6 @@ export class ExperienceLearningResolver {
     const academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(
       academicAsignatureCourseId
     );
-    let evaluativeComponents: EvaluativeComponent[] = [];
-    if (academicAsignatureCourse) {
-      let course = await this.repositoryCourse.findOneBy(academicAsignatureCourse.courseId);
-      let academicAsignature = await this.repositoryAcademicAsignature.findOneBy(
-        academicAsignatureCourse.academicAsignatureId
-      );
-      if (course && academicAsignature) {
-        let campus = await this.repositoryCampus.findOneBy(course.campusId);
-        if (campus) {
-          evaluativeComponents = await this.repository.findBy({
-            where: {
-              academicAsignaturesId: { $in: [academicAsignature.id.toString()] },
-              academicAreasId: null,
-              schoolId: campus.schoolId,
-              active: true,
-            },
-            order: { createdAt: 'DESC' },
-          });
-          if (evaluativeComponents.length === 0) {
-            evaluativeComponents = await this.repository.findBy({
-              where: {
-                academicAsignaturesId: null,
-                academicAreasId: { $in: [academicAsignature.academicAreaId] },
-                schoolId: campus.schoolId,
-                active: true,
-              },
-              order: { createdAt: 'DESC' },
-            });
-            if (evaluativeComponents.length === 0) {
-              evaluativeComponents = await this.repository.findBy({
-                where: {
-                  academicAsignaturesId: null,
-                  academicAreasId: null,
-                  schoolId: campus.schoolId,
-                  active: true,
-                },
-                order: { createdAt: 'DESC' },
-              });
-            }
-          }
-        }
-      }
-    }
     if (academicAsignatureCourse) {
       const course = await this.repositoryCourse.findOneBy(academicAsignatureCourse.courseId);
       if (course) {

@@ -10,7 +10,7 @@ import {
   ExperienceLearningRubricValuationRepository,
   PerformanceLevelRepository,
   StudentRepository,
-  UserRepository,
+  UserRepository
 } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewExperienceLearningRubricValuation } from '../../inputs/CampusAdministrator/NewExperienceLearningRubricValuation';
@@ -20,13 +20,15 @@ import { ExperienceLearningRubricCriteria } from '../../models/CampusAdministrat
 import { ExperienceLearningRubricCriteriaValuation } from '../../models/CampusAdministrator/ExperienceLearningRubricCriteriaValuation';
 import {
   ExperienceLearningRubricValuation,
-  ExperienceLearningRubricValuationConnection,
+  ExperienceLearningRubricValuationConnection
 } from '../../models/CampusAdministrator/ExperienceLearningRubricValuation';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { Student } from '../../models/GeneralAdministrator/Student';
 import { User } from '../../models/GeneralAdministrator/User';
 import { PerformanceLevel } from '../../models/SchoolAdministrator/PerformanceLevel';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
+import { PerformanceLevelResolver } from '../SchoolAdministrator/PerformanceLevelResolver';
+import { ExperienceLearningResolver } from './ExperienceLearningResolver';
 
 @Resolver(ExperienceLearningRubricValuation)
 export class ExperienceLearningRubricValuationResolver {
@@ -53,6 +55,10 @@ export class ExperienceLearningRubricValuationResolver {
 
   @InjectRepository(PerformanceLevel)
   private repositoryPerformanceLevel = PerformanceLevelRepository;
+
+  private experienceLearningResolver = new ExperienceLearningResolver();
+
+  private performanceLevelResolver = new PerformanceLevelResolver();
 
   @Query(() => ExperienceLearningRubricValuation, { nullable: true })
   async getExperienceLearningRubricValuation(@Arg('id', () => String) id: string) {
@@ -140,6 +146,8 @@ export class ExperienceLearningRubricValuationResolver {
         active: true,
       });
     let assessment = 0;
+    let perf = null;
+    let performanceLevelId = undefined;
     for (let experienceLearningRubricCriteria of experienceLearningRubricCriterias) {
       let experienceLearningRubricCriteriaValuations =
         await this.repositoryExperienceLearningRubricCriteriaValuation.findBy({
@@ -160,6 +168,21 @@ export class ExperienceLearningRubricValuationResolver {
               experienceLearningRubricCriteriaValuations[0].assessment) /
             100;
           assessment += assessmentWeight;
+          let experienceLearning = await this.repositoryExperienceLearning.findOneBy(result?.experienceLearningId);
+          if (experienceLearning) {
+            let performanceLevels = await this.performanceLevelResolver.getAllPerformanceLevelAcademicAsignatureCourse({}, experienceLearning.academicAsignatureCourseId + "")
+            perf = performanceLevels?.edges?.find((c: any) => {
+              return assessment < c.node.topScore && assessment >= c.node.minimumScore;
+            });
+            if (perf === undefined) {
+              perf = performanceLevels?.edges?.find((c: any) => {
+                return assessment <= c.node.topScore && assessment > c.node.minimumScore;
+              });
+            }
+            if (perf && perf?.node?.id) {
+              performanceLevelId = perf.node.id
+            }
+          }
         }
       }
     }
@@ -167,9 +190,14 @@ export class ExperienceLearningRubricValuationResolver {
       _id: new ObjectId(id),
       ...result,
       assessment,
+      performanceLevelId,
       version: (result?.version as number) + 1,
       updatedByUserId,
     });
+    const experienceLearning = await this.repositoryExperienceLearning.findOneBy(result?.experienceLearningId);
+    if (experienceLearning?.academicAsignatureCourseId && experienceLearning?.academicPeriodId && result?.studentId) {
+      this.experienceLearningResolver.createAcademicAsignatureCoursePeriodValuationStudent(experienceLearning?.academicAsignatureCourseId, experienceLearning?.academicPeriodId, result?.studentId + "");
+    }
     return result;
   }
 

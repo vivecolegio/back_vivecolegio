@@ -15,4 +15,7 @@ export class NewAcademicAsignatureCoursePeriodValuation implements Partial<Acade
     @Field({ nullable: true })
     assessment?: number;
 
+    @Field({ nullable: true })
+    performanceLevelId?: String;
+
 }

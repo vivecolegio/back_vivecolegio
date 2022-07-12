@@ -9,7 +9,7 @@ import {
   CourseRepository,
   GradeAssignmentRepository,
   SchoolRepository,
-  UserRepository,
+  UserRepository
 } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewGradeAssignment } from '../../inputs/SchoolAdministrator/NewGradeAssignment';
@@ -22,7 +22,7 @@ import { AcademicAsignature } from '../../models/SchoolAdministrator/AcademicAsi
 import { AcademicGrade } from '../../models/SchoolAdministrator/AcademicGrade';
 import {
   GradeAssignment,
-  GradeAssignmentConnection,
+  GradeAssignmentConnection
 } from '../../models/SchoolAdministrator/GradeAssignment';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
@@ -227,6 +227,33 @@ export class GradeAssignmentResolver {
       createdByUserId,
     });
     let result = await this.repository.save(model);
+    let courses = await this.repositoryCourse.findBy({
+      where: {
+        academicGradeId: result?.academicGradeId
+      },
+    })
+    if (courses) {
+      for (let course of courses) {
+        let repositoryAcademicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findBy({
+          where: {
+            academicAsignatureId: result?.academicAsignatureId,
+            courseId: course?.id.toString()
+          },
+        })
+        if (repositoryAcademicAsignatureCourse.length === 0) {
+          const modelAcademicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.create({
+            hourlyIntensity: result?.minHourlyIntensity,
+            academicAsignatureId: result?.academicAsignatureId,
+            courseId: course?.id.toString(),
+            gradeAssignmentId: result?.id.toString(),
+            active: true,
+            version: 0,
+            createdByUserId,
+          });
+          let resultAcademicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.save(modelAcademicAsignatureCourse);
+        }
+      }
+    }
     return result;
   }
 

@@ -2,7 +2,7 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicPeriodRepository, CampusRepository, StudentRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicPeriodRepository, CampusRepository, PerformanceLevelRepository, StudentRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicAsignatureCoursePeriodValuation } from '../../inputs/CampusAdministrator/NewAcademicAsignatureCoursePeriodValuation';
 import { IContext } from '../../interfaces/IContext';
@@ -12,6 +12,7 @@ import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { Student } from '../../models/GeneralAdministrator/Student';
 import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicPeriod } from '../../models/SchoolAdministrator/AcademicPeriod';
+import { PerformanceLevel } from '../../models/SchoolAdministrator/PerformanceLevel';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
 @Resolver(AcademicAsignatureCoursePeriodValuation)
@@ -33,6 +34,9 @@ export class AcademicAsignatureCoursePeriodValuationResolver {
 
     @InjectRepository(Student)
     private repositoryStudent = StudentRepository;
+
+    @InjectRepository(PerformanceLevel)
+    private repositoryPerformanceLevel = PerformanceLevelRepository;
 
     @Query(() => AcademicAsignatureCoursePeriodValuation, { nullable: true })
     async getAcademicAsignatureCoursePeriodValuation(@Arg('id', () => String) id: string) {
@@ -264,5 +268,14 @@ export class AcademicAsignatureCoursePeriodValuationResolver {
         return null;
     }
 
+    @FieldResolver((_type) => PerformanceLevel, { nullable: true })
+    async performanceLevel(@Root() data: AcademicAsignatureCoursePeriodValuation) {
+        let id = data.performanceLevelId;
+        if (id !== null && id !== undefined) {
+            const result = await this.repositoryPerformanceLevel.findOneBy(id);
+            return result;
+        }
+        return null;
+    }
 
 }

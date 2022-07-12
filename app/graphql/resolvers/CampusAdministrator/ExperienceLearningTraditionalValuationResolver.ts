@@ -8,7 +8,7 @@ import {
   ExperienceLearningTraditionalValuationRepository,
   PerformanceLevelRepository,
   StudentRepository,
-  UserRepository,
+  UserRepository
 } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewExperienceLearningTraditionalValuation } from '../../inputs/CampusAdministrator/NewExperienceLearningTraditionalValuation';
@@ -16,13 +16,14 @@ import { IContext } from '../../interfaces/IContext';
 import { ExperienceLearning } from '../../models/CampusAdministrator/ExperienceLearning';
 import {
   ExperienceLearningTraditionalValuation,
-  ExperienceLearningTraditionalValuationConnection,
+  ExperienceLearningTraditionalValuationConnection
 } from '../../models/CampusAdministrator/ExperienceLearningTraditionalValuation';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { Student } from '../../models/GeneralAdministrator/Student';
 import { User } from '../../models/GeneralAdministrator/User';
 import { PerformanceLevel } from '../../models/SchoolAdministrator/PerformanceLevel';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
+import { ExperienceLearningResolver } from './ExperienceLearningResolver';
 
 @Resolver(ExperienceLearningTraditionalValuation)
 export class ExperienceLearningTraditionalValuationResolver {
@@ -43,6 +44,8 @@ export class ExperienceLearningTraditionalValuationResolver {
 
   @InjectRepository(PerformanceLevel)
   private repositoryPerformanceLevel = PerformanceLevelRepository;
+
+  private experienceLearningResolver = new ExperienceLearningResolver();
 
   @Query(() => ExperienceLearningTraditionalValuation, { nullable: true })
   async getExperienceLearningTraditionalValuation(@Arg('id', () => String) id: string) {
@@ -174,6 +177,10 @@ export class ExperienceLearningTraditionalValuationResolver {
       version: (result?.version as number) + 1,
       updatedByUserId,
     });
+    const experienceLearning = await this.repositoryExperienceLearning.findOneBy(data.experienceLearningId);
+    if (experienceLearning?.academicAsignatureCourseId && experienceLearning?.academicPeriodId && result?.studentId) {
+      this.experienceLearningResolver.createAcademicAsignatureCoursePeriodValuationStudent(experienceLearning?.academicAsignatureCourseId, experienceLearning?.academicPeriodId, result?.studentId + "");
+    }
     return result;
   }
 

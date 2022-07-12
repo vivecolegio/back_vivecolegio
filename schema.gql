@@ -125,6 +125,8 @@ type AcademicAsignatureCoursePeriodValuation implements IModelCampusData {
   createdByUser: User
   createdByUserId: String
   id: ID!
+  performanceLevel: PerformanceLevel
+  performanceLevelId: String
   student: Student
   studentId: String
   updatedAt: DateTime
@@ -1183,7 +1185,6 @@ type ExperienceLearningValuation implements IModelCampusData {
 """The ExperienceType Register"""
 enum ExperienceType {
   COEVALUATION
-  ONLINETEST
   SELFAPPRAISAL
   TRADITIONALVALUATION
   VALUATIONRUBRIC
@@ -2187,6 +2188,7 @@ input NewAcademicAsignatureCoursePeriodValuation {
   academicAsignatureCourseId: String
   academicPeriodId: String
   assessment: Float
+  performanceLevelId: String
   studentId: String
 }
 
