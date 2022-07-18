@@ -42,7 +42,7 @@
     "@types/jsonwebtoken": "8.5.8",
     "@types/mongodb": "4.0.7",
     "@types/morgan": "1.9.3",
-    "@types/node": "18.0.4",
+    "@types/node": "18.0.6",
     "apollo-server": "3.10.0",
     "apollo-server-express": "3.10.0",
     "bcrypt": "5.0.1",
@@ -87,7 +87,7 @@
   },
   "devDependencies": {
     "chalk": "5.0.1",
-    "eslint": "8.19.0",
+    "eslint": "8.20.0",
     "eslint-config-prettier": "8.5.0",
     "eslint-plugin-prettier": "4.2.1",
     "husky": "8.0.1",
