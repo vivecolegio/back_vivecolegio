@@ -1175,6 +1175,8 @@ type ExperienceLearningValuation implements IModelCampusData {
   experienceLearning: ExperienceLearning
   experienceLearningId: String
   id: ID!
+  performanceLevel: PerformanceLevel
+  performanceLevelId: String
   student: Student
   studentId: String
   updatedAt: DateTime

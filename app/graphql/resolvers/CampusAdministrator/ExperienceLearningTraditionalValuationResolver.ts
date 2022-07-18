@@ -177,9 +177,12 @@ export class ExperienceLearningTraditionalValuationResolver {
       version: (result?.version as number) + 1,
       updatedByUserId,
     });
-    const experienceLearning = await this.repositoryExperienceLearning.findOneBy(data.experienceLearningId);
-    if (experienceLearning?.academicAsignatureCourseId && experienceLearning?.academicPeriodId && result?.studentId) {
-      this.experienceLearningResolver.createAcademicAsignatureCoursePeriodValuationStudent(experienceLearning?.academicAsignatureCourseId, experienceLearning?.academicPeriodId, result?.studentId + "");
+    if (result?.experienceLearningId) {
+      const experienceLearning = await this.repositoryExperienceLearning.findOneBy(result?.experienceLearningId);
+      console.log(experienceLearning)
+      if (experienceLearning?.academicAsignatureCourseId && experienceLearning?.academicPeriodId && result?.studentId) {
+        this.experienceLearningResolver.createAcademicAsignatureCoursePeriodValuationStudent(experienceLearning?.academicAsignatureCourseId, experienceLearning?.academicPeriodId, result?.studentId + "");
+      }
     }
     return result;
   }

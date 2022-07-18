@@ -2,7 +2,7 @@ import { buildSubgraphSchema } from '@apollo/federation';
 import { printSubgraphSchema } from '@apollo/subgraph';
 import {
   ApolloServerPluginLandingPageLocalDefault,
-  ApolloServerPluginLandingPageProductionDefault,
+  ApolloServerPluginLandingPageProductionDefault
 } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import express from 'express';
@@ -30,6 +30,7 @@ import { ExperienceLearningRubricCriteriaValuationResolver } from '../graphql/re
 import { ExperienceLearningRubricValuationResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningRubricValuationResolver';
 import { ExperienceLearningSelfAssessmentValuationResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningSelfAssessmentValuationResolver';
 import { ExperienceLearningTraditionalValuationResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningTraditionalValuationResolver';
+import { ExperienceLearningValuationResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningValuationResolver';
 import { QuestionBankTestOnlineResolver } from '../graphql/resolvers/CampusAdministrator/QuestionBankTestOnlineResolver';
 import { QuestionCategoryTestOnlineResolver } from '../graphql/resolvers/CampusAdministrator/QuestionCategoryTestOnlineResolver';
 import { QuestionTestOnlineResolver } from '../graphql/resolvers/CampusAdministrator/QuestionTestOnlineResolver';
@@ -155,6 +156,7 @@ async function app() {
         ClassroomPlanExpectedPerformanceResolver,
         ClassroomPlanResolver,
         SchoolAdministrativeResolver,
+        ExperienceLearningValuationResolver
       ],
       emitSchemaFile: true,
       validate: false,
