@@ -18,6 +18,14 @@ export class GeneralAcademicAsignature extends IModelData {
 
   @Field({ nullable: true })
   generalAcademicArea?: GeneralAcademicArea;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  hasStandard?: Boolean;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  hasDba?: Boolean;
 }
 
 @ObjectType()

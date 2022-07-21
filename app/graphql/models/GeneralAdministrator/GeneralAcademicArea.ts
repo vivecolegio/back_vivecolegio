@@ -9,13 +9,21 @@ export class GeneralAcademicArea extends IModelData {
   @Field({ nullable: true })
   @Column({ nullable: true })
   name?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  hasStandard?: Boolean;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  hasDba?: Boolean;
 }
 
 @ObjectType()
-export class GeneralAcademicAreaEdge extends EdgeType('GeneralAcademicArea', GeneralAcademicArea) {}
+export class GeneralAcademicAreaEdge extends EdgeType('GeneralAcademicArea', GeneralAcademicArea) { }
 
 @ObjectType()
 export class GeneralAcademicAreaConnection extends ConnectionType<GeneralAcademicAreaEdge>(
   'GeneralAcademicArea',
   GeneralAcademicAreaEdge
-) {}
+) { }

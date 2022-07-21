@@ -17,9 +17,9 @@ import path from 'path';
 import 'reflect-metadata';
 import { port, SERVER_NAME_APP, SERVER_PORT_APP } from './config/index';
 
-const cluster = require('cluster');
+const cluster = require('node:cluster');
 const expressHealthApi = require('express-health-api');
-const numCPUs = require('os').cpus().length;
+const numCPUs = require('node:os').cpus().length;
 
 async function app() {
   try {
@@ -150,7 +150,7 @@ async function app() {
 }
 
 if (cluster.isMaster) {
-  console.log(`Master ${process.pid} is running`);
+  console.log(`Master Gateway ${process.pid} is running`);
   // Fork workers.
   for (let i = 0; i < numCPUs; i++) {
     cluster.fork();

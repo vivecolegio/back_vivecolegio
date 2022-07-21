@@ -179,7 +179,7 @@ export class ExperienceLearningTraditionalValuationResolver {
     });
     if (result?.experienceLearningId) {
       const experienceLearning = await this.repositoryExperienceLearning.findOneBy(result?.experienceLearningId);
-      console.log(experienceLearning)
+      //console.log(experienceLearning)
       if (experienceLearning?.academicAsignatureCourseId && experienceLearning?.academicPeriodId && result?.studentId) {
         this.experienceLearningResolver.createAcademicAsignatureCoursePeriodValuationStudent(experienceLearning?.academicAsignatureCourseId, experienceLearning?.academicPeriodId, result?.studentId + "");
       }

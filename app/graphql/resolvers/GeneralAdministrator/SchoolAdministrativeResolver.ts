@@ -8,7 +8,7 @@ import {
   PlantaDocenteRepository,
   SchoolAdministrativeRepository,
   SchoolRepository,
-  UserRepository,
+  UserRepository
 } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewSchoolAdministrative } from '../../inputs/GeneralAdministrator/NewSchoolAdministrative';
@@ -19,7 +19,7 @@ import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { School } from '../../models/GeneralAdministrator/School';
 import {
   SchoolAdministrative,
-  SchoolAdministrativeConnection,
+  SchoolAdministrativeConnection
 } from '../../models/GeneralAdministrator/SchoolAdministrative';
 import { User } from '../../models/GeneralAdministrator/User';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
@@ -177,10 +177,10 @@ export class SchoolAdministrativeResolver {
                     : '60ecc36d6c716a21bee51e00',
                 birthdate: fechaNacimiento
                   ? new Date(
-                      Number(fechaNacimiento[2]),
-                      Number(fechaNacimiento[1]) - 1,
-                      Number(fechaNacimiento[0])
-                    )
+                    Number(fechaNacimiento[2]),
+                    Number(fechaNacimiento[1]) - 1,
+                    Number(fechaNacimiento[0])
+                  )
                   : undefined,
                 phone: administrativo.telefono,
                 email: administrativo.email,
@@ -218,7 +218,7 @@ export class SchoolAdministrativeResolver {
               count += 1;
               //console.log(model);
               let result = await this.repositoryPlantaDocente.save(model);
-              console.log('procesados ' + count);
+              //console.log('procesados ' + count);
             }
           }
         }

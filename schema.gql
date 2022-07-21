@@ -1292,6 +1292,8 @@ type GeneralAcademicArea implements IModelData {
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  hasDba: Boolean
+  hasStandard: Boolean
   id: ID!
   name: String
   updatedAt: DateTime
@@ -1322,6 +1324,8 @@ type GeneralAcademicAsignature implements IModelData {
   createdByUserId: String
   generalAcademicArea: GeneralAcademicArea
   generalAcademicAreaId: String
+  hasDba: Boolean
+  hasStandard: Boolean
   id: ID!
   name: String
   updatedAt: DateTime
@@ -2095,6 +2099,7 @@ type Mutation {
   updateCampusAdministrator(data: NewCampusAdministrator!, id: String!): CampusAdministrator!
   updateCampusCoordinator(data: NewCampusCoordinator!, id: String!): CampusCoordinator!
   updateClassroomPlan(data: NewClassroomPlan!, id: String!): ClassroomPlan!
+  updateCodeStudentsAllCourses: Boolean!
   updateCodeStudentsCourse(id: String!): Boolean!
   updateCourse(data: NewCourse!, id: String!): Course!
   updateDocumentType(data: NewDocumentType!, id: String!): DocumentType!
@@ -2468,11 +2473,15 @@ input NewGender {
 }
 
 input NewGeneralAcademicArea {
+  hasDba: Boolean
+  hasStandard: Boolean
   name: String
 }
 
 input NewGeneralAcademicAsignature {
   generalAcademicAreaId: String
+  hasDba: Boolean
+  hasStandard: Boolean
   name: String
 }
 

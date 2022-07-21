@@ -11,7 +11,7 @@ import {
   SchoolRepository,
   StudentRepository,
   TeacherRepository,
-  UserRepository,
+  UserRepository
 } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewCourse } from '../../inputs/CampusAdministrator/NewCourse';
@@ -407,50 +407,78 @@ export class CourseResolver {
             version: (course?.version as number) + 1,
           });
           count += 1;
-          console.log(count);
+          //console.log(count);
         }
       }
     }
   }
 
   @Mutation(() => Boolean)
+  public async updateCodeStudentsAllCourses() {
+    let schools = await this.repositorySchool.find();
+    let count = 0;
+    for (let school of schools) {
+      let campus = await this.repositoryCampus.findBy({
+        where: { schoolId: school.id.toString() },
+      });
+      for (let campu of campus) {
+        let courses = await this.repository.findBy({
+          where: {
+            campusId: campu.id.toString(),
+          },
+        });
+        for (let course of courses) {
+          this.updateCodeStudentsCourse(course.id.toString())
+          count += 1;
+          //console.log(count);
+        }
+      }
+    }
+    return true;
+  }
+
+  @Mutation(() => Boolean)
   async updateCodeStudentsCourse(
-    @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Arg('id', () => String) id: string
   ): Promise<Boolean | null> {
     let course = await this.repository.findOneBy(id);
     if (course) {
-      let students = await this.repositoryStudent.findBy({
-        where: {
-          courseId: course.id.toString(),
-        },
-      });
-      let usersId = [];
-      for (let student of students) {
-        usersId?.push(new ObjectId(student.userId));
-      }
-      let users = await this.repositoryUser.findBy({
-        where: { _id: { $in: usersId }, active: true },
-        order: { lastName: 'ASC' },
-      });
-      if (users && users.length > 0) {
-        let code = 1;
-        for (let user of users) {
-          let student = await this.repositoryStudent.findBy({
-            where: {
-              courseId: course.id.toString(),
-              userId: user.id.toString(),
-              active: true,
-            },
-          });
-          if (student && student.length === 1) {
-            await this.repositoryStudent.save({
-              _id: new ObjectId(student[0].id.toString()),
-              ...student[0],
-              code: code as number,
-              version: (student[0]?.version as number) + 1,
+      if (course.studentsId && course.studentsId.length > 0) {
+        let studentsAux = course.studentsId;
+        let studentsIds = [];
+        for (let studentId of studentsAux) {
+          studentsIds?.push(new ObjectId(studentId.toString()));
+        }
+        let students = await this.repositoryStudent.findBy({
+          where: { _id: { $in: studentsIds } },
+        });
+        let usersId = [];
+        for (let student of students) {
+          usersId?.push(new ObjectId(student.userId));
+        }
+        let users = await this.repositoryUser.findBy({
+          where: { _id: { $in: usersId }, active: true },
+          order: { lastName: 'ASC' },
+        });
+        if (users && users.length > 0) {
+          let code = 1;
+          for (let user of users) {
+            let student = await this.repositoryStudent.findBy({
+              where: {
+                courseId: course.id.toString(),
+                userId: user.id.toString(),
+                active: true,
+              },
             });
-            code += 1;
+            if (student && student.length === 1) {
+              await this.repositoryStudent.save({
+                _id: new ObjectId(student[0].id.toString()),
+                ...student[0],
+                code: code as number,
+                version: (student[0]?.version as number) + 1,
+              });
+              code += 1;
+            }
           }
         }
       }

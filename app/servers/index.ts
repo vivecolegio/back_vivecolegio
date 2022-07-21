@@ -9,6 +9,7 @@ import express from 'express';
 import gql from 'graphql-tag';
 import { graphqlUploadExpress } from 'graphql-upload';
 import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
+import Morgan from 'morgan';
 import 'reflect-metadata';
 import { buildSchemaSync, createResolversMap } from 'type-graphql';
 import { SERVER_NAME_APP, SERVER_PORT_APP } from '../config';
@@ -84,6 +85,10 @@ import { dataSource } from './DataSource';
 
 const PORT = SERVER_PORT_APP;
 const SERVER_NAME = SERVER_NAME_APP;
+
+const cluster = require('node:cluster');
+const numCPUs = require('node:os').cpus().length;
+const expressHealthApi = require('express-health-api');
 
 async function app() {
   try {
@@ -162,6 +167,44 @@ async function app() {
       validate: false,
     });
 
+    const configExpressStatusMonitor = {
+      title: 'Express Status ViveColegios', // Default title
+      theme: 'default.css', // Default styles
+      path: '/status',
+      spans: [
+        {
+          interval: 1, // Every second
+          retention: 60, // Keep 60 datapoints in memory
+        },
+        {
+          interval: 5, // Every 5 seconds
+          retention: 60,
+        },
+        {
+          interval: 15, // Every 15 seconds
+          retention: 60,
+        },
+      ],
+      chartVisibility: {
+        cpu: true,
+        mem: true,
+        load: true,
+        eventLoop: true,
+        heap: true,
+        responseTime: true,
+        rps: true,
+        statusCodes: true,
+      },
+      healthChecks: [
+        {
+          protocol: 'http',
+          host: 'localhost',
+          path: `/healthcheck-${SERVER_NAME_APP}`,
+          port: `${SERVER_PORT_APP}`,
+        },
+      ],
+    };
+
     const federatedSchema = buildSubgraphSchema({
       typeDefs: gql(printSubgraphSchema(schema)),
       resolvers: createResolversMap(schema) as any,
@@ -216,9 +259,11 @@ async function app() {
     const app = express();
     // Middlewares
     app.use(`/healthcheck-${SERVER_NAME}`, require('express-healthcheck')());
-    //app.use(Morgan('common'));
+    app.use(require('express-status-monitor')(configExpressStatusMonitor));
+    app.use(Morgan('common'));
     // app.use(Helmet());
     // app.use(Cors());
+    app.use(expressHealthApi({ apiPath: '/health' }));
     app.use('/voyager', voyagerMiddleware({ endpointUrl: '/graphql' }));
 
     // const openApi = OpenAPI({
@@ -264,4 +309,19 @@ async function app() {
   }
 }
 
-app();
+if (cluster.isMaster) {
+  console.log(`Master Services ${process.pid} is running`);
+  // Fork workers.
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
+  // This event is firs when worker died
+  cluster.on('exit', (worker: { process: { pid: any; }; }, code: any, signal: any) => {
+    console.log(`worker ${worker.process.pid} died`);
+  });
+}
+// For Worker
+else {
+  app();
+}
+

@@ -1096,7 +1096,7 @@ export class ExperienceLearningResolver {
             studentPeriodValuation.performanceLevelId = performanceLevelId;
             break;
         }
-        console.log(studentPeriodValuation)
+        //console.log(studentPeriodValuation)
         if (studentPeriodValuation.id) {
           studentPeriodValuation =
             await this.repositoryAcademicAsignatureCoursePeriodValuation.save({

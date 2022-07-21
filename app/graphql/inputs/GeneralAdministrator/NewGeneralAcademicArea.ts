@@ -5,4 +5,10 @@ import { GeneralAcademicArea } from '../../models/GeneralAdministrator/GeneralAc
 export class NewGeneralAcademicArea implements Partial<GeneralAcademicArea> {
   @Field({ nullable: true })
   name?: string;
+
+  @Field({ nullable: true })
+  hasStandard?: Boolean;
+
+  @Field({ nullable: true })
+  hasDba?: Boolean;
 }
