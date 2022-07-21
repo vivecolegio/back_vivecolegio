@@ -15,7 +15,7 @@
     "development:server": "ts-node ./app/servers/index.ts",
     "development:gateway": "wait-on tcp:4001 && ts-node ./app/index.dev",
     "start": "concurrently -k npm:server:*",
-    "server:server": "nodemon ./app/servers/index.ts",
+    "server:server": "ts-node ./app/servers/index.ts",
     "server:gateway": "wait-on tcp:4001 && ts-node ./app/index",
     "sonar-scanner": "sonar-scanner",
     "build:docker": "docker build -f Dockerfile -t lidertecnologicovivecolegios/backendvivecolegios .",
