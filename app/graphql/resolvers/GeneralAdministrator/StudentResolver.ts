@@ -10,7 +10,7 @@ import {
   EstudiantesRepository,
   SchoolRepository,
   StudentRepository,
-  UserRepository,
+  UserRepository
 } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewStudent } from '../../inputs/GeneralAdministrator/NewStudent';
@@ -23,6 +23,7 @@ import { Student, StudentConnection } from '../../models/GeneralAdministrator/St
 import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicGrade } from '../../models/SchoolAdministrator/AcademicGrade';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
+import { CourseResolver } from '../CampusAdministrator/CourseResolver';
 import { Estudiantes } from './../../models/Data/Estudiantes';
 
 const BCRYPT_SALT_ROUNDS = 12;
@@ -49,6 +50,8 @@ export class StudentResolver {
 
   @InjectRepository(Estudiantes)
   private repositoryEstudiantes = EstudiantesRepository;
+
+  private courseResolver = new CourseResolver();
 
   @Query(() => Student, { nullable: true })
   async getStudent(@Arg('id', () => String) id: string) {
@@ -334,8 +337,8 @@ export class StudentResolver {
                   name: estudiante.nombre1
                     ? estudiante.nombre1
                     : '' + ' ' + estudiante.nombre2
-                    ? estudiante.nombre2
-                    : '',
+                      ? estudiante.nombre2
+                      : '',
                   lastName: estudiante.apellido1 + ' ' + estudiante.apellido2,
                   username: estudiante.doc,
                   password: passwordHash,
@@ -347,10 +350,10 @@ export class StudentResolver {
                       : '60ecc36d6c716a21bee51e00',
                   birthdate: fechaNacimiento
                     ? new Date(
-                        Number(fechaNacimiento[2]),
-                        Number(fechaNacimiento[1]) - 1,
-                        Number(fechaNacimiento[0])
-                      )
+                      Number(fechaNacimiento[2]),
+                      Number(fechaNacimiento[1]) - 1,
+                      Number(fechaNacimiento[0])
+                    )
                     : undefined,
                   roleId: '619551d1882a2fb6525a3078',
                   active: true,
@@ -409,34 +412,45 @@ export class StudentResolver {
       updatedByUserId,
     });
     delete dataProcess?.newUser;
+    console.log(data);
     if (data.courseId) {
-      let course = await this.repositoryCourse.findOneBy(data.courseId);
-      let studentsId = course?.studentsId;
-      if (studentsId == undefined || studentsId == null) {
-        studentsId = [];
+      if (data.courseId != result?.courseId) {
+        let course = await this.repositoryCourse.findOneBy(data.courseId);
+        let studentsId = course?.studentsId;
+        if (studentsId == undefined || studentsId == null) {
+          studentsId = [];
+        }
+        studentsId?.push(id);
+        let resultCourse = await this.repositoryCourse.save({
+          _id: new ObjectId(data.courseId),
+          ...course,
+          studentsId,
+          version: (result?.version as number) + 1,
+        });
+        this.courseResolver.updateCodeStudentsCourse(data?.courseId + "");
+        dataProcess.campusId = [course?.campusId]
       }
-      studentsId?.push(id);
-      let resultCourse = await this.repositoryCourse.save({
-        _id: new ObjectId(data.courseId),
-        ...course,
-        studentsId,
-        version: (result?.version as number) + 1,
-      });
     } else {
-      let course = await this.repositoryCourse.findOneBy(result?.courseId);
-      let studentsId = course?.studentsId;
-      if (studentsId == undefined || studentsId == null) {
-        studentsId = [];
+      if (result?.courseId) {
+        let course = await this.repositoryCourse.findOneBy(result?.courseId);
+        if (course && course != undefined) {
+          let studentsId = course?.studentsId;
+          if (studentsId == undefined || studentsId == null) {
+            studentsId = [];
+          }
+          studentsId = studentsId?.filter((student) => {
+            return student !== id;
+          });
+          let resultCourse = await this.repositoryCourse.save({
+            _id: new ObjectId(data.courseId),
+            ...course,
+            studentsId,
+            version: (result?.version as number) + 1,
+          });
+          console.log(result?.courseId)
+          this.courseResolver.updateCodeStudentsCourse(result?.courseId + "");
+        }
       }
-      studentsId = studentsId?.filter((student) => {
-        return student !== id;
-      });
-      let resultCourse = await this.repositoryCourse.save({
-        _id: new ObjectId(data.courseId),
-        ...course,
-        studentsId,
-        version: (result?.version as number) + 1,
-      });
     }
     result = await this.repository.save({
       _id: new ObjectId(id),
