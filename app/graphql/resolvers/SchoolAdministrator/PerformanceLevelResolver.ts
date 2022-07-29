@@ -2,18 +2,11 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import {
-  AcademicAsignatureCourseRepository,
-  AcademicGradeRepository,
-  CampusRepository,
-  CourseRepository,
-  GeneralPerformanceLevelRepository,
-  PerformanceLevelRepository,
-  SchoolRepository,
-  UserRepository,
-} from '../../../servers/DataSource';
+
+import { AcademicAsignatureCourseRepository, AcademicGradeRepository, CampusRepository, CourseRepository, GeneralPerformanceLevelRepository, PerformanceLevelRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { PerformanceLevelCategory } from '../../enums/PerformanceLevelCategory';
+import { PerformanceLevelCategoryGrade } from '../../enums/PerformanceLevelCategoryGrade';
 import { PerformanceLevelType } from '../../enums/PerformanceLevelType';
 import { NewPerformanceLevel } from '../../inputs/SchoolAdministrator/NewPerformanceLevel';
 import { IContext } from '../../interfaces/IContext';
@@ -23,10 +16,7 @@ import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { GeneralPerformanceLevel } from '../../models/GeneralAdministrator/GeneralPerformanceLevel';
 import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
-import {
-  PerformanceLevel,
-  PerformanceLevelConnection,
-} from '../../models/SchoolAdministrator/PerformanceLevel';
+import { PerformanceLevel, PerformanceLevelConnection } from '../../models/SchoolAdministrator/PerformanceLevel';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 import { AcademicGrade } from './../../models/SchoolAdministrator/AcademicGrade';
 
@@ -186,6 +176,11 @@ export class PerformanceLevelResolver {
     } else {
       dataProcess.category = PerformanceLevelCategory.SCHOOL;
     }
+    if (dataProcess?.academicGradesId && dataProcess?.academicGradesId?.length > 0) {
+      dataProcess.categoryGrade = PerformanceLevelCategoryGrade.SPECIFIC;
+    } else {
+      dataProcess.categoryGrade = PerformanceLevelCategoryGrade.ALL;
+    }
     const model = await this.repository.create({
       ...dataProcess,
       active: true,
@@ -213,6 +208,11 @@ export class PerformanceLevelResolver {
       dataProcess.category = PerformanceLevelCategory.CAMPUS;
     } else {
       dataProcess.category = PerformanceLevelCategory.SCHOOL;
+    }
+    if (dataProcess?.academicGradesId && dataProcess?.academicGradesId?.length > 0) {
+      dataProcess.categoryGrade = PerformanceLevelCategoryGrade.SPECIFIC;
+    } else {
+      dataProcess.categoryGrade = PerformanceLevelCategoryGrade.ALL;
     }
     result = await this.repository.save({
       _id: new ObjectId(id),

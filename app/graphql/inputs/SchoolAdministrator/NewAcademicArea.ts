@@ -1,4 +1,5 @@
 import { Field, InputType } from 'type-graphql';
+
 import { AcademicArea } from '../../models/SchoolAdministrator/AcademicArea';
 
 @InputType()
@@ -17,4 +18,7 @@ export class NewAcademicArea implements Partial<AcademicArea> {
 
   @Field(() => [String], { nullable: true })
   academicGradeId?: [string];
+
+  @Field({ nullable: true })
+  order?: number;
 }

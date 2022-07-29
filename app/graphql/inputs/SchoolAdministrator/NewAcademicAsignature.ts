@@ -1,4 +1,5 @@
 import { Field, InputType } from 'type-graphql';
+
 import { AcademicAsignature } from './../../models/SchoolAdministrator/AcademicAsignature';
 
 @InputType()
@@ -30,4 +31,6 @@ export class NewAcademicAsignature implements Partial<AcademicAsignature> {
   @Field({ nullable: true })
   generalAcademicAsignatureId?: string;
 
+  @Field({ nullable: true })
+  order?: number;
 }

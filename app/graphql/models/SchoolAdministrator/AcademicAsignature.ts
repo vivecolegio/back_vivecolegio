@@ -1,5 +1,6 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Column, Entity, Index } from 'typeorm';
+
 import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { GeneralAcademicAsignature } from '../GeneralAdministrator/GeneralAcademicAsignature';
@@ -53,6 +54,10 @@ export class AcademicAsignature extends IModelSchoolData {
 
   @Field({ nullable: true })
   generalAcademicAsignature?: GeneralAcademicAsignature;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  order?: number;
 }
 
 @ObjectType()

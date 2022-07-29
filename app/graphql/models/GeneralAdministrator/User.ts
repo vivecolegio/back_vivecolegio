@@ -1,13 +1,6 @@
 import { Field, ID, ObjectType } from 'type-graphql';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  Index,
-  ManyToOne,
-  ObjectIdColumn,
-  UpdateDateColumn
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, ManyToOne, ObjectIdColumn, UpdateDateColumn } from 'typeorm';
+
 import { Lazy } from '../../../types';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { DocumentType } from './DocumentType';
@@ -60,6 +53,7 @@ export class User {
   @Column({ nullable: true })
   lastName?: string;
 
+  //@Index("index_username", { unique: true })
   @Index("index_username")
   @Field({ nullable: true })
   @Column({ nullable: true })
@@ -83,6 +77,8 @@ export class User {
   @Column({ nullable: true })
   documentTypeId?: string;
 
+  //@Index("index_documentNumber", { unique: true })
+  @Index("index_documentNumber")
   @Field({ nullable: true })
   @Column({ nullable: true })
   documentNumber?: string;

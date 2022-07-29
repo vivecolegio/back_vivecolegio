@@ -1,5 +1,6 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Column, Entity, Index } from 'typeorm';
+
 import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { GeneralAcademicArea } from '../GeneralAdministrator/GeneralAcademicArea';
@@ -33,6 +34,9 @@ export class AcademicArea extends IModelSchoolData {
   @Field(() => [AcademicGrade], { nullable: true })
   academicGrade?: [AcademicGrade];
 
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  order?: number;
 }
 
 @ObjectType()

@@ -1,6 +1,8 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Column, Entity, Index } from 'typeorm';
+
 import { PerformanceLevelCategory } from '../../enums/PerformanceLevelCategory';
+import { PerformanceLevelCategoryGrade } from '../../enums/PerformanceLevelCategoryGrade';
 import { PerformanceLevelType } from '../../enums/PerformanceLevelType';
 import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
@@ -8,7 +10,8 @@ import { Campus } from '../GeneralAdministrator/Campus';
 import { GeneralPerformanceLevel } from '../GeneralAdministrator/GeneralPerformanceLevel';
 import { AcademicGrade } from './AcademicGrade';
 
-@Index("index_full", ["generalPerformanceLevelId", "campusId", "academicGradesId", "schoolId"])
+@Index("index_full_campusId", ["generalPerformanceLevelId", "campusId", "schoolId"])
+@Index("index_full_academicGradesId", ["generalPerformanceLevelId", "academicGradesId", "schoolId"])
 @ObjectType({ description: 'The PerformanceLevel model', implements: IModelSchoolData })
 @Entity()
 export class PerformanceLevel extends IModelSchoolData {
@@ -31,6 +34,10 @@ export class PerformanceLevel extends IModelSchoolData {
   @Field(() => PerformanceLevelCategory, { nullable: true })
   @Column({ nullable: true })
   category?: PerformanceLevelCategory;
+
+  @Field(() => PerformanceLevelCategoryGrade, { nullable: true })
+  @Column({ nullable: true })
+  categoryGrade?: PerformanceLevelCategoryGrade;
 
   @Index("index_generalPerformanceLevelId")
   @Field({ nullable: true })

@@ -1,5 +1,7 @@
 import { Field, InputType } from 'type-graphql';
+
 import { PerformanceLevelCategory } from '../../enums/PerformanceLevelCategory';
+import { PerformanceLevelCategoryGrade } from '../../enums/PerformanceLevelCategoryGrade';
 import { PerformanceLevelType } from '../../enums/PerformanceLevelType';
 import { PerformanceLevel } from '../../models/SchoolAdministrator/PerformanceLevel';
 
@@ -22,6 +24,9 @@ export class NewPerformanceLevel implements Partial<PerformanceLevel> {
 
   @Field(() => PerformanceLevelCategory, { nullable: true })
   category?: PerformanceLevelCategory;
+
+  @Field(() => PerformanceLevelCategoryGrade, { nullable: true })
+  categoryGrade?: PerformanceLevelCategoryGrade;
 
   @Field(() => [String], { nullable: true })
   academicGradesId?: String[];

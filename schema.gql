@@ -16,6 +16,7 @@ type AcademicArea implements IModelSchoolData {
   generalAcademicAreaId: String
   id: ID!
   name: String
+  order: Float
   school: School
   schoolId: String
   updatedAt: DateTime
@@ -56,6 +57,7 @@ type AcademicAsignature implements IModelSchoolData {
   maxWeight: Float
   minWeight: Float
   name: String
+  order: Float
   school: School
   schoolId: String
   updatedAt: DateTime
@@ -2166,6 +2168,7 @@ input NewAcademicArea {
   academicGradeId: [String!]
   generalAcademicAreaId: String
   name: String
+  order: Float
   schoolId: String
 }
 
@@ -2178,6 +2181,7 @@ input NewAcademicAsignature {
   maxWeight: Float
   minWeight: Float
   name: String
+  order: Float
   schoolId: String
 }
 
@@ -2609,6 +2613,7 @@ input NewPerformanceLevel {
   academicGradesId: [String!]
   campusId: [String!]
   category: PerformanceLevelCategory
+  categoryGrade: PerformanceLevelCategoryGrade
   generalPerformanceLevelId: String
   minimumScore: Float
   name: String
@@ -2767,6 +2772,7 @@ type PerformanceLevel implements IModelSchoolData {
   campus: [Campus!]
   campusId: [String!]
   category: PerformanceLevelCategory
+  categoryGrade: PerformanceLevelCategoryGrade
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
@@ -2789,6 +2795,12 @@ type PerformanceLevel implements IModelSchoolData {
 enum PerformanceLevelCategory {
   CAMPUS
   SCHOOL
+}
+
+"""The PerformanceLevelCategoryGrade Register"""
+enum PerformanceLevelCategoryGrade {
+  ALL
+  SPECIFIC
 }
 
 type PerformanceLevelConnection {
