@@ -2,28 +2,8 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import {
-  AcademicAsignatureCoursePeriodValuationRepository,
-  AcademicAsignatureCourseRepository,
-  AcademicAsignatureRepository,
-  AcademicPeriodRepository,
-  CampusRepository,
-  CourseRepository,
-  EvaluativeComponentRepository,
-  EvidenceLearningRepository,
-  ExperienceLearningAverageValuationRepository,
-  ExperienceLearningCoEvaluationRepository,
-  ExperienceLearningCoEvaluationValuationRepository,
-  ExperienceLearningRepository,
-  ExperienceLearningRubricCriteriaRepository,
-  ExperienceLearningRubricCriteriaValuationRepository,
-  ExperienceLearningRubricValuationRepository,
-  ExperienceLearningSelfAssessmentValuationRepository,
-  ExperienceLearningTraditionalValuationRepository,
-  LearningRepository,
-  PerformanceLevelRepository,
-  UserRepository
-} from '../../../servers/DataSource';
+
+import { AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicAsignatureRepository, AcademicPeriodRepository, CampusRepository, CourseRepository, EvaluativeComponentRepository, EvidenceLearningRepository, ExperienceLearningAverageValuationRepository, ExperienceLearningCoEvaluationRepository, ExperienceLearningCoEvaluationValuationRepository, ExperienceLearningRepository, ExperienceLearningRubricCriteriaRepository, ExperienceLearningRubricCriteriaValuationRepository, ExperienceLearningRubricValuationRepository, ExperienceLearningSelfAssessmentValuationRepository, ExperienceLearningTraditionalValuationRepository, LearningRepository, PerformanceLevelRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { ExperienceType } from '../../enums/ExperienceType';
 import { PerformanceLevelType } from '../../enums/PerformanceLevelType';
@@ -32,10 +12,7 @@ import { IContext } from '../../interfaces/IContext';
 import { AcademicAsignatureCourse } from '../../models/CampusAdministrator/AcademicAsignatureCourse';
 import { AcademicAsignatureCoursePeriodValuation } from '../../models/CampusAdministrator/AcademicAsignatureCoursePeriodValuation';
 import { Course } from '../../models/CampusAdministrator/Course';
-import {
-  ExperienceLearning,
-  ExperienceLearningConnection
-} from '../../models/CampusAdministrator/ExperienceLearning';
+import { ExperienceLearning, ExperienceLearningConnection } from '../../models/CampusAdministrator/ExperienceLearning';
 import { ExperienceLearningAverageValuation } from '../../models/CampusAdministrator/ExperienceLearningAverageValuation';
 import { ExperienceLearningCoEvaluation } from '../../models/CampusAdministrator/ExperienceLearningCoEvaluation';
 import { ExperienceLearningCoEvaluationValuation } from '../../models/CampusAdministrator/ExperienceLearningCoEvaluationValuation';
@@ -291,6 +268,97 @@ export class ExperienceLearningResolver {
               });
             }
           }
+        }
+      }
+    }
+    let resultConn = new ExperienceLearningConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
+  }
+
+  @Query(() => ExperienceLearningConnection)
+  async getAllExperienceLearningWhitoutCampusId(
+    @Args() args: ConnectionArgs,
+    @Arg('allData', () => Boolean) allData: Boolean,
+    @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
+    @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: String,
+    @Arg('academicPeriodId', () => String, { nullable: true }) academicPeriodId: String,
+  ): Promise<ExperienceLearningConnection> {
+    let result;
+    if (allData) {
+      if (orderCreated) {
+        if (academicPeriodId) {
+          result = await this.repository.findBy({
+            where: {
+              academicPeriodId,
+              academicAsignatureCourseId,
+            },
+            order: { createdAt: 'DESC' },
+          });
+        } else {
+          result = await this.repository.findBy({
+            where: {
+              academicAsignatureCourseId,
+            },
+            order: { createdAt: 'DESC' },
+          });
+        }
+      } else {
+        if (academicAsignatureCourseId && academicPeriodId) {
+          result = await this.repository.findBy({
+            where: {
+              academicPeriodId,
+              academicAsignatureCourseId,
+            },
+          });
+        } else {
+          result = await this.repository.findBy({
+            where: {
+              academicAsignatureCourseId,
+            },
+          });
+        }
+      }
+    } else {
+      if (orderCreated) {
+        if (academicPeriodId) {
+          result = await this.repository.findBy({
+            where: {
+              academicPeriodId,
+              academicAsignatureCourseId,
+              active: true,
+            },
+            order: { createdAt: 'DESC' },
+          });
+        } else {
+          result = await this.repository.findBy({
+            where: {
+              academicAsignatureCourseId,
+              active: true,
+            },
+            order: { createdAt: 'DESC' },
+          });
+        }
+      } else {
+        if (academicPeriodId) {
+          result = await this.repository.findBy({
+            where: {
+              academicPeriodId,
+              academicAsignatureCourseId,
+              active: true,
+            },
+          });
+        } else {
+          result = await this.repository.findBy({
+            where: {
+              academicAsignatureCourseId,
+              active: true,
+            },
+          });
         }
       }
     }

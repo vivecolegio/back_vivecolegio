@@ -3450,6 +3450,24 @@ type Query {
     orderCreated: Boolean!
     studentId: String
   ): ExperienceLearningTraditionalValuationConnection!
+  getAllExperienceLearningWhitoutCampusId(
+    academicAsignatureCourseId: String!
+    academicPeriodId: String
+
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): ExperienceLearningConnection!
   getAllForum(
     """Paginate after opaque cursor"""
     after: String
