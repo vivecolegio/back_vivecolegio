@@ -10,6 +10,7 @@ import gql from 'graphql-tag';
 import { graphqlUploadExpress } from 'graphql-upload';
 import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
 import Morgan from 'morgan';
+import { env } from 'process';
 import 'reflect-metadata';
 import { buildSchemaSync, createResolversMap } from 'type-graphql';
 import { SERVER_NAME_APP, SERVER_PORT_APP } from '../config';
@@ -87,7 +88,7 @@ const PORT = SERVER_PORT_APP;
 const SERVER_NAME = SERVER_NAME_APP;
 
 const cluster = require('node:cluster');
-const numCPUs = require('node:os').cpus().length;
+const numCPUs = env.NODE_ENV === "development" ? 1 : require('node:os').cpus().length;
 const expressHealthApi = require('express-health-api');
 
 async function app() {

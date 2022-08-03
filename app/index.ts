@@ -14,12 +14,13 @@ import { graphqlUploadExpress } from 'graphql-upload';
 import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
 import Morgan from 'morgan';
 import path from 'path';
+import { env } from 'process';
 import 'reflect-metadata';
 import { port, SERVER_NAME_APP, SERVER_PORT_APP } from './config/index';
 
 const cluster = require('node:cluster');
 const expressHealthApi = require('express-health-api');
-const numCPUs = require('node:os').cpus().length;
+const numCPUs = env.NODE_ENV === "development" ? 1 : require('node:os').cpus().length;
 
 async function app() {
   try {

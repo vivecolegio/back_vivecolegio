@@ -160,6 +160,67 @@ export class PerformanceLevelResolver {
     return resultConn;
   }
 
+  @Query(() => PerformanceLevelConnection)
+  async getAllPerformanceLevelAcademicCourse(
+    @Args() args: ConnectionArgs,
+    @Arg('courseId', () => String) courseId: String
+  ): Promise<PerformanceLevelConnection> {
+    let result: any[] = [];
+    if (courseId) {
+      let course = await this.repositoryCourse.findOneBy(courseId);
+      if (course) {
+        let campus = await this.repositoryCampus.findOneBy(course.campusId);
+        if (campus) {
+          result = await this.repository.findBy({
+            where: {
+              campusId: { $in: [course.campusId] },
+              academicGradesId: { $in: [course.academicGradeId] },
+              schoolId: campus.schoolId,
+              active: true,
+            },
+            order: { createdAt: 'DESC' },
+          });
+          if (result.length === 0) {
+            result = await this.repository.findBy({
+              where: {
+                campusId: { $in: [course.campusId] },
+                schoolId: campus.schoolId,
+                active: true,
+              },
+              order: { createdAt: 'DESC' },
+            });
+            if (result.length === 0) {
+              result = await this.repository.findBy({
+                where: {
+                  academicGradesId: { $in: [course.academicGradeId] },
+                  schoolId: campus.schoolId,
+                  active: true,
+                },
+                order: { createdAt: 'DESC' },
+              });
+              if (result.length === 0) {
+                result = await this.repository.findBy({
+                  where: {
+                    schoolId: campus.schoolId,
+                    active: true,
+                  },
+                  order: { createdAt: 'DESC' },
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+    let resultConn = new PerformanceLevelConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
+  }
+
   @Mutation(() => PerformanceLevel)
   async createPerformanceLevel(
     @Arg('data') data: NewPerformanceLevel,
