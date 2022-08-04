@@ -2036,7 +2036,7 @@ cliui@^7.0.2:
     strip-ansi "^6.0.0"
     wrap-ansi "^7.0.0"
 
-cluster@^0.7.7:
+cluster@0.7.7:
   version "0.7.7"
   resolved "https://registry.yarnpkg.com/cluster/-/cluster-0.7.7.tgz#e497e267cc956bd0b0513adb4aa393357d0085ef"
   integrity sha512-16LzEZSoBUgRHSN7NA46ntGnI9tf0NnxTm3KCDvHd6aj4EsBqUbYDN3ImCfjYegBXJZiutULF5rWkcRusMIozQ==
@@ -3512,7 +3512,7 @@ graphql@15.8.0:
   resolved "https://registry.yarnpkg.com/graphql/-/graphql-15.8.0.tgz#33410e96b012fa3bdb1091cc99a94769db212b38"
   integrity sha512-5gghUc24tP9HRznNpV2+FIoq3xKkj5dTQqf4v0CpdPbFVwFkWoxOM+o+2OC9ZSvjEMTjfmG9QT+gcvggTwW1zw==
 
-handlebars@^4.7.6, handlebars@^4.7.7:
+handlebars@^4.7.7:
   version "4.7.7"
   resolved "https://registry.yarnpkg.com/handlebars/-/handlebars-4.7.7.tgz#9ce33416aad02dbd6c8fafa8240d5d98004945a1"
   integrity sha512-aAcXm5OAfE/8IXkcZvCepKU3VzW1/39Fb5ZuqMtgI/hT8X2YgoMvBY5dLhq/cpOvw7Lk1nK/UF71aLG/ZnVYRA==
@@ -5316,12 +5316,12 @@ pause@0.0.1:
   resolved "https://registry.yarnpkg.com/pause/-/pause-0.0.1.tgz#1d408b3fdb76923b9543d96fb4c9dfd535d9cb5d"
   integrity sha1-HUCLP9t2kjuVQ9lvtMnf1TXZy10=
 
-pdf-creator-node@^2.3.4:
-  version "2.3.4"
-  resolved "https://registry.yarnpkg.com/pdf-creator-node/-/pdf-creator-node-2.3.4.tgz#d860217b29d7ad73026d027bea579ed24805140f"
-  integrity sha512-em2s088cu1ipeiivmp6NKL5cDDBdC5UlLBHtHtKPw34ddC8Dbf+jP8sXhW6ql8ooTeKzsUVi624STkK4qY5zhQ==
+pdf-creator-node@2.3.5:
+  version "2.3.5"
+  resolved "https://registry.yarnpkg.com/pdf-creator-node/-/pdf-creator-node-2.3.5.tgz#51f501e31946eaf620b3be330e75b43bcfa7c5a1"
+  integrity sha512-dUnYiYTGBkC60M1hBrHjlZs+gsSZZvXP33OLDUDOUPhNNhnHXQrzXFC3leo57ujzS/3rpbrqFcXxWpB5fgwkpw==
   dependencies:
-    handlebars "^4.7.6"
+    handlebars "^4.7.7"
     html-pdf "^3.0.1"
 
 pend@~1.2.0:
