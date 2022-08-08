@@ -27,6 +27,14 @@ export class PerformanceLevel extends IModelSchoolData {
   @Column({ nullable: true })
   topScore?: number;
 
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  abbreviation?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  colorHex?: string;
+
   @Field(() => PerformanceLevelType, { nullable: true })
   @Column({ nullable: true })
   type?: PerformanceLevelType;

@@ -1,5 +1,6 @@
 import { env } from 'process';
 import { DataSource } from 'typeorm';
+
 import { AcademicAsignatureCourse } from '../graphql/models/CampusAdministrator/AcademicAsignatureCourse';
 import { AcademicAsignatureCoursePeriodValuation } from '../graphql/models/CampusAdministrator/AcademicAsignatureCoursePeriodValuation';
 import { AcademicDay } from '../graphql/models/CampusAdministrator/AcademicDay';
@@ -20,6 +21,7 @@ import { Guardian } from '../graphql/models/CampusAdministrator/Guardian';
 import { QuestionBankTestOnline } from '../graphql/models/CampusAdministrator/QuestionBankTestOnline';
 import { QuestionCategoryTestOnline } from '../graphql/models/CampusAdministrator/QuestionCategoryTestOnline';
 import { QuestionTestOnline } from '../graphql/models/CampusAdministrator/QuestionTestOnline';
+import { StudentAttendance } from '../graphql/models/CampusAdministrator/StudentAttendance';
 import { Teacher } from '../graphql/models/CampusAdministrator/Teacher';
 import { Estudiantes } from '../graphql/models/Data/Estudiantes';
 import { PlantaDocente } from '../graphql/models/Data/PlantaDocente';
@@ -140,6 +142,7 @@ export const dataSource = new DataSource({
     Jornadas,
     Cursos,
     SchoolAdministrative,
+    StudentAttendance
   ],
   synchronize: true,
   logger: 'advanced-console',
@@ -243,3 +246,4 @@ export const EstudiantesRepository = dataSource.getMongoRepository(Estudiantes);
 export const JornadasRepository = dataSource.getMongoRepository(Jornadas);
 export const CursosRepository = dataSource.getMongoRepository(Cursos);
 export const SchoolAdministrativeRepository = dataSource.getMongoRepository(SchoolAdministrative);
+export const StudentAttendanceRepository = dataSource.getMongoRepository(StudentAttendance);

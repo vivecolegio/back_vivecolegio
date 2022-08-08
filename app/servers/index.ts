@@ -1,9 +1,6 @@
 import { buildSubgraphSchema } from '@apollo/federation';
 import { printSubgraphSchema } from '@apollo/subgraph';
-import {
-  ApolloServerPluginLandingPageLocalDefault,
-  ApolloServerPluginLandingPageProductionDefault
-} from 'apollo-server-core';
+import { ApolloServerPluginLandingPageLocalDefault, ApolloServerPluginLandingPageProductionDefault } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import express from 'express';
 import gql from 'graphql-tag';
@@ -11,8 +8,8 @@ import { graphqlUploadExpress } from 'graphql-upload';
 import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
 import Morgan from 'morgan';
 import { env } from 'process';
-import 'reflect-metadata';
 import { buildSchemaSync, createResolversMap } from 'type-graphql';
+
 import { SERVER_NAME_APP, SERVER_PORT_APP } from '../config';
 import { AcademicAsignatureCoursePeriodValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAsignatureCoursePeriodValuationResolver';
 import { AcademicAsignatureCourseResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAsignatureCourseResolver';
@@ -36,6 +33,7 @@ import { ExperienceLearningValuationResolver } from '../graphql/resolvers/Campus
 import { QuestionBankTestOnlineResolver } from '../graphql/resolvers/CampusAdministrator/QuestionBankTestOnlineResolver';
 import { QuestionCategoryTestOnlineResolver } from '../graphql/resolvers/CampusAdministrator/QuestionCategoryTestOnlineResolver';
 import { QuestionTestOnlineResolver } from '../graphql/resolvers/CampusAdministrator/QuestionTestOnlineResolver';
+import { StudentAttendanceResolver } from '../graphql/resolvers/CampusAdministrator/StudentAttendanceResolver';
 import { AuditLoginResolver } from '../graphql/resolvers/GeneralAdministrator/AuditLoginResolver';
 import { GenderResolver } from '../graphql/resolvers/GeneralAdministrator/GenderResolver';
 import { GeneralAcademicAsignatureResolver } from '../graphql/resolvers/GeneralAdministrator/GeneralAcademicAsignatureResolver';
@@ -83,6 +81,8 @@ import { PerformanceLevelResolver } from './../graphql/resolvers/SchoolAdministr
 import { SchoolYearResolver } from './../graphql/resolvers/SchoolAdministrator/SchoolYearResolver';
 import { SpecialtyResolver } from './../graphql/resolvers/SchoolAdministrator/SpecialtyResolver';
 import { dataSource } from './DataSource';
+
+import 'reflect-metadata';
 
 const PORT = SERVER_PORT_APP;
 const SERVER_NAME = SERVER_NAME_APP;
@@ -162,7 +162,8 @@ async function app() {
         ClassroomPlanExpectedPerformanceResolver,
         ClassroomPlanResolver,
         SchoolAdministrativeResolver,
-        ExperienceLearningValuationResolver
+        ExperienceLearningValuationResolver,
+        StudentAttendanceResolver
       ],
       emitSchemaFile: true,
       validate: false,

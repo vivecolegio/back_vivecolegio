@@ -1938,6 +1938,7 @@ type Mutation {
   changeActiveSchoolYear(active: Boolean!, id: String!): Boolean!
   changeActiveSpecialty(active: Boolean!, id: String!): Boolean!
   changeActiveStudent(active: Boolean!, id: String!): Boolean!
+  changeActiveStudentAttendance(active: Boolean!, id: String!): Boolean!
   changeActiveTeacher(active: Boolean!, id: String!): Boolean!
   changeActiveUser(active: Boolean!, id: String!): Boolean!
   changePasswordUser(id: String!, password: String!): Boolean!
@@ -2018,6 +2019,7 @@ type Mutation {
   createSchoolYear(data: NewSchoolYear!): SchoolYear!
   createSpecialty(data: NewSpecialty!): Specialty!
   createStudent(data: NewStudent!): Student!
+  createStudentAttendance(data: NewStudentAttendance!): StudentAttendance!
   createTeacher(data: NewTeacher!): Teacher!
   createUser(data: NewUser!): User!
   deleteAcademicArea(id: String!): Boolean!
@@ -2080,6 +2082,7 @@ type Mutation {
   deleteSchoolYear(id: String!): Boolean!
   deleteSpecialty(id: String!): Boolean!
   deleteStudent(id: String!): Boolean!
+  deleteStudentAttendance(id: String!): Boolean!
   deleteTeacher(id: String!): Boolean!
   deleteUser(id: String!): Boolean!
   login(password: String!, username: String!): Jwt!
@@ -2151,6 +2154,7 @@ type Mutation {
   updateSchoolYear(data: NewSchoolYear!, id: String!): SchoolYear!
   updateSpecialty(data: NewSpecialty!, id: String!): Specialty!
   updateStudent(data: NewStudent!, id: String!): Student!
+  updateStudentAttendance(data: NewStudentAttendance!, id: String!): StudentAttendance!
   updateStudentsAllInitialsCourse: Boolean!
   updateTeacher(data: NewTeacher!, id: String!): Teacher!
   updateUser(data: NewUser!, id: String!): User!
@@ -2610,10 +2614,12 @@ input NewNotification {
 }
 
 input NewPerformanceLevel {
+  abbreviation: String
   academicGradesId: [String!]
   campusId: [String!]
   category: PerformanceLevelCategory
   categoryGrade: PerformanceLevelCategoryGrade
+  colorHex: String
   generalPerformanceLevelId: String
   minimumScore: Float
   name: String
@@ -2700,6 +2706,13 @@ input NewStudent {
   userId: String
 }
 
+input NewStudentAttendance {
+  academicAsignatureCourseId: String
+  academicPeriodId: String
+  day: DateTime
+  studentId: String
+}
+
 input NewTeacher {
   academicAsignatureId: [String!]
   attentionSchedule: String
@@ -2766,6 +2779,7 @@ type PageInfo {
 
 """The PerformanceLevel model"""
 type PerformanceLevel implements IModelSchoolData {
+  abbreviation: String
   academicGrades: [AcademicGrade!]
   academicGradesId: [String!]
   active: Boolean
@@ -2773,6 +2787,7 @@ type PerformanceLevel implements IModelSchoolData {
   campusId: [String!]
   category: PerformanceLevelCategory
   categoryGrade: PerformanceLevelCategoryGrade
+  colorHex: String
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
@@ -4069,6 +4084,25 @@ type Query {
     last: Float
     schoolId: String!
   ): StudentConnection!
+  getAllStudentAttendance(
+    academicAsignatureCourseId: String!
+    academicPeriodId: String!
+
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+    studentId: String
+  ): StudentAttendanceConnection!
   getAllTeacher(
     """Paginate after opaque cursor"""
     after: String
@@ -4153,6 +4187,7 @@ type Query {
   getSchoolYear(id: String!): SchoolYear
   getSpecialty(id: String!): Specialty
   getStudent(id: String!): Student
+  getStudentAttendance(id: String!): StudentAttendance
   getTeacher(id: String!): Teacher
   getUser(id: String!): User
   getValidationDocumentNumberUser(documentNumber: String!): Boolean!
@@ -4492,6 +4527,42 @@ type Student implements IModelData {
   user: User
   userId: String
   version: Float
+}
+
+"""The StudentAttendance model"""
+type StudentAttendance implements IModelCampusData {
+  academicAsignatureCourse: AcademicAsignatureCourse
+  academicAsignatureCourseId: String
+  academicPeriod: AcademicPeriod
+  academicPeriodId: String
+  active: Boolean
+  campus: Campus
+  campusId: String
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  day: DateTime
+  id: ID!
+  student: Student
+  studentId: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type StudentAttendanceConnection {
+  edges: [StudentAttendanceEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type StudentAttendanceEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: StudentAttendance!
 }
 
 type StudentConnection {
