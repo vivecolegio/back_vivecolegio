@@ -43,6 +43,7 @@ import { EvidenceLearningResolver } from '../graphql/resolvers/SchoolAdministrat
 import { ForumInteractionResolver } from '../graphql/resolvers/SchoolAdministrator/ForumInteractionResolver';
 import { ForumResolver } from '../graphql/resolvers/SchoolAdministrator/ForumResolver';
 import { LearningResolver } from '../graphql/resolvers/SchoolAdministrator/LearningResolver';
+import { PerformanceReportResolver } from '../graphql/resolvers/SchoolAdministrator/PerformanceReportResolver';
 import { AcademicDayResolver } from './../graphql/resolvers/CampusAdministrator/AcademicDayResolver';
 import { CourseResolver } from './../graphql/resolvers/CampusAdministrator/CourseResolver';
 import { GuardianResolver } from './../graphql/resolvers/CampusAdministrator/GuardianResolver';
@@ -163,7 +164,8 @@ async function app() {
         ClassroomPlanResolver,
         SchoolAdministrativeResolver,
         ExperienceLearningValuationResolver,
-        StudentAttendanceResolver
+        StudentAttendanceResolver,
+        PerformanceReportResolver
       ],
       emitSchemaFile: true,
       validate: false,
