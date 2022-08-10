@@ -2086,6 +2086,7 @@ type Mutation {
   deleteTeacher(id: String!): Boolean!
   deleteUser(id: String!): Boolean!
   generatePerformanceLevelExample(id: String!): Boolean!
+  generatePerformanceLevelExample2(id: String!): Boolean!
   login(password: String!, username: String!): Jwt!
   resetPasswordUser(id: String!): Boolean!
   singleUpload(file: Upload, id: String!): Boolean!
