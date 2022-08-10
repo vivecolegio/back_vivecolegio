@@ -10,14 +10,14 @@ import {
   ExperienceLearningRepository,
   GradeAssignmentRepository,
   TeacherRepository,
-  UserRepository,
+  UserRepository
 } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicAsignatureCourse } from '../../inputs/CampusAdministrator/NewAcademicAsignatureCourse';
 import { IContext } from '../../interfaces/IContext';
 import {
   AcademicAsignatureCourse,
-  AcademicAsignatureCourseConnection,
+  AcademicAsignatureCourseConnection
 } from '../../models/CampusAdministrator/AcademicAsignatureCourse';
 import { Course } from '../../models/CampusAdministrator/Course';
 import { ExperienceLearning } from '../../models/CampusAdministrator/ExperienceLearning';
@@ -162,6 +162,53 @@ export class AcademicAsignatureCourseResolver {
             });
           }
         }
+      }
+    }
+    let resultConn = new AcademicAsignatureCourseConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
+  }
+
+  @Query(() => AcademicAsignatureCourseConnection)
+  async getAllAcademicAsignatureCourseByCourse(
+    @Args() args: ConnectionArgs,
+    @Arg('allData', () => Boolean) allData: Boolean,
+    @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
+    @Arg('courseId', () => String) courseId: String
+  ): Promise<AcademicAsignatureCourseConnection> {
+    let result;
+    if (allData) {
+      if (orderCreated) {
+        result = await this.repository.findBy({
+          where: { courseId },
+          order: { createdAt: 'DESC' },
+        });
+      } else {
+        result = await this.repository.findBy({
+          where: { courseId },
+        });
+      }
+    } else {
+      if (orderCreated) {
+        result = await this.repository.findBy({
+          where: {
+            courseId,
+            active: true,
+          },
+          order: { createdAt: 'DESC' },
+        });
+
+      } else {
+        result = await this.repository.findBy({
+          where: {
+            courseId,
+            active: true,
+          },
+        });
       }
     }
     let resultConn = new AcademicAsignatureCourseConnection();

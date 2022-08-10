@@ -1,5 +1,6 @@
 import { env } from 'process';
 import { DataSource } from 'typeorm';
+import { AcademicAreaCoursePeriodValuation } from '../graphql/models/CampusAdministrator/AcademicAreaCoursePeriodValuation';
 
 import { AcademicAsignatureCourse } from '../graphql/models/CampusAdministrator/AcademicAsignatureCourse';
 import { AcademicAsignatureCoursePeriodValuation } from '../graphql/models/CampusAdministrator/AcademicAsignatureCoursePeriodValuation';
@@ -142,7 +143,8 @@ export const dataSource = new DataSource({
     Jornadas,
     Cursos,
     SchoolAdministrative,
-    StudentAttendance
+    StudentAttendance,
+    AcademicAreaCoursePeriodValuation
   ],
   synchronize: true,
   logger: 'advanced-console',
@@ -247,3 +249,4 @@ export const JornadasRepository = dataSource.getMongoRepository(Jornadas);
 export const CursosRepository = dataSource.getMongoRepository(Cursos);
 export const SchoolAdministrativeRepository = dataSource.getMongoRepository(SchoolAdministrative);
 export const StudentAttendanceRepository = dataSource.getMongoRepository(StudentAttendance);
+export const AcademicAreaCoursePeriodValuationRepository = dataSource.getMongoRepository(AcademicAreaCoursePeriodValuation);
