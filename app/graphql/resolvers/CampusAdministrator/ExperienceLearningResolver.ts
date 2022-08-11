@@ -1030,6 +1030,7 @@ export class ExperienceLearningResolver {
     }
   }
 
+  //este es el que actualiza cuando cambian una nota en la planilla
   @Mutation(() => Boolean)
   async createAcademicAsignatureCoursePeriodValuationStudent(
     @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: string,
@@ -1097,6 +1098,13 @@ export class ExperienceLearningResolver {
               studentId,
             },
           });
+        if (studentPeriodValuationList.length > 1) {
+          for (let studentPeriodValuation of studentPeriodValuationList) {
+            let data = await this.repositoryAcademicAsignatureCoursePeriodValuation.findOneBy(studentPeriodValuation?.id?.toString());
+            let result = await this.repositoryAcademicAsignatureCoursePeriodValuation.deleteOne({ _id: new ObjectId(studentPeriodValuation?.id?.toString()) });
+          }
+          studentPeriodValuationList = [];
+        }
         if (studentPeriodValuationList.length > 0) {
           studentPeriodValuation = studentPeriodValuationList[0];
         } else {
@@ -1164,7 +1172,6 @@ export class ExperienceLearningResolver {
             studentPeriodValuation.performanceLevelId = performanceLevelId;
             break;
         }
-        //console.log(studentPeriodValuation)
         if (studentPeriodValuation.id) {
           studentPeriodValuation =
             await this.repositoryAcademicAsignatureCoursePeriodValuation.save({
