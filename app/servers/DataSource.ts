@@ -1,7 +1,7 @@
 import { env } from 'process';
 import { DataSource } from 'typeorm';
-import { AcademicAreaCoursePeriodValuation } from '../graphql/models/CampusAdministrator/AcademicAreaCoursePeriodValuation';
 
+import { AcademicAreaCoursePeriodValuation } from '../graphql/models/CampusAdministrator/AcademicAreaCoursePeriodValuation';
 import { AcademicAsignatureCourse } from '../graphql/models/CampusAdministrator/AcademicAsignatureCourse';
 import { AcademicAsignatureCoursePeriodValuation } from '../graphql/models/CampusAdministrator/AcademicAsignatureCoursePeriodValuation';
 import { AcademicDay } from '../graphql/models/CampusAdministrator/AcademicDay';
@@ -66,6 +66,7 @@ import { GradeAssignment } from '../graphql/models/SchoolAdministrator/GradeAssi
 import { Learning } from '../graphql/models/SchoolAdministrator/Learning';
 import { Modality } from '../graphql/models/SchoolAdministrator/Modality';
 import { PerformanceLevel } from '../graphql/models/SchoolAdministrator/PerformanceLevel';
+import { SchoolConfiguration } from '../graphql/models/SchoolAdministrator/SchoolConfiguration';
 import { SchoolYear } from '../graphql/models/SchoolAdministrator/SchoolYear';
 import { Specialty } from '../graphql/models/SchoolAdministrator/Specialty';
 import { Cursos } from './../graphql/models/Data/Cursos';
@@ -144,7 +145,8 @@ export const dataSource = new DataSource({
     Cursos,
     SchoolAdministrative,
     StudentAttendance,
-    AcademicAreaCoursePeriodValuation
+    AcademicAreaCoursePeriodValuation,
+    SchoolConfiguration
   ],
   synchronize: true,
   logger: 'advanced-console',
@@ -250,3 +252,4 @@ export const CursosRepository = dataSource.getMongoRepository(Cursos);
 export const SchoolAdministrativeRepository = dataSource.getMongoRepository(SchoolAdministrative);
 export const StudentAttendanceRepository = dataSource.getMongoRepository(StudentAttendance);
 export const AcademicAreaCoursePeriodValuationRepository = dataSource.getMongoRepository(AcademicAreaCoursePeriodValuation);
+export const SchoolConfigurationRepository = dataSource.getMongoRepository(SchoolConfiguration);

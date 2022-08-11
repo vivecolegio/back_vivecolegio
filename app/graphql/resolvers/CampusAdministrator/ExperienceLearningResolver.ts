@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicAsignatureRepository, AcademicPeriodRepository, CampusRepository, CourseRepository, EvaluativeComponentRepository, EvidenceLearningRepository, ExperienceLearningAverageValuationRepository, ExperienceLearningCoEvaluationRepository, ExperienceLearningCoEvaluationValuationRepository, ExperienceLearningRepository, ExperienceLearningRubricCriteriaRepository, ExperienceLearningRubricCriteriaValuationRepository, ExperienceLearningRubricValuationRepository, ExperienceLearningSelfAssessmentValuationRepository, ExperienceLearningTraditionalValuationRepository, LearningRepository, PerformanceLevelRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicAsignatureRepository, AcademicGradeRepository, AcademicPeriodRepository, CampusRepository, CourseRepository, EvaluativeComponentRepository, EvidenceLearningRepository, ExperienceLearningAverageValuationRepository, ExperienceLearningCoEvaluationRepository, ExperienceLearningCoEvaluationValuationRepository, ExperienceLearningRepository, ExperienceLearningRubricCriteriaRepository, ExperienceLearningRubricCriteriaValuationRepository, ExperienceLearningRubricValuationRepository, ExperienceLearningSelfAssessmentValuationRepository, ExperienceLearningTraditionalValuationRepository, LearningRepository, PerformanceLevelRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { ExperienceType } from '../../enums/ExperienceType';
 import { PerformanceLevelType } from '../../enums/PerformanceLevelType';
@@ -23,8 +23,10 @@ import { ExperienceLearningSelfAssessmentValuation } from '../../models/CampusAd
 import { ExperienceLearningTraditionalValuation } from '../../models/CampusAdministrator/ExperienceLearningTraditionalValuation';
 import { ExperienceLearningValuation } from '../../models/CampusAdministrator/ExperienceLearningValuation';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
+import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicAsignature } from '../../models/SchoolAdministrator/AcademicAsignature';
+import { AcademicGrade } from '../../models/SchoolAdministrator/AcademicGrade';
 import { AcademicPeriod } from '../../models/SchoolAdministrator/AcademicPeriod';
 import { EvaluativeComponent } from '../../models/SchoolAdministrator/EvaluativeComponent';
 import { EvidenceLearning } from '../../models/SchoolAdministrator/EvidenceLearning';
@@ -44,6 +46,9 @@ export class ExperienceLearningResolver {
   @InjectRepository(Campus)
   private repositoryCampus = CampusRepository;
 
+  @InjectRepository(School)
+  private repositorySchool = SchoolRepository;
+
   @InjectRepository(Learning)
   private repositoryLearning = LearningRepository;
 
@@ -61,6 +66,9 @@ export class ExperienceLearningResolver {
 
   @InjectRepository(Course)
   private repositoryCourse = CourseRepository;
+
+  @InjectRepository(AcademicGrade)
+  private repositoryAcademicGrade = AcademicGradeRepository;
 
   @InjectRepository(ExperienceLearningTraditionalValuation)
   private repositoryExperienceLearningTraditionalValuation = ExperienceLearningTraditionalValuationRepository;
@@ -1040,10 +1048,77 @@ export class ExperienceLearningResolver {
   }
 
   @Mutation(() => Boolean)
+  async updateAllStudentSchoolPeriodValuation(
+    @Arg('schoolId', () => String) schoolId: string,
+    @Arg('academicPeriodId', () => String) academicPeriodId: string,
+  ) {
+    const school = await this.repositorySchool.findOneBy(schoolId);
+    if (school) {
+      const academicGrades = await this.repositoryAcademicGrade.findBy({ where: { schoolId: school?.id?.toString() } });
+      let promisesList: any[] = [];
+      for (let academicGrade of academicGrades) {
+        promisesList.push(
+          this.updateAllStudentGradePeriodValuation(academicGrade?.id?.toString(), academicPeriodId)
+        );
+      }
+      await Promise.all(promisesList).then(() => {
+        return true;
+      });
+      return false;
+    }
+  }
+
+  @Mutation(() => Boolean)
+  async updateAllStudentGradePeriodValuation(
+    @Arg('academicGradeId', () => String) academicGradeId: string,
+    @Arg('academicPeriodId', () => String) academicPeriodId: string,
+  ) {
+    const academicGrade = await this.repositoryAcademicGrade.findOneBy(academicGradeId);
+    if (academicGrade) {
+      const courses = await this.repositoryCourse.findBy({ where: { academicGradeId: academicGrade?.id?.toString() } });
+      let promisesList: any[] = [];
+      for (let course of courses) {
+        promisesList.push(
+          this.updateAllStudentCoursePeriodValuation(course?.id?.toString(), academicPeriodId)
+        );
+      }
+      await Promise.all(promisesList).then(() => {
+        return true;
+      });
+      return false;
+    }
+  }
+
+  @Mutation(() => Boolean)
+  async updateAllStudentCoursePeriodValuation(
+    @Arg('courseId', () => String) courseId: string,
+    @Arg('academicPeriodId', () => String) academicPeriodId: string,
+  ) {
+    console.log("aca llego 1")
+    const course = await this.repositoryCourse.findOneBy(courseId);
+    if (course) {
+      const academicAsignatureCourses = await this.repositoryAcademicAsignatureCourse.findBy({ where: { courseId: courseId, active: true } })
+      let promisesList: any[] = [];
+      for (let academicAsignatureCourse of academicAsignatureCourses) {
+        if (academicAsignatureCourse) {
+          promisesList.push(
+            this.updateAllStudentAcademicAsignatureCoursePeriodValuation(academicAsignatureCourse?.id?.toString(), academicPeriodId)
+          );
+        }
+      }
+      await Promise.all(promisesList).then(() => {
+        return true;
+      });
+      return false;
+    }
+  }
+
+  @Mutation(() => Boolean)
   async updateAllStudentAcademicAsignatureCoursePeriodValuation(
     @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: string,
     @Arg('academicPeriodId', () => String) academicPeriodId: string,
   ) {
+    console.log("aca llego 2")
     const academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(
       academicAsignatureCourseId
     );
@@ -1058,11 +1133,11 @@ export class ExperienceLearningResolver {
               this.createAcademicAsignatureCoursePeriodValuationStudent(academicAsignatureCourseId, academicPeriodId, student + "")
             );
           }
+          await Promise.all(promisesList).then(() => {
+            return true;
+          });
+          return false;
         }
-        await Promise.all(promisesList).then(() => {
-          return true;
-        });
-        return false;
       }
     }
   }
@@ -1074,6 +1149,7 @@ export class ExperienceLearningResolver {
     @Arg('academicPeriodId', () => String) academicPeriodId: string,
     @Arg('studentId', () => String) studentId: string
   ) {
+    console.log("aca llego al que es")
     let academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(
       academicAsignatureCourseId
     );
