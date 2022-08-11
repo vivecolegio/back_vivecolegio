@@ -404,6 +404,9 @@ export class ExperienceLearningResolver {
       version: (result?.version as number) + 1,
       updatedByUserId,
     });
+    if (result?.academicPeriodId && result?.academicAsignatureCourseId) {
+      this.updateAllStudentAcademicAsignatureCoursePeriodValuation(result?.academicAsignatureCourseId, result?.academicPeriodId)
+    }
     return result;
   }
 
@@ -422,6 +425,9 @@ export class ExperienceLearningResolver {
       version: (result?.version as number) + 1,
       updatedByUserId,
     });
+    if (result?.academicPeriodId && result?.academicAsignatureCourseId) {
+      this.updateAllStudentAcademicAsignatureCoursePeriodValuation(result?.academicAsignatureCourseId, result?.academicPeriodId)
+    }
     if (result.id) {
       return true;
     } else {
@@ -435,6 +441,9 @@ export class ExperienceLearningResolver {
     @Ctx() context: IContext
   ): Promise<Boolean | null> {
     let data = await this.repository.findOneBy(id);
+    if (data?.academicPeriodId && data?.academicAsignatureCourseId) {
+      this.updateAllStudentAcademicAsignatureCoursePeriodValuation(data?.academicAsignatureCourseId, data?.academicPeriodId)
+    }
     let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
     return result?.result?.ok === 1 ?? true;
   }
@@ -1026,6 +1035,34 @@ export class ExperienceLearningResolver {
           }
           return true;
         }
+      }
+    }
+  }
+
+  @Mutation(() => Boolean)
+  async updateAllStudentAcademicAsignatureCoursePeriodValuation(
+    @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: string,
+    @Arg('academicPeriodId', () => String) academicPeriodId: string,
+  ) {
+    const academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(
+      academicAsignatureCourseId
+    );
+    if (academicAsignatureCourse) {
+      const course = await this.repositoryCourse.findOneBy(academicAsignatureCourse.courseId);
+      if (course) {
+        const students = course.studentsId;
+        let promisesList: any[] = [];
+        if (students) {
+          for (const student of students) {
+            promisesList.push(
+              this.createAcademicAsignatureCoursePeriodValuationStudent(academicAsignatureCourseId, academicPeriodId, student + "")
+            );
+          }
+        }
+        await Promise.all(promisesList).then(() => {
+          return true;
+        });
+        return false;
       }
     }
   }

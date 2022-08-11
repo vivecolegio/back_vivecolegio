@@ -2101,6 +2101,7 @@ type Mutation {
   updateAcademicPeriod(data: NewAcademicPeriod!, id: String!): AcademicPeriod!
   updateAcademicSchedule(data: NewAcademicSchedule!, id: String!): AcademicSchedule!
   updateAcademicStandard(data: NewAcademicStandard!, id: String!): AcademicStandard!
+  updateAllStudentAcademicAsignatureCoursePeriodValuation(academicAsignatureCourseId: String!, academicPeriodId: String!): Boolean!
   updateAssessmentExperienceLearningRubricValuation(id: String!): ExperienceLearningRubricValuation!
   updateAuditLogin(data: NewAuditLogin!, id: String!): AuditLogin!
   updateCampus(data: NewCampus!, id: String!): Campus!
