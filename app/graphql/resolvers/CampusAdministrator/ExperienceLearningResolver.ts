@@ -1103,7 +1103,6 @@ export class ExperienceLearningResolver {
     @Arg('courseId', () => String) courseId: string,
     @Arg('academicPeriodId', () => String) academicPeriodId: string,
   ) {
-    console.log("aca llego 1")
     const course = await this.repositoryCourse.findOneBy(courseId);
     if (course) {
       const academicAsignatureCourses = await this.repositoryAcademicAsignatureCourse.findBy({ where: { courseId: courseId, active: true } })
@@ -1127,7 +1126,6 @@ export class ExperienceLearningResolver {
     @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: string,
     @Arg('academicPeriodId', () => String) academicPeriodId: string,
   ) {
-    console.log("aca llego 2")
     const academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(
       academicAsignatureCourseId
     );
@@ -1164,7 +1162,6 @@ export class ExperienceLearningResolver {
     @Arg('academicPeriodId', () => String) academicPeriodId: string,
     @Arg('studentId', () => String) studentId: string
   ) {
-    console.log("aca llego al que es")
     let academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(
       academicAsignatureCourseId
     );
@@ -1326,8 +1323,6 @@ export class ExperienceLearningResolver {
     @Arg('academicPeriodId', () => String) academicPeriodId: string,
     @Arg('studentId', () => String) studentId: string
   ) {
-
-    console.log("aca llega al otro")
     let academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(
       academicAsignatureCourseId
     );
@@ -1338,7 +1333,7 @@ export class ExperienceLearningResolver {
     for (let asignature of academicAsignatures) {
       asignaturesAux.push(asignature?.id?.toString());
     }
-    let academicAsignaturesCourses = await this.repositoryAcademicAsignatureCourse.findBy({ where: { academicAsignatureId: { $in: [asignaturesAux] }, courseId: academicAsignatureCourse?.courseId } });
+    let academicAsignaturesCourses = await this.repositoryAcademicAsignatureCourse.findBy({ where: { academicAsignatureId: { $in: asignaturesAux }, courseId: academicAsignatureCourse?.courseId } });
     let hourlyIntensityTotal = 0;
     for (let academicAsignature of academicAsignaturesCourses) {
       hourlyIntensityTotal += academicAsignature?.hourlyIntensity ? academicAsignature?.hourlyIntensity : 0;
@@ -1355,7 +1350,6 @@ export class ExperienceLearningResolver {
         studentId,
       }
     });
-    console.log("aca vamos bien 2")
     if (studentAreaPeriodValuationList.length > 1) {
       for (let studentAreaPeriodValuation of studentAreaPeriodValuationList) {
         let data = await this.repositoryAcademicAreaCoursePeriodValuation.findOneBy(studentAreaPeriodValuation?.id?.toString());
@@ -1379,18 +1373,15 @@ export class ExperienceLearningResolver {
     if (performanceLevels) {
       performanceLevelType = performanceLevels?.edges[0]?.node?.type;
     }
-    console.log("aca vamos bien 3");
-    console.log(academicAsignaturesCourses);
     for (let academicAsignature of academicAsignaturesCourses) {
       let studentAsignaturePeriodValuationList =
         await this.repositoryAcademicAsignatureCoursePeriodValuation.findBy({
           where: {
-            academicAsignatureId: academicAsignature?.id?.toString(),
+            academicAsignatureCourseId: academicAsignature?.id?.toString(),
             academicPeriodId,
             studentId,
           },
         });
-      console.log(studentAsignaturePeriodValuationList);
       if (studentAsignaturePeriodValuationList.length == 1) {
         let averageAsignatureCourse = 0;
         let horlyIntensityAsignature = 0;

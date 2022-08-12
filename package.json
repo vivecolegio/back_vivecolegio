@@ -42,7 +42,7 @@
     "@types/jsonwebtoken": "8.5.8",
     "@types/mongodb": "4.0.7",
     "@types/morgan": "1.9.3",
-    "@types/node": "18.7.1",
+    "@types/node": "18.7.2",
     "apollo-server": "3.10.1",
     "apollo-server-express": "3.10.1",
     "bcrypt": "5.0.1",
