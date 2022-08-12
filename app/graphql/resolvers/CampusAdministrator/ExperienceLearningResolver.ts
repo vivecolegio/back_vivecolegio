@@ -1135,15 +1135,21 @@ export class ExperienceLearningResolver {
       const course = await this.repositoryCourse.findOneBy(academicAsignatureCourse.courseId);
       if (course) {
         const students = course.studentsId;
-        let promisesList: any[] = [];
+        let promisesListAsignatures: any[] = [];
+        let promisesListAreas: any[] = [];
         if (students) {
           for (const student of students) {
-            promisesList.push(
+            promisesListAsignatures.push(
               this.createAcademicAsignatureCoursePeriodValuationStudent(academicAsignatureCourseId, academicPeriodId, student + "")
             );
+            promisesListAreas.push(
+              this.createAcademicAreaCoursePeriodValuationStudent(academicAsignatureCourseId, academicPeriodId, student + "")
+            );
           }
-          await Promise.all(promisesList).then(() => {
-            return true;
+          await Promise.all(promisesListAsignatures).then(async () => {
+            await Promise.all(promisesListAreas).then(() => {
+              return true;
+            });
           });
           return false;
         }
@@ -1320,6 +1326,8 @@ export class ExperienceLearningResolver {
     @Arg('academicPeriodId', () => String) academicPeriodId: string,
     @Arg('studentId', () => String) studentId: string
   ) {
+
+    console.log("aca llega al otro")
     let academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(
       academicAsignatureCourseId
     );
@@ -1330,9 +1338,11 @@ export class ExperienceLearningResolver {
     for (let asignature of academicAsignatures) {
       asignaturesAux.push(asignature?.id?.toString());
     }
-    let academicAsignaturesCourses = await this.repositoryAcademicAsignatureCourse.findBy({ where: { academicAsignatureId: { $in: [asignaturesAux] }, } });
-
-
+    let academicAsignaturesCourses = await this.repositoryAcademicAsignatureCourse.findBy({ where: { academicAsignatureId: { $in: [asignaturesAux] }, courseId: academicAsignatureCourse?.courseId } });
+    let hourlyIntensityTotal = 0;
+    for (let academicAsignature of academicAsignaturesCourses) {
+      hourlyIntensityTotal += academicAsignature?.hourlyIntensity ? academicAsignature?.hourlyIntensity : 0;
+    }
     let studentAreaPeriodValuation: AcademicAreaCoursePeriodValuation;
     let average = 0;
     let perf = null;
@@ -1345,6 +1355,7 @@ export class ExperienceLearningResolver {
         studentId,
       }
     });
+    console.log("aca vamos bien 2")
     if (studentAreaPeriodValuationList.length > 1) {
       for (let studentAreaPeriodValuation of studentAreaPeriodValuationList) {
         let data = await this.repositoryAcademicAreaCoursePeriodValuation.findOneBy(studentAreaPeriodValuation?.id?.toString());
@@ -1368,7 +1379,8 @@ export class ExperienceLearningResolver {
     if (performanceLevels) {
       performanceLevelType = performanceLevels?.edges[0]?.node?.type;
     }
-
+    console.log("aca vamos bien 3");
+    console.log(academicAsignaturesCourses);
     for (let academicAsignature of academicAsignaturesCourses) {
       let studentAsignaturePeriodValuationList =
         await this.repositoryAcademicAsignatureCoursePeriodValuation.findBy({
@@ -1378,32 +1390,33 @@ export class ExperienceLearningResolver {
             studentId,
           },
         });
-      if (studentAsignaturePeriodValuationList.length > 0) {
-        let averageComponent = 0;
-        let weightComponent = 0;
+      console.log(studentAsignaturePeriodValuationList);
+      if (studentAsignaturePeriodValuationList.length == 1) {
+        let averageAsignatureCourse = 0;
+        let horlyIntensityAsignature = 0;
         switch (performanceLevelType) {
           case PerformanceLevelType.QUALITATIVE:
             let performanceLevelIndex = performanceLevels?.edges?.findIndex((i: any) => i.node.id.toString() === studentAsignaturePeriodValuationList[0]?.performanceLevelId) + 1;
-            averageComponent = performanceLevelIndex;
-            weightComponent = academicAsignature?.hourlyIntensity ? academicAsignature?.hourlyIntensity : 0;
-            average += averageComponent * (weightComponent / 100);
+            averageAsignatureCourse = performanceLevelIndex;
+            horlyIntensityAsignature = academicAsignature?.hourlyIntensity ? academicAsignature?.hourlyIntensity : 0;
+            average += averageAsignatureCourse * (horlyIntensityAsignature / hourlyIntensityTotal);
             break;
           case PerformanceLevelType.QUANTITATIVE:
-            averageComponent = studentAsignaturePeriodValuationList[0].assessment
+            averageAsignatureCourse = studentAsignaturePeriodValuationList[0].assessment
               ? studentAsignaturePeriodValuationList[0].assessment
               : 0;
-            weightComponent = academicAsignature.hourlyIntensity ? academicAsignature.hourlyIntensity : 0;
-            average += averageComponent * (weightComponent / 100);
+            horlyIntensityAsignature = academicAsignature.hourlyIntensity ? academicAsignature.hourlyIntensity : 0;
+            average += averageAsignatureCourse * (horlyIntensityAsignature / hourlyIntensityTotal);
             break;
         }
       }
     }
     switch (performanceLevelType) {
       case PerformanceLevelType.QUALITATIVE:
-        studentPeriodValuation.performanceLevelId = performanceLevels?.edges[Math.trunc(average) - 1]?.node?.id.toString();
+        studentAreaPeriodValuation.performanceLevelId = performanceLevels?.edges[Math.trunc(average) - 1]?.node?.id.toString();
         break;
       case PerformanceLevelType.QUANTITATIVE:
-        studentPeriodValuation.assessment = average;
+        studentAreaPeriodValuation.assessment = average;
         perf = performanceLevels?.edges?.find((c: any) => {
           return average < c.node.topScore && average >= c.node.minimumScore;
         });
@@ -1415,20 +1428,20 @@ export class ExperienceLearningResolver {
         if (perf && perf?.node?.id) {
           performanceLevelId = perf.node.id
         }
-        studentPeriodValuation.performanceLevelId = performanceLevelId;
+        studentAreaPeriodValuation.performanceLevelId = performanceLevelId;
         break;
     }
-    if (studentPeriodValuation.id) {
-      studentPeriodValuation =
-        await this.repositoryAcademicAsignatureCoursePeriodValuation.save({
-          _id: new ObjectId(studentPeriodValuation.id.toString()),
-          ...studentPeriodValuation,
-          version: (studentPeriodValuation?.version as number) + 1,
+    if (studentAreaPeriodValuation.id) {
+      studentAreaPeriodValuation =
+        await this.repositoryAcademicAreaCoursePeriodValuation.save({
+          _id: new ObjectId(studentAreaPeriodValuation.id.toString()),
+          ...studentAreaPeriodValuation,
+          version: (studentAreaPeriodValuation?.version as number) + 1,
         });
     } else {
-      studentPeriodValuation =
-        await this.repositoryAcademicAsignatureCoursePeriodValuation.save({
-          ...studentPeriodValuation,
+      studentAreaPeriodValuation =
+        await this.repositoryAcademicAreaCoursePeriodValuation.save({
+          ...studentAreaPeriodValuation,
         });
     }
     return true;

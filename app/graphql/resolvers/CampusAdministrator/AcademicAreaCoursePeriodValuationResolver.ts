@@ -2,13 +2,18 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicAreaCoursePeriodValuationRepository, CampusRepository, UserRepository } from '../../../servers/DataSource';
+
+import { AcademicAreaCoursePeriodValuationRepository, AcademicAreaRepository, AcademicPeriodRepository, CampusRepository, PerformanceLevelRepository, StudentRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicAreaCoursePeriodValuation } from '../../inputs/CampusAdministrator/NewAcademicAreaCoursePeriodValuation';
 import { IContext } from '../../interfaces/IContext';
 import { AcademicAreaCoursePeriodValuation, AcademicAreaCoursePeriodValuationConnection } from '../../models/CampusAdministrator/AcademicAreaCoursePeriodValuation';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
+import { Student } from '../../models/GeneralAdministrator/Student';
 import { User } from '../../models/GeneralAdministrator/User';
+import { AcademicArea } from '../../models/SchoolAdministrator/AcademicArea';
+import { AcademicPeriod } from '../../models/SchoolAdministrator/AcademicPeriod';
+import { PerformanceLevel } from '../../models/SchoolAdministrator/PerformanceLevel';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
 @Resolver(AcademicAreaCoursePeriodValuation)
@@ -22,6 +27,18 @@ export class AcademicAreaCoursePeriodValuationResolver {
     @InjectRepository(Campus)
     private repositoryCampus = CampusRepository;
 
+    @InjectRepository(AcademicArea)
+    private repositoryAcademicArea = AcademicAreaRepository;
+
+    @InjectRepository(AcademicPeriod)
+    private repositoryAcademicPeriod = AcademicPeriodRepository;
+
+    @InjectRepository(Student)
+    private repositoryStudent = StudentRepository;
+
+    @InjectRepository(PerformanceLevel)
+    private repositoryPerformanceLevel = PerformanceLevelRepository;
+
     @Query(() => AcademicAreaCoursePeriodValuation, { nullable: true })
     async getAcademicAreaCoursePeriodValuation(@Arg('id', () => String) id: string) {
         const result = await this.repository.findOneBy(id);
@@ -33,40 +50,90 @@ export class AcademicAreaCoursePeriodValuationResolver {
         @Args() args: ConnectionArgs,
         @Arg('allData', () => Boolean) allData: Boolean,
         @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
-        @Arg('campusId', () => String) campusId: String,
+        @Arg('academicAreaId', () => String) academicAreaId: String,
+        @Arg('academicPeriodId', () => String) academicPeriodId: String,
+        @Arg('studentId', () => String, { nullable: true }) studentId: String,
     ): Promise<AcademicAreaCoursePeriodValuationConnection> {
         let result;
         if (allData) {
             if (orderCreated) {
-                result = await this.repository.findBy({
-                    where: {
-                        campusId
-                    },
-                    order: { createdAt: 'DESC' },
-                });
+                if (academicAreaId && academicPeriodId && studentId) {
+                    result = await this.repository.findBy({
+                        where: {
+                            academicAreaId,
+                            academicPeriodId,
+                            studentId
+                        },
+                        order: { createdAt: 'DESC' },
+                    });
+                } else {
+                    result = await this.repository.findBy({
+                        where: {
+                            academicAreaId,
+                            academicPeriodId,
+                        },
+                        order: { createdAt: 'DESC' },
+                    });
+                }
             } else {
-                result = await this.repository.findBy({
-                    where: {
-                        campusId
-                    },
-                });
+                if (academicAreaId && academicPeriodId && studentId) {
+                    result = await this.repository.findBy({
+                        where: {
+                            academicAreaId,
+                            academicPeriodId,
+                            studentId
+                        },
+                    });
+                } else {
+                    result = await this.repository.findBy({
+                        where: {
+                            academicAreaId,
+                            academicPeriodId,
+                        },
+                    });
+                }
             }
         } else {
             if (orderCreated) {
-                result = await this.repository.findBy({
-                    where: {
-                        campusId,
-                        active: true,
-                    },
-                    order: { createdAt: 'DESC' },
-                });
+                if (academicAreaId && academicPeriodId && studentId) {
+                    result = await this.repository.findBy({
+                        where: {
+                            academicAreaId,
+                            academicPeriodId,
+                            studentId,
+                            active: true,
+                        },
+                        order: { createdAt: 'DESC' },
+                    });
+                } else {
+                    result = await this.repository.findBy({
+                        where: {
+                            academicAreaId,
+                            academicPeriodId,
+                            active: true,
+                        },
+                        order: { createdAt: 'DESC' },
+                    });
+                }
             } else {
-                result = await this.repository.findBy({
-                    where: {
-                        campusId,
-                        active: true,
-                    },
-                });
+                if (academicAreaId && academicPeriodId && studentId) {
+                    result = await this.repository.findBy({
+                        where: {
+                            academicAreaId,
+                            academicPeriodId,
+                            studentId,
+                            active: true,
+                        },
+                    });
+                } else {
+                    result = await this.repository.findBy({
+                        where: {
+                            academicAreaId,
+                            academicPeriodId,
+                            active: true,
+                        },
+                    });
+                }
             }
         }
         let resultConn = new AcademicAreaCoursePeriodValuationConnection();
@@ -171,6 +238,45 @@ export class AcademicAreaCoursePeriodValuationResolver {
         let id = data.campusId;
         if (id !== null && id !== undefined) {
             const result = await this.repositoryCampus.findOneBy(id);
+            return result;
+        }
+        return null;
+    }
+
+    @FieldResolver((_type) => AcademicArea, { nullable: true })
+    async academicAsignatureCourse(@Root() data: AcademicAreaCoursePeriodValuation) {
+        let id = data.academicAreaId;
+        if (id !== null && id !== undefined) {
+            const result = await this.repositoryAcademicArea.findOneBy(id);
+            return result;
+        }
+        return null;
+    }
+
+    @FieldResolver((_type) => AcademicPeriod, { nullable: true })
+    async academicPeriod(@Root() data: AcademicAreaCoursePeriodValuation) {
+        let id = data.academicPeriodId;
+        if (id !== null && id !== undefined) {
+            const result = await this.repositoryAcademicPeriod.findOneBy(id);
+            return result;
+        }
+        return null;
+    }
+    @FieldResolver((_type) => Student, { nullable: true })
+    async student(@Root() data: AcademicAreaCoursePeriodValuation) {
+        let id = data.studentId;
+        if (id !== null && id !== undefined) {
+            const result = await this.repositoryStudent.findOneBy(id);
+            return result;
+        }
+        return null;
+    }
+
+    @FieldResolver((_type) => PerformanceLevel, { nullable: true })
+    async performanceLevel(@Root() data: AcademicAreaCoursePeriodValuation) {
+        let id = data.performanceLevelId;
+        if (id !== null && id !== undefined) {
+            const result = await this.repositoryPerformanceLevel.findOneBy(id);
             return result;
         }
         return null;

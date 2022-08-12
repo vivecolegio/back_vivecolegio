@@ -9,7 +9,7 @@ import { EvidenceLearning } from '../SchoolAdministrator/EvidenceLearning';
 import { PerformanceLevel } from '../SchoolAdministrator/PerformanceLevel';
 import { AcademicAsignatureCourse } from './AcademicAsignatureCourse';
 
-@Index("index_full", ["evidenceLearningId", "academicAsignatureCourseId", "academicPeriod", "studentId", "campusId"])
+@Index("index_full", ["evidenceLearningId", "academicAsignatureCourseId", "academicPeriodId", "studentId", "campusId"])
 @ObjectType({ description: 'The AcademicAsignatureCoursePeriodEvidenceLearningValuation model', implements: IModelCampusData })
 @Entity()
 export class AcademicAsignatureCoursePeriodEvidenceLearningValuation extends IModelCampusData {
