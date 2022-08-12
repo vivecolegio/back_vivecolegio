@@ -3,6 +3,7 @@ import { DataSource } from 'typeorm';
 
 import { AcademicAreaCoursePeriodValuation } from '../graphql/models/CampusAdministrator/AcademicAreaCoursePeriodValuation';
 import { AcademicAsignatureCourse } from '../graphql/models/CampusAdministrator/AcademicAsignatureCourse';
+import { AcademicAsignatureCoursePeriodEvidenceLearningValuation } from '../graphql/models/CampusAdministrator/AcademicAsignatureCoursePeriodEvidenceLearningValuation';
 import { AcademicAsignatureCoursePeriodValuation } from '../graphql/models/CampusAdministrator/AcademicAsignatureCoursePeriodValuation';
 import { AcademicDay } from '../graphql/models/CampusAdministrator/AcademicDay';
 import { AcademicHour } from '../graphql/models/CampusAdministrator/AcademicHour';
@@ -146,7 +147,8 @@ export const dataSource = new DataSource({
     SchoolAdministrative,
     StudentAttendance,
     AcademicAreaCoursePeriodValuation,
-    SchoolConfiguration
+    SchoolConfiguration,
+    AcademicAsignatureCoursePeriodEvidenceLearningValuation
   ],
   synchronize: true,
   logger: 'advanced-console',
@@ -253,3 +255,4 @@ export const SchoolAdministrativeRepository = dataSource.getMongoRepository(Scho
 export const StudentAttendanceRepository = dataSource.getMongoRepository(StudentAttendance);
 export const AcademicAreaCoursePeriodValuationRepository = dataSource.getMongoRepository(AcademicAreaCoursePeriodValuation);
 export const SchoolConfigurationRepository = dataSource.getMongoRepository(SchoolConfiguration);
+export const AcademicAsignatureCoursePeriodEvidenceLearningValuationRepository = dataSource.getMongoRepository(AcademicAsignatureCoursePeriodEvidenceLearningValuation);
