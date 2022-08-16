@@ -22,6 +22,9 @@ export class NewPerformanceLevel implements Partial<PerformanceLevel> {
   @Field({ nullable: true })
   colorHex?: string;
 
+  @Field({ nullable: true })
+  isFinal?: boolean;
+
   @Field(() => PerformanceLevelType, { nullable: true })
   type?: PerformanceLevelType;
 
