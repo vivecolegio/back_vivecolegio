@@ -2738,6 +2738,7 @@ input NewPerformanceLevel {
   categoryGrade: PerformanceLevelCategoryGrade
   colorHex: String
   generalPerformanceLevelId: String
+  isFinal: Boolean
   minimumScore: Float
   name: String
   schoolId: String
@@ -2917,6 +2918,7 @@ type PerformanceLevel implements IModelSchoolData {
   generalPerformanceLevel: GeneralPerformanceLevel
   generalPerformanceLevelId: String
   id: ID!
+  isFinal: Boolean
   minimumScore: Float
   name: String
   school: School
