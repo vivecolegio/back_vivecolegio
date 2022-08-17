@@ -4026,6 +4026,21 @@ type Query {
     """Paginate last"""
     last: Float
   ): PerformanceLevelConnection!
+  getAllPerformanceLevelAcademicAsignatureCourseFinal(
+    academicAsignatureCourseId: String!
+
+    """Paginate after opaque cursor"""
+    after: String
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+  ): PerformanceLevelConnection!
   getAllPerformanceLevelAcademicCourse(
     """Paginate after opaque cursor"""
     after: String

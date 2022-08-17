@@ -860,6 +860,8 @@ export class ExperienceLearningResolver {
           let evaluations = [];
           let performanceLevelType: any = null;
           let performanceLevels = await this.performanceLevelResolver.getAllPerformanceLevelAcademicAsignatureCourse({}, academicAsignatureCourseId + "");
+          let performanceLevelsFinal = await this.performanceLevelResolver.getAllPerformanceLevelAcademicAsignatureCourseFinal({}, academicAsignatureCourseId + "");
+          let diferencesPerformanceLevels = (performanceLevels?.edges?.length - performanceLevelsFinal?.edges?.length);
           if (performanceLevels) {
             performanceLevelType = performanceLevels?.edges[0]?.node?.type;
           }
@@ -949,8 +951,13 @@ export class ExperienceLearningResolver {
                   switch (performanceLevelType) {
                     case PerformanceLevelType.QUALITATIVE:
                       if (evaluation?.performanceLevelId) {
-                        let performanceLevelIndex = performanceLevels?.edges?.findIndex((i: any) => i.node.id.toString() === evaluation?.performanceLevelId) + 1;
-                        average += performanceLevelIndex;
+                        let perfomance = performanceLevels?.edges?.find((i: any) => i.node.id.toString() === evaluation?.performanceLevelId);
+                        let performanceLevelIndex = performanceLevels?.edges?.findIndex((i: any) => i.node.id.toString() === evaluation?.performanceLevelId) - diferencesPerformanceLevels;
+                        if (perfomance?.node?.isFinal) {
+                          average += performanceLevelIndex;
+                        } else {
+                          average += 0;
+                        }
                         countExperienceLearningAssessment++;
                       }
                       break;
@@ -974,7 +981,7 @@ export class ExperienceLearningResolver {
                   switch (performanceLevelType) {
                     case PerformanceLevelType.QUALITATIVE:
                       if (evaluation?.performanceLevelId) {
-                        let performanceLevelIndex = performanceLevels?.edges?.findIndex((i: any) => i.node.id.toString() === evaluation?.performanceLevelId) + 1;
+                        let performanceLevelIndex = performanceLevels?.edges?.findIndex((i: any) => i.node.id.toString() === evaluation?.performanceLevelId);
                         average += performanceLevelIndex;
                         countExperienceLearningAssessment++;
                       }
@@ -992,14 +999,38 @@ export class ExperienceLearningResolver {
               //   break;
             }
           }
-          if (average != null && average > 0 && countExperienceLearningAssessment > 0) {
-            studentAverage.average = average / countExperienceLearningAssessment;
-            studentAverage.performanceLevelId = performanceLevels?.edges[Math.trunc(average) - 1]?.node?.id.toString();
-          } else {
-            studentAverage.average = 0;
-          }
-          if (Number.isNaN(studentAverage.average)) {
-            studentAverage.average = 0;
+          performanceLevels = await this.performanceLevelResolver.getAllPerformanceLevelAcademicAsignatureCourseFinal({}, academicAsignatureCourseId + "");
+          average = average / countExperienceLearningAssessment;
+          switch (performanceLevelType) {
+            case PerformanceLevelType.QUALITATIVE:
+              if (average != null && average > 0 && countExperienceLearningAssessment > 0) {
+                studentAverage.average = average;
+                studentAverage.performanceLevelId = performanceLevels?.edges[Math.trunc(average)]?.node?.id.toString();
+              } else {
+                studentAverage.average = 0;
+                studentAverage.performanceLevelId = performanceLevels?.edges[0]?.node?.id.toString();
+              }
+              break;
+            case PerformanceLevelType.QUANTITATIVE:
+              studentAverage.average = average;
+              if (Number.isNaN(average) || average < 0) {
+                studentAverage.average = 0;
+              } else {
+                let performanceLevelId;
+                let perf = performanceLevels?.edges?.find((c: any) => {
+                  return average < c.node.topScore && average >= c.node.minimumScore;
+                });
+                if (perf === undefined) {
+                  perf = performanceLevels?.edges?.find((c: any) => {
+                    return average <= c.node.topScore && average > c.node.minimumScore;
+                  });
+                }
+                if (perf && perf?.node?.id) {
+                  performanceLevelId = perf.node.id
+                }
+                studentAverage.performanceLevelId = performanceLevelId;
+              }
+              break;
           }
           if (studentAverage.id) {
             studentAverage = await this.repositoryExperienceLearningAverageValuation.save({
@@ -1132,7 +1163,7 @@ export class ExperienceLearningResolver {
     if (academicAsignatureCourse) {
       const course = await this.repositoryCourse.findOneBy(academicAsignatureCourse.courseId);
       if (course) {
-        const students = course.studentsId;
+        let students = course.studentsId;
         let promisesListAsignatures: any[] = [];
         let promisesListAreas: any[] = [];
         if (students) {
@@ -1242,7 +1273,7 @@ export class ExperienceLearningResolver {
           studentPeriodValuation.assessment = 0;
         }
         let performanceLevelType: any = null;
-        let performanceLevels = await this.performanceLevelResolver.getAllPerformanceLevelAcademicAsignatureCourse({}, academicAsignatureCourseId + "");
+        let performanceLevels = await this.performanceLevelResolver.getAllPerformanceLevelAcademicAsignatureCourseFinal({}, academicAsignatureCourseId + "");
         if (performanceLevels) {
           performanceLevelType = performanceLevels?.edges[0]?.node?.type;
         }
