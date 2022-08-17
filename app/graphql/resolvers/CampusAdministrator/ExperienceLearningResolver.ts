@@ -1095,16 +1095,17 @@ export class ExperienceLearningResolver {
     const school = await this.repositorySchool.findOneBy(schoolId);
     if (school) {
       const academicGrades = await this.repositoryAcademicGrade.findBy({ where: { schoolId: school?.id?.toString() } });
-      let promisesList: any[] = [];
       for (let academicGrade of academicGrades) {
+        let promisesList: any[] = [];
+        console.log("Generando =", academicGrade?.name + " " + academicGrade?.id?.toString())
         promisesList.push(
           this.updateAllStudentGradePeriodValuation(academicGrade?.id?.toString(), academicPeriodId)
         );
+        await Promise.all(promisesList).then(() => {
+          //return true;
+        });
       }
-      await Promise.all(promisesList).then(() => {
-        return true;
-      });
-      return false;
+      return true;
     }
   }
 
@@ -1116,16 +1117,17 @@ export class ExperienceLearningResolver {
     const academicGrade = await this.repositoryAcademicGrade.findOneBy(academicGradeId);
     if (academicGrade) {
       const courses = await this.repositoryCourse.findBy({ where: { academicGradeId: academicGrade?.id?.toString() } });
-      let promisesList: any[] = [];
       for (let course of courses) {
+        let promisesList: any[] = [];
+        console.log("Generando =", course?.name + " " + course?.academicGradeId)
         promisesList.push(
           this.updateAllStudentCoursePeriodValuation(course?.id?.toString(), academicPeriodId)
         );
+        await Promise.all(promisesList).then(() => {
+          //return true;
+        });
       }
-      await Promise.all(promisesList).then(() => {
-        return true;
-      });
-      return false;
+      return true;
     }
   }
 
@@ -1152,6 +1154,7 @@ export class ExperienceLearningResolver {
     }
   }
 
+  //este es el que se llama cuando se actualizauna nota
   @Mutation(() => Boolean)
   async updateAllStudentAcademicAsignatureCoursePeriodValuation(
     @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: string,

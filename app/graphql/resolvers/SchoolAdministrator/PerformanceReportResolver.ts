@@ -319,9 +319,7 @@ export class PerformanceReportResolver {
     const data = require('../../../reports/performanceReport/data.json');
     try {
       const browser = await puppeteer.launch({
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        ignoreHTTPSErrors: true,
-        dumpio: false
+        args: ['--no-sandbox']
       });
       const page = await browser.newPage();
       //console.log(data)
