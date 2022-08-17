@@ -1,7 +1,8 @@
+import PDFMerger from 'pdf-merger-js/browser';
 import { Arg, Ctx, Mutation, Resolver } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { AcademicAreaCoursePeriodValuationRepository, AcademicAreaRepository, AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicAsignatureRepository, AcademicDayRepository, AcademicGradeRepository, AcademicPeriodRepository, CampusRepository, CourseRepository, PerformanceLevelRepository, SchoolRepository, StudentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
 
+import { AcademicAreaCoursePeriodValuationRepository, AcademicAreaRepository, AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicAsignatureRepository, AcademicDayRepository, AcademicGradeRepository, AcademicPeriodRepository, CampusRepository, CourseRepository, PerformanceLevelRepository, SchoolRepository, StudentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
 import { IContext } from '../../interfaces/IContext';
 import { AcademicAreaCoursePeriodValuation } from '../../models/CampusAdministrator/AcademicAreaCoursePeriodValuation';
 import { AcademicAsignatureCourse } from '../../models/CampusAdministrator/AcademicAsignatureCourse';
@@ -19,6 +20,7 @@ import { AcademicGrade } from '../../models/SchoolAdministrator/AcademicGrade';
 import { AcademicPeriod } from '../../models/SchoolAdministrator/AcademicPeriod';
 import { PerformanceLevel } from '../../models/SchoolAdministrator/PerformanceLevel';
 import { SchoolConfiguration } from '../../models/SchoolAdministrator/SchoolConfiguration';
+
 @Resolver(SchoolConfiguration)
 export class PerformanceReportResolver {
 
@@ -100,6 +102,7 @@ export class PerformanceReportResolver {
     @Ctx() context: IContext
   ): Promise<Boolean | null> {
     // id = "6298c6ede686a07d17a79e2c";
+    const merger = new PDFMerger();
     let data = {};
     let course = await this.repositoryCourse.findOneBy(id);
     if (course) {
@@ -170,8 +173,11 @@ export class PerformanceReportResolver {
         data = { ...data, "puestoEstudiante": "-" };
         data = { ...data, "promCourse": "-" };
         //console.log("aca vamos bien", academicAsignaturesCourse);
+        let urls: any[] = [];
         if (studentsId) {
-          for (let studentId of [studentsId[0]]) {
+          let promisesGeneratePDF: any[] = [];
+          // for (let studentId of [studentsId[0]]) {
+          for (let studentId of studentsId) {
             let dataPDF = { ...data };
             let student = await this.repositoryStudent.findOneBy(studentId + "");
             let studentUser = await this.repositoryUser.findOneBy(student?.userId);
@@ -204,8 +210,31 @@ export class PerformanceReportResolver {
               }
             }
             dataPDF = { ...dataPDF, "notesAsignatures": notesAsignatures };
-            await this.generatePerformanceReportStudent(dataPDF, studentId);
+            promisesGeneratePDF.push(
+              this.generatePerformanceReportStudent(dataPDF, studentId).then((dataUrl) => {
+                urls.push(dataUrl);
+              })
+            );
           }
+          await Promise.all(promisesGeneratePDF).then(() => {
+            const merge = require('easy-pdf-merge');
+            const opts = {
+              maxBuffer: 1024 * 5096, // 500kb
+              maxHeap: '2g' // for setting JVM heap limits to 2GB
+            };
+            console.log(urls);
+            var dir = './public/downloads/reports/courses/' + id;
+            const fs = require("fs-extra");
+            if (!fs.existsSync(dir)) {
+              fs.mkdirSync(dir, { recursive: true });
+            }
+            merge(urls, dir + '/' + id + '.pdf', opts, function (err: any) {
+              if (err) {
+                return console.log(err)
+              }
+              console.log('Successfully merged!')
+            });
+          });
         }
       }
     }
@@ -248,8 +277,12 @@ export class PerformanceReportResolver {
       const content = await this.compile('index', data);
       //console.log(content)
       await page.setContent(content);
+      var dir = './public/downloads/reports/students/' + id;
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
       await page.pdf({
-        path: id + '.pdf',
+        path: dir + '/' + id + '.pdf',
         format: 'Letter',
         printBackground: true,
         preferCSSPageSize: true,
@@ -261,12 +294,14 @@ export class PerformanceReportResolver {
         },
         //displayHeaderFooter: true,
         //footerTemplate: '<style>@font-face{font-family:Mina;src:url(/mina/Mina-Regular.woff2) format("woff2"),url(/mina/Mina-Regular.woff) format("woff"),url(/mina/Mina-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:Mina;src:url(/mina/Mina-Bold.woff2) format("woff2"),url(/mina/Mina-Bold.woff) format("woff"),url(/mina/Mina-Bold.ttf) format("truetype");font-weight:700;font-style:normal}h1,h2,h3,h4,h5,h6,p,span{font-family:Mina,sans-serif}</style><div style="font-size:10px!important;color:grey!important;padding-left:400px;" class="pdfheader"><span>Pagina: </span><span class="pageNumber"></span>/<span class="totalPages"></span></div>',
-      })
+      });
       //console.log("done creating pdf");
       await browser.close();
+      return dir + '/' + id + '.pdf';
       //process.exit();
     } catch (e) {
       console.log(e);
+      return "";
     }
   }
 
@@ -329,4 +364,5 @@ export class PerformanceReportResolver {
     }
     return 0;
   }
+
 }
