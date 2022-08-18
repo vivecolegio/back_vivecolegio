@@ -93,12 +93,13 @@ export class PerformanceReportResolver {
   }
 
 
-  @Mutation(() => Boolean)
-  async generatePerformanceLevelReportCourse(
+  @Mutation(() => String)
+  async generatePerformanceReportCourse(
     @Arg('id', () => String) id: string,
     @Arg('schoolId', () => String) schoolId: string,
     @Arg('schoolYearId', () => String) schoolYearId: string,
     @Arg('academicPeriodId', () => String) academicPeriodId: string,
+    @Arg('studentId', () => String, { nullable: true }) studentId: String,
     @Ctx() context: IContext
   ): Promise<Boolean | null> {
     // id = "6298c6ede686a07d17a79e2c";
@@ -136,8 +137,10 @@ export class PerformanceReportResolver {
         for (let asignatureCourse of academicAsignaturesCourse) {
           let academicAsignature = await this.repositoryAcademicAsignature.findOneBy(asignatureCourse?.academicAsignatureId);
           let academicArea = await this.repositoryAcademicArea.findOneBy(academicAsignature?.academicAreaId);
-          asignaturesAux.push(academicAsignature);
-          areasAux.push(academicArea);
+          if (academicArea !== null) {
+            asignaturesAux.push(academicAsignature);
+            areasAux.push(academicArea);
+          }
         }
         const ids = areasAux.map(o => o.id?.toString())
         const count: any = {};
@@ -155,6 +158,9 @@ export class PerformanceReportResolver {
         })
         data = { ...data, "academicPeriods": academicPeriodsData };
         let studentsId = course?.studentsId;
+        if (studentId !== null && studentId.length > 0) {
+          studentsId = [studentId]
+        }
         areasAux = filtered.sort(this.compareOrderAcademicArea)
         let areas: any[] = [];
         areasAux.map((area) => {
@@ -234,6 +240,7 @@ export class PerformanceReportResolver {
               }
               console.log('Successfully merged!')
             });
+            return dir + '/' + id + '.pdf';
           });
         }
       }
