@@ -271,7 +271,9 @@ export class PerformanceReportResolver {
         }
         return opts.inverse(this);
       });
-      const browser = await puppeteer.launch();
+      const browser = await puppeteer.launch({
+        args: ['--no-sandbox']
+      });
       const page = await browser.newPage();
       //console.log(data)
       const content = await this.compile('index', data);
