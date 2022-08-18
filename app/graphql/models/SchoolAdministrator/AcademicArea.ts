@@ -37,6 +37,10 @@ export class AcademicArea extends IModelSchoolData {
   @Field({ nullable: true })
   @Column({ nullable: true })
   order?: number;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  isAverage?: boolean;
 }
 
 @ObjectType()

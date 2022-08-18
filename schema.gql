@@ -15,6 +15,7 @@ type AcademicArea implements IModelSchoolData {
   generalAcademicArea: GeneralAcademicArea
   generalAcademicAreaId: String
   id: ID!
+  isAverage: Boolean
   name: String
   order: Float
   school: School
@@ -2047,6 +2048,7 @@ type Mutation {
   createAllInitialsStudents: Boolean!
   createAllInitialsTeachers: Boolean!
   createAuditLogin(data: NewAuditLogin!): AuditLogin!
+  createAveragePeriodValuationStudent(academicPeriodId: String!, courseId: String!, studentId: String!): Boolean!
   createCampus(data: NewCampus!): Campus!
   createCampusAdministrator(data: NewCampusAdministrator!): CampusAdministrator!
   createCampusCoordinator(data: NewCampusCoordinator!): CampusCoordinator!
@@ -2271,6 +2273,7 @@ input NewAcademicArea {
   abbreviation: String
   academicGradeId: [String!]
   generalAcademicAreaId: String
+  isAverage: Boolean
   name: String
   order: Float
   schoolId: String

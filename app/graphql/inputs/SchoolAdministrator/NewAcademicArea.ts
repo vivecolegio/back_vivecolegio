@@ -21,4 +21,7 @@ export class NewAcademicArea implements Partial<AcademicArea> {
 
   @Field({ nullable: true })
   order?: number;
+
+  @Field({ nullable: true })
+  isAverage?: boolean;
 }
