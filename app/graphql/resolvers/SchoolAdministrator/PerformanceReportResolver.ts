@@ -101,7 +101,7 @@ export class PerformanceReportResolver {
     @Arg('academicPeriodId', () => String) academicPeriodId: string,
     @Arg('studentId', () => String, { nullable: true }) studentId: String,
     @Ctx() context: IContext
-  ): Promise<Boolean | null> {
+  ): Promise<String | undefined> {
     // id = "6298c6ede686a07d17a79e2c";
     const merger = new PDFMerger();
     let data = {};
@@ -158,7 +158,7 @@ export class PerformanceReportResolver {
         })
         data = { ...data, "academicPeriods": academicPeriodsData };
         let studentsId = course?.studentsId;
-        if (studentId !== null && studentId.length > 0) {
+        if (studentId !== null && studentId?.length > 0) {
           studentsId = [studentId]
         }
         areasAux = filtered.sort(this.compareOrderAcademicArea)
@@ -222,30 +222,34 @@ export class PerformanceReportResolver {
               })
             );
           }
-          await Promise.all(promisesGeneratePDF).then(() => {
-            const merge = require('easy-pdf-merge');
-            const opts = {
-              maxBuffer: 1024 * 5096, // 500kb
-              maxHeap: '2g' // for setting JVM heap limits to 2GB
-            };
-            console.log(urls);
-            var dir = './public/downloads/reports/courses/' + id;
-            const fs = require("fs-extra");
-            if (!fs.existsSync(dir)) {
-              fs.mkdirSync(dir, { recursive: true });
-            }
-            merge(urls, dir + '/' + id + '.pdf', opts, function (err: any) {
-              if (err) {
-                return console.log(err)
+          let urlsReturn = await Promise.all(promisesGeneratePDF).then(() => {
+            if (urls?.length > 1) {
+              const merge = require('easy-pdf-merge');
+              const opts = {
+                maxBuffer: 1024 * 5096, // 500kb
+                maxHeap: '2g' // for setting JVM heap limits to 2GB
+              };
+              //console.log(urls);
+              var dir = './public/downloads/reports/courses/' + id;
+              const fs = require("fs-extra");
+              if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
               }
-              console.log('Successfully merged!')
-            });
-            return dir + '/' + id + '.pdf';
+              merge(urls, dir + '/' + id + '.pdf', opts, function (err: any) {
+                if (err) {
+                  return console.log(err)
+                }
+                console.log('Successfully merged!')
+              });
+              return dir + '/' + id + '.pdf';
+            } else {
+              return urls[0];
+            }
           });
+          return urlsReturn + "";
         }
       }
     }
-    return true;
   }
 
   async generatePerformanceReportStudent(data: any, id: any) {
@@ -356,7 +360,7 @@ export class PerformanceReportResolver {
   }
 
   async compile(templateName: any, data: any) {
-    console.log(data)
+    //console.log(data)
     const path = require("path");
     const fs = require("fs-extra");
     const hbs = require("handlebars");
