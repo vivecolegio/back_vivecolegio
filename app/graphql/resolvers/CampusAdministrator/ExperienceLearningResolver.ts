@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicAreaCoursePeriodValuationRepository, AcademicAreaRepository, AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicAsignatureRepository, AcademicGradeRepository, AcademicPeriodRepository, CampusRepository, CourseRepository, EvaluativeComponentRepository, EvidenceLearningRepository, ExperienceLearningAverageValuationRepository, ExperienceLearningCoEvaluationRepository, ExperienceLearningCoEvaluationValuationRepository, ExperienceLearningRepository, ExperienceLearningRubricCriteriaRepository, ExperienceLearningRubricCriteriaValuationRepository, ExperienceLearningRubricValuationRepository, ExperienceLearningSelfAssessmentValuationRepository, ExperienceLearningTraditionalValuationRepository, LearningRepository, PerformanceLevelRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAreaCoursePeriodValuationRepository, AcademicAreaRepository, AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicAsignatureRepository, AcademicGradeRepository, AcademicPeriodRepository, AverageAcademicPeriodCourseRepository, AverageAcademicPeriodStudentRepository, CampusRepository, CourseRepository, EvaluativeComponentRepository, EvidenceLearningRepository, ExperienceLearningAverageValuationRepository, ExperienceLearningCoEvaluationRepository, ExperienceLearningCoEvaluationValuationRepository, ExperienceLearningRepository, ExperienceLearningRubricCriteriaRepository, ExperienceLearningRubricCriteriaValuationRepository, ExperienceLearningRubricValuationRepository, ExperienceLearningSelfAssessmentValuationRepository, ExperienceLearningTraditionalValuationRepository, LearningRepository, PerformanceLevelRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { ExperienceType } from '../../enums/ExperienceType';
 import { PerformanceLevelType } from '../../enums/PerformanceLevelType';
@@ -12,6 +12,8 @@ import { IContext } from '../../interfaces/IContext';
 import { AcademicAreaCoursePeriodValuation } from '../../models/CampusAdministrator/AcademicAreaCoursePeriodValuation';
 import { AcademicAsignatureCourse } from '../../models/CampusAdministrator/AcademicAsignatureCourse';
 import { AcademicAsignatureCoursePeriodValuation } from '../../models/CampusAdministrator/AcademicAsignatureCoursePeriodValuation';
+import { AverageAcademicPeriodCourse } from '../../models/CampusAdministrator/AverageAcademicPeriodCourse';
+import { AverageAcademicPeriodStudent } from '../../models/CampusAdministrator/AverageAcademicPeriodStudent';
 import { Course } from '../../models/CampusAdministrator/Course';
 import { ExperienceLearning, ExperienceLearningConnection } from '../../models/CampusAdministrator/ExperienceLearning';
 import { ExperienceLearningAverageValuation } from '../../models/CampusAdministrator/ExperienceLearningAverageValuation';
@@ -111,6 +113,11 @@ export class ExperienceLearningResolver {
   @InjectRepository(AcademicArea)
   private repositoryAcademicArea = AcademicAreaRepository;
 
+  @InjectRepository(AverageAcademicPeriodStudent)
+  private repositoryAverageAcademicPeriodStudent = AverageAcademicPeriodStudentRepository;
+
+  @InjectRepository(AverageAcademicPeriodCourse)
+  private repositoryAverageAcademicPeriodCourse = AverageAcademicPeriodCourseRepository;
 
   private performanceLevelResolver = new PerformanceLevelResolver();
 
@@ -1172,6 +1179,11 @@ export class ExperienceLearningResolver {
             );
           }
           return await Promise.all(promisesListAsignatures).then(async () => {
+            if (students) {
+              for (const student of students) {
+                await this.createAveragePeriodValuationStudent(course?.id?.toString(), academicPeriodId, student + "")
+              }
+            }
             return true;
           });
         }
@@ -1535,78 +1547,200 @@ export class ExperienceLearningResolver {
           average += averageArea * hourlyIntensityArea;
           break;
       }
-      console.log("Area: ", area?.name);
-      console.log("IH:", hourlyIntensityArea);
-      console.log("AverageArea:", averageArea);
-
+      //console.log("Area: ", area?.name);
+      //console.log("IH:", hourlyIntensityArea);
+      //console.log("AverageArea:", averageArea);
     }
-    console.log("AverageTotal:", average / hourlyIntensityTotal)
-    console.log("IHT:", hourlyIntensityTotal);
+    //console.log("AverageTotal:", average / hourlyIntensityTotal)
+    //console.log("IHT:", hourlyIntensityTotal);
+    average = average / hourlyIntensityTotal;
     let perf = null;
     let performanceLevelId = undefined;
-    let studentAreaPeriodValuation: AcademicAreaCoursePeriodValuation;
-    // let studentAreaPeriodValuationList = await this.repositoryAcademicAreaCoursePeriodValuation.findBy({
-    //   where:
-    //   {
-    //     academicAreaId: area?.id?.toString(),
-    //     academicPeriodId,
-    //     studentId,
-    //   }
-    // });
-    // if (studentAreaPeriodValuationList.length > 1) {
-    //   for (let studentAreaPeriodValuation of studentAreaPeriodValuationList) {
-    //     let data = await this.repositoryAcademicAreaCoursePeriodValuation.findOneBy(studentAreaPeriodValuation?.id?.toString());
-    //     let result = await this.repositoryAcademicAreaCoursePeriodValuation.deleteOne({ _id: new ObjectId(studentAreaPeriodValuation?.id?.toString()) });
-    //   }
-    //   studentAreaPeriodValuationList = [];
-    // }
-    // if (studentAreaPeriodValuationList.length > 0) {
-    //   studentAreaPeriodValuation = studentAreaPeriodValuationList[0];
-    // } else {
-    //   studentAreaPeriodValuation = new AcademicAreaCoursePeriodValuation();
-    //   studentAreaPeriodValuation.version = 0;
-    //   studentAreaPeriodValuation.active = true;
-    //   studentAreaPeriodValuation.studentId = studentId;
-    //   studentAreaPeriodValuation.academicPeriodId = academicPeriodId;
-    //   studentAreaPeriodValuation.academicAreaId = academicArea?.id?.toString();
-    //   studentAreaPeriodValuation.assessment = 0;
-    // }
-
-
-    // switch (performanceLevelType) {
-    //   case PerformanceLevelType.QUALITATIVE:
-    //     studentAreaPeriodValuation.performanceLevelId = performanceLevels?.edges[Math.trunc(average) - 1]?.node?.id.toString();
-    //     break;
-    //   case PerformanceLevelType.QUANTITATIVE:
-    //     studentAreaPeriodValuation.assessment = average;
-    //     perf = performanceLevels?.edges?.find((c: any) => {
-    //       return average < c.node.topScore && average >= c.node.minimumScore;
-    //     });
-    //     if (perf === undefined) {
-    //       perf = performanceLevels?.edges?.find((c: any) => {
-    //         return average <= c.node.topScore && average > c.node.minimumScore;
-    //       });
-    //     }
-    //     if (perf && perf?.node?.id) {
-    //       performanceLevelId = perf.node.id
-    //     }
-    //     studentAreaPeriodValuation.performanceLevelId = performanceLevelId;
-    //     break;
-    // }
-    // if (studentAreaPeriodValuation.id) {
-    //   studentAreaPeriodValuation =
-    //     await this.repositoryAcademicAreaCoursePeriodValuation.save({
-    //       _id: new ObjectId(studentAreaPeriodValuation.id.toString()),
-    //       ...studentAreaPeriodValuation,
-    //       version: (studentAreaPeriodValuation?.version as number) + 1,
-    //     });
-    // } else {
-    //   studentAreaPeriodValuation =
-    //     await this.repositoryAcademicAreaCoursePeriodValuation.save({
-    //       ...studentAreaPeriodValuation,
-    //     });
-    // }
+    let averageAcademicPeriodStudent: AverageAcademicPeriodStudent;
+    let averageAcademicPeriodStudentList = await this.repositoryAverageAcademicPeriodStudent.findBy({
+      where:
+      {
+        courseId,
+        academicPeriodId,
+        studentId,
+      }
+    });
+    if (averageAcademicPeriodStudentList.length > 1) {
+      for (let averageAcademicPeriodStudents of averageAcademicPeriodStudentList) {
+        let data = await this.repositoryAverageAcademicPeriodStudent.findOneBy(averageAcademicPeriodStudents?.id?.toString());
+        let result = await this.repositoryAverageAcademicPeriodStudent.deleteOne({ _id: new ObjectId(averageAcademicPeriodStudents?.id?.toString()) });
+      }
+      averageAcademicPeriodStudentList = [];
+    }
+    if (averageAcademicPeriodStudentList.length > 0) {
+      averageAcademicPeriodStudent = averageAcademicPeriodStudentList[0];
+    } else {
+      averageAcademicPeriodStudent = new AverageAcademicPeriodStudent();
+      averageAcademicPeriodStudent.version = 0;
+      averageAcademicPeriodStudent.active = true;
+      averageAcademicPeriodStudent.studentId = studentId;
+      averageAcademicPeriodStudent.academicPeriodId = academicPeriodId;
+      averageAcademicPeriodStudent.courseId = courseId;
+      averageAcademicPeriodStudent.assessment = 0;
+    }
+    if (Number.isNaN(average) || average < 0) {
+      averageAcademicPeriodStudent.assessment = 0;
+    }
+    switch (performanceLevelType) {
+      case PerformanceLevelType.QUALITATIVE:
+        averageAcademicPeriodStudent.performanceLevelId = performanceLevels?.edges[Math.trunc(average) - 1]?.node?.id.toString();
+        averageAcademicPeriodStudent.assessment = average;
+        break;
+      case PerformanceLevelType.QUANTITATIVE:
+        averageAcademicPeriodStudent.assessment = average;
+        perf = performanceLevels?.edges?.find((c: any) => {
+          return average < c.node.topScore && average >= c.node.minimumScore;
+        });
+        if (perf === undefined) {
+          perf = performanceLevels?.edges?.find((c: any) => {
+            return average <= c.node.topScore && average > c.node.minimumScore;
+          });
+        }
+        if (perf && perf?.node?.id) {
+          performanceLevelId = perf.node.id
+        }
+        averageAcademicPeriodStudent.performanceLevelId = performanceLevelId;
+        break;
+    }
+    //console.log(averageAcademicPeriodStudent);
+    if (averageAcademicPeriodStudent.id) {
+      averageAcademicPeriodStudent =
+        await this.repositoryAverageAcademicPeriodStudent.save({
+          _id: new ObjectId(averageAcademicPeriodStudent.id.toString()),
+          ...averageAcademicPeriodStudent,
+          version: (averageAcademicPeriodStudent?.version as number) + 1,
+        });
+    } else {
+      averageAcademicPeriodStudent =
+        await this.repositoryAverageAcademicPeriodStudent.save({
+          ...averageAcademicPeriodStudent,
+        });
+    }
+    await this.createAveragePeriodValuationCourse(courseId, academicPeriodId);
     return true;
+  }
+
+  @Mutation(() => Boolean)
+  async createAveragePeriodValuationCourse(
+    @Arg('courseId', () => String) courseId: string,
+    @Arg('academicPeriodId', () => String) academicPeriodId: string
+  ) {
+    const course = await this.repositoryCourse.findOneBy(courseId);
+    if (course) {
+      let averageAcademicPeriodStudentList = await this.repositoryAverageAcademicPeriodStudent.findBy({
+        where:
+        {
+          courseId,
+          academicPeriodId,
+        },
+        order: { order: 1 },
+      });
+      let average = 0;
+      let performanceLevelType: any = null;
+      let academicAsignaturesCourses = await this.repositoryAcademicAsignatureCourse.findBy({ where: { courseId: courseId } });
+      let performanceLevels = await this.performanceLevelResolver.getAllPerformanceLevelAcademicAsignatureCourseFinal({}, academicAsignaturesCourses[0]?.id?.toString() + "");
+      if (performanceLevels) {
+        performanceLevelType = performanceLevels?.edges[0]?.node?.type;
+      }
+      let auxCount = 1;
+      for (let averageAcademicPeriodStudents of averageAcademicPeriodStudentList) {
+        await this.repositoryAverageAcademicPeriodStudent.save({
+          _id: new ObjectId(averageAcademicPeriodStudents.id.toString()),
+          ...averageAcademicPeriodStudents,
+          score: auxCount,
+          version: (averageAcademicPeriodStudents?.version as number) + 1,
+        });
+        auxCount++;
+        let averageStudent = 0;
+        switch (performanceLevelType) {
+          case PerformanceLevelType.QUALITATIVE:
+            let performanceLevelIndex = performanceLevels?.edges?.findIndex((i: any) => i.node.id.toString() === averageAcademicPeriodStudents?.performanceLevelId) + 1;
+            averageStudent = performanceLevelIndex;
+            average += averageStudent;
+            break;
+          case PerformanceLevelType.QUANTITATIVE:
+            averageStudent = averageAcademicPeriodStudents?.assessment
+              ? averageAcademicPeriodStudents?.assessment
+              : 0;
+            average += averageStudent;
+            break;
+        }
+      }
+      if (course?.studentsId && course?.studentsId?.length > 0) {
+        average = average / course?.studentsId?.length;
+      }
+      let perf = null;
+      let performanceLevelId = undefined;
+      let averageAcademicPeriodCourse: AverageAcademicPeriodCourse;
+      let averageAcademicPeriodCourseList = await this.repositoryAverageAcademicPeriodCourse.findBy({
+        where:
+        {
+          courseId,
+          academicPeriodId,
+        }
+      });
+      if (averageAcademicPeriodCourseList.length > 1) {
+        for (let averageAcademicPeriodcourses of averageAcademicPeriodCourseList) {
+          let data = await this.repositoryAverageAcademicPeriodCourse.findOneBy(averageAcademicPeriodcourses?.id?.toString());
+          let result = await this.repositoryAverageAcademicPeriodCourse.deleteOne({ _id: new ObjectId(averageAcademicPeriodcourses?.id?.toString()) });
+        }
+        averageAcademicPeriodCourseList = [];
+      }
+      if (averageAcademicPeriodCourseList.length > 0) {
+        averageAcademicPeriodCourse = averageAcademicPeriodCourseList[0];
+      } else {
+        averageAcademicPeriodCourse = new AverageAcademicPeriodCourse();
+        averageAcademicPeriodCourse.version = 0;
+        averageAcademicPeriodCourse.active = true;
+        averageAcademicPeriodCourse.academicPeriodId = academicPeriodId;
+        averageAcademicPeriodCourse.courseId = courseId;
+        averageAcademicPeriodCourse.assessment = 0;
+      }
+      if (Number.isNaN(average) || average < 0) {
+        averageAcademicPeriodCourse.assessment = 0;
+      }
+      switch (performanceLevelType) {
+        case PerformanceLevelType.QUALITATIVE:
+          averageAcademicPeriodCourse.performanceLevelId = performanceLevels?.edges[Math.trunc(average) - 1]?.node?.id.toString();
+          averageAcademicPeriodCourse.assessment = average;
+          break;
+        case PerformanceLevelType.QUANTITATIVE:
+          averageAcademicPeriodCourse.assessment = average;
+          perf = performanceLevels?.edges?.find((c: any) => {
+            return average < c.node.topScore && average >= c.node.minimumScore;
+          });
+          if (perf === undefined) {
+            perf = performanceLevels?.edges?.find((c: any) => {
+              return average <= c.node.topScore && average > c.node.minimumScore;
+            });
+          }
+          if (perf && perf?.node?.id) {
+            performanceLevelId = perf.node.id
+          }
+          averageAcademicPeriodCourse.performanceLevelId = performanceLevelId;
+          break;
+      }
+      //console.log(averageAcademicPeriodCourse);
+      if (averageAcademicPeriodCourse.id) {
+        averageAcademicPeriodCourse =
+          await this.repositoryAverageAcademicPeriodCourse.save({
+            _id: new ObjectId(averageAcademicPeriodCourse.id.toString()),
+            ...averageAcademicPeriodCourse,
+            version: (averageAcademicPeriodCourse?.version as number) + 1,
+          });
+      } else {
+        averageAcademicPeriodCourse =
+          await this.repositoryAverageAcademicPeriodCourse.save({
+            ...averageAcademicPeriodCourse,
+          });
+      }
+      return true;
+    }
   }
 
   @Mutation(() => Boolean)

@@ -2,12 +2,14 @@ import PDFMerger from 'pdf-merger-js/browser';
 import { Arg, Ctx, Mutation, Resolver } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicAreaCoursePeriodValuationRepository, AcademicAreaRepository, AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicAsignatureRepository, AcademicDayRepository, AcademicGradeRepository, AcademicPeriodRepository, CampusRepository, CourseRepository, PerformanceLevelRepository, SchoolRepository, StudentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAreaCoursePeriodValuationRepository, AcademicAreaRepository, AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicAsignatureRepository, AcademicDayRepository, AcademicGradeRepository, AcademicPeriodRepository, AverageAcademicPeriodCourseRepository, AverageAcademicPeriodStudentRepository, CampusRepository, CourseRepository, PerformanceLevelRepository, SchoolRepository, StudentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
 import { IContext } from '../../interfaces/IContext';
 import { AcademicAreaCoursePeriodValuation } from '../../models/CampusAdministrator/AcademicAreaCoursePeriodValuation';
 import { AcademicAsignatureCourse } from '../../models/CampusAdministrator/AcademicAsignatureCourse';
 import { AcademicAsignatureCoursePeriodValuation } from '../../models/CampusAdministrator/AcademicAsignatureCoursePeriodValuation';
 import { AcademicDay } from '../../models/CampusAdministrator/AcademicDay';
+import { AverageAcademicPeriodCourse } from '../../models/CampusAdministrator/AverageAcademicPeriodCourse';
+import { AverageAcademicPeriodStudent } from '../../models/CampusAdministrator/AverageAcademicPeriodStudent';
 import { Course } from '../../models/CampusAdministrator/Course';
 import { Teacher } from '../../models/CampusAdministrator/Teacher';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
@@ -69,6 +71,12 @@ export class PerformanceReportResolver {
   @InjectRepository(PerformanceLevel)
   private repositoryPerformanceLevel = PerformanceLevelRepository;
 
+  @InjectRepository(AverageAcademicPeriodStudent)
+  private repositoryAverageAcademicPeriodStudent = AverageAcademicPeriodStudentRepository;
+
+  @InjectRepository(AverageAcademicPeriodCourse)
+  private repositoryAverageAcademicPeriodCourse = AverageAcademicPeriodCourseRepository;
+
   @Mutation(() => Boolean)
   async generatePerformanceLevelExample(
     @Arg('id', () => String) id: string,
@@ -100,6 +108,7 @@ export class PerformanceReportResolver {
     @Arg('schoolYearId', () => String) schoolYearId: string,
     @Arg('academicPeriodId', () => String) academicPeriodId: string,
     @Arg('studentId', () => String, { nullable: true }) studentId: String,
+    @Arg('format', () => String) format: String,
     @Ctx() context: IContext
   ): Promise<String | undefined> {
     // id = "6298c6ede686a07d17a79e2c";
@@ -125,6 +134,10 @@ export class PerformanceReportResolver {
       let academicAsignaturesCourse = await this.repositoryAcademicAsignatureCourse.findBy({ where: { courseId: course?.id?.toString() } });
       if (academicAsignaturesCourse?.length > 0) {
         data = { ...data, "schoolName": school?.name };
+        data = { ...data, "schoolResolution": school?.textResolution };
+        data = { ...data, "schoolAddress": school?.textAddress };
+        data = { ...data, "schoolDaneNit": school?.textDaneNit };
+        data = { ...data, "schoolLogo": school?.logo };
         data = { ...data, "studentAcademicGradeName": academicGrade?.name };
         data = { ...data, "studentAcademicCourseName": course?.name };
         data = { ...data, "campusName": campus?.name };
@@ -156,6 +169,8 @@ export class PerformanceReportResolver {
           let academicPeriodData = { "name": academicPeriod?.name, "id": academicPeriod?.id?.toString(), "order": academicPeriod?.order }
           academicPeriodsData.push(academicPeriodData);
         })
+        let academicPeriodData = { "name": "FINAL", "id": "FINAL", "order": 99 }
+        academicPeriodsData.push(academicPeriodData);
         data = { ...data, "academicPeriods": academicPeriodsData };
         let studentsId = course?.studentsId;
         if (studentId !== null && studentId?.length > 0) {
@@ -175,9 +190,24 @@ export class PerformanceReportResolver {
           areas.push(areaData);
         })
         data = { ...data, "areas": areas };
-        data = { ...data, "promStudent": "-" };
-        data = { ...data, "puestoEstudiante": "-" };
-        data = { ...data, "promCourse": "-" };
+        let averageAcademicPeriodStudentList = await this.repositoryAverageAcademicPeriodStudent.findBy({
+          where:
+          {
+            courseId: id,
+            academicPeriodId,
+            studentId,
+          }
+        });
+        let averageAcademicPeriodCourseList = await this.repositoryAverageAcademicPeriodCourse.findBy({
+          where:
+          {
+            courseId: id,
+            academicPeriodId,
+          }
+        });
+        data = { ...data, "promStudent": averageAcademicPeriodStudentList[0]?.assessment?.toFixed(2) };
+        data = { ...data, "puestoEstudiante": averageAcademicPeriodStudentList[0]?.score };
+        data = { ...data, "promCourse": averageAcademicPeriodCourseList[0]?.assessment?.toFixed(2) };
         //console.log("aca vamos bien", academicAsignaturesCourse);
         let urls: any[] = [];
         if (studentsId) {
@@ -214,10 +244,36 @@ export class PerformanceReportResolver {
                   }
                 }
               }
+              notesAsignatures.push({ assessment: "-", academicPeriodId: "FINAL", performanceLevel: "-", "asignatureId": academicAsignature?.id?.toString(), "areaId": academicArea?.id?.toString(), "teacher": teacherUserAsignatureCourse?.name + " " + teacherUserAsignatureCourse?.lastName })
             }
+            let notesAreas = [];
+            for (let area of areas) {
+              for (let period of academicPeriods) {
+                if (period?.order && academicPeriod?.order) {
+                  if (period?.order <= academicPeriod?.order) {
+                    let notesArea = await this.repositoryAcademicAreaCoursePeriodValuation.findBy({
+                      academicAreaId: area?.id?.toString(),
+                      academicPeriodId: period?.id?.toString(),
+                      studentId
+                    });
+                    if (notesArea?.length == 1) {
+                      let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(notesArea[0]?.performanceLevelId);
+                      notesAreas.push({ assessment: notesArea[0]?.assessment?.toFixed(2), academicPeriodId: notesArea[0]?.academicPeriodId, performanceLevel: performanceLevel?.name, "areaId": area?.id?.toString() })
+                    } else {
+                      notesAreas.push({ assessment: "-", academicPeriodId: period?.id?.toString(), performanceLevel: "-", "areaId": area?.id?.toString() })
+                    }
+                  } else {
+                    notesAreas.push({ assessment: "-", academicPeriodId: period?.id?.toString(), performanceLevel: "-", "areaId": area?.id?.toString() })
+                  }
+                }
+              }
+              notesAreas.push({ assessment: "-", academicPeriodId: "FINAL", performanceLevel: "-", "areaId": area?.id?.toString() })
+            }
+            //console.log(notesAreas)
             dataPDF = { ...dataPDF, "notesAsignatures": notesAsignatures };
+            dataPDF = { ...dataPDF, "notesAreas": notesAreas };
             promisesGeneratePDF.push(
-              this.generatePerformanceReportStudent(dataPDF, studentId).then((dataUrl) => {
+              this.generatePerformanceReportStudent(dataPDF, studentId, format).then((dataUrl) => {
                 urls.push(dataUrl);
               })
             );
@@ -252,7 +308,7 @@ export class PerformanceReportResolver {
     }
   }
 
-  async generatePerformanceReportStudent(data: any, id: any) {
+  async generatePerformanceReportStudent(data: any, id: any, format: any) {
     const puppeteer = require("puppeteer");
     const fs = require("fs-extra");
     const hbs = require("handlebars");
@@ -296,7 +352,7 @@ export class PerformanceReportResolver {
       }
       await page.pdf({
         path: dir + '/' + id + '.pdf',
-        format: 'Letter',
+        format: format,
         printBackground: true,
         preferCSSPageSize: true,
         margin: {

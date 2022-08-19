@@ -19,10 +19,6 @@
       -webkit-print-color-adjust: exact;
     }
 
-    @page {
-      margin: 10px 0;
-    }
-
     .page {
       position: relative;
       height: 100%;
@@ -77,7 +73,7 @@
       color: #fff;
       text-align: center;
       height: 100%;
-      padding-top: 2%;
+      padding-top: 3%;
     }
 
     .titulo h1 {
@@ -227,7 +223,7 @@
     .container-firma-nombre {
       display: flex;
       justify-content: space-between;
-      margin-top: 15rem;
+      margin-top: 10rem;
       margin-bottom: 5rem;
       align-items: center;
     }
@@ -269,18 +265,16 @@
   <div class="page">
     <div class="app-student-notes" id="header">
       <div>
-        <img class="header-img-school"
-          src="http://vivecolegios.nortedesantander.gov.co:4000/public/uploads/users/profile/61faa0716770295e7c3775ab/e59qDbP1sjjFCH.png"
-          alt="" />
+        <img class="header-img-school" src="http://vivecolegios.nortedesantander.gov.co:4000/{{schoolLogo}}" alt="" />
       </div>
       <div class="nombre-instituto-note">
         <h1>
           {{schoolName}} <br />
         </h1>
         <p>
-          Resolución de aprobación No. 01880 del 25 de noviembre de 2021 <br />
-          Código DANE 154001004716 - NIT. 807.007.504-1 <br />
-          Calle 13 No 5-65 Centro - Cúcuta, Norte de Santander Tel: 5482323 <br />
+          {{schoolResolution}}<br />
+          {{schoolDaneNit}} <br />
+          {{schoolAddress}} <br />
         </p>
       </div>
       <div>
@@ -328,19 +322,21 @@
         {{#each academicPeriods as | academicPeriod academicPeriodId|}}
         <div class="item-data item-note-gris">{{academicPeriod.name}}</div>
         {{/each}}
-        <div class="item-data item-note-gris">FINAL</div>
         {{#each areas as | area areaId|}}
         <div class="item-data">{{area.name}}</div>
-        {{#each area.academicPeriods as | academicPeriod2|}}
+        {{#each area.academicPeriods as | academicPeriod2 academicPeriodId2|}}
+
+        {{#each ../../notesAreas as | notesArea notesAreaId|}}
+        {{#iff notesArea.areaId '===' area.id}}
+        {{#iff academicPeriod2.id '===' notesArea.academicPeriodId}}
         <div class="item-data item-data-flex item-data-flex-azul">
-          <div>-</div>
-          <div>-</div>
+          <div>{{notesArea.assessment}}</div>
+          <div>{{notesArea.performanceLevel}}</div>
         </div>
+        {{/iff }}
+        {{/iff }}
         {{/each}}
-        <div class="item-data item-data-flex item-data-flex-azul">
-          <div>-</div>
-          <div>-</div>
-        </div>
+        {{/each}}
         {{#each area.asignatures as | asignature asignatureId|}}
         <div class="item-data item-data-white">{{asignature.name}}</div>
         {{#each ../../academicPeriods as | academicPeriods3 academicPeriodId3|}}
@@ -355,16 +351,10 @@
         {{/iff }}
         {{/each}}
         {{/each}}
-        <div class="item-data item-data-flex">
-          <div>-</div>
-          <div>-</div>
-        </div>
         {{/each}}
         {{/each}}
-
       </div>
-
-      <div class="observaciones-note">
+      {{!-- <div class="observaciones-note">
         {{#each areas as | area areaId|}}
         {{#each area.asignatures as | asignature asignatureId|}}
         {{#each ../../notesAsignatures as | notesAsignature notesAsignatureId|}}
@@ -392,16 +382,16 @@
         {{/each}}
         {{/each}}
         {{/each}}
-      </div>
+      </div> --}}
       <div class="container-firma-nombre">
         <div class="container-firma">
           <div class="firma"></div>
           <p>{{titular}}</p>
           <p>Titular</p>
         </div>
-        <div class="container-observacion">
+        {{!-- <div class="container-observacion">
           OBSERVACIÓN
-        </div>
+        </div> --}}
       </div>
     </div>
   </div>

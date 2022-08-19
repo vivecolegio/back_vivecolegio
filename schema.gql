@@ -2048,6 +2048,7 @@ type Mutation {
   createAllInitialsStudents: Boolean!
   createAllInitialsTeachers: Boolean!
   createAuditLogin(data: NewAuditLogin!): AuditLogin!
+  createAveragePeriodValuationCourse(academicPeriodId: String!, courseId: String!): Boolean!
   createAveragePeriodValuationStudent(academicPeriodId: String!, courseId: String!, studentId: String!): Boolean!
   createCampus(data: NewCampus!): Campus!
   createCampusAdministrator(data: NewCampusAdministrator!): CampusAdministrator!
@@ -2179,7 +2180,7 @@ type Mutation {
   deleteUser(id: String!): Boolean!
   generatePerformanceLevelExample(id: String!): Boolean!
   generatePerformanceLevelExample2(id: String!): Boolean!
-  generatePerformanceReportCourse(academicPeriodId: String!, id: String!, schoolId: String!, schoolYearId: String!, studentId: String): String!
+  generatePerformanceReportCourse(academicPeriodId: String!, format: String!, id: String!, schoolId: String!, schoolYearId: String!, studentId: String): String!
   login(password: String!, username: String!): Jwt!
   resetPasswordUser(id: String!): Boolean!
   singleUpload(file: Upload, id: String!): Boolean!
@@ -2786,8 +2787,12 @@ input NewSchool {
   curricularComponent: String
   daneCode: String
   educationalModel: String
+  logo: String
   name: String
   pedagogicalModel: String
+  textAddress: String
+  textDaneNit: String
+  textResolution: String
 }
 
 input NewSchoolAdministrative {
@@ -4564,8 +4569,12 @@ type School implements IModelData {
   daneCode: String
   educationalModel: String
   id: ID!
+  logo: String
   name: String
   pedagogicalModel: String
+  textAddress: String
+  textDaneNit: String
+  textResolution: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
