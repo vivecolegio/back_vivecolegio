@@ -56,6 +56,7 @@ type AcademicAreaCoursePeriodValuation implements IModelCampusData {
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
+  valuationType: ValuationType
   version: Float
 }
 
@@ -214,6 +215,7 @@ type AcademicAsignatureCoursePeriodValuation implements IModelCampusData {
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
+  valuationType: ValuationType
   version: Float
 }
 
@@ -2286,6 +2288,7 @@ input NewAcademicAreaCoursePeriodValuation {
   assessment: Float
   performanceLevelId: String
   studentId: String
+  valuationType: ValuationType
 }
 
 input NewAcademicAsignature {
@@ -2326,6 +2329,7 @@ input NewAcademicAsignatureCoursePeriodValuation {
   assessment: Float
   performanceLevelId: String
   studentId: String
+  valuationType: ValuationType
 }
 
 input NewAcademicDay {
@@ -4912,4 +4916,11 @@ type UserEdge {
   """Used in `before` and `after` args"""
   cursor: String!
   node: User!
+}
+
+"""The ValuationType Register"""
+enum ValuationType {
+  CALCULATE
+  DEFINITIVE
+  RECOVERY
 }

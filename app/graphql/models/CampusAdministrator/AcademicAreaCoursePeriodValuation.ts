@@ -1,5 +1,6 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Column, Entity, Index } from 'typeorm';
+import { ValuationType } from '../../enums/ValuationType';
 
 import { IModelCampusData } from '../../interfaces/IModelCampusData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
@@ -49,6 +50,9 @@ export class AcademicAreaCoursePeriodValuation extends IModelCampusData {
   @Field(() => PerformanceLevel, { nullable: true })
   performanceLevel?: PerformanceLevel;
 
+  @Field(() => ValuationType, { nullable: true })
+  @Column({ nullable: true })
+  valuationType?: ValuationType;
 }
 
 @ObjectType()

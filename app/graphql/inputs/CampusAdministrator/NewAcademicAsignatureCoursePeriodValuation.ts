@@ -1,4 +1,5 @@
 import { Field, InputType } from 'type-graphql';
+import { ValuationType } from '../../enums/ValuationType';
 import { AcademicAsignatureCoursePeriodValuation } from '../../models/CampusAdministrator/AcademicAsignatureCoursePeriodValuation';
 
 @InputType()
@@ -18,4 +19,6 @@ export class NewAcademicAsignatureCoursePeriodValuation implements Partial<Acade
     @Field({ nullable: true })
     performanceLevelId?: String;
 
+    @Field(() => ValuationType, { nullable: true })
+    valuationType?: ValuationType;
 }
