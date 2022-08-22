@@ -1175,9 +1175,9 @@ export class ExperienceLearningResolver {
         let promisesListAsignatures: any[] = [];
         if (students) {
           for (const student of students) {
-            // promisesListAsignatures.push(
-            //   this.createAcademicAsignatureCoursePeriodValuationStudent(academicAsignatureCourseId, academicPeriodId, student + "")
-            // );
+            promisesListAsignatures.push(
+              this.createAcademicAsignatureCoursePeriodValuationStudent(academicAsignatureCourseId, academicPeriodId, student + "")
+            );
           }
           return await Promise.all(promisesListAsignatures).then(async () => {
             if (students) {
@@ -1371,7 +1371,7 @@ export class ExperienceLearningResolver {
         }
       }
     }
-    //this.createAcademicAreaCoursePeriodValuationStudent(academicAsignatureCourseId, academicPeriodId, studentId + "")
+    this.createAcademicAreaCoursePeriodValuationStudent(academicAsignatureCourseId, academicPeriodId, studentId + "")
     return true;
   }
 
