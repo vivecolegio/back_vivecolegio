@@ -161,6 +161,8 @@ export const dataSource = new DataSource({
   cache: true,
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  connectTimeoutMS: 50000,
+  socketTimeoutMS: 50000,
 });
 
 export const AuditLoginRepository = dataSource.getMongoRepository(AuditLogin);
