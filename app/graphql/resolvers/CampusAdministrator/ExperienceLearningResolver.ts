@@ -1354,6 +1354,7 @@ export class ExperienceLearningResolver {
               studentPeriodValuation.performanceLevelId = performanceLevelId;
               break;
           }
+          studentPeriodValuation.valuationType = ValuationType.CALCULATE;
           if (studentPeriodValuation.id) {
             studentPeriodValuation =
               await this.repositoryAcademicAsignatureCoursePeriodValuation.save({
@@ -1541,6 +1542,7 @@ export class ExperienceLearningResolver {
           studentAreaPeriodValuation.performanceLevelId = performanceLevelId;
           break;
       }
+      studentAreaPeriodValuation.valuationType = ValuationType.CALCULATE;
       if (studentAreaPeriodValuation.id) {
         studentAreaPeriodValuation =
           await this.repositoryAcademicAreaCoursePeriodValuation.save({
