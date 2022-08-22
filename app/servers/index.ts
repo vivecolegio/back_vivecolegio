@@ -11,6 +11,8 @@ import { env } from 'process';
 import { buildSchemaSync, createResolversMap } from 'type-graphql';
 
 import { SERVER_NAME_APP, SERVER_PORT_APP } from '../config';
+import { AcademicAreaCoursePeriodValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAreaCoursePeriodValuationResolver';
+import { AcademicAsignatureCoursePeriodEvidenceLearningValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAsignatureCoursePeriodEvidenceLearningValuationResolver';
 import { AcademicAsignatureCoursePeriodValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAsignatureCoursePeriodValuationResolver';
 import { AcademicAsignatureCourseResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAsignatureCourseResolver';
 import { AcademicHourResolver } from '../graphql/resolvers/CampusAdministrator/AcademicHourResolver';
@@ -85,14 +87,13 @@ import { SpecialtyResolver } from './../graphql/resolvers/SchoolAdministrator/Sp
 import { dataSource } from './DataSource';
 
 import 'reflect-metadata';
-import { AcademicAreaCoursePeriodValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAreaCoursePeriodValuationResolver';
-import { AcademicAsignatureCoursePeriodEvidenceLearningValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAsignatureCoursePeriodEvidenceLearningValuationResolver';
 
 const PORT = SERVER_PORT_APP;
 const SERVER_NAME = SERVER_NAME_APP;
 
 const cluster = require('node:cluster');
-const numCPUs = env.NODE_ENV === "development" ? 1 : require('node:os').cpus().length;
+//const numCPUs = env.NODE_ENV === "development" ? 2 : require('node:os').cpus().length;
+const numCPUs = env.NODE_ENV === "development" ? 1 : 10;
 const expressHealthApi = require('express-health-api');
 
 async function app() {

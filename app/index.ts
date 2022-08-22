@@ -1,10 +1,7 @@
 import { ApolloGateway, IntrospectAndCompose } from '@apollo/gateway';
 import { Ipware } from '@fullerstack/nax-ipware';
 import FileUploadDataSource from '@profusion/apollo-federation-upload';
-import {
-  ApolloServerPluginLandingPageLocalDefault,
-  ApolloServerPluginLandingPageProductionDefault
-} from 'apollo-server-core';
+import { ApolloServerPluginLandingPageLocalDefault, ApolloServerPluginLandingPageProductionDefault } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import Cors from 'cors';
 import Express from 'express';
@@ -15,13 +12,15 @@ import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
 import Morgan from 'morgan';
 import path from 'path';
 import { env } from 'process';
-import 'reflect-metadata';
+
 import { port, SERVER_NAME_APP, SERVER_PORT_APP } from './config/index';
+
+import 'reflect-metadata';
 
 const cluster = require('node:cluster');
 const expressHealthApi = require('express-health-api');
-const numCPUs = env.NODE_ENV === "development" ? 1 : require('node:os').cpus().length;
-
+//const numCPUs = env.NODE_ENV === "development" ? 1 : require('node:os').cpus().length;
+const numCPUs = env.NODE_ENV === "development" ? 1 : 10;
 async function app() {
   try {
     const gateway = new ApolloGateway({
