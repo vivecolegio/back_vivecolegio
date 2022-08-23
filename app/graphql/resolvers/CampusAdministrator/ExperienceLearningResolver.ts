@@ -1013,7 +1013,9 @@ export class ExperienceLearningResolver {
             case PerformanceLevelType.QUALITATIVE:
               if (average != null && average > 0 && countExperienceLearningAssessment > 0) {
                 studentAverage.average = average;
-                studentAverage.performanceLevelId = performanceLevels?.edges[Math.trunc(average)]?.node?.id.toString();
+                let averagePerfomanceLevel = Number(average.toFixed(0));
+                //studentAverage.performanceLevelId = performanceLevels?.edges[Math.trunc(average)]?.node?.id.toString();
+                studentAverage.performanceLevelId = performanceLevels?.edges[averagePerfomanceLevel]?.node?.id.toString();
               } else {
                 studentAverage.average = 0;
                 studentAverage.performanceLevelId = performanceLevels?.edges[0]?.node?.id.toString();
@@ -1109,10 +1111,11 @@ export class ExperienceLearningResolver {
         promisesList.push(
           this.updateAllStudentGradePeriodValuation(academicGrade?.id?.toString(), academicPeriodId)
         );
-        return await Promise.all(promisesList).then(() => {
+        await Promise.all(promisesList).then(() => {
           return true;
         });
       }
+      return true;
     }
   }
 
@@ -1130,10 +1133,11 @@ export class ExperienceLearningResolver {
         promisesList.push(
           this.updateAllStudentCoursePeriodValuation(course?.id?.toString(), academicPeriodId)
         );
-        return await Promise.all(promisesList).then(() => {
+        await Promise.all(promisesList).then(() => {
           return true;
         });
       }
+      return true;
     }
   }
 
@@ -1336,7 +1340,9 @@ export class ExperienceLearningResolver {
           }
           switch (performanceLevelType) {
             case PerformanceLevelType.QUALITATIVE:
-              studentPeriodValuation.performanceLevelId = performanceLevels?.edges[Math.trunc(average) - 1]?.node?.id.toString();
+              let averagePerfomanceLevel = Number(average.toFixed(0));
+              studentPeriodValuation.performanceLevelId = performanceLevels?.edges[averagePerfomanceLevel - 1]?.node?.id.toString();
+              //studentPeriodValuation.performanceLevelId = performanceLevels?.edges[Math.trunc(average) - 1]?.node?.id.toString();
               break;
             case PerformanceLevelType.QUANTITATIVE:
               studentPeriodValuation.assessment = average;
@@ -1524,7 +1530,9 @@ export class ExperienceLearningResolver {
       }
       switch (performanceLevelType) {
         case PerformanceLevelType.QUALITATIVE:
-          studentAreaPeriodValuation.performanceLevelId = performanceLevels?.edges[Math.trunc(average) - 1]?.node?.id.toString();
+          let averagePerfomanceLevel = Number(average.toFixed(0));
+          studentAreaPeriodValuation.performanceLevelId = performanceLevels?.edges[averagePerfomanceLevel - 1]?.node?.id.toString();
+          //studentAreaPeriodValuation.performanceLevelId = performanceLevels?.edges[Math.trunc(average) - 1]?.node?.id.toString();
           break;
         case PerformanceLevelType.QUANTITATIVE:
           studentAreaPeriodValuation.assessment = average;
@@ -1669,7 +1677,9 @@ export class ExperienceLearningResolver {
     }
     switch (performanceLevelType) {
       case PerformanceLevelType.QUALITATIVE:
-        averageAcademicPeriodStudent.performanceLevelId = performanceLevels?.edges[Math.trunc(average) - 1]?.node?.id.toString();
+        let averagePerfomanceLevel = Number(average.toFixed(0));
+        averageAcademicPeriodStudent.performanceLevelId = performanceLevels?.edges[averagePerfomanceLevel - 1]?.node?.id.toString();
+        //averageAcademicPeriodStudent.performanceLevelId = performanceLevels?.edges[Math.trunc(average) - 1]?.node?.id.toString();
         averageAcademicPeriodStudent.assessment = average;
         break;
       case PerformanceLevelType.QUANTITATIVE:
@@ -1786,7 +1796,9 @@ export class ExperienceLearningResolver {
       }
       switch (performanceLevelType) {
         case PerformanceLevelType.QUALITATIVE:
-          averageAcademicPeriodCourse.performanceLevelId = performanceLevels?.edges[Math.trunc(average) - 1]?.node?.id.toString();
+          let averagePerfomanceLevel = Number(average.toFixed(0));
+          averageAcademicPeriodCourse.performanceLevelId = performanceLevels?.edges[averagePerfomanceLevel - 1]?.node?.id.toString();
+          //averageAcademicPeriodCourse.performanceLevelId = performanceLevels?.edges[Math.trunc(average) - 1]?.node?.id.toString();
           averageAcademicPeriodCourse.assessment = average;
           break;
         case PerformanceLevelType.QUANTITATIVE:

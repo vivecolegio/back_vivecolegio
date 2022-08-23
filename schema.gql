@@ -2749,6 +2749,7 @@ input NewPerformanceLevel {
   isFinal: Boolean
   minimumScore: Float
   name: String
+  order: Float
   schoolId: String
   topScore: Float
   type: PerformanceLevelType
@@ -2933,6 +2934,7 @@ type PerformanceLevel implements IModelSchoolData {
   isFinal: Boolean
   minimumScore: Float
   name: String
+  order: Float
   school: School
   schoolId: String
   topScore: Float

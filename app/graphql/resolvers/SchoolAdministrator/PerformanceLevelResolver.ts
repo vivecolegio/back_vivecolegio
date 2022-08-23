@@ -117,7 +117,7 @@ export class PerformanceLevelResolver {
               schoolId: campus.schoolId,
               active: true,
             },
-            order: { createdAt: 'DESC' },
+            order: { order: 1 },
           });
           if (result.length === 0) {
             result = await this.repository.findBy({
@@ -126,7 +126,7 @@ export class PerformanceLevelResolver {
                 schoolId: campus.schoolId,
                 active: true,
               },
-              order: { createdAt: 'DESC' },
+              order: { order: 1 },
             });
             if (result.length === 0) {
               result = await this.repository.findBy({
@@ -135,7 +135,7 @@ export class PerformanceLevelResolver {
                   schoolId: campus.schoolId,
                   active: true,
                 },
-                order: { createdAt: 'DESC' },
+                order: { order: 1 },
               });
               if (result.length === 0) {
                 result = await this.repository.findBy({
@@ -143,7 +143,7 @@ export class PerformanceLevelResolver {
                     schoolId: campus.schoolId,
                     active: true,
                   },
-                  order: { createdAt: 'DESC' },
+                  order: { order: 1 },
                 });
               }
             }
@@ -182,7 +182,7 @@ export class PerformanceLevelResolver {
               isFinal: true,
               active: true,
             },
-            order: { createdAt: 'DESC' },
+            order: { order: 1 },
           });
           if (result.length === 0) {
             result = await this.repository.findBy({
@@ -192,7 +192,7 @@ export class PerformanceLevelResolver {
                 isFinal: true,
                 active: true,
               },
-              order: { createdAt: 'DESC' },
+              order: { order: 1 },
             });
             if (result.length === 0) {
               result = await this.repository.findBy({
@@ -202,7 +202,7 @@ export class PerformanceLevelResolver {
                   isFinal: true,
                   active: true,
                 },
-                order: { createdAt: 'DESC' },
+                order: { order: 1 },
               });
               if (result.length === 0) {
                 result = await this.repository.findBy({
@@ -211,7 +211,7 @@ export class PerformanceLevelResolver {
                     isFinal: true,
                     active: true,
                   },
-                  order: { createdAt: 'DESC' },
+                  order: { order: 1 },
                 });
               }
             }

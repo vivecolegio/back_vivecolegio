@@ -74,6 +74,11 @@ export class PerformanceLevel extends IModelSchoolData {
 
   @Field(() => [AcademicGrade], { nullable: true })
   academicGrades?: AcademicGrade[];
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  order?: number;
+
 }
 
 @ObjectType()

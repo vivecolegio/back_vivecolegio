@@ -7,7 +7,7 @@ import {
   CampusAdministratorRepository,
   CampusRepository,
   SchoolRepository,
-  UserRepository,
+  UserRepository
 } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
@@ -18,7 +18,7 @@ import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import {
   CampusAdministrator,
-  CampusAdministratorConnection,
+  CampusAdministratorConnection
 } from '../../models/SchoolAdministrator/CampusAdministrator';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
