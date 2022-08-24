@@ -1148,6 +1148,7 @@ export class ExperienceLearningResolver {
   ) {
     const course = await this.repositoryCourse.findOneBy(courseId);
     if (course) {
+      let students = course.studentsId;
       const academicAsignatureCourses = await this.repositoryAcademicAsignatureCourse.findBy({ where: { courseId: courseId, active: true } })
       let promisesList: any[] = [];
       for (let academicAsignatureCourse of academicAsignatureCourses) {
@@ -1157,8 +1158,18 @@ export class ExperienceLearningResolver {
           );
         }
       }
-      return await Promise.all(promisesList).then(() => {
-        return true;
+      return await Promise.all(promisesList).then(async () => {
+        if (students) {
+          let promisesListStudents: any[] = [];
+          for (let student of students) {
+            promisesListStudents.push(
+              this.createAveragePeriodValuationStudent(course?.id?.toString(), academicPeriodId, student + "")
+            );
+          }
+          await Promise.all(promisesListStudents).then(async () => {
+            return true;
+          });
+        }
       });
     }
   }
@@ -1167,7 +1178,7 @@ export class ExperienceLearningResolver {
   @Mutation(() => Boolean)
   async updateAllStudentAcademicAsignatureCoursePeriodValuation(
     @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: string,
-    @Arg('academicPeriodId', () => String) academicPeriodId: string,
+    @Arg('academicPeriodId', () => String) academicPeriodId: string
   ) {
     const academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(
       academicAsignatureCourseId
@@ -1178,19 +1189,21 @@ export class ExperienceLearningResolver {
         let students = course.studentsId;
         let promisesListAsignatures: any[] = [];
         if (students) {
-          for (const student of students) {
+          for (let student of students) {
             promisesListAsignatures.push(
               this.createAcademicAsignatureCoursePeriodValuationStudent(academicAsignatureCourseId, academicPeriodId, student + "")
             );
           }
-          return await Promise.all(promisesListAsignatures).then(async () => {
-            if (students) {
-              for (const student of students) {
-                await this.createAveragePeriodValuationStudent(course?.id?.toString(), academicPeriodId, student + "")
-              }
-            }
-            return true;
+          await Promise.all(promisesListAsignatures).then(async () => {
           });
+          // if (students) {
+          //   console.log(students)
+          //   for (let student of students) {
+          //     console.log("calculando 2 el de: ", student);
+          //     await this.createAveragePeriodValuationStudent(course?.id?.toString(), academicPeriodId, student + "")
+          //   }
+          // }
+          return true;
         }
       }
     }
@@ -1577,6 +1590,7 @@ export class ExperienceLearningResolver {
     @Arg('academicPeriodId', () => String) academicPeriodId: string,
     @Arg('studentId', () => String) studentId: string
   ) {
+    //console.log("llamando ", courseId, academicPeriodId, studentId)
     let academicAsignaturesCourses = await this.repositoryAcademicAsignatureCourse.findBy({ where: { courseId: courseId } });
     let areasAux: any[] = []
     let hourlyIntensityAreaAux = new Array();
@@ -1656,11 +1670,13 @@ export class ExperienceLearningResolver {
       }
     });
     if (averageAcademicPeriodStudentList.length > 1) {
+      //console.log("elminando repetidos")
       for (let averageAcademicPeriodStudents of averageAcademicPeriodStudentList) {
         let result = await this.repositoryAverageAcademicPeriodStudent.deleteOne({ _id: new ObjectId(averageAcademicPeriodStudents?.id?.toString()) });
       }
       averageAcademicPeriodStudentList = [];
     }
+    //console.log(averageAcademicPeriodStudentList)
     if (averageAcademicPeriodStudentList.length > 0) {
       averageAcademicPeriodStudent = averageAcademicPeriodStudentList[0];
     } else {
@@ -1674,32 +1690,37 @@ export class ExperienceLearningResolver {
     }
     if (Number.isNaN(average) || average < 0) {
       averageAcademicPeriodStudent.assessment = 0;
-    }
-    switch (performanceLevelType) {
-      case PerformanceLevelType.QUALITATIVE:
-        let averagePerfomanceLevel = Number(average.toFixed(0));
-        averageAcademicPeriodStudent.performanceLevelId = performanceLevels?.edges[averagePerfomanceLevel - 1]?.node?.id.toString();
-        //averageAcademicPeriodStudent.performanceLevelId = performanceLevels?.edges[Math.trunc(average) - 1]?.node?.id.toString();
-        averageAcademicPeriodStudent.assessment = average;
-        break;
-      case PerformanceLevelType.QUANTITATIVE:
-        averageAcademicPeriodStudent.assessment = average;
-        perf = performanceLevels?.edges?.find((c: any) => {
-          return average < c.node.topScore && average >= c.node.minimumScore;
-        });
-        if (perf === undefined) {
+    } else {
+      switch (performanceLevelType) {
+        case PerformanceLevelType.QUALITATIVE:
+          let averagePerfomanceLevel = Number(average.toFixed(0));
+          averageAcademicPeriodStudent.performanceLevelId = performanceLevels?.edges[averagePerfomanceLevel - 1]?.node?.id.toString();
+          //averageAcademicPeriodStudent.performanceLevelId = performanceLevels?.edges[Math.trunc(average) - 1]?.node?.id.toString();
+          averageAcademicPeriodStudent.assessment = average;
+          break;
+        case PerformanceLevelType.QUANTITATIVE:
+          averageAcademicPeriodStudent.assessment = average;
           perf = performanceLevels?.edges?.find((c: any) => {
-            return average <= c.node.topScore && average > c.node.minimumScore;
+            return average < c.node.topScore && average >= c.node.minimumScore;
           });
-        }
-        if (perf && perf?.node?.id) {
-          performanceLevelId = perf.node.id
-        }
-        averageAcademicPeriodStudent.performanceLevelId = performanceLevelId;
-        break;
+          if (perf === undefined) {
+            perf = performanceLevels?.edges?.find((c: any) => {
+              return average <= c.node.topScore && average > c.node.minimumScore;
+            });
+          }
+          if (perf && perf?.node?.id) {
+            performanceLevelId = perf.node.id
+          }
+          // console.log(averageAcademicPeriodStudent?.studentId)
+          // console.log(average)
+          // console.log(perf?.node?.name);
+          averageAcademicPeriodStudent.performanceLevelId = performanceLevelId;
+          break;
+      }
     }
     //console.log(averageAcademicPeriodStudent);
     if (averageAcademicPeriodStudent.id) {
+      //console.log("problema aca ", averageAcademicPeriodStudent);
       averageAcademicPeriodStudent =
         await this.repositoryAverageAcademicPeriodStudent.save({
           _id: new ObjectId(averageAcademicPeriodStudent.id.toString()),
@@ -1819,6 +1840,7 @@ export class ExperienceLearningResolver {
       }
       //console.log(averageAcademicPeriodCourse);
       if (averageAcademicPeriodCourse.id) {
+        //console.log("problema aca", averageAcademicPeriodCourse);
         averageAcademicPeriodCourse =
           await this.repositoryAverageAcademicPeriodCourse.save({
             _id: new ObjectId(averageAcademicPeriodCourse.id.toString()),

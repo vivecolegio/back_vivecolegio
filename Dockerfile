@@ -9,6 +9,8 @@ RUN apt-get update \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
+RUN apt-get install default-jre default-jdk
+
 WORKDIR /usr/src/app
 
 COPY . .
