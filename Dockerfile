@@ -9,7 +9,8 @@ RUN apt-get update \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get install default-jre default-jdk
+RUN apt-get update && apt-get install -y curl 
+RUN apt-get update && apt-get install -y default-jre default-jdk
 
 WORKDIR /usr/src/app
 

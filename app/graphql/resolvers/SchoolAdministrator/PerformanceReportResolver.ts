@@ -296,8 +296,9 @@ export class PerformanceReportResolver {
                   return console.log(err)
                 }
                 console.log('Successfully merged!')
+                return dir + '/' + id + '.pdf';
               });
-              return dir + '/' + id + '.pdf';
+
             } else {
               return urls[0];
             }
