@@ -190,14 +190,6 @@ export class PerformanceReportResolver {
           areas.push(areaData);
         })
         data = { ...data, "areas": areas };
-        let averageAcademicPeriodStudentList = await this.repositoryAverageAcademicPeriodStudent.findBy({
-          where:
-          {
-            courseId: id,
-            academicPeriodId,
-            studentId,
-          }
-        });
         let averageAcademicPeriodCourseList = await this.repositoryAverageAcademicPeriodCourse.findBy({
           where:
           {
@@ -205,8 +197,6 @@ export class PerformanceReportResolver {
             academicPeriodId,
           }
         });
-        data = { ...data, "promStudent": averageAcademicPeriodStudentList[0]?.assessment?.toFixed(2) };
-        data = { ...data, "puestoEstudiante": averageAcademicPeriodStudentList[0]?.score };
         data = { ...data, "promCourse": averageAcademicPeriodCourseList[0]?.assessment?.toFixed(2) };
         //console.log("aca vamos bien", academicAsignaturesCourse);
         let urls: any[] = [];
@@ -219,6 +209,16 @@ export class PerformanceReportResolver {
             let studentUser = await this.repositoryUser.findOneBy(student?.userId);
             dataPDF = { ...dataPDF, "studentName": studentUser?.name + " " + studentUser?.lastName };
             dataPDF = { ...dataPDF, "studentDocumentNumber": studentUser?.documentNumber };
+            let averageAcademicPeriodStudentList = await this.repositoryAverageAcademicPeriodStudent.findBy({
+              where:
+              {
+                courseId: id,
+                academicPeriodId,
+                studentId,
+              }
+            });
+            data = { ...data, "promStudent": averageAcademicPeriodStudentList[0]?.assessment?.toFixed(2) };
+            data = { ...data, "puestoEstudiante": averageAcademicPeriodStudentList[0]?.score };
             let notesAsignatures = [];
             for (let asignatureCourse of academicAsignaturesCourse) {
               let academicAsignature = await this.repositoryAcademicAsignature.findOneBy(asignatureCourse?.academicAsignatureId);
