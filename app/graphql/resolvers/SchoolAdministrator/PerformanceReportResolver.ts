@@ -291,7 +291,7 @@ export class PerformanceReportResolver {
               if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir, { recursive: true });
               }
-              merge(urls, dir + '/' + id + '.pdf', opts, function (err: any) {
+              return merge(urls, dir + '/' + id + '.pdf', opts, function (err: any) {
                 if (err) {
                   return console.log(err)
                 }
