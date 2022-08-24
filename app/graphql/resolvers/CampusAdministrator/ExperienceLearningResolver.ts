@@ -1167,6 +1167,7 @@ export class ExperienceLearningResolver {
             );
           }
           await Promise.all(promisesListStudents).then(async () => {
+            await this.createAveragePeriodValuationCourse(course?.id?.toString(), academicPeriodId);
             return true;
           });
         }
@@ -1733,7 +1734,7 @@ export class ExperienceLearningResolver {
           ...averageAcademicPeriodStudent,
         });
     }
-    await this.createAveragePeriodValuationCourse(courseId, academicPeriodId);
+    // await this.createAveragePeriodValuationCourse(courseId, academicPeriodId);
     return true;
   }
 
