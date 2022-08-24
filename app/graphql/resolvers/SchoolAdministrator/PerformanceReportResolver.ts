@@ -291,14 +291,13 @@ export class PerformanceReportResolver {
               if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir, { recursive: true });
               }
-              return merge(urls, dir + '/' + id + '.pdf', opts, function (err: any) {
+              merge(urls, dir + '/' + id + '.pdf', opts, function (err: any) {
                 if (err) {
                   return console.log(err)
                 }
-                console.log('Successfully merged!')
-                return dir + '/' + id + '.pdf';
+                console.log('Successfully merged!');
               });
-
+              return dir + '/' + id + '.pdf';
             } else {
               return urls[0];
             }
