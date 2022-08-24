@@ -2190,6 +2190,7 @@ type Mutation {
   updateAcademicAreaCoursePeriodValuation(data: NewAcademicAreaCoursePeriodValuation!, id: String!): AcademicAreaCoursePeriodValuation!
   updateAcademicAsignature(data: NewAcademicAsignature!, id: String!): AcademicAsignature!
   updateAcademicAsignatureCourse(data: NewAcademicAsignatureCourse!, id: String!): AcademicAsignatureCourse!
+  updateAcademicAsignatureCourseHourltIntensity(data: NewAcademicAsignatureCourse!, id: String!): AcademicAsignatureCourse!
   updateAcademicAsignatureCoursePeriodEvidenceLearningValuation(data: NewAcademicAsignatureCoursePeriodEvidenceLearningValuation!, id: String!): AcademicAsignatureCoursePeriodEvidenceLearningValuation!
   updateAcademicAsignatureCoursePeriodValuation(data: NewAcademicAsignatureCoursePeriodValuation!, id: String!): AcademicAsignatureCoursePeriodValuation!
   updateAcademicDay(data: NewAcademicDay!, id: String!): AcademicDay!

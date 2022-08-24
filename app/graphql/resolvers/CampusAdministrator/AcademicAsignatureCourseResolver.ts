@@ -2,23 +2,12 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import {
-  AcademicAsignatureCourseRepository,
-  AcademicAsignatureRepository,
-  CampusRepository,
-  CourseRepository,
-  ExperienceLearningRepository,
-  GradeAssignmentRepository,
-  TeacherRepository,
-  UserRepository
-} from '../../../servers/DataSource';
+
+import { AcademicAsignatureCourseRepository, AcademicAsignatureRepository, CampusRepository, CourseRepository, ExperienceLearningRepository, GradeAssignmentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicAsignatureCourse } from '../../inputs/CampusAdministrator/NewAcademicAsignatureCourse';
 import { IContext } from '../../interfaces/IContext';
-import {
-  AcademicAsignatureCourse,
-  AcademicAsignatureCourseConnection
-} from '../../models/CampusAdministrator/AcademicAsignatureCourse';
+import { AcademicAsignatureCourse, AcademicAsignatureCourseConnection } from '../../models/CampusAdministrator/AcademicAsignatureCourse';
 import { Course } from '../../models/CampusAdministrator/Course';
 import { ExperienceLearning } from '../../models/CampusAdministrator/ExperienceLearning';
 import { Teacher } from '../../models/CampusAdministrator/Teacher';
@@ -74,7 +63,7 @@ export class AcademicAsignatureCourseResolver {
         if (campusId && courseId) {
           result = await this.repository.findBy({
             where: { campusId, courseId },
-            order: { createdAt: 'DESC' },
+            order: { order: 'DESC' },
           });
         } else {
           if (campusId) {
@@ -323,6 +312,61 @@ export class AcademicAsignatureCourseResolver {
         active: true,
       },
       order: { createdAt: 'ASC' },
+    });
+    return result;
+  }
+
+
+  @Mutation(() => AcademicAsignatureCourse)
+  async updateAcademicAsignatureCourseHourltIntensity(
+    @Arg('data') data: NewAcademicAsignatureCourse,
+    @Arg('id', () => String) id: string,
+    @Ctx() context: IContext
+  ): Promise<AcademicAsignatureCourse | null> {
+    let dataProcess = removeEmptyStringElements(data);
+    let updatedByUserId = context?.user?.authorization?.id;
+    let result = await this.repository.findOneBy(id);
+    result = await this.repository.save({
+      _id: new ObjectId(id),
+      ...result,
+      ...dataProcess,
+      version: (result?.version as number) + 1,
+      updatedByUserId,
+    });
+    let min = null;
+    let max = null;
+    const gradeAssignment = await this.repositoryGradeAssignment.findOneBy(result?.gradeAssignmentId);
+    const academicAsignatureCourses = await this.repository.findBy({
+      where: {
+        gradeAssignmentId: result?.gradeAssignmentId,
+        active: true,
+      },
+    });
+    if (academicAsignatureCourses && gradeAssignment) {
+      for (let academicAsignatureCourse of academicAsignatureCourses) {
+        if (academicAsignatureCourse?.hourlyIntensity) {
+          if (min == null && academicAsignatureCourse?.hourlyIntensity) {
+            min = academicAsignatureCourse?.hourlyIntensity;
+          }
+          if (min != null && academicAsignatureCourse?.hourlyIntensity < min) {
+            min = academicAsignatureCourse?.hourlyIntensity;
+          }
+          if (max == null && academicAsignatureCourse?.hourlyIntensity) {
+            max = academicAsignatureCourse?.hourlyIntensity;
+          }
+          if (max != null && academicAsignatureCourse?.hourlyIntensity > max) {
+            max = academicAsignatureCourse?.hourlyIntensity;
+          }
+        }
+      }
+    }
+    let resultGradeAssignment = await this.repositoryGradeAssignment.save({
+      _id: new ObjectId(gradeAssignment?.id?.toString()),
+      ...gradeAssignment,
+      minHourlyIntensity: min ? min : 0,
+      maxHourlyIntensity: max ? max : 0,
+      version: (result?.version as number) + 1,
+      updatedByUserId,
     });
     return result;
   }
