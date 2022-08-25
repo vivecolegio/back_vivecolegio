@@ -355,10 +355,12 @@ export class PerformanceReportResolver {
         let bool = false;
         a?.toString();
         b?.toString();
-        //console.log(a, b)
         switch (operator) {
           case `===`:
             bool = a === b;
+            break;
+          case `==`:
+            bool = a == b;
             break;
           case `>`:
             bool = a > b;
