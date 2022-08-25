@@ -2035,6 +2035,7 @@ type Mutation {
   createAcademicAsignatureCoursePeriodEvidenceLearningValuation(data: NewAcademicAsignatureCoursePeriodEvidenceLearningValuation!): AcademicAsignatureCoursePeriodEvidenceLearningValuation!
   createAcademicAsignatureCoursePeriodValuation(data: NewAcademicAsignatureCoursePeriodValuation!): AcademicAsignatureCoursePeriodValuation!
   createAcademicAsignatureCoursePeriodValuationStudent(academicAsignatureCourseId: String!, academicPeriodId: String!, studentId: String!): Boolean!
+  createAcademicAsignatureCoursePeriodValuationStudentBulk(academicAsignatureCourseId: String!, academicPeriodId: String!, studentId: String!): Boolean!
   createAcademicAsignatureCoursePeriodValuationStudents(academicAsignatureCourseId: String!, academicPeriodId: String!, schoolId: String!): Boolean!
   createAcademicDay(data: NewAcademicDay!): AcademicDay!
   createAcademicGrade(data: NewAcademicGrade!): AcademicGrade!
@@ -2199,6 +2200,7 @@ type Mutation {
   updateAcademicPeriod(data: NewAcademicPeriod!, id: String!): AcademicPeriod!
   updateAcademicSchedule(data: NewAcademicSchedule!, id: String!): AcademicSchedule!
   updateAcademicStandard(data: NewAcademicStandard!, id: String!): AcademicStandard!
+  updateAllIStudentsName: Boolean!
   updateAllStudentAcademicAsignatureCoursePeriodValuation(academicAsignatureCourseId: String!, academicPeriodId: String!): Boolean!
   updateAllStudentCoursePeriodValuation(academicPeriodId: String!, courseId: String!): Boolean!
   updateAllStudentGradePeriodValuation(academicGradeId: String!, academicPeriodId: String!): Boolean!

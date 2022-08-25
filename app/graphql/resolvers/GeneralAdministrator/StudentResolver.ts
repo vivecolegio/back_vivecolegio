@@ -10,6 +10,7 @@ import { NewStudent } from '../../inputs/GeneralAdministrator/NewStudent';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
 import { IContext } from '../../interfaces/IContext';
 import { Course } from '../../models/CampusAdministrator/Course';
+import { Estudiantes2 } from '../../models/Data/Estudiantes2';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { School } from '../../models/GeneralAdministrator/School';
 import { Student, StudentConnection } from '../../models/GeneralAdministrator/Student';
@@ -17,7 +18,6 @@ import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicGrade } from '../../models/SchoolAdministrator/AcademicGrade';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 import { CourseResolver } from '../CampusAdministrator/CourseResolver';
-import { Estudiantes } from './../../models/Data/Estudiantes';
 
 const BCRYPT_SALT_ROUNDS = 12;
 
@@ -41,7 +41,7 @@ export class StudentResolver {
   @InjectRepository(Course)
   private repositoryCourse = CourseRepository;
 
-  @InjectRepository(Estudiantes)
+  @InjectRepository(Estudiantes2)
   private repositoryEstudiantes = EstudiantesRepository;
 
   private courseResolver = new CourseResolver();
@@ -378,6 +378,59 @@ export class StudentResolver {
                   procesado: true,
                 });
                 //console.log(model);
+                let result = await this.repositoryEstudiantes.save(model);
+              }
+            }
+          }
+        }
+      }
+    }
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  public async updateAllIStudentsName() {
+    let schools = await this.repositorySchool.find();
+    let count = 0;
+    for (let school of schools) {
+      if (school?.daneCode == "354405000098") {
+        let data = await this.repositoryEstudiantes.findBy({
+          where: { dane: school.daneCode, procesado: null },
+        });
+        for (let estudiante of data) {
+          if (
+            estudiante.jornada &&
+            estudiante.consecutivo &&
+            estudiante.dane &&
+            estudiante.grado_cod &&
+            estudiante.grupo
+          ) {
+            if (
+              estudiante.jornada.length > 1 &&
+              estudiante.consecutivo.length > 1 &&
+              estudiante.dane.length > 1 &&
+              estudiante.grado_cod.length > 0 &&
+              estudiante.grupo.length > 0
+            ) {
+              let user = await this.repositoryUser.findBy({ username: estudiante.doc });
+              if (user.length == 1) {
+                let name = (estudiante.nombre1 ? estudiante.nombre1 : '') + " ";
+                name += estudiante.nombre2 ? estudiante.nombre2 : '';
+                let lastName = (estudiante.apellido1 ? estudiante.apellido1 : '') + " ";
+                lastName += estudiante.apellido2 ? estudiante.apellido2 : '';
+                console.log(name, lastName)
+                let resultUser = await this.repositoryUser.save({
+                  _id: new ObjectId(user[0]?.id?.toString()),
+                  ...user[0],
+                  name,
+                  lastName,
+                  version: (user[0]?.version as number) + 1,
+                });
+                const model = await this.repositoryEstudiantes.create({
+                  ...estudiante,
+                  procesado: true,
+                });
+                // console.log(model);
                 let result = await this.repositoryEstudiantes.save(model);
               }
             }

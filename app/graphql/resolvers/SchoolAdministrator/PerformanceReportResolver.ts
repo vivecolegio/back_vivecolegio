@@ -217,8 +217,8 @@ export class PerformanceReportResolver {
                 studentId,
               }
             });
-            data = { ...data, "promStudent": averageAcademicPeriodStudentList[0]?.assessment?.toFixed(2) };
-            data = { ...data, "puestoEstudiante": averageAcademicPeriodStudentList[0]?.score };
+            dataPDF = { ...dataPDF, "promStudent": averageAcademicPeriodStudentList[0]?.assessment?.toFixed(2) };
+            dataPDF = { ...dataPDF, "puestoEstudiante": averageAcademicPeriodStudentList[0]?.score };
             let notesAsignatures = [];
             for (let asignatureCourse of academicAsignaturesCourse) {
               let academicAsignature = await this.repositoryAcademicAsignature.findOneBy(asignatureCourse?.academicAsignatureId);
