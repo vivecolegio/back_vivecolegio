@@ -172,6 +172,7 @@ export class PerformanceReportResolver {
         let academicPeriodData = { "name": "FINAL", "id": "FINAL", "order": 99 }
         academicPeriodsData.push(academicPeriodData);
         data = { ...data, "academicPeriods": academicPeriodsData };
+        data = { ...data, "academicPeriodsCount": `3fr repeat(${academicPeriodsData?.length}, 1fr);` };
         let studentsId = course?.studentsId;
         if (studentId !== null && studentId?.length > 0) {
           studentsId = [studentId]

@@ -128,7 +128,6 @@
 
     .data-note-student {
       display: grid;
-      grid-template-columns: 3fr repeat(5, 1fr);
       grid-template-rows: 1fr;
       grid-column-gap: 1rem;
       grid-row-gap: 0.5rem;
@@ -317,7 +316,7 @@
         <div class="item-data">Sede</div>
         <div class="item-data item-data-white">{{campusName}}</div>
       </div>
-      <div class="data-note-student">
+      <div class="data-note-student" style="grid-template-columns: {{academicPeriodsCount}}">
         <div class="item-data item-note-gris">Áreas / Asignaturas</div>
         {{#each academicPeriods as | academicPeriod academicPeriodId|}}
         <div class="item-data item-note-gris">{{academicPeriod.name}}</div>
