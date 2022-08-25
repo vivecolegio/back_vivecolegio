@@ -329,7 +329,9 @@
         {{#iff notesArea.areaId '===' area.id}}
         {{#iff academicPeriod2.id '===' notesArea.academicPeriodId}}
         <div class="item-data item-data-flex item-data-flex-azul">
+          {{#iff performanceLevelType '===' "QUANTITATIVE"}}
           <div>{{notesArea.assessment}}</div>
+          {{/iff }}
           <div>{{notesArea.performanceLevel}}</div>
         </div>
         {{/iff }}
@@ -343,7 +345,9 @@
         {{#iff notesAsignature.asignatureId '===' asignature.id}}
         {{#iff academicPeriods3.id '===' notesAsignature.academicPeriodId}}
         <div class="item-data item-data-flex">
+          {{#iff performanceLevelType '===' "QUANTITATIVE"}}
           <div>{{notesAsignature.assessment}}</div>
+          {{/iff }}
           <div>{{notesAsignature.performanceLevel}}</div>
         </div>
         {{/iff }}

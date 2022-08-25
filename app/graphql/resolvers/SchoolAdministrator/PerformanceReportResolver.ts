@@ -3,6 +3,7 @@ import { Arg, Ctx, Mutation, Resolver } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
 import { AcademicAreaCoursePeriodValuationRepository, AcademicAreaRepository, AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicAsignatureRepository, AcademicDayRepository, AcademicGradeRepository, AcademicPeriodRepository, AverageAcademicPeriodCourseRepository, AverageAcademicPeriodStudentRepository, CampusRepository, CourseRepository, PerformanceLevelRepository, SchoolRepository, StudentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
+import { PerformanceLevelType } from '../../enums/PerformanceLevelType';
 import { IContext } from '../../interfaces/IContext';
 import { AcademicAreaCoursePeriodValuation } from '../../models/CampusAdministrator/AcademicAreaCoursePeriodValuation';
 import { AcademicAsignatureCourse } from '../../models/CampusAdministrator/AcademicAsignatureCourse';
@@ -22,6 +23,7 @@ import { AcademicGrade } from '../../models/SchoolAdministrator/AcademicGrade';
 import { AcademicPeriod } from '../../models/SchoolAdministrator/AcademicPeriod';
 import { PerformanceLevel } from '../../models/SchoolAdministrator/PerformanceLevel';
 import { SchoolConfiguration } from '../../models/SchoolAdministrator/SchoolConfiguration';
+import { PerformanceLevelResolver } from './PerformanceLevelResolver';
 
 @Resolver(SchoolConfiguration)
 export class PerformanceReportResolver {
@@ -76,6 +78,8 @@ export class PerformanceReportResolver {
 
   @InjectRepository(AverageAcademicPeriodCourse)
   private repositoryAverageAcademicPeriodCourse = AverageAcademicPeriodCourseRepository;
+
+  private performanceLevelResolver = new PerformanceLevelResolver();
 
   @Mutation(() => Boolean)
   async generatePerformanceLevelExample(
@@ -147,6 +151,14 @@ export class PerformanceReportResolver {
         data = { ...data, "academicPeriodId": academicPeriod?.id?.toString() };
         let areasAux: any[] = []
         let asignaturesAux: any[] = []
+        let performanceLevelType: any = null;
+        if (academicAsignaturesCourse?.length > 0) {
+          let performanceLevels = await this.performanceLevelResolver.getAllPerformanceLevelAcademicAsignatureCourseFinal({}, academicAsignaturesCourse[0]?.id?.toString() + "");
+          if (performanceLevels) {
+            performanceLevelType = performanceLevels?.edges[0]?.node?.type;
+            data = { ...data, "performanceLevelType": performanceLevelType };
+          }
+        }
         for (let asignatureCourse of academicAsignaturesCourse) {
           let academicAsignature = await this.repositoryAcademicAsignature.findOneBy(asignatureCourse?.academicAsignatureId);
           let academicArea = await this.repositoryAcademicArea.findOneBy(academicAsignature?.academicAreaId);
@@ -198,7 +210,19 @@ export class PerformanceReportResolver {
             academicPeriodId,
           }
         });
-        data = { ...data, "promCourse": averageAcademicPeriodCourseList[0]?.assessment?.toFixed(2) };
+        switch (performanceLevelType) {
+          case PerformanceLevelType.QUALITATIVE:
+            if (averageAcademicPeriodCourseList[0]?.performanceLevelId != null) {
+              let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(averageAcademicPeriodCourseList[0]?.performanceLevelId);
+              data = { ...data, "promCourse": performanceLevel?.name };
+            } else {
+              data = { ...data, "promCourse": "" }
+            }
+            break;
+          case PerformanceLevelType.QUANTITATIVE:
+            data = { ...data, "promCourse": averageAcademicPeriodCourseList[0]?.assessment?.toFixed(2) };
+            break;
+        }
         //console.log("aca vamos bien", academicAsignaturesCourse);
         let urls: any[] = [];
         if (studentsId) {
@@ -218,7 +242,19 @@ export class PerformanceReportResolver {
                 studentId,
               }
             });
-            dataPDF = { ...dataPDF, "promStudent": averageAcademicPeriodStudentList[0]?.assessment?.toFixed(2) };
+            switch (performanceLevelType) {
+              case PerformanceLevelType.QUALITATIVE:
+                if (averageAcademicPeriodStudentList[0]?.performanceLevelId != null) {
+                  let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(averageAcademicPeriodStudentList[0]?.performanceLevelId);
+                  dataPDF = { ...dataPDF, "promStudent": performanceLevel?.name };
+                } else {
+                  dataPDF = { ...dataPDF, "promStudent": "" };
+                }
+                break;
+              case PerformanceLevelType.QUANTITATIVE:
+                dataPDF = { ...dataPDF, "promStudent": averageAcademicPeriodStudentList[0]?.assessment?.toFixed(2) };
+                break;
+            }
             dataPDF = { ...dataPDF, "puestoEstudiante": averageAcademicPeriodStudentList[0]?.score };
             let notesAsignatures = [];
             for (let asignatureCourse of academicAsignaturesCourse) {
