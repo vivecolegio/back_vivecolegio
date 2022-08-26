@@ -247,7 +247,7 @@ export class StudentResolver {
     let schools = await this.repositorySchool.find();
     let count = 0;
     for (let school of schools) {
-      if (school?.daneCode == "154518000265") {
+      if (school?.daneCode == "154871000261") {
         let data = await this.repositoryEstudiantes.findBy({
           where: { dane: school.daneCode, procesado: null },
         });
@@ -327,13 +327,14 @@ export class StudentResolver {
                       return hashedPassword;
                     });
                   let fechaNacimiento = estudiante.fecha_nacimiento?.split('/');
+                  let name = (estudiante.nombre1 ? estudiante.nombre1 : '') + " ";
+                  name += estudiante.nombre2 ? estudiante.nombre2 : '';
+                  let lastName = (estudiante.apellido1 ? estudiante.apellido1 : '') + " ";
+                  lastName += estudiante.apellido2 ? estudiante.apellido2 : '';
+                  console.log(name, lastName)
                   const modelUser = await this.repositoryUser.create({
-                    name: estudiante.nombre1
-                      ? estudiante.nombre1
-                      : '' + ' ' + estudiante.nombre2
-                        ? estudiante.nombre2
-                        : '',
-                    lastName: estudiante.apellido1 + ' ' + estudiante.apellido2,
+                    name,
+                    lastName,
                     username: estudiante.doc,
                     password: passwordHash,
                     documentTypeId,
@@ -364,6 +365,21 @@ export class StudentResolver {
                     version: 0,
                   });
                   let result = await this.repository.save(model);
+                  if (courseId != null && courseId != undefined) {
+                    let course = await this.repositoryCourse.findOneBy(courseId);
+                    let studentsId = course?.studentsId;
+                    if (studentsId == undefined || studentsId == null) {
+                      studentsId = [];
+                    }
+                    studentsId?.push(result?.id?.toString());
+                    let resultCourse = await this.repositoryCourse.save({
+                      _id: new ObjectId(courseId),
+                      ...course,
+                      studentsId,
+                      version: (result?.version as number) + 1,
+                    });
+                    this.courseResolver.updateCodeStudentsCourse(courseId + "");
+                  }
                   count += 1;
                   const model2 = await this.repositoryEstudiantes.create({
                     ...estudiante,
@@ -393,7 +409,7 @@ export class StudentResolver {
     let schools = await this.repositorySchool.find();
     let count = 0;
     for (let school of schools) {
-      if (school?.daneCode == "354405000098") {
+      if (school?.daneCode == "154680000015") {
         let data = await this.repositoryEstudiantes.findBy({
           where: { dane: school.daneCode, procesado: null },
         });
