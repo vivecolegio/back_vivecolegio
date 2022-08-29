@@ -349,11 +349,20 @@
         <div class="data-observacion">
           <div class="item-data item-data-white observacion">
             <ul>
+              {{#iff ../../../../typeDisplayDetails '==' 'LEARNING'}}
               {{#each asignature.learnings as | learning learnignsId|}}
               <li>
                 <p>{{learning.statement}}</p>
               </li>
               {{/each}}
+              {{/iff }}
+              {{#iff ../../../../typeDisplayDetails '==' 'EVIDENCE_LEARNING'}}
+              {{#each asignature.evidenceLearnings as | evidenceLearning evidenceLearningsId|}}
+              <li>
+                <p>{{evidenceLearning.statement}}</p>
+              </li>
+              {{/each}}
+              {{/iff }}
             </ul>
           </div>
           {{!-- <div class="item-data item-data-white desempeño">
