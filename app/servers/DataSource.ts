@@ -26,6 +26,7 @@ import { QuestionBankTestOnline } from '../graphql/models/CampusAdministrator/Qu
 import { QuestionCategoryTestOnline } from '../graphql/models/CampusAdministrator/QuestionCategoryTestOnline';
 import { QuestionTestOnline } from '../graphql/models/CampusAdministrator/QuestionTestOnline';
 import { StudentAttendance } from '../graphql/models/CampusAdministrator/StudentAttendance';
+import { StudentBehaviour } from '../graphql/models/CampusAdministrator/StudentBehaviour';
 import { Teacher } from '../graphql/models/CampusAdministrator/Teacher';
 import { Estudiantes } from '../graphql/models/Data/Estudiantes';
 import { PlantaDocente } from '../graphql/models/Data/PlantaDocente';
@@ -152,7 +153,8 @@ export const dataSource = new DataSource({
     SchoolConfiguration,
     AcademicAsignatureCoursePeriodEvidenceLearningValuation,
     AverageAcademicPeriodStudent,
-    AverageAcademicPeriodCourse
+    AverageAcademicPeriodCourse,
+    StudentBehaviour
   ],
   synchronize: true,
   logger: 'advanced-console',
@@ -264,6 +266,4 @@ export const SchoolConfigurationRepository = dataSource.getMongoRepository(Schoo
 export const AcademicAsignatureCoursePeriodEvidenceLearningValuationRepository = dataSource.getMongoRepository(AcademicAsignatureCoursePeriodEvidenceLearningValuation);
 export const AverageAcademicPeriodStudentRepository = dataSource.getMongoRepository(AverageAcademicPeriodStudent);
 export const AverageAcademicPeriodCourseRepository = dataSource.getMongoRepository(AverageAcademicPeriodCourse);
-
-
-
+export const StudentBehaviourRepository = dataSource.getMongoRepository(StudentBehaviour);
