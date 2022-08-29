@@ -1,8 +1,10 @@
+import { ObjectId } from 'mongodb';
 import PDFMerger from 'pdf-merger-js/browser';
+import report from "puppeteer-report";
 import { Arg, Ctx, Mutation, Resolver } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicAreaCoursePeriodValuationRepository, AcademicAreaRepository, AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicAsignatureRepository, AcademicDayRepository, AcademicGradeRepository, AcademicPeriodRepository, AverageAcademicPeriodCourseRepository, AverageAcademicPeriodStudentRepository, CampusRepository, CourseRepository, PerformanceLevelRepository, SchoolRepository, StudentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAreaCoursePeriodValuationRepository, AcademicAreaRepository, AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicAsignatureRepository, AcademicDayRepository, AcademicGradeRepository, AcademicPeriodRepository, AverageAcademicPeriodCourseRepository, AverageAcademicPeriodStudentRepository, CampusRepository, CourseRepository, EvidenceLearningRepository, ExperienceLearningRepository, LearningRepository, PerformanceLevelRepository, SchoolConfigurationRepository, SchoolRepository, StudentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
 import { PerformanceLevelType } from '../../enums/PerformanceLevelType';
 import { IContext } from '../../interfaces/IContext';
 import { AcademicAreaCoursePeriodValuation } from '../../models/CampusAdministrator/AcademicAreaCoursePeriodValuation';
@@ -12,6 +14,7 @@ import { AcademicDay } from '../../models/CampusAdministrator/AcademicDay';
 import { AverageAcademicPeriodCourse } from '../../models/CampusAdministrator/AverageAcademicPeriodCourse';
 import { AverageAcademicPeriodStudent } from '../../models/CampusAdministrator/AverageAcademicPeriodStudent';
 import { Course } from '../../models/CampusAdministrator/Course';
+import { ExperienceLearning } from '../../models/CampusAdministrator/ExperienceLearning';
 import { Teacher } from '../../models/CampusAdministrator/Teacher';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { School } from '../../models/GeneralAdministrator/School';
@@ -21,6 +24,8 @@ import { AcademicArea } from '../../models/SchoolAdministrator/AcademicArea';
 import { AcademicAsignature } from '../../models/SchoolAdministrator/AcademicAsignature';
 import { AcademicGrade } from '../../models/SchoolAdministrator/AcademicGrade';
 import { AcademicPeriod } from '../../models/SchoolAdministrator/AcademicPeriod';
+import { EvidenceLearning } from '../../models/SchoolAdministrator/EvidenceLearning';
+import { Learning } from '../../models/SchoolAdministrator/Learning';
 import { PerformanceLevel } from '../../models/SchoolAdministrator/PerformanceLevel';
 import { SchoolConfiguration } from '../../models/SchoolAdministrator/SchoolConfiguration';
 import { PerformanceLevelResolver } from './PerformanceLevelResolver';
@@ -79,6 +84,18 @@ export class PerformanceReportResolver {
   @InjectRepository(AverageAcademicPeriodCourse)
   private repositoryAverageAcademicPeriodCourse = AverageAcademicPeriodCourseRepository;
 
+  @InjectRepository(Learning)
+  private repositoryLearning = LearningRepository;
+
+  @InjectRepository(EvidenceLearning)
+  private repositoryEvidenceLearning = EvidenceLearningRepository;
+
+  @InjectRepository(ExperienceLearning)
+  private repositoryExperienceLearning = ExperienceLearningRepository;
+
+  @InjectRepository(SchoolConfiguration)
+  private repositorySchoolConfiguration = SchoolConfigurationRepository;
+
   private performanceLevelResolver = new PerformanceLevelResolver();
 
   @Mutation(() => Boolean)
@@ -122,6 +139,21 @@ export class PerformanceReportResolver {
     if (course) {
       let campus = await this.repositoryCampus.findOneBy(course?.campusId);
       let school = await this.repositorySchool.findOneBy(schoolId);
+      let schoolConfigurationCountDigitsPerformanceLevel = await this.repositorySchoolConfiguration.findBy({
+        where: { schoolId, code: "COUNT_DIGITS_PERFORMANCE_LEVEL", active: true },
+      });
+      let schoolConfigurationCountDigitsAverageStudent = await this.repositorySchoolConfiguration.findBy({
+        where: { schoolId, code: "COUNT_DIGITS_AVERAGE_STUDENT", active: true },
+      });
+      let schoolConfigurationTypeLearningsDisplay = await this.repositorySchoolConfiguration.findBy({
+        where: { schoolId, code: "REPORT_PERFORMANCE_TYPE_LEARNINGS_DISPLAY", active: true },
+      });
+      let schoolConfigurationTypeEvidenceLearningsDisplay = await this.repositorySchoolConfiguration.findBy({
+        where: { schoolId, code: "REPORT_PERFORMANCE_TYPE_EVIDENCE_LEARNINGS_DISPLAY", active: true },
+      });
+      let schoolConfigurationTypeDisplayDetails = await this.repositorySchoolConfiguration.findBy({
+        where: { schoolId, code: "REPORT_PERFORMANCE_TYPE_DISPLAY_DETAILS", active: true },
+      });
       let academicGrade = await this.repositoryAcademicGrade.findOneBy(course?.academicGradeId);
       let titular = await this.repositoryTeacher.findOneBy(course?.teacherId);
       let titularUser = await this.repositoryUser.findOneBy(titular?.userId);
@@ -189,19 +221,162 @@ export class PerformanceReportResolver {
         if (studentId !== null && studentId?.length > 0) {
           studentsId = [studentId]
         }
-        areasAux = filtered.sort(this.compareOrderAcademicArea)
+        areasAux = filtered.sort(this.compareOrderAcademicArea);
         let areas: any[] = [];
-        areasAux.map((area) => {
+        // areasAux.map((area) => {
+        let typeDisplayDetails = "EVIDENCE_LEARNING";
+        if (schoolConfigurationTypeDisplayDetails?.length > 0) {
+          typeDisplayDetails = schoolConfigurationTypeDisplayDetails[0]?.valueString ? schoolConfigurationTypeDisplayDetails[0]?.valueString : "EVIDENCE_LEARNING";
+        }
+        let typeEvidenceLearningsDisplay = "SPECIFIC";
+        if (schoolConfigurationTypeEvidenceLearningsDisplay?.length > 0) {
+          typeEvidenceLearningsDisplay = schoolConfigurationTypeEvidenceLearningsDisplay[0]?.valueString ? schoolConfigurationTypeEvidenceLearningsDisplay[0]?.valueString : "SPECIFIC";
+        }
+        let typeLearningsDisplay = "SPECIFIC";
+        if (schoolConfigurationTypeLearningsDisplay?.length > 0) {
+          typeLearningsDisplay = schoolConfigurationTypeLearningsDisplay[0]?.valueString ? schoolConfigurationTypeLearningsDisplay[0]?.valueString : "SPECIFIC";
+        }
+        let countDigitsPerformanceLevel = 2;
+        if (schoolConfigurationCountDigitsPerformanceLevel?.length > 0) {
+          countDigitsPerformanceLevel = schoolConfigurationCountDigitsPerformanceLevel[0]?.valueNumber ? schoolConfigurationCountDigitsPerformanceLevel[0]?.valueNumber : 2;
+        }
+        let countDigitsAverageStudent = 2;
+        if (schoolConfigurationCountDigitsAverageStudent?.length > 0) {
+          countDigitsAverageStudent = schoolConfigurationCountDigitsAverageStudent[0]?.valueNumber ? schoolConfigurationCountDigitsAverageStudent[0]?.valueNumber : 2;
+        }
+
+        data = { ...data, "countDigitsPerformanceLevel": countDigitsPerformanceLevel };
+        data = { ...data, "countDigitsAverageStudent": countDigitsAverageStudent };
+        data = { ...data, "typeDisplayDetails": typeDisplayDetails };
+        data = { ...data, "typeEvidenceLearningsDisplay": typeEvidenceLearningsDisplay };
+        data = { ...data, "typeLearningsDisplay": typeLearningsDisplay };
+        for (let area of areasAux) {
           let asignaturesAreaData: any[] = [];
           for (let asignature of asignaturesAux) {
             if (asignature?.academicAreaId === area?.id?.toString()) {
-              let asignaturesData = { "name": asignature?.name, "id": asignature?.id?.toString(), "academicPeriods": academicPeriodsData }
+              let evidencesIdAux: String[] = [];
+              let learningsIdAux: String[] = [];
+              let evidenceLearnings: any[] = [];
+              let learnings: any[] = [];
+              switch (typeDisplayDetails) {
+                case "EVIDENCE_LEARNING":
+                  switch (typeEvidenceLearningsDisplay) {
+                    case "ALL":
+                      let learnigs = await this.repositoryLearning.findBy({
+                        where:
+                        {
+                          academicAsignatureId: asignature?.id?.toString(),
+                          academicPeriodsId: { $in: [academicPeriod?.id?.toString()] },
+                          academicGradeId: course?.academicGradeId,
+                          active: true
+                        }
+                      });
+                      for (let learning of learnigs) {
+                        let evidenceLearningAux = await this.repositoryEvidenceLearning.findBy({
+                          where:
+                          {
+                            learningId: learning?.id?.toString(),
+                            active: true
+                          }
+                        });
+                        for (let evidenceLearning of evidenceLearningAux) {
+                          evidenceLearnings.push(evidenceLearning)
+                        }
+                      }
+                      break;
+                    case "SPECIFIC":
+                      for (let asignatureCourse of academicAsignaturesCourse) {
+                        if (asignatureCourse?.academicAsignatureId == asignature?.id?.toString()) {
+                          let experienceLearnings = await this.repositoryExperienceLearning.findBy({
+                            where:
+                            {
+                              academicAsignatureCourseId: asignatureCourse?.id?.toString(),
+                              active: true
+                            }
+                          });
+                          for (let experienceLearning of experienceLearnings) {
+                            if (experienceLearning?.evidenceLearningsId && experienceLearning?.evidenceLearningsId?.length > 0) {
+                              for (let evidence of experienceLearning?.evidenceLearningsId) {
+                                evidencesIdAux.push(evidence)
+                              }
+                            }
+                          }
+                        }
+                      }
+                      evidencesIdAux = evidencesIdAux.filter((ele, pos) => evidencesIdAux.indexOf(ele) == pos);
+                      let evidencesId: any[] = [];
+                      for (let evidenceId of evidencesIdAux) {
+                        evidencesId?.push(new ObjectId(evidenceId.toString()));
+                      }
+                      evidenceLearnings = await this.repositoryEvidenceLearning.findBy({
+                        where: { _id: { $in: evidencesId } },
+                      });
+                      break;
+                  }
+                  break;
+                case "LEARNING":
+                  switch (typeLearningsDisplay) {
+                    case "ALL":
+                      let learnigsAux = await this.repositoryLearning.findBy({
+                        where:
+                        {
+                          academicAsignatureId: asignature?.id?.toString(),
+                          academicPeriodsId: { $in: [academicPeriod?.id?.toString()] },
+                          academicGradeId: course?.academicGradeId,
+                          active: true
+                        }
+                      });
+                      for (let learning of learnigsAux) {
+                        learnings.push(learning)
+                      }
+                      break;
+                    case "SPECIFIC":
+                      for (let asignatureCourse of academicAsignaturesCourse) {
+                        if (asignatureCourse?.academicAsignatureId == asignature?.id?.toString()) {
+                          //console.log(asignature?.name, asignatureCourse?.academicAsignatureId)
+                          let experienceLearnings = await this.repositoryExperienceLearning.findBy({
+                            where:
+                            {
+                              academicAsignatureCourseId: asignatureCourse?.id?.toString(),
+                              active: true
+                            }
+                          });
+                          for (let experienceLearning of experienceLearnings) {
+                            if (experienceLearning?.learningsId && experienceLearning?.learningsId?.length > 0) {
+                              for (let learning of experienceLearning?.learningsId) {
+                                learningsIdAux.push(learning)
+                              }
+                              //console.log(experienceLearning?.learningsId)
+                            }
+                          }
+                        }
+                      }
+                      learningsIdAux = learningsIdAux.filter((ele, pos) => learningsIdAux.indexOf(ele) == pos);
+                      let learningsId: any[] = [];
+                      for (let learningId of learningsIdAux) {
+                        learningsId?.push(new ObjectId(learningId.toString()));
+                      }
+                      learnings = await this.repositoryLearning.findBy({
+                        where: { _id: { $in: learningsId } },
+                      });
+                      break;
+                  }
+                  break;
+              }
+              let hourlyIntensity = 0;
+              for (let asignatureCourse of academicAsignaturesCourse) {
+                if (asignatureCourse?.academicAsignatureId == asignature?.id?.toString()) {
+                  hourlyIntensity = asignatureCourse?.hourlyIntensity ? asignatureCourse?.hourlyIntensity : 0;
+                }
+              }
+              let asignaturesData = { "name": asignature?.name, "id": asignature?.id?.toString(), "academicPeriods": academicPeriodsData, "evidenceLearnings": evidenceLearnings, "learnings": learnings, "ihs": hourlyIntensity }
+              //console.log(asignaturesData)
               asignaturesAreaData.push(asignaturesData)
             }
           }
           let areaData = { "name": area?.name, "id": area?.id?.toString(), "asignatures": asignaturesAreaData, "academicPeriods": academicPeriodsData }
           areas.push(areaData);
-        })
+        }
         data = { ...data, "areas": areas };
         let averageAcademicPeriodCourseList = await this.repositoryAverageAcademicPeriodCourse.findBy({
           where:
@@ -220,7 +395,7 @@ export class PerformanceReportResolver {
             }
             break;
           case PerformanceLevelType.QUANTITATIVE:
-            data = { ...data, "promCourse": averageAcademicPeriodCourseList[0]?.assessment?.toFixed(2) };
+            data = { ...data, "promCourse": averageAcademicPeriodCourseList[0]?.assessment?.toFixed(countDigitsAverageStudent) };
             break;
         }
         //console.log("aca vamos bien", academicAsignaturesCourse);
@@ -252,7 +427,7 @@ export class PerformanceReportResolver {
                 }
                 break;
               case PerformanceLevelType.QUANTITATIVE:
-                dataPDF = { ...dataPDF, "promStudent": averageAcademicPeriodStudentList[0]?.assessment?.toFixed(2) };
+                dataPDF = { ...dataPDF, "promStudent": averageAcademicPeriodStudentList[0]?.assessment?.toFixed(countDigitsAverageStudent) };
                 break;
             }
             dataPDF = { ...dataPDF, "puestoEstudiante": averageAcademicPeriodStudentList[0]?.score };
@@ -273,7 +448,7 @@ export class PerformanceReportResolver {
                     if (notesAsignature?.length > 0) {
                       if (notesAsignature?.length == 1) {
                         let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(notesAsignature[0]?.performanceLevelId);
-                        notesAsignatures.push({ assessment: notesAsignature[0]?.assessment?.toFixed(2), academicPeriodId: notesAsignature[0]?.academicPeriodId, performanceLevel: performanceLevel?.name, "asignatureId": academicAsignature?.id?.toString(), "areaId": academicArea?.id?.toString(), "teacher": teacherUserAsignatureCourse?.name + " " + teacherUserAsignatureCourse?.lastName })
+                        notesAsignatures.push({ assessment: notesAsignature[0]?.assessment?.toFixed(countDigitsPerformanceLevel), academicPeriodId: notesAsignature[0]?.academicPeriodId, performanceLevel: performanceLevel?.name, "asignatureId": academicAsignature?.id?.toString(), "areaId": academicArea?.id?.toString(), "teacher": teacherUserAsignatureCourse?.name + " " + teacherUserAsignatureCourse?.lastName })
                       } else {
                         let valuationAsignatureCalculate;
                         let valuationAsignatureDefinitive;
@@ -289,11 +464,11 @@ export class PerformanceReportResolver {
                         }
                         if (valuationAsignatureDefinitive) {
                           let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(valuationAsignatureDefinitive?.performanceLevelId);
-                          notesAsignatures.push({ assessment: valuationAsignatureDefinitive?.assessment?.toFixed(2), academicPeriodId: valuationAsignatureDefinitive?.academicPeriodId, performanceLevel: performanceLevel?.name, "asignatureId": academicAsignature?.id?.toString(), "areaId": academicArea?.id?.toString(), "teacher": teacherUserAsignatureCourse?.name + " " + teacherUserAsignatureCourse?.lastName })
+                          notesAsignatures.push({ assessment: valuationAsignatureDefinitive?.assessment?.toFixed(countDigitsPerformanceLevel), academicPeriodId: valuationAsignatureDefinitive?.academicPeriodId, performanceLevel: performanceLevel?.name, "asignatureId": academicAsignature?.id?.toString(), "areaId": academicArea?.id?.toString(), "teacher": teacherUserAsignatureCourse?.name + " " + teacherUserAsignatureCourse?.lastName })
                         } else {
                           if (valuationAsignatureCalculate) {
                             let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(valuationAsignatureCalculate?.performanceLevelId);
-                            notesAsignatures.push({ assessment: valuationAsignatureCalculate?.assessment?.toFixed(2), academicPeriodId: valuationAsignatureCalculate?.academicPeriodId, performanceLevel: performanceLevel?.name, "asignatureId": academicAsignature?.id?.toString(), "areaId": academicArea?.id?.toString(), "teacher": teacherUserAsignatureCourse?.name + " " + teacherUserAsignatureCourse?.lastName })
+                            notesAsignatures.push({ assessment: valuationAsignatureCalculate?.assessment?.toFixed(countDigitsPerformanceLevel), academicPeriodId: valuationAsignatureCalculate?.academicPeriodId, performanceLevel: performanceLevel?.name, "asignatureId": academicAsignature?.id?.toString(), "areaId": academicArea?.id?.toString(), "teacher": teacherUserAsignatureCourse?.name + " " + teacherUserAsignatureCourse?.lastName })
                           }
                         }
                       }
@@ -319,7 +494,7 @@ export class PerformanceReportResolver {
                     });
                     if (notesArea?.length == 1) {
                       let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(notesArea[0]?.performanceLevelId);
-                      notesAreas.push({ assessment: notesArea[0]?.assessment?.toFixed(2), academicPeriodId: notesArea[0]?.academicPeriodId, performanceLevel: performanceLevel?.name, "areaId": area?.id?.toString() })
+                      notesAreas.push({ assessment: notesArea[0]?.assessment?.toFixed(countDigitsPerformanceLevel), academicPeriodId: notesArea[0]?.academicPeriodId, performanceLevel: performanceLevel?.name, "areaId": area?.id?.toString() })
                     } else {
                       notesAreas.push({ assessment: "-", academicPeriodId: period?.id?.toString(), performanceLevel: "-", "areaId": area?.id?.toString() })
                     }
@@ -334,6 +509,11 @@ export class PerformanceReportResolver {
             dataPDF = { ...dataPDF, "notesAsignatures": notesAsignatures };
             dataPDF = { ...dataPDF, "notesAreas": notesAreas };
             promisesGeneratePDF.push(
+              this.generatePerformanceReportStudentDetails(dataPDF, studentId, format).then((dataUrl) => {
+                urls.push(dataUrl);
+              })
+            );
+            promisesGeneratePDF.push(
               this.generatePerformanceReportStudent(dataPDF, studentId, format).then((dataUrl) => {
                 urls.push(dataUrl);
               })
@@ -341,6 +521,7 @@ export class PerformanceReportResolver {
           }
           let urlsReturn = await Promise.all(promisesGeneratePDF).then(() => {
             if (urls?.length > 1) {
+              urls = urls.sort();
               const merge = require('easy-pdf-merge');
               const opts = {
                 maxBuffer: 1024 * 5096, // 500kb
@@ -407,14 +588,30 @@ export class PerformanceReportResolver {
       const page = await browser.newPage();
       //console.log(data)
       const content = await this.compile('index', data);
-      //console.log(content)
+
       await page.setContent(content);
       var dir = './public/downloads/reports/students/' + id;
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
-      await page.pdf({
-        path: dir + '/' + id + '.pdf',
+      // await page.pdf({
+      //   path: dir + '/' + id + '-1' + '.pdf',
+      //   format: format,
+      //   printBackground: true,
+      //   preferCSSPageSize: true,
+      //   margin: {
+      //     bottom: "0",
+      //     left: "0",
+      //     right: "0",
+      //     top: "0",
+      //   },
+      //   // displayHeaderFooter: true,
+      //   // headerTemplate: header,
+      //   //footerTemplate: '<style>@font-face{font-family:Mina;src:url(/mina/Mina-Regular.woff2) format("woff2"),url(/mina/Mina-Regular.woff) format("woff"),url(/mina/Mina-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:Mina;src:url(/mina/Mina-Bold.woff2) format("woff2"),url(/mina/Mina-Bold.woff) format("woff"),url(/mina/Mina-Bold.ttf) format("truetype");font-weight:700;font-style:normal}h1,h2,h3,h4,h5,h6,p,span{font-family:Mina,sans-serif}</style><div style="font-size:10px!important;color:grey!important;padding-left:400px;" class="pdfheader"><span>Pagina: </span><span class="pageNumber"></span>/<span class="totalPages"></span></div>',
+      // });
+
+      await report.pdfPage(page, {
+        path: dir + '/' + id + '-1' + '.pdf',
         format: format,
         printBackground: true,
         preferCSSPageSize: true,
@@ -424,12 +621,92 @@ export class PerformanceReportResolver {
           right: "0",
           top: "0",
         },
-        //displayHeaderFooter: true,
-        //footerTemplate: '<style>@font-face{font-family:Mina;src:url(/mina/Mina-Regular.woff2) format("woff2"),url(/mina/Mina-Regular.woff) format("woff"),url(/mina/Mina-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:Mina;src:url(/mina/Mina-Bold.woff2) format("woff2"),url(/mina/Mina-Bold.woff) format("woff"),url(/mina/Mina-Bold.ttf) format("truetype");font-weight:700;font-style:normal}h1,h2,h3,h4,h5,h6,p,span{font-family:Mina,sans-serif}</style><div style="font-size:10px!important;color:grey!important;padding-left:400px;" class="pdfheader"><span>Pagina: </span><span class="pageNumber"></span>/<span class="totalPages"></span></div>',
       });
       //console.log("done creating pdf");
       await browser.close();
-      return dir + '/' + id + '.pdf';
+      return dir + '/' + id + '-1' + '.pdf';
+      //process.exit();
+    } catch (e) {
+      console.log(e);
+      return "";
+    }
+  }
+
+  async generatePerformanceReportStudentDetails(data: any, id: any, format: any) {
+    const puppeteer = require("puppeteer");
+    const fs = require("fs-extra");
+    const hbs = require("handlebars");
+    const path = require("path");
+
+    try {
+      hbs.registerHelper(`iff`, (a: number, operator: any, b: number, opts: { fn: (arg0: any) => any; inverse: (arg0: any) => any; }) => {
+        let bool = false;
+        a?.toString();
+        b?.toString();
+        switch (operator) {
+          case `===`:
+            bool = a === b;
+            break;
+          case `==`:
+            bool = a == b;
+            break;
+          case `>`:
+            bool = a > b;
+            break;
+          case `<`:
+            bool = a < b;
+            break;
+          default:
+            bool = a === b;
+        }
+
+        if (bool) {
+          return opts.fn(this);
+        }
+        return opts.inverse(this);
+      });
+      const browser = await puppeteer.launch({
+        args: ['--no-sandbox']
+      });
+      const page = await browser.newPage();
+      //console.log(data)
+      const content = await this.compile('index2', data);
+      //console.log(content)
+      await page.setContent(content);
+      var dir = './public/downloads/reports/students/' + id;
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      // await page.pdf({
+      //   path: dir + '/' + id + '-2' + '.pdf',
+      //   format: format,
+      //   printBackground: true,
+      //   preferCSSPageSize: true,
+      //   margin: {
+      //     bottom: "0",
+      //     left: "0",
+      //     right: "0",
+      //     top: "0",
+      //   },
+      //   //displayHeaderFooter: true,
+      //   //footerTemplate: '<style>@font-face{font-family:Mina;src:url(/mina/Mina-Regular.woff2) format("woff2"),url(/mina/Mina-Regular.woff) format("woff"),url(/mina/Mina-Regular.ttf) format("truetype");font-weight:400;font-style:normal}@font-face{font-family:Mina;src:url(/mina/Mina-Bold.woff2) format("woff2"),url(/mina/Mina-Bold.woff) format("woff"),url(/mina/Mina-Bold.ttf) format("truetype");font-weight:700;font-style:normal}h1,h2,h3,h4,h5,h6,p,span{font-family:Mina,sans-serif}</style><div style="font-size:10px!important;color:grey!important;padding-left:400px;" class="pdfheader"><span>Pagina: </span><span class="pageNumber"></span>/<span class="totalPages"></span></div>',
+      // });
+
+      await report.pdfPage(page, {
+        path: dir + '/' + id + '-2' + '.pdf',
+        format: format,
+        printBackground: true,
+        preferCSSPageSize: true,
+        margin: {
+          bottom: "0",
+          left: "0",
+          right: "0",
+          top: "0",
+        },
+      });
+      //console.log("done creating pdf");
+      await browser.close();
+      return dir + '/' + id + '-2' + '.pdf';
       //process.exit();
     } catch (e) {
       console.log(e);

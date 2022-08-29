@@ -210,6 +210,47 @@ export class StudentBehaviourResolver {
     return result?.result?.ok === 1 ?? true;
   }
 
+  @Mutation(() => Boolean)
+  async createPeriodStudentBehaviour(
+    @Arg('courseId', () => String) courseId: string,
+    @Arg('academicPeriodId', () => String) academicPeriodId: string,
+    @Ctx() context: IContext
+  ): Promise<Boolean | null> {
+    let course = await this.repositoryCourse.findOneBy(courseId);
+    let academicPeriod = await this.repositoryAcademicPeriod.findOneBy(academicPeriodId)
+    if (course && academicPeriod) {
+      const students = course.studentsId;
+      if (students) {
+        for (let student of students) {
+          let studentBehaviour =
+            await this.repository.findBy({
+              where: {
+                academicPeriodId,
+                courseId,
+                studentId: student,
+              },
+            });
+          if (studentBehaviour.length == 0) {
+            let createdByUserId = context?.user?.authorization?.id;
+            const model = await this.repository.create({
+              courseId,
+              academicPeriodId,
+              studentId: student,
+              active: true,
+              version: 0,
+              createdByUserId,
+            });
+            let result = await this.repository.save(
+              model
+            );
+          }
+        }
+      }
+
+    }
+    return true;
+  }
+
   @FieldResolver((_type) => User, { nullable: true })
   async createdByUser(@Root() data: StudentBehaviour) {
     let id = data.createdByUserId;

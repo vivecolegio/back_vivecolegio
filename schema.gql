@@ -2024,6 +2024,7 @@ type Mutation {
   changeActiveSpecialty(active: Boolean!, id: String!): Boolean!
   changeActiveStudent(active: Boolean!, id: String!): Boolean!
   changeActiveStudentAttendance(active: Boolean!, id: String!): Boolean!
+  changeActiveStudentBehaviour(active: Boolean!, id: String!): Boolean!
   changeActiveTeacher(active: Boolean!, id: String!): Boolean!
   changeActiveUser(active: Boolean!, id: String!): Boolean!
   changePasswordUser(id: String!, password: String!): Boolean!
@@ -2101,6 +2102,7 @@ type Mutation {
   createMunicipality(data: NewMunicipality!): Municipality!
   createNotification(data: NewNotification!): Notification!
   createPerformanceLevel(data: NewPerformanceLevel!): PerformanceLevel!
+  createPeriodStudentBehaviour(academicPeriodId: String!, courseId: String!): Boolean!
   createQuestionBankTestOnline(data: NewQuestionBankTestOnline!): QuestionBankTestOnline!
   createQuestionCategoryTestOnline(data: NewQuestionCategoryTestOnline!): QuestionCategoryTestOnline!
   createQuestionTestOnline(data: NewQuestionTestOnline!): QuestionTestOnline!
@@ -2113,6 +2115,7 @@ type Mutation {
   createSpecialty(data: NewSpecialty!): Specialty!
   createStudent(data: NewStudent!): Student!
   createStudentAttendance(data: NewStudentAttendance!): StudentAttendance!
+  createStudentBehaviour(data: NewStudentBehaviour!): StudentBehaviour!
   createTeacher(data: NewTeacher!): Teacher!
   createUser(data: NewUser!): User!
   deleteAcademicArea(id: String!): Boolean!
@@ -2179,6 +2182,7 @@ type Mutation {
   deleteSpecialty(id: String!): Boolean!
   deleteStudent(id: String!): Boolean!
   deleteStudentAttendance(id: String!): Boolean!
+  deleteStudentBehaviour(id: String!): Boolean!
   deleteTeacher(id: String!): Boolean!
   deleteUser(id: String!): Boolean!
   generatePerformanceLevelExample(id: String!): Boolean!
@@ -2263,6 +2267,7 @@ type Mutation {
   updateSpecialty(data: NewSpecialty!, id: String!): Specialty!
   updateStudent(data: NewStudent!, id: String!): Student!
   updateStudentAttendance(data: NewStudentAttendance!, id: String!): StudentAttendance!
+  updateStudentBehaviour(data: NewStudentBehaviour!, id: String!): StudentBehaviour!
   updateStudentsAllInitialsCourse: Boolean!
   updateTeacher(data: NewTeacher!, id: String!): Teacher!
   updateUser(data: NewUser!, id: String!): User!
@@ -2850,6 +2855,15 @@ input NewStudentAttendance {
   academicAsignatureCourseId: String
   academicPeriodId: String
   day: DateTime
+  studentId: String
+}
+
+input NewStudentBehaviour {
+  academicPeriodId: String
+  assessment: Float
+  courseId: String
+  observation: String
+  performanceLevelId: String
   studentId: String
 }
 
@@ -4343,6 +4357,25 @@ type Query {
     orderCreated: Boolean!
     studentId: String
   ): StudentAttendanceConnection!
+  getAllStudentBehaviour(
+    academicPeriodId: String!
+
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+    courseId: String!
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+    studentId: String
+  ): StudentBehaviourConnection!
   getAllTeacher(
     """Paginate after opaque cursor"""
     after: String
@@ -4429,6 +4462,7 @@ type Query {
   getSpecialty(id: String!): Specialty
   getStudent(id: String!): Student
   getStudentAttendance(id: String!): StudentAttendance
+  getStudentBehaviour(id: String!): StudentBehaviour
   getTeacher(id: String!): Teacher
   getUser(id: String!): User
   getValidationDocumentNumberUser(documentNumber: String!): Boolean!
@@ -4840,6 +4874,45 @@ type StudentAttendanceEdge {
   """Used in `before` and `after` args"""
   cursor: String!
   node: StudentAttendance!
+}
+
+"""The StudentBehaviour model"""
+type StudentBehaviour implements IModelCampusData {
+  academicPeriod: AcademicPeriod
+  academicPeriodId: String
+  active: Boolean
+  assessment: Float
+  campus: Campus
+  campusId: String
+  course: Course
+  courseId: String
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  id: ID!
+  observation: String
+  performanceLevel: PerformanceLevel
+  performanceLevelId: String
+  student: Student
+  studentId: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type StudentBehaviourConnection {
+  edges: [StudentBehaviourEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type StudentBehaviourEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: StudentBehaviour!
 }
 
 type StudentConnection {

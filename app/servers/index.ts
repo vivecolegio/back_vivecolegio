@@ -36,6 +36,7 @@ import { QuestionBankTestOnlineResolver } from '../graphql/resolvers/CampusAdmin
 import { QuestionCategoryTestOnlineResolver } from '../graphql/resolvers/CampusAdministrator/QuestionCategoryTestOnlineResolver';
 import { QuestionTestOnlineResolver } from '../graphql/resolvers/CampusAdministrator/QuestionTestOnlineResolver';
 import { StudentAttendanceResolver } from '../graphql/resolvers/CampusAdministrator/StudentAttendanceResolver';
+import { StudentBehaviourResolver } from '../graphql/resolvers/CampusAdministrator/StudentBehaviourResolver';
 import { AuditLoginResolver } from '../graphql/resolvers/GeneralAdministrator/AuditLoginResolver';
 import { GenderResolver } from '../graphql/resolvers/GeneralAdministrator/GenderResolver';
 import { GeneralAcademicAsignatureResolver } from '../graphql/resolvers/GeneralAdministrator/GeneralAcademicAsignatureResolver';
@@ -172,7 +173,8 @@ async function app() {
         PerformanceReportResolver,
         SchoolConfigurationResolver,
         AcademicAreaCoursePeriodValuationResolver,
-        AcademicAsignatureCoursePeriodEvidenceLearningValuationResolver
+        AcademicAsignatureCoursePeriodEvidenceLearningValuationResolver,
+        StudentBehaviourResolver
       ],
       emitSchemaFile: true,
       validate: false,

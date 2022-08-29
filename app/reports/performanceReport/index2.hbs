@@ -271,7 +271,7 @@
 <body>
   <div class="page">
     <div id="header" style="padding-bottom: 2%;">
-      <div class="app-student-notes" id="header">
+      <div class="app-student-notes">
         <div>
           <img class="header-img-school" src="http://vivecolegios.nortedesantander.gov.co:4000/{{schoolLogo}}" alt="" />
         </div>
@@ -294,7 +294,7 @@
     </div>
     <div class="titulo">
       <h1>
-        Informe de Desempeño <br />
+        Informe de Desempeño Detallado<br />
       </h1>
     </div>
     <div class="content-student-notes">
@@ -326,48 +326,7 @@
         <div class="item-data">Sede</div>
         <div class="item-data item-data-white">{{campusName}}</div>
       </div>
-      <div class="data-note-student" style="grid-template-columns: {{academicPeriodsCount}}">
-        <div class="item-data item-note-gris">Áreas / Asignaturas</div>
-        {{#each academicPeriods as | academicPeriod academicPeriodId|}}
-        <div class="item-data item-note-gris">{{academicPeriod.name}}</div>
-        {{/each}}
-        {{#each areas as | area areaId|}}
-        <div class="item-data">{{area.name}}</div>
-        {{#each area.academicPeriods as | academicPeriod2 academicPeriodId2|}}
-
-        {{#each ../../notesAreas as | notesArea notesAreaId|}}
-        {{#iff notesArea.areaId '===' area.id}}
-        {{#iff academicPeriod2.id '===' notesArea.academicPeriodId}}
-        <div class="item-data item-data-flex item-data-flex-azul">
-          {{#iff ../../../../performanceLevelType '==' 'QUANTITATIVE'}}
-          <div>{{notesArea.assessment}}</div>
-          {{/iff }}
-          <div>{{notesArea.performanceLevel}}</div>
-        </div>
-        {{/iff }}
-        {{/iff }}
-        {{/each}}
-        {{/each}}
-        {{#each area.asignatures as | asignature asignatureId|}}
-        <div class="item-data item-data-white">{{asignature.name}}</div>
-        {{#each ../../academicPeriods as | academicPeriods3 academicPeriodId3|}}
-        {{#each ../../../notesAsignatures as | notesAsignature notesAsignatureId|}}
-        {{#iff notesAsignature.asignatureId '===' asignature.id}}
-        {{#iff academicPeriods3.id '===' notesAsignature.academicPeriodId}}
-        <div class="item-data item-data-flex">
-          {{#iff ../../../../../performanceLevelType '==' 'QUANTITATIVE'}}
-          <div>{{notesAsignature.assessment}}</div>
-          {{/iff }}
-          <div>{{notesAsignature.performanceLevel}}</div>
-        </div>
-        {{/iff }}
-        {{/iff }}
-        {{/each}}
-        {{/each}}
-        {{/each}}
-        {{/each}}
-      </div>
-      {{!-- <div class="observaciones-note">
+      <div class="observaciones-note">
         {{#each areas as | area areaId|}}
         {{#each area.asignatures as | asignature asignatureId|}}
         {{#each ../../notesAsignatures as | notesAsignature notesAsignatureId|}}
@@ -376,26 +335,37 @@
         <div class="data-materia">
           <div class="item-data">Asignatura</div>
           <div class="item-data item-data-white">{{asignature.name}}</div>
+          <div class="item-data">I.H.S.</div>
+          <div class="item-data item-data-white">{{asignature.ihs}}</div>
           <div class="item-data">Docente</div>
           <div class="item-data item-data-white">{{notesAsignature.teacher}}</div>
-          <div class="item-data item-data-white">{{notesAsignature.assessment}} - {{notesAsignature.performanceLevel}}
+          <div class="item-data">
+            {{#iff ../../../../performanceLevelType '==' 'QUANTITATIVE'}}
+            <div>{{notesAsignature.assessment}}</div>
+            {{/iff }}
+            <div>{{notesAsignature.performanceLevel}}</div>
           </div>
         </div>
         <div class="data-observacion">
           <div class="item-data item-data-white observacion">
-            <p> -
-            </p>
+            <ul>
+              {{#each asignature.learnings as | learning learnignsId|}}
+              <li>
+                <p>{{learning.statement}}</p>
+              </li>
+              {{/each}}
+            </ul>
           </div>
-          <div class="item-data item-data-white desempeño">
+          {{!-- <div class="item-data item-data-white desempeño">
             <div class="item-data item-data-white"> - </div>
-          </div>
+          </div> --}}
         </div>
         {{/iff }}
         {{/iff }}
         {{/each}}
         {{/each}}
         {{/each}}
-      </div> --}}
+      </div>
       <div class="container-firma-nombre">
         <div class="container-firma">
           <div class="firma"></div>

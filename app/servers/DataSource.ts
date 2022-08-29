@@ -29,6 +29,7 @@ import { StudentAttendance } from '../graphql/models/CampusAdministrator/Student
 import { StudentBehaviour } from '../graphql/models/CampusAdministrator/StudentBehaviour';
 import { Teacher } from '../graphql/models/CampusAdministrator/Teacher';
 import { Estudiantes } from '../graphql/models/Data/Estudiantes';
+import { Estudiantes2 } from '../graphql/models/Data/Estudiantes2';
 import { PlantaDocente } from '../graphql/models/Data/PlantaDocente';
 import { AuditLogin } from '../graphql/models/GeneralAdministrator/AuditLogin';
 import { Campus } from '../graphql/models/GeneralAdministrator/Campus';
@@ -145,6 +146,7 @@ export const dataSource = new DataSource({
     ClassroomPlan,
     PlantaDocente,
     Estudiantes,
+    Estudiantes2,
     Jornadas,
     Cursos,
     SchoolAdministrative,
@@ -256,7 +258,7 @@ export const QuestionCategoryTestOnlineRepository = dataSource.getMongoRepositor
 );
 export const ClassroomPlanRepository = dataSource.getMongoRepository(ClassroomPlan);
 export const PlantaDocenteRepository = dataSource.getMongoRepository(PlantaDocente);
-export const EstudiantesRepository = dataSource.getMongoRepository(Estudiantes);
+export const EstudiantesRepository = dataSource.getMongoRepository(Estudiantes2);
 export const JornadasRepository = dataSource.getMongoRepository(Jornadas);
 export const CursosRepository = dataSource.getMongoRepository(Cursos);
 export const SchoolAdministrativeRepository = dataSource.getMongoRepository(SchoolAdministrative);

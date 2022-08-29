@@ -84,7 +84,7 @@
     "pdf-creator-node": "2.3.5",
     "pdf-merger-js": "4.1.0",
     "puppeteer": "16.2.0",
-    "puppeteer-report": "3.0.3",
+    "puppeteer-report": "^3.0.3",
     "reflect-metadata": "0.1.13",
     "short-unique-id": "4.4.4",
     "ts-node": "10.9.1",
