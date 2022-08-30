@@ -145,6 +145,9 @@ export class PerformanceReportResolver {
       let schoolConfigurationCountDigitsAverageStudent = await this.repositorySchoolConfiguration.findBy({
         where: { schoolId, code: "COUNT_DIGITS_AVERAGE_STUDENT", active: true },
       });
+      let schoolConfigurationCountDigitsAverageCourse = await this.repositorySchoolConfiguration.findBy({
+        where: { schoolId, code: "COUNT_DIGITS_AVERAGE_COURSE", active: true },
+      });
       let schoolConfigurationTypeLearningsDisplay = await this.repositorySchoolConfiguration.findBy({
         where: { schoolId, code: "REPORT_PERFORMANCE_TYPE_LEARNINGS_DISPLAY", active: true },
       });
@@ -153,6 +156,9 @@ export class PerformanceReportResolver {
       });
       let schoolConfigurationTypeDisplayDetails = await this.repositorySchoolConfiguration.findBy({
         where: { schoolId, code: "REPORT_PERFORMANCE_TYPE_DISPLAY_DETAILS", active: true },
+      });
+      let schoolConfigurationReportPerformanceType = await this.repositorySchoolConfiguration.findBy({
+        where: { schoolId, code: "REPORT_PERFORMANCE_TYPE", active: true },
       });
       let academicGrade = await this.repositoryAcademicGrade.findOneBy(course?.academicGradeId);
       let titular = await this.repositoryTeacher.findOneBy(course?.teacherId);
@@ -236,6 +242,10 @@ export class PerformanceReportResolver {
         if (schoolConfigurationTypeLearningsDisplay?.length > 0) {
           typeLearningsDisplay = schoolConfigurationTypeLearningsDisplay[0]?.valueString ? schoolConfigurationTypeLearningsDisplay[0]?.valueString : "SPECIFIC";
         }
+        let reportPerformanceType = "DETAILS"
+        if (schoolConfigurationReportPerformanceType?.length > 0) {
+          reportPerformanceType = schoolConfigurationReportPerformanceType[0]?.valueString ? schoolConfigurationReportPerformanceType[0]?.valueString : "DETAILS";
+        }
         let countDigitsPerformanceLevel = 2;
         if (schoolConfigurationCountDigitsPerformanceLevel?.length > 0) {
           countDigitsPerformanceLevel = schoolConfigurationCountDigitsPerformanceLevel[0]?.valueNumber ? schoolConfigurationCountDigitsPerformanceLevel[0]?.valueNumber : 2;
@@ -244,12 +254,17 @@ export class PerformanceReportResolver {
         if (schoolConfigurationCountDigitsAverageStudent?.length > 0) {
           countDigitsAverageStudent = schoolConfigurationCountDigitsAverageStudent[0]?.valueNumber ? schoolConfigurationCountDigitsAverageStudent[0]?.valueNumber : 2;
         }
-
+        let countDigitsAverageCourse = 2;
+        if (schoolConfigurationCountDigitsAverageCourse?.length > 0) {
+          countDigitsAverageCourse = schoolConfigurationCountDigitsAverageCourse[0]?.valueNumber ? schoolConfigurationCountDigitsAverageCourse[0]?.valueNumber : 2;
+        }
+        data = { ...data, "countDigitsAverageCourse": countDigitsAverageCourse };
         data = { ...data, "countDigitsPerformanceLevel": countDigitsPerformanceLevel };
         data = { ...data, "countDigitsAverageStudent": countDigitsAverageStudent };
         data = { ...data, "typeDisplayDetails": typeDisplayDetails };
         data = { ...data, "typeEvidenceLearningsDisplay": typeEvidenceLearningsDisplay };
         data = { ...data, "typeLearningsDisplay": typeLearningsDisplay };
+        data = { ...data, "reportPerformanceType": reportPerformanceType };
         for (let area of areasAux) {
           let asignaturesAreaData: any[] = [];
           for (let asignature of asignaturesAux) {
@@ -395,7 +410,7 @@ export class PerformanceReportResolver {
             }
             break;
           case PerformanceLevelType.QUANTITATIVE:
-            data = { ...data, "promCourse": averageAcademicPeriodCourseList[0]?.assessment?.toFixed(countDigitsAverageStudent) };
+            data = { ...data, "promCourse": averageAcademicPeriodCourseList[0]?.assessment?.toFixed(countDigitsAverageCourse) };
             break;
         }
         //console.log("aca vamos bien", academicAsignaturesCourse);
@@ -508,16 +523,27 @@ export class PerformanceReportResolver {
             //console.log(notesAreas)
             dataPDF = { ...dataPDF, "notesAsignatures": notesAsignatures };
             dataPDF = { ...dataPDF, "notesAreas": notesAreas };
-            promisesGeneratePDF.push(
-              this.generatePerformanceReportStudentDetails(dataPDF, studentId, format).then((dataUrl) => {
-                urls.push(dataUrl);
-              })
-            );
-            promisesGeneratePDF.push(
-              this.generatePerformanceReportStudent(dataPDF, studentId, format).then((dataUrl) => {
-                urls.push(dataUrl);
-              })
-            );
+            switch (reportPerformanceType) {
+              case "DETAILS":
+                promisesGeneratePDF.push(
+                  this.generatePerformanceReportStudentDetails(dataPDF, studentId, format).then((dataUrl) => {
+                    urls.push(dataUrl);
+                  })
+                );
+                promisesGeneratePDF.push(
+                  this.generatePerformanceReportStudent(dataPDF, studentId, format).then((dataUrl) => {
+                    urls.push(dataUrl);
+                  })
+                );
+                break;
+              case "SINGLE":
+                promisesGeneratePDF.push(
+                  this.generatePerformanceReportStudent(dataPDF, studentId, format).then((dataUrl) => {
+                    urls.push(dataUrl);
+                  })
+                );
+                break;
+            }
           }
           let urlsReturn = await Promise.all(promisesGeneratePDF).then(() => {
             if (urls?.length > 1) {
