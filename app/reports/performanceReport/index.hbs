@@ -143,6 +143,15 @@
       margin-top: 2rem;
     }
 
+    .data-note-student-behaviour {
+      display: grid;
+      grid-template-columns: 80% 20%;
+      grid-template-rows: 1fr;
+      grid-column-gap: 1rem;
+      grid-row-gap: 0.5rem;
+      margin-top: 2rem;
+    }
+
     .item-data {
       background-color: #c1e7f5;
       border-radius: 5px;
@@ -367,44 +376,37 @@
         {{/each}}
         {{/each}}
       </div>
-      {{!-- <div class="observaciones-note">
-        {{#each areas as | area areaId|}}
-        {{#each area.asignatures as | asignature asignatureId|}}
-        {{#each ../../notesAsignatures as | notesAsignature notesAsignatureId|}}
-        {{#iff notesAsignature.asignatureId '===' asignature.id}}
-        {{#iff notesAsignature.academicPeriodId '===' ../../../../academicPeriodId}}
-        <div class="data-materia">
-          <div class="item-data">Asignatura</div>
-          <div class="item-data item-data-white">{{asignature.name}}</div>
-          <div class="item-data">Docente</div>
-          <div class="item-data item-data-white">{{notesAsignature.teacher}}</div>
-          <div class="item-data item-data-white">{{notesAsignature.assessment}} - {{notesAsignature.performanceLevel}}
-          </div>
-        </div>
-        <div class="data-observacion">
-          <div class="item-data item-data-white observacion">
-            <p> -
-            </p>
-          </div>
-          <div class="item-data item-data-white desempeño">
-            <div class="item-data item-data-white"> - </div>
-          </div>
-        </div>
+      {{#iff reportPerformanceBehaviourStudent '==' 'DISPLAY'}}
+      <div class="data-note-student-behaviour">
+        <div class="item-data item-note-gris">Comportamiento Escolar</div>
+        {{#each ../noteBehaviour as | behaviour noteBehaviourId|}}
+        {{#iff ../../reportPerformanceBehaviourStudentType '==' 'QUANTITATIVE'}}
+        <div>{{behaviour.assessment}}</div>
         {{/iff }}
-        {{/iff }}
+        <div class="item-data item-note-gris">{{behaviour.performanceLevel}}</div>
         {{/each}}
-        {{/each}}
-        {{/each}}
-      </div> --}}
+      </div>
+      {{/iff }}
       <div class="container-firma-nombre">
+        {{#iff reportPerformanceSignatureType '==' 'TEACHER_COURSE'}}
         <div class="container-firma">
           <div class="firma"></div>
-          <p>{{titular}}</p>
+          <p>{{../titular}}</p>
           <p>Titular</p>
         </div>
-        {{!-- <div class="container-observacion">
-          OBSERVACIÓN
-        </div> --}}
+        {{/iff }}
+        {{#iff reportPerformanceSignatureType '==' 'TEACHER_COURSE_AND_PRINCIPAL'}}
+        <div class="container-firma">
+          <div class="firma"></div>
+          <p>{{../titular}}</p>
+          <p>Titular</p>
+        </div>
+        <div class="container-firma">
+          <div class="firma"></div>
+          <p>{{../schoolPrincipalSignature}}</p>
+          <p>Rector</p>
+        </div>
+        {{/iff }}
       </div>
     </div>
     <div id="footer" style="padding-bottom: 1%; margin-top: 1%">

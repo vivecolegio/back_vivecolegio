@@ -1,4 +1,5 @@
 import { Field, InputType } from 'type-graphql';
+
 import { School } from '../../models/GeneralAdministrator/School';
 
 @InputType()
@@ -29,4 +30,7 @@ export class NewSchool implements Partial<School> {
 
   @Field({ nullable: true })
   logo?: string;
+
+  @Field({ nullable: true })
+  textPrincipalSignature?: string;
 }

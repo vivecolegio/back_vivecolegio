@@ -1,5 +1,6 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Column, Entity } from 'typeorm';
+
 import { IModelData } from '../../interfaces/IModelData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 
@@ -41,6 +42,10 @@ export class School extends IModelData {
   @Field({ nullable: true })
   @Column({ nullable: true })
   logo?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  textPrincipalSignature?: string;
 }
 
 @ObjectType()

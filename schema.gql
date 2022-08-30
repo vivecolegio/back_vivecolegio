@@ -2805,6 +2805,7 @@ input NewSchool {
   pedagogicalModel: String
   textAddress: String
   textDaneNit: String
+  textPrincipalSignature: String
   textResolution: String
 }
 
@@ -4631,6 +4632,7 @@ type School implements IModelData {
   pedagogicalModel: String
   textAddress: String
   textDaneNit: String
+  textPrincipalSignature: String
   textResolution: String
   updatedAt: DateTime
   updatedByUser: User
