@@ -50,7 +50,7 @@
     "cluster": "0.7.7",
     "concurrently": "7.3.0",
     "cors": "2.8.5",
-    "dotenv": "16.0.1",
+    "dotenv": "16.0.2",
     "easy-pdf-merge": "0.2.6",
     "ember-truth-helpers": "3.1.1",
     "express": "4.18.1",
