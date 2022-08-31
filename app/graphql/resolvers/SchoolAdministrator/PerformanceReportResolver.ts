@@ -173,6 +173,15 @@ export class PerformanceReportResolver {
       let schoolConfigurationReportPerformanceBehaviourStudentType = await this.repositorySchoolConfiguration.findBy({
         where: { schoolId, code: "REPORT_PERFORMANCE_BEHAVIOUR_STUDENT_TYPE", active: true },
       });
+      let schoolConfigurationReportPerformanceAreaAsignatureType = await this.repositorySchoolConfiguration.findBy({
+        where: { schoolId, code: "REPORT_PERFORMANCE_AREA_ASIGNATURE_TYPE", active: true },
+      });
+      let schoolConfigurationReportPerformanceTitleSignatureTeacherCourse = await this.repositorySchoolConfiguration.findBy({
+        where: { schoolId, code: "REPORT_PERFORMANCE_TITLE_SIGNATURE_TEACHER_COURSE", active: true },
+      });
+      let schoolConfigurationReportPerformanceTitleSignaturePrincipal = await this.repositorySchoolConfiguration.findBy({
+        where: { schoolId, code: "REPORT_PERFORMANCE_TITLE_SIGNATURE_PRINCIPAL", active: true },
+      });
       let academicGrade = await this.repositoryAcademicGrade.findOneBy(course?.academicGradeId);
       let titular = await this.repositoryTeacher.findOneBy(course?.teacherId);
       let titularUser = await this.repositoryUser.findOneBy(titular?.userId);
@@ -284,6 +293,21 @@ export class PerformanceReportResolver {
         if (schoolConfigurationReportPerformanceBehaviourStudentType?.length > 0) {
           reportPerformanceBehaviourStudentType = schoolConfigurationReportPerformanceBehaviourStudentType[0]?.valueString ? schoolConfigurationReportPerformanceBehaviourStudentType[0]?.valueString : "QUALITATIVE";
         }
+        let reportPerformanceAreaAsignatureType = "AREA_ASIGNATURE"
+        if (schoolConfigurationReportPerformanceAreaAsignatureType?.length > 0) {
+          reportPerformanceAreaAsignatureType = schoolConfigurationReportPerformanceAreaAsignatureType[0]?.valueString ? schoolConfigurationReportPerformanceAreaAsignatureType[0]?.valueString : "AREA_ASIGNATURE";
+        }
+        let reportPerformanceTitleSignatureTeacherCourse = "Titular"
+        if (schoolConfigurationReportPerformanceTitleSignatureTeacherCourse?.length > 0) {
+          reportPerformanceTitleSignatureTeacherCourse = schoolConfigurationReportPerformanceTitleSignatureTeacherCourse[0]?.valueString ? schoolConfigurationReportPerformanceTitleSignatureTeacherCourse[0]?.valueString : "Titular";
+        }
+        let reportPerformanceTitleSignaturePrincipal = "Rector"
+        if (schoolConfigurationReportPerformanceTitleSignaturePrincipal?.length > 0) {
+          reportPerformanceTitleSignaturePrincipal = schoolConfigurationReportPerformanceTitleSignaturePrincipal[0]?.valueString ? schoolConfigurationReportPerformanceTitleSignaturePrincipal[0]?.valueString : "Rector";
+        }
+        data = { ...data, "reportPerformanceTitleSignatureTeacherCourse": reportPerformanceTitleSignatureTeacherCourse };
+        data = { ...data, "reportPerformanceTitleSignaturePrincipal": reportPerformanceTitleSignaturePrincipal };
+        data = { ...data, "reportPerformanceAreaAsignatureType": reportPerformanceAreaAsignatureType };
         data = { ...data, "reportPerformanceBehaviourStudent": reportPerformanceBehaviourStudent };
         data = { ...data, "reportPerformanceBehaviourStudentType": reportPerformanceBehaviourStudentType };
         data = { ...data, "reportPerformanceSignatureType": reportPerformanceSignatureType };
@@ -633,6 +657,9 @@ export class PerformanceReportResolver {
         a?.toString();
         b?.toString();
         switch (operator) {
+          case `!=`:
+            bool = a != b;
+            break;
           case `===`:
             bool = a === b;
             break;

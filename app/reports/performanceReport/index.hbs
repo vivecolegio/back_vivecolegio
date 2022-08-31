@@ -41,7 +41,7 @@
     .app-student-notes {
       display: grid;
       background-color: #e6e7e9;
-      grid-template-columns: 28% 44% 28%;
+      grid-template-columns: 25% 50% 25%;
       width: 100%;
       height: 113px;
       background-image: url("http://vivecolegios.nortedesantander.gov.co:4000/public/uploads/users/profile/61faa0716770295e7c3775ab/VCpmSvM0jrd93e.svg");
@@ -98,7 +98,7 @@
 
     .nombre-instituto-note p {
       font-weight: 100;
-      font-size: 10px;
+      font-size: 11px;
     }
 
     .content-student-notes {
@@ -336,19 +336,27 @@
         <div class="item-data item-data-white">{{campusName}}</div>
       </div>
       <div class="data-note-student" style="grid-template-columns: {{academicPeriodsCount}}">
+        {{#iff reportPerformanceAreaAsignatureType '==' 'AREA_ASIGNATURE'}}
         <div class="item-data item-note-gris">Áreas / Asignaturas</div>
+        {{/iff }}
+        {{#iff reportPerformanceAreaAsignatureType '==' 'AREA'}}
+        <div class="item-data item-note-gris">Áreas</div>
+        {{/iff }}
+        {{#iff reportPerformanceAreaAsignatureType '==' 'ASIGNATURE'}}
+        <div class="item-data item-note-gris">Asignaturas</div>
+        {{/iff }}
         {{#each academicPeriods as | academicPeriod academicPeriodId|}}
         <div class="item-data item-note-gris">{{academicPeriod.name}}</div>
         {{/each}}
         {{#each areas as | area areaId|}}
+        {{#iff ../reportPerformanceAreaAsignatureType '==' 'AREA_ASIGNATURE'}}
         <div class="item-data">{{area.name}}</div>
         {{#each area.academicPeriods as | academicPeriod2 academicPeriodId2|}}
-
-        {{#each ../../notesAreas as | notesArea notesAreaId|}}
+        {{#each ../../../notesAreas as | notesArea notesAreaId|}}
         {{#iff notesArea.areaId '===' area.id}}
         {{#iff academicPeriod2.id '===' notesArea.academicPeriodId}}
         <div class="item-data item-data-flex item-data-flex-azul">
-          {{#iff ../../../../performanceLevelType '==' 'QUANTITATIVE'}}
+          {{#iff ../../../../../performanceLevelType '==' 'QUANTITATIVE'}}
           <div>{{notesArea.assessment}}</div>
           {{/iff }}
           <div>{{notesArea.performanceLevel}}</div>
@@ -357,14 +365,33 @@
         {{/iff }}
         {{/each}}
         {{/each}}
+        {{/iff }}
+        {{#iff ../reportPerformanceAreaAsignatureType '==' 'AREA'}}
+        <div class="item-data">{{area.name}}</div>
+        {{#each area.academicPeriods as | academicPeriod2 academicPeriodId2|}}
+        {{#each ../../../notesAreas as | notesArea notesAreaId|}}
+        {{#iff notesArea.areaId '===' area.id}}
+        {{#iff academicPeriod2.id '===' notesArea.academicPeriodId}}
+        <div class="item-data item-data-flex item-data-flex-azul">
+          {{#iff ../../../../../performanceLevelType '==' 'QUANTITATIVE'}}
+          <div>{{notesArea.assessment}}</div>
+          {{/iff }}
+          <div>{{notesArea.performanceLevel}}</div>
+        </div>
+        {{/iff }}
+        {{/iff }}
+        {{/each}}
+        {{/each}}
+        {{/iff }}
+        {{#iff ../reportPerformanceAreaAsignatureType '==' 'AREA_ASIGNATURE'}}
         {{#each area.asignatures as | asignature asignatureId|}}
         <div class="item-data item-data-white">{{asignature.name}}</div>
-        {{#each ../../academicPeriods as | academicPeriods3 academicPeriodId3|}}
-        {{#each ../../../notesAsignatures as | notesAsignature notesAsignatureId|}}
+        {{#each ../../../academicPeriods as | academicPeriods3 academicPeriodId3|}}
+        {{#each ../../../../notesAsignatures as | notesAsignature notesAsignatureId|}}
         {{#iff notesAsignature.asignatureId '===' asignature.id}}
         {{#iff academicPeriods3.id '===' notesAsignature.academicPeriodId}}
         <div class="item-data item-data-flex">
-          {{#iff ../../../../../performanceLevelType '==' 'QUANTITATIVE'}}
+          {{#iff ../../../../../../performanceLevelType '==' 'QUANTITATIVE'}}
           <div>{{notesAsignature.assessment}}</div>
           {{/iff }}
           <div>{{notesAsignature.performanceLevel}}</div>
@@ -374,6 +401,26 @@
         {{/each}}
         {{/each}}
         {{/each}}
+        {{/iff }}
+        {{#iff ../reportPerformanceAreaAsignatureType '==' 'ASIGNATURE'}}
+        {{#each area.asignatures as | asignature asignatureId|}}
+        <div class="item-data item-data-white">{{asignature.name}}</div>
+        {{#each ../../../academicPeriods as | academicPeriods3 academicPeriodId3|}}
+        {{#each ../../../../notesAsignatures as | notesAsignature notesAsignatureId|}}
+        {{#iff notesAsignature.asignatureId '===' asignature.id}}
+        {{#iff academicPeriods3.id '===' notesAsignature.academicPeriodId}}
+        <div class="item-data item-data-flex">
+          {{#iff ../../../../../../performanceLevelType '==' 'QUANTITATIVE'}}
+          <div>{{notesAsignature.assessment}}</div>
+          {{/iff }}
+          <div>{{notesAsignature.performanceLevel}}</div>
+        </div>
+        {{/iff }}
+        {{/iff }}
+        {{/each}}
+        {{/each}}
+        {{/each}}
+        {{/iff }}
         {{/each}}
       </div>
       {{#iff reportPerformanceBehaviourStudent '==' 'DISPLAY'}}
@@ -392,19 +439,19 @@
         <div class="container-firma">
           <div class="firma"></div>
           <p>{{../titular}}</p>
-          <p>Titular</p>
+          <p>{{../reportPerformanceTitleSignatureTeacherCourse}}</p>
         </div>
         {{/iff }}
         {{#iff reportPerformanceSignatureType '==' 'TEACHER_COURSE_AND_PRINCIPAL'}}
         <div class="container-firma">
           <div class="firma"></div>
           <p>{{../titular}}</p>
-          <p>Titular</p>
+          <p>{{../reportPerformanceTitleSignatureTeacherCourse}}</p>
         </div>
         <div class="container-firma">
           <div class="firma"></div>
           <p>{{../schoolPrincipalSignature}}</p>
-          <p>Rector</p>
+          <p>{{../reportPerformanceTitleSignaturePrincipal}}</p>
         </div>
         {{/iff }}
       </div>
