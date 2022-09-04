@@ -145,7 +145,7 @@
 
     .data-note-student-behaviour {
       display: grid;
-      grid-template-columns: 80% 20%;
+      grid-template-columns: 80% 18.5%;
       grid-template-rows: 1fr;
       grid-column-gap: 1rem;
       grid-row-gap: 0.5rem;
@@ -423,17 +423,19 @@
         {{/iff }}
         {{/each}}
       </div>
-      {{#iff reportPerformanceBehaviourStudent '==' 'DISPLAY'}}
       <div class="data-note-student-behaviour">
+        {{#iff reportPerformanceBehaviourStudent '==' 'DISPLAY'}}
         <div class="item-data item-note-gris">Comportamiento Escolar</div>
         {{#each ../noteBehaviour as | behaviour noteBehaviourId|}}
-        {{#iff ../../reportPerformanceBehaviourStudentType '==' 'QUANTITATIVE'}}
-        <div>{{behaviour.assessment}}</div>
-        {{/iff }}
-        <div class="item-data item-note-gris">{{behaviour.performanceLevel}}</div>
+        <div class="item-data item-note-gris">
+          {{#iff ../../reportPerformanceBehaviourStudentType '==' 'QUANTITATIVE'}}
+          {{behaviour.assessment}} -
+          {{/iff }}
+          {{behaviour.performanceLevel}}
+        </div>
         {{/each}}
+        {{/iff }}
       </div>
-      {{/iff }}
       <div class="container-firma-nombre">
         {{#iff reportPerformanceSignatureType '==' 'TEACHER_COURSE'}}
         <div class="container-firma">
@@ -462,7 +464,6 @@
       </div>
     </div>
   </div>
-
 </body>
 
 </html>

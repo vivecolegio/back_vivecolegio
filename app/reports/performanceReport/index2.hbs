@@ -177,6 +177,15 @@
       margin-top: 0.5rem;
     }
 
+    .data-behaviour {
+      display: grid;
+      grid-template-columns: 6fr 2fr 6fr 3fr;
+      grid-template-rows: 1fr;
+      grid-column-gap: 0.5rem;
+      grid-row-gap: 0px;
+      margin-top: 0.5rem;
+    }
+
     .data-observacion {
       display: grid;
       grid-template-columns: 16fr;
@@ -341,9 +350,9 @@
           <div class="item-data item-data-white">{{notesAsignature.teacher}}</div>
           <div class="item-data">
             {{#iff ../../../../performanceLevelType '==' 'QUANTITATIVE'}}
-            <div>{{notesAsignature.assessment}}</div>
+            {{notesAsignature.assessment}} -
             {{/iff }}
-            <div>{{notesAsignature.performanceLevel}}</div>
+            {{notesAsignature.performanceLevel}}
           </div>
         </div>
         <div class="data-observacion">
@@ -374,16 +383,53 @@
         {{/each}}
         {{/each}}
         {{/each}}
+        {{#iff reportPerformanceBehaviourStudent '==' 'DISPLAY'}}
+        <div class="data-behaviour">
+          <div class="item-data item-data-white">Comportamiento Escolar</div>
+          <div class="item-data">Docente</div>
+          <div class="item-data item-data-white">{{../titular}}</div>
+          <div class="item-data">
+            {{#each ../noteBehaviour as | behaviour noteBehaviourId|}}
+            {{#iff ../../reportPerformanceBehaviourStudentType '==' 'QUANTITATIVE'}}
+            {{behaviour.assessment}} -
+            {{/iff }}
+            {{behaviour.performanceLevel}}
+            {{/each}}
+          </div>
+        </div>
+        <div class="data-observacion">
+          <div class="item-data item-data-white observacion">
+            <ul>
+              {{#each ../noteBehaviour as | behaviour noteBehaviourId|}}
+              <li>
+                <p>{{behaviour.observation}}</p>
+              </li>
+              {{/each}}
+            </ul>
+          </div>
+        </div>
+        {{/iff }}
       </div>
       <div class="container-firma-nombre">
+        {{#iff reportPerformanceSignatureType '==' 'TEACHER_COURSE'}}
         <div class="container-firma">
           <div class="firma"></div>
-          <p>{{titular}}</p>
-          <p>Titular</p>
+          <p>{{../titular}}</p>
+          <p>{{../reportPerformanceTitleSignatureTeacherCourse}}</p>
         </div>
-        {{!-- <div class="container-observacion">
-          OBSERVACIÓN
-        </div> --}}
+        {{/iff }}
+        {{#iff reportPerformanceSignatureType '==' 'TEACHER_COURSE_AND_PRINCIPAL'}}
+        <div class="container-firma">
+          <div class="firma"></div>
+          <p>{{../titular}}</p>
+          <p>{{../reportPerformanceTitleSignatureTeacherCourse}}</p>
+        </div>
+        <div class="container-firma">
+          <div class="firma"></div>
+          <p>{{../schoolPrincipalSignature}}</p>
+          <p>{{../reportPerformanceTitleSignaturePrincipal}}</p>
+        </div>
+        {{/iff }}
       </div>
     </div>
     <div id="footer" style="padding-bottom: 1%; margin-top: 1%">
@@ -392,7 +438,6 @@
       </div>
     </div>
   </div>
-
 </body>
 
 </html>

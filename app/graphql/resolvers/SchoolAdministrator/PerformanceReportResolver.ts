@@ -584,9 +584,9 @@ export class PerformanceReportResolver {
               });
               if (noteBehaviour?.length == 1) {
                 let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(noteBehaviour[0]?.performanceLevelId);
-                notesBehaviour.push({ assessment: noteBehaviour[0]?.assessment?.toFixed(countDigitsPerformanceLevel), academicPeriodId: noteBehaviour[0]?.academicPeriodId, performanceLevel: performanceLevel?.name })
+                notesBehaviour.push({ assessment: noteBehaviour[0]?.assessment?.toFixed(countDigitsPerformanceLevel), academicPeriodId: noteBehaviour[0]?.academicPeriodId, performanceLevel: performanceLevel?.name, observation: noteBehaviour[0]?.observation })
               } else {
-                notesBehaviour.push({ assessment: "-", academicPeriodId: academicPeriod?.id?.toString(), performanceLevel: "-" })
+                notesBehaviour.push({ assessment: "-", academicPeriodId: academicPeriod?.id?.toString(), performanceLevel: "-", observation: "-" })
               }
             }
             dataPDF = { ...dataPDF, "noteBehaviour": notesBehaviour };
