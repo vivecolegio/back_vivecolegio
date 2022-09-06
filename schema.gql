@@ -908,6 +908,7 @@ type ExperienceLearning implements IModelCampusData {
   evidenceLearnings: [EvidenceLearning!]
   evidenceLearningsId: [String!]
   experienceLearningPerformanceLevel: [ExperienceLearningPerformanceLevel!]
+  experienceLearningType: ExperienceLearningType
   experienceType: ExperienceType
   id: ID!
   learnigs: [Learning!]
@@ -1246,6 +1247,12 @@ type ExperienceLearningTraditionalValuationEdge {
   """Used in `before` and `after` args"""
   cursor: String!
   node: ExperienceLearningTraditionalValuation!
+}
+
+"""The ExperienceLearningType Register"""
+enum ExperienceLearningType {
+  NORMAL
+  RECOVERY
 }
 
 """The ExperienceLearningValuation model"""
@@ -2509,6 +2516,7 @@ input NewExperienceLearning {
   evaluativeComponentsId: [String!]
   evidenceLearningsId: [String!]
   experienceLearningPerformanceLevel: [NewExperienceLearningPerformanceLevel!]
+  experienceLearningType: ExperienceLearningType
   experienceType: ExperienceType
   learningsId: [String!]
   navigationMethod: NavigationMethodTestOnline

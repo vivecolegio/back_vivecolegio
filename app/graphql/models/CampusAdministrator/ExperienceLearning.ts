@@ -1,5 +1,6 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Column, Entity, Index } from 'typeorm';
+import { ExperienceLearningType } from '../../enums/ExperienceLearningType';
 import { ExperienceType } from '../../enums/ExperienceType';
 import { NavigationMethodTestOnline } from '../../enums/NavigationMethodTestOnline';
 import { IModelCampusData } from '../../interfaces/IModelCampusData';
@@ -36,6 +37,10 @@ export class ExperienceLearning extends IModelCampusData {
   @Field(() => ExperienceType, { nullable: true })
   @Column({ nullable: true })
   experienceType?: ExperienceType;
+
+  @Field(() => ExperienceLearningType, { nullable: true })
+  @Column({ nullable: true })
+  experienceLearningType?: ExperienceLearningType;
 
   @Field({ nullable: true })
   @Column({ nullable: true })
