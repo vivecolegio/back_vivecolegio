@@ -5,6 +5,7 @@ import { InjectRepository } from 'typeorm-typedi-extensions';
 
 import { AcademicAreaCoursePeriodValuationRepository, AcademicAreaRepository, AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicAsignatureRepository, AcademicGradeRepository, AcademicPeriodRepository, AverageAcademicPeriodCourseRepository, AverageAcademicPeriodStudentRepository, CampusRepository, CourseRepository, EvaluativeComponentRepository, EvidenceLearningRepository, ExperienceLearningAverageValuationRepository, ExperienceLearningCoEvaluationRepository, ExperienceLearningCoEvaluationValuationRepository, ExperienceLearningRepository, ExperienceLearningRubricCriteriaRepository, ExperienceLearningRubricCriteriaValuationRepository, ExperienceLearningRubricValuationRepository, ExperienceLearningSelfAssessmentValuationRepository, ExperienceLearningTraditionalValuationRepository, LearningRepository, PerformanceLevelRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
+import { ExperienceLearningType } from '../../enums/ExperienceLearningType';
 import { ExperienceType } from '../../enums/ExperienceType';
 import { PerformanceLevelType } from '../../enums/PerformanceLevelType';
 import { ValuationType } from '../../enums/ValuationType';
@@ -132,6 +133,7 @@ export class ExperienceLearningResolver {
   async getAllExperienceLearning(
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
+    @Arg('experienceLearningType', () => ExperienceLearningType) experienceLearningType: ExperienceLearningType,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('campusId', () => String) campusId: String,
     @Arg('academicPeriodId', () => String, { nullable: true }) academicPeriodId: String,
@@ -147,6 +149,7 @@ export class ExperienceLearningResolver {
               campusId,
               academicPeriodId,
               academicAsignatureCourseId,
+              experienceLearningType,
             },
             order: { createdAt: 'DESC' },
           });
@@ -156,6 +159,7 @@ export class ExperienceLearningResolver {
               where: {
                 academicAsignatureCourseId,
                 campusId,
+                experienceLearningType,
               },
               order: { createdAt: 'DESC' },
             });
@@ -165,6 +169,7 @@ export class ExperienceLearningResolver {
                 where: {
                   campusId,
                   academicPeriodId,
+                  experienceLearningType,
                 },
                 order: { createdAt: 'DESC' },
               });
@@ -172,6 +177,7 @@ export class ExperienceLearningResolver {
               result = await this.repository.findBy({
                 where: {
                   campusId,
+                  experienceLearningType,
                 },
                 order: { createdAt: 'DESC' },
               });
@@ -185,6 +191,7 @@ export class ExperienceLearningResolver {
               campusId,
               academicPeriodId,
               academicAsignatureCourseId,
+              experienceLearningType,
             },
           });
         } else {
@@ -193,6 +200,7 @@ export class ExperienceLearningResolver {
               where: {
                 academicAsignatureCourseId,
                 campusId,
+                experienceLearningType,
               },
             });
           } else {
@@ -201,12 +209,14 @@ export class ExperienceLearningResolver {
                 where: {
                   campusId,
                   academicPeriodId,
+                  experienceLearningType,
                 },
               });
             } else {
               result = await this.repository.findBy({
                 where: {
                   campusId,
+                  experienceLearningType,
                 },
               });
             }
@@ -221,6 +231,7 @@ export class ExperienceLearningResolver {
               campusId,
               academicPeriodId,
               academicAsignatureCourseId,
+              experienceLearningType,
               active: true,
             },
             order: { createdAt: 'DESC' },
@@ -231,6 +242,7 @@ export class ExperienceLearningResolver {
               where: {
                 academicAsignatureCourseId,
                 campusId,
+                experienceLearningType,
                 active: true,
               },
               order: { createdAt: 'DESC' },
@@ -241,6 +253,7 @@ export class ExperienceLearningResolver {
                 where: {
                   campusId,
                   academicPeriodId,
+                  experienceLearningType,
                   active: true,
                 },
                 order: { createdAt: 'DESC' },
@@ -249,6 +262,7 @@ export class ExperienceLearningResolver {
               result = await this.repository.findBy({
                 where: {
                   campusId,
+                  experienceLearningType,
                   active: true,
                 },
                 order: { createdAt: 'DESC' },
@@ -263,6 +277,7 @@ export class ExperienceLearningResolver {
               campusId,
               academicPeriodId,
               academicAsignatureCourseId,
+              experienceLearningType,
               active: true,
             },
           });
@@ -272,6 +287,7 @@ export class ExperienceLearningResolver {
               where: {
                 academicAsignatureCourseId,
                 campusId,
+                experienceLearningType,
                 active: true,
               },
             });
@@ -281,6 +297,7 @@ export class ExperienceLearningResolver {
                 where: {
                   campusId,
                   academicPeriodId,
+                  experienceLearningType,
                   active: true,
                 },
               });
@@ -288,6 +305,7 @@ export class ExperienceLearningResolver {
               result = await this.repository.findBy({
                 where: {
                   campusId,
+                  experienceLearningType,
                   active: true,
                 },
               });
@@ -309,6 +327,7 @@ export class ExperienceLearningResolver {
   async getAllExperienceLearningWhitoutCampusId(
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
+    @Arg('experienceLearningType', () => ExperienceLearningType) experienceLearningType: ExperienceLearningType,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: String,
     @Arg('academicPeriodId', () => String, { nullable: true }) academicPeriodId: String,
@@ -321,6 +340,7 @@ export class ExperienceLearningResolver {
             where: {
               academicPeriodId,
               academicAsignatureCourseId,
+              experienceLearningType,
             },
             order: { createdAt: 'DESC' },
           });
@@ -328,6 +348,7 @@ export class ExperienceLearningResolver {
           result = await this.repository.findBy({
             where: {
               academicAsignatureCourseId,
+              experienceLearningType,
             },
             order: { createdAt: 'DESC' },
           });
@@ -338,12 +359,14 @@ export class ExperienceLearningResolver {
             where: {
               academicPeriodId,
               academicAsignatureCourseId,
+              experienceLearningType,
             },
           });
         } else {
           result = await this.repository.findBy({
             where: {
               academicAsignatureCourseId,
+              experienceLearningType,
             },
           });
         }
@@ -355,6 +378,7 @@ export class ExperienceLearningResolver {
             where: {
               academicPeriodId,
               academicAsignatureCourseId,
+              experienceLearningType,
               active: true,
             },
             order: { createdAt: 'DESC' },
@@ -363,6 +387,7 @@ export class ExperienceLearningResolver {
           result = await this.repository.findBy({
             where: {
               academicAsignatureCourseId,
+              experienceLearningType,
               active: true,
             },
             order: { createdAt: 'DESC' },
@@ -374,6 +399,7 @@ export class ExperienceLearningResolver {
             where: {
               academicPeriodId,
               academicAsignatureCourseId,
+              experienceLearningType,
               active: true,
             },
           });
@@ -381,6 +407,7 @@ export class ExperienceLearningResolver {
           result = await this.repository.findBy({
             where: {
               academicAsignatureCourseId,
+              experienceLearningType,
               active: true,
             },
           });
