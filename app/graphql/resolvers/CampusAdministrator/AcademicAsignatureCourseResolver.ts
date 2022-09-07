@@ -5,6 +5,7 @@ import { InjectRepository } from 'typeorm-typedi-extensions';
 
 import { AcademicAsignatureCourseRepository, AcademicAsignatureRepository, CampusRepository, CourseRepository, ExperienceLearningRepository, GradeAssignmentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
+import { ExperienceLearningType } from '../../enums/ExperienceLearningType';
 import { NewAcademicAsignatureCourse } from '../../inputs/CampusAdministrator/NewAcademicAsignatureCourse';
 import { IContext } from '../../interfaces/IContext';
 import { AcademicAsignatureCourse, AcademicAsignatureCourseConnection } from '../../models/CampusAdministrator/AcademicAsignatureCourse';
@@ -302,13 +303,15 @@ export class AcademicAsignatureCourseResolver {
   async getAllExperienceLearningAcademicPeriodEvaluativeComponentAcademicAsignatureCourse(
     @Arg('id', () => String) id: string,
     @Arg('academicPeriodId', () => String) academicPeriodId: string,
-    @Arg('evaluativeComponentId', () => String) evaluativeComponentId: string
+    @Arg('evaluativeComponentId', () => String) evaluativeComponentId: string,
+    @Arg('experienceLearningType', () => ExperienceLearningType) experienceLearningType: ExperienceLearningType,
   ) {
     const result = await this.repositoryExperienceLearning.findBy({
       where: {
         academicAsignatureCourseId: id,
         academicPeriodId,
         evaluativeComponentsId: { $in: [evaluativeComponentId] },
+        experienceLearningType,
         active: true,
       },
       order: { createdAt: 'ASC' },

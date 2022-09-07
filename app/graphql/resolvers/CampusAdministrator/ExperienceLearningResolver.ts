@@ -457,7 +457,7 @@ export class ExperienceLearningResolver {
       updatedByUserId,
     });
     if (result?.academicPeriodId && result?.academicAsignatureCourseId) {
-      this.updateAllStudentAcademicAsignatureCoursePeriodValuation(result?.academicAsignatureCourseId, result?.academicPeriodId)
+      this.updateAllStudentAcademicAsignatureCoursePeriodValuation(result?.academicAsignatureCourseId, result?.academicPeriodId, result?.experienceLearningType ? result?.experienceLearningType : ExperienceLearningType.NORMAL)
     }
     return result;
   }
@@ -478,7 +478,7 @@ export class ExperienceLearningResolver {
       updatedByUserId,
     });
     if (result?.academicPeriodId && result?.academicAsignatureCourseId) {
-      this.updateAllStudentAcademicAsignatureCoursePeriodValuation(result?.academicAsignatureCourseId, result?.academicPeriodId)
+      this.updateAllStudentAcademicAsignatureCoursePeriodValuation(result?.academicAsignatureCourseId, result?.academicPeriodId, result?.experienceLearningType ? result?.experienceLearningType : ExperienceLearningType.NORMAL)
     }
     if (result.id) {
       return true;
@@ -494,7 +494,7 @@ export class ExperienceLearningResolver {
   ): Promise<Boolean | null> {
     let data = await this.repository.findOneBy(id);
     if (data?.academicPeriodId && data?.academicAsignatureCourseId) {
-      this.updateAllStudentAcademicAsignatureCoursePeriodValuation(data?.academicAsignatureCourseId, data?.academicPeriodId)
+      this.updateAllStudentAcademicAsignatureCoursePeriodValuation(data?.academicAsignatureCourseId, data?.academicPeriodId, data?.experienceLearningType ? data?.experienceLearningType : ExperienceLearningType.NORMAL)
     }
     let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
     return result?.result?.ok === 1 ?? true;
@@ -873,13 +873,15 @@ export class ExperienceLearningResolver {
     @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: string,
     @Arg('academicPeriodId', () => String) academicPeriodId: string,
     @Arg('evaluativeComponentId', () => String) evaluativeComponentId: string,
-    @Arg('studentId', () => String) studentId: string
+    @Arg('studentId', () => String) studentId: string,
+    @Arg('experienceLearningType', () => ExperienceLearningType) experienceLearningType: ExperienceLearningType,
   ) {
     const experienceLearnings = await this.repository.findBy({
       where: {
         evaluativeComponentsId: { $in: [evaluativeComponentId] },
         academicAsignatureCourseId,
         academicPeriodId,
+        experienceLearningType,
         active: true,
       },
     });
@@ -919,6 +921,7 @@ export class ExperienceLearningResolver {
             studentAverage.evaluativeComponentId = evaluativeComponentId;
             studentAverage.academicPeriodId = academicPeriodId;
             studentAverage.academicAsignatureCourseId = academicAsignatureCourseId;
+            studentAverage.experienceLearningType = experienceLearningType;
           }
           let countExperienceLearningAssessment = 0;
           for (let experienceLearning of experienceLearnings) {
@@ -1090,7 +1093,8 @@ export class ExperienceLearningResolver {
   async createExperienceLearningAverageValuationStudents(
     @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: string,
     @Arg('academicPeriodId', () => String) academicPeriodId: string,
-    @Arg('evaluativeComponentId', () => String) evaluativeComponentId: string
+    @Arg('evaluativeComponentId', () => String) evaluativeComponentId: string,
+    @Arg('experienceLearningType', () => ExperienceLearningType) experienceLearningType: ExperienceLearningType,
   ) {
     const experienceLearnings = await this.repository.findBy({
       where: {
@@ -1114,7 +1118,8 @@ export class ExperienceLearningResolver {
                 academicAsignatureCourseId,
                 academicPeriodId,
                 evaluativeComponentId,
-                student as string
+                student as string,
+                experienceLearningType
               );
             }
           }
@@ -1128,6 +1133,7 @@ export class ExperienceLearningResolver {
   async updateAllStudentSchoolPeriodValuation(
     @Arg('schoolId', () => String) schoolId: string,
     @Arg('academicPeriodId', () => String) academicPeriodId: string,
+    @Arg('experienceLearningType', () => ExperienceLearningType) experienceLearningType: ExperienceLearningType,
   ) {
     const school = await this.repositorySchool.findOneBy(schoolId);
     if (school) {
@@ -1136,7 +1142,7 @@ export class ExperienceLearningResolver {
         let promisesList: any[] = [];
         console.log("Generando =", academicGrade?.name + " " + academicGrade?.id?.toString())
         promisesList.push(
-          this.updateAllStudentGradePeriodValuation(academicGrade?.id?.toString(), academicPeriodId)
+          this.updateAllStudentGradePeriodValuation(academicGrade?.id?.toString(), academicPeriodId, experienceLearningType)
         );
         await Promise.all(promisesList).then(() => {
           return true;
@@ -1150,6 +1156,7 @@ export class ExperienceLearningResolver {
   async updateAllStudentGradePeriodValuation(
     @Arg('academicGradeId', () => String) academicGradeId: string,
     @Arg('academicPeriodId', () => String) academicPeriodId: string,
+    @Arg('experienceLearningType', () => ExperienceLearningType) experienceLearningType: ExperienceLearningType,
   ) {
     const academicGrade = await this.repositoryAcademicGrade.findOneBy(academicGradeId);
     if (academicGrade) {
@@ -1158,7 +1165,7 @@ export class ExperienceLearningResolver {
         let promisesList: any[] = [];
         console.log("Generando =", course?.name + " " + course?.academicGradeId)
         promisesList.push(
-          this.updateAllStudentCoursePeriodValuation(course?.id?.toString(), academicPeriodId)
+          this.updateAllStudentCoursePeriodValuation(course?.id?.toString(), academicPeriodId, experienceLearningType)
         );
         await Promise.all(promisesList).then(() => {
           return true;
@@ -1172,6 +1179,7 @@ export class ExperienceLearningResolver {
   async updateAllStudentCoursePeriodValuation(
     @Arg('courseId', () => String) courseId: string,
     @Arg('academicPeriodId', () => String) academicPeriodId: string,
+    @Arg('experienceLearningType', () => ExperienceLearningType) experienceLearningType: ExperienceLearningType,
   ) {
     const course = await this.repositoryCourse.findOneBy(courseId);
     if (course) {
@@ -1181,7 +1189,7 @@ export class ExperienceLearningResolver {
       for (let academicAsignatureCourse of academicAsignatureCourses) {
         if (academicAsignatureCourse) {
           promisesList.push(
-            this.updateAllStudentAcademicAsignatureCoursePeriodValuation(academicAsignatureCourse?.id?.toString(), academicPeriodId)
+            this.updateAllStudentAcademicAsignatureCoursePeriodValuation(academicAsignatureCourse?.id?.toString(), academicPeriodId, experienceLearningType)
           );
         }
       }
@@ -1244,7 +1252,8 @@ export class ExperienceLearningResolver {
   @Mutation(() => Boolean)
   async updateAllStudentAcademicAsignatureCoursePeriodValuation(
     @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: string,
-    @Arg('academicPeriodId', () => String) academicPeriodId: string
+    @Arg('academicPeriodId', () => String) academicPeriodId: string,
+    @Arg('experienceLearningType', () => ExperienceLearningType) experienceLearningType: ExperienceLearningType,
   ) {
     const academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(
       academicAsignatureCourseId
@@ -1257,7 +1266,7 @@ export class ExperienceLearningResolver {
         if (students) {
           for (let student of students) {
             promisesListAsignatures.push(
-              this.createAcademicAsignatureCoursePeriodValuationStudentBulk(academicAsignatureCourseId, academicPeriodId, student + "")
+              this.createAcademicAsignatureCoursePeriodValuationStudentBulk(academicAsignatureCourseId, academicPeriodId, student + "", experienceLearningType)
             );
           }
           await Promise.all(promisesListAsignatures).then(async () => {
@@ -1272,7 +1281,8 @@ export class ExperienceLearningResolver {
   async createAcademicAsignatureCoursePeriodValuationStudentBulk(
     @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: string,
     @Arg('academicPeriodId', () => String) academicPeriodId: string,
-    @Arg('studentId', () => String) studentId: string
+    @Arg('studentId', () => String) studentId: string,
+    @Arg('experienceLearningType', () => ExperienceLearningType) experienceLearningType: ExperienceLearningType,
   ) {
     let academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(
       academicAsignatureCourseId
@@ -1333,6 +1343,7 @@ export class ExperienceLearningResolver {
               academicAsignatureCourseId,
               academicPeriodId,
               studentId,
+              experienceLearningType
             },
           });
         let countDefinitive = 0;
@@ -1360,8 +1371,16 @@ export class ExperienceLearningResolver {
             }
             studentPeriodValuationList = [];
           }
+          if (countRecovery > 1) {
+            for (let studentPeriodValuation of studentPeriodValuationList) {
+              if (studentPeriodValuation?.valuationType == ValuationType?.RECOVERY) {
+                let result = await this.repositoryAcademicAsignatureCoursePeriodValuation.deleteOne({ _id: new ObjectId(studentPeriodValuation?.id?.toString()) });
+              }
+            }
+            studentPeriodValuationList = [];
+          }
         }
-        if (countDefinitive == 0 && countRecovery == 0) {
+        if (countDefinitive == 0) {
           if (studentPeriodValuationList.length > 0) {
             studentPeriodValuation = studentPeriodValuationList[0];
           } else {
@@ -1372,6 +1391,12 @@ export class ExperienceLearningResolver {
             studentPeriodValuation.academicPeriodId = academicPeriodId;
             studentPeriodValuation.academicAsignatureCourseId = academicAsignatureCourseId;
             studentPeriodValuation.assessment = 0;
+            if (experienceLearningType == ExperienceLearningType?.NORMAL) {
+              studentPeriodValuation.valuationType = ValuationType?.CALCULATE;
+            }
+            if (experienceLearningType == ExperienceLearningType?.RECOVERY) {
+              studentPeriodValuation.valuationType = ValuationType?.RECOVERY;
+            }
           }
           let performanceLevelType: any = null;
           let performanceLevels = await this.performanceLevelResolver.getAllPerformanceLevelAcademicAsignatureCourseFinal({}, academicAsignatureCourseId + "");
@@ -1379,7 +1404,7 @@ export class ExperienceLearningResolver {
             performanceLevelType = performanceLevels?.edges[0]?.node?.type;
           }
           for (let evaluativeComponent of evaluativeComponents) {
-            await this.createExperienceLearningAverageValuationStudent(academicAsignatureCourseId, academicPeriodId, evaluativeComponent.id.toString(), studentId);
+            await this.createExperienceLearningAverageValuationStudent(academicAsignatureCourseId, academicPeriodId, evaluativeComponent.id.toString(), studentId, experienceLearningType);
             const experienceLearningAverageValuation =
               await this.repositoryExperienceLearningAverageValuation.findBy({
                 where: {
@@ -1446,6 +1471,8 @@ export class ExperienceLearningResolver {
               });
           }
         }
+
+
       }
     }
     return true;
@@ -1456,7 +1483,8 @@ export class ExperienceLearningResolver {
   async createAcademicAsignatureCoursePeriodValuationStudent(
     @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: string,
     @Arg('academicPeriodId', () => String) academicPeriodId: string,
-    @Arg('studentId', () => String) studentId: string
+    @Arg('studentId', () => String) studentId: string,
+    @Arg('experienceLearningType', () => ExperienceLearningType) experienceLearningType: ExperienceLearningType,
   ) {
     let academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(
       academicAsignatureCourseId
@@ -1563,7 +1591,7 @@ export class ExperienceLearningResolver {
             performanceLevelType = performanceLevels?.edges[0]?.node?.type;
           }
           for (let evaluativeComponent of evaluativeComponents) {
-            await this.createExperienceLearningAverageValuationStudent(academicAsignatureCourseId, academicPeriodId, evaluativeComponent.id.toString(), studentId);
+            await this.createExperienceLearningAverageValuationStudent(academicAsignatureCourseId, academicPeriodId, evaluativeComponent.id.toString(), studentId, experienceLearningType);
             const experienceLearningAverageValuation =
               await this.repositoryExperienceLearningAverageValuation.findBy({
                 where: {
@@ -2103,7 +2131,8 @@ export class ExperienceLearningResolver {
   async createAcademicAsignatureCoursePeriodValuationStudents(
     @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: string,
     @Arg('academicPeriodId', () => String) academicPeriodId: string,
-    @Arg('schoolId', () => String) schoolId: string
+    @Arg('schoolId', () => String) schoolId: string,
+    @Arg('experienceLearningType', () => ExperienceLearningType) experienceLearningType: ExperienceLearningType,
   ) {
     const academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(
       academicAsignatureCourseId
@@ -2117,7 +2146,8 @@ export class ExperienceLearningResolver {
             this.createAcademicAsignatureCoursePeriodValuationStudent(
               academicAsignatureCourseId,
               academicPeriodId,
-              student as string
+              student as string,
+              experienceLearningType
             );
           }
         }

@@ -25,6 +25,9 @@ export class NewPerformanceLevel implements Partial<PerformanceLevel> {
   @Field({ nullable: true })
   isFinal?: boolean;
 
+  @Field({ nullable: true })
+  isRecovery?: boolean;
+
   @Field(() => PerformanceLevelType, { nullable: true })
   type?: PerformanceLevelType;
 

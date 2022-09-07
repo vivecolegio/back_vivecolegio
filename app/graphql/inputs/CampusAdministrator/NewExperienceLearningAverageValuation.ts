@@ -1,4 +1,5 @@
 import { Field, InputType } from 'type-graphql';
+import { ExperienceLearningType } from '../../enums/ExperienceLearningType';
 import { ExperienceLearningAverageValuation } from '../../models/CampusAdministrator/ExperienceLearningAverageValuation';
 
 @InputType()
@@ -16,6 +17,9 @@ export class NewExperienceLearningAverageValuation
 
   @Field({ nullable: true })
   average?: number;
+
+  @Field(() => ExperienceLearningType, { nullable: true })
+  experienceLearningType?: ExperienceLearningType;
 
   @Field({ nullable: true })
   evaluativeComponentId?: string;

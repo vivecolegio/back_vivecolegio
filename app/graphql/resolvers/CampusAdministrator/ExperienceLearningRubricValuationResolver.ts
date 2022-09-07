@@ -13,6 +13,7 @@ import {
   UserRepository
 } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
+import { ExperienceLearningType } from '../../enums/ExperienceLearningType';
 import { NewExperienceLearningRubricValuation } from '../../inputs/CampusAdministrator/NewExperienceLearningRubricValuation';
 import { IContext } from '../../interfaces/IContext';
 import { ExperienceLearning } from '../../models/CampusAdministrator/ExperienceLearning';
@@ -196,7 +197,7 @@ export class ExperienceLearningRubricValuationResolver {
     });
     const experienceLearning = await this.repositoryExperienceLearning.findOneBy(result?.experienceLearningId);
     if (experienceLearning?.academicAsignatureCourseId && experienceLearning?.academicPeriodId && result?.studentId) {
-      this.experienceLearningResolver.createAcademicAsignatureCoursePeriodValuationStudent(experienceLearning?.academicAsignatureCourseId, experienceLearning?.academicPeriodId, result?.studentId + "");
+      this.experienceLearningResolver.createAcademicAsignatureCoursePeriodValuationStudent(experienceLearning?.academicAsignatureCourseId, experienceLearning?.academicPeriodId, result?.studentId + "", ExperienceLearningType?.NORMAL);
     }
     return result;
   }

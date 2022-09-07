@@ -940,6 +940,7 @@ type ExperienceLearningAverageValuation implements IModelCampusData {
   createdByUserId: String
   evaluativeComponent: EvaluativeComponent
   evaluativeComponentId: String
+  experienceLearningType: ExperienceLearningType
   id: ID!
   performanceLevel: PerformanceLevel
   performanceLevelId: String
@@ -2048,9 +2049,9 @@ type Mutation {
   createAcademicAsignatureCourse(data: NewAcademicAsignatureCourse!): AcademicAsignatureCourse!
   createAcademicAsignatureCoursePeriodEvidenceLearningValuation(data: NewAcademicAsignatureCoursePeriodEvidenceLearningValuation!): AcademicAsignatureCoursePeriodEvidenceLearningValuation!
   createAcademicAsignatureCoursePeriodValuation(data: NewAcademicAsignatureCoursePeriodValuation!): AcademicAsignatureCoursePeriodValuation!
-  createAcademicAsignatureCoursePeriodValuationStudent(academicAsignatureCourseId: String!, academicPeriodId: String!, studentId: String!): Boolean!
-  createAcademicAsignatureCoursePeriodValuationStudentBulk(academicAsignatureCourseId: String!, academicPeriodId: String!, studentId: String!): Boolean!
-  createAcademicAsignatureCoursePeriodValuationStudents(academicAsignatureCourseId: String!, academicPeriodId: String!, schoolId: String!): Boolean!
+  createAcademicAsignatureCoursePeriodValuationStudent(academicAsignatureCourseId: String!, academicPeriodId: String!, experienceLearningType: ExperienceLearningType!, studentId: String!): Boolean!
+  createAcademicAsignatureCoursePeriodValuationStudentBulk(academicAsignatureCourseId: String!, academicPeriodId: String!, experienceLearningType: ExperienceLearningType!, studentId: String!): Boolean!
+  createAcademicAsignatureCoursePeriodValuationStudents(academicAsignatureCourseId: String!, academicPeriodId: String!, experienceLearningType: ExperienceLearningType!, schoolId: String!): Boolean!
   createAcademicDay(data: NewAcademicDay!): AcademicDay!
   createAcademicGrade(data: NewAcademicGrade!): AcademicGrade!
   createAcademicHour(data: NewAcademicHour!): AcademicHour!
@@ -2080,8 +2081,8 @@ type Mutation {
   createEvidenceLearning(data: NewEvidenceLearning!): EvidenceLearning!
   createExperienceLearning(data: NewExperienceLearning!): ExperienceLearning!
   createExperienceLearningAverageValuation(data: NewExperienceLearningAverageValuation!): ExperienceLearningAverageValuation!
-  createExperienceLearningAverageValuationStudent(academicAsignatureCourseId: String!, academicPeriodId: String!, evaluativeComponentId: String!, studentId: String!): Boolean!
-  createExperienceLearningAverageValuationStudents(academicAsignatureCourseId: String!, academicPeriodId: String!, evaluativeComponentId: String!): Boolean!
+  createExperienceLearningAverageValuationStudent(academicAsignatureCourseId: String!, academicPeriodId: String!, evaluativeComponentId: String!, experienceLearningType: ExperienceLearningType!, studentId: String!): Boolean!
+  createExperienceLearningAverageValuationStudents(academicAsignatureCourseId: String!, academicPeriodId: String!, evaluativeComponentId: String!, experienceLearningType: ExperienceLearningType!): Boolean!
   createExperienceLearningCoEvaluation(data: NewExperienceLearningCoEvaluation!): ExperienceLearningCoEvaluation!
   createExperienceLearningCoEvaluationStudents(id: String!): Boolean!
   createExperienceLearningCoEvaluationValuation(data: NewExperienceLearningCoEvaluationValuation!): ExperienceLearningCoEvaluationValuation!
@@ -2218,10 +2219,10 @@ type Mutation {
   updateAcademicSchedule(data: NewAcademicSchedule!, id: String!): AcademicSchedule!
   updateAcademicStandard(data: NewAcademicStandard!, id: String!): AcademicStandard!
   updateAllIStudentsName: Boolean!
-  updateAllStudentAcademicAsignatureCoursePeriodValuation(academicAsignatureCourseId: String!, academicPeriodId: String!): Boolean!
-  updateAllStudentCoursePeriodValuation(academicPeriodId: String!, courseId: String!): Boolean!
-  updateAllStudentGradePeriodValuation(academicGradeId: String!, academicPeriodId: String!): Boolean!
-  updateAllStudentSchoolPeriodValuation(academicPeriodId: String!, schoolId: String!): Boolean!
+  updateAllStudentAcademicAsignatureCoursePeriodValuation(academicAsignatureCourseId: String!, academicPeriodId: String!, experienceLearningType: ExperienceLearningType!): Boolean!
+  updateAllStudentCoursePeriodValuation(academicPeriodId: String!, courseId: String!, experienceLearningType: ExperienceLearningType!): Boolean!
+  updateAllStudentGradePeriodValuation(academicGradeId: String!, academicPeriodId: String!, experienceLearningType: ExperienceLearningType!): Boolean!
+  updateAllStudentSchoolPeriodValuation(academicPeriodId: String!, experienceLearningType: ExperienceLearningType!, schoolId: String!): Boolean!
   updateAssessmentExperienceLearningRubricValuation(id: String!): ExperienceLearningRubricValuation!
   updateAuditLogin(data: NewAuditLogin!, id: String!): AuditLogin!
   updateCampus(data: NewCampus!, id: String!): Campus!
@@ -2537,6 +2538,7 @@ input NewExperienceLearningAverageValuation {
   academicPeriodId: String
   average: Float
   evaluativeComponentId: String
+  experienceLearningType: ExperienceLearningType
   performanceLevelId: String
   studentId: String
 }
@@ -2769,6 +2771,7 @@ input NewPerformanceLevel {
   colorHex: String
   generalPerformanceLevelId: String
   isFinal: Boolean
+  isRecovery: Boolean
   minimumScore: Float
   name: String
   order: Float
@@ -2964,6 +2967,7 @@ type PerformanceLevel implements IModelSchoolData {
   generalPerformanceLevelId: String
   id: ID!
   isFinal: Boolean
+  isRecovery: Boolean
   minimumScore: Float
   name: String
   order: Float
@@ -3534,7 +3538,7 @@ type Query {
     last: Float
     orderCreated: Boolean!
   ): ExperienceLearningConnection!
-  getAllExperienceLearningAcademicPeriodEvaluativeComponentAcademicAsignatureCourse(academicPeriodId: String!, evaluativeComponentId: String!, id: String!): [ExperienceLearning!]
+  getAllExperienceLearningAcademicPeriodEvaluativeComponentAcademicAsignatureCourse(academicPeriodId: String!, evaluativeComponentId: String!, experienceLearningType: ExperienceLearningType!, id: String!): [ExperienceLearning!]
   getAllExperienceLearningAverageValuation(
     academicAsignatureCourseId: String!
     academicPeriodId: String!
@@ -3546,6 +3550,7 @@ type Query {
     """Paginate before opaque cursor"""
     before: String
     evaluativeComponentId: String!
+    experienceLearningType: ExperienceLearningType!
 
     """Paginate first"""
     first: Float

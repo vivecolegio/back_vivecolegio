@@ -39,6 +39,10 @@ export class PerformanceLevel extends IModelSchoolData {
   @Column({ nullable: true })
   isFinal?: boolean;
 
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  isRecovery?: boolean;
+
   @Field(() => PerformanceLevelType, { nullable: true })
   @Column({ nullable: true })
   type?: PerformanceLevelType;

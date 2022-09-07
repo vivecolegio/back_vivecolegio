@@ -180,8 +180,8 @@ export class ExperienceLearningTraditionalValuationResolver {
     if (result?.experienceLearningId) {
       const experienceLearning = await this.repositoryExperienceLearning.findOneBy(result?.experienceLearningId);
       //console.log(experienceLearning)
-      if (experienceLearning?.academicAsignatureCourseId && experienceLearning?.academicPeriodId && result?.studentId) {
-        this.experienceLearningResolver.createAcademicAsignatureCoursePeriodValuationStudent(experienceLearning?.academicAsignatureCourseId, experienceLearning?.academicPeriodId, result?.studentId + "");
+      if (experienceLearning?.academicAsignatureCourseId && experienceLearning?.academicPeriodId && result?.studentId && experienceLearning?.experienceLearningType) {
+        this.experienceLearningResolver.createAcademicAsignatureCoursePeriodValuationStudent(experienceLearning?.academicAsignatureCourseId, experienceLearning?.academicPeriodId, result?.studentId + "", experienceLearning?.experienceLearningType);
       }
     }
     return result;

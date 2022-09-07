@@ -10,15 +10,16 @@ import {
   ExperienceLearningAverageValuationRepository,
   PerformanceLevelRepository,
   StudentRepository,
-  UserRepository,
+  UserRepository
 } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
+import { ExperienceLearningType } from '../../enums/ExperienceLearningType';
 import { NewExperienceLearningAverageValuation } from '../../inputs/CampusAdministrator/NewExperienceLearningAverageValuation';
 import { IContext } from '../../interfaces/IContext';
 import { AcademicAsignatureCourse } from '../../models/CampusAdministrator/AcademicAsignatureCourse';
 import {
   ExperienceLearningAverageValuation,
-  ExperienceLearningAverageValuationConnection,
+  ExperienceLearningAverageValuationConnection
 } from '../../models/CampusAdministrator/ExperienceLearningAverageValuation';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { Student } from '../../models/GeneralAdministrator/Student';
@@ -68,7 +69,8 @@ export class ExperienceLearningAverageValuationResolver {
     @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: String,
     @Arg('academicPeriodId', () => String) academicPeriodId: String,
     @Arg('evaluativeComponentId', () => String) evaluativeComponentId: String,
-    @Arg('studentId', () => String, { nullable: true }) studentId: String
+    @Arg('studentId', () => String, { nullable: true }) studentId: String,
+    @Arg('experienceLearningType', () => ExperienceLearningType) experienceLearningType: ExperienceLearningType,
   ): Promise<ExperienceLearningAverageValuationConnection> {
     let result;
     if (allData) {
@@ -80,6 +82,7 @@ export class ExperienceLearningAverageValuationResolver {
               academicPeriodId,
               evaluativeComponentId,
               studentId,
+              experienceLearningType
             },
             order: { createdAt: 'DESC' },
           });
@@ -89,6 +92,7 @@ export class ExperienceLearningAverageValuationResolver {
               academicAsignatureCourseId,
               academicPeriodId,
               evaluativeComponentId,
+              experienceLearningType
             },
             order: { createdAt: 'DESC' },
           });
@@ -101,6 +105,7 @@ export class ExperienceLearningAverageValuationResolver {
               academicPeriodId,
               evaluativeComponentId,
               studentId,
+              experienceLearningType
             },
           });
         } else {
@@ -109,6 +114,7 @@ export class ExperienceLearningAverageValuationResolver {
               academicAsignatureCourseId,
               academicPeriodId,
               evaluativeComponentId,
+              experienceLearningType
             },
           });
         }
@@ -122,6 +128,7 @@ export class ExperienceLearningAverageValuationResolver {
               academicPeriodId,
               evaluativeComponentId,
               studentId,
+              experienceLearningType,
               active: true,
             },
             order: { createdAt: 'DESC' },
@@ -132,6 +139,7 @@ export class ExperienceLearningAverageValuationResolver {
               academicAsignatureCourseId,
               academicPeriodId,
               evaluativeComponentId,
+              experienceLearningType,
               active: true,
             },
             order: { createdAt: 'DESC' },
@@ -145,6 +153,7 @@ export class ExperienceLearningAverageValuationResolver {
               academicPeriodId,
               evaluativeComponentId,
               studentId,
+              experienceLearningType,
               active: true,
             },
           });
@@ -154,6 +163,7 @@ export class ExperienceLearningAverageValuationResolver {
               academicAsignatureCourseId,
               academicPeriodId,
               evaluativeComponentId,
+              experienceLearningType,
               active: true,
             },
           });
