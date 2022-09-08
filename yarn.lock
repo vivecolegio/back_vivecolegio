@@ -2142,10 +2142,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.34.tgz#3b0b6a50ff797280b8d000c6281d229f9c538cef"
   integrity sha512-XImEz7XwTvDBtzlTnm8YvMqGW/ErMWBsKZ+hMTvnDIjGCKxwK5Xpc+c/oQjOauwq8M4OS11hEkpjX8rrI/eEgA==
 
-"@types/node@18.7.15":
-  version "18.7.15"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.7.15.tgz#20ae1ec80c57ee844b469f968a1cd511d4088b29"
-  integrity sha512-XnjpaI8Bgc3eBag2Aw4t2Uj/49lLBSStHWfqKvIuXD7FIrZyMLWp8KuAFHAqxMZYTF9l08N1ctUn9YNybZJVmQ==
+"@types/node@18.7.16":
+  version "18.7.16"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.7.16.tgz#0eb3cce1e37c79619943d2fd903919fc30850601"
+  integrity sha512-EQHhixfu+mkqHMZl1R2Ovuvn47PUw18azMJOTwSZr9/fhzHNGXAJ0ma0dayRVchprpCj0Kc1K1xKoWaATWF1qg==
 
 "@types/node@^10.1.0":
   version "10.17.60"
@@ -7788,10 +7788,10 @@ puppeteer-report@3.0.3:
   dependencies:
     pdf-lib "^1.17.1"
 
-puppeteer@17.1.1:
-  version "17.1.1"
-  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-17.1.1.tgz#e981b17e8edee72a7c7b676878040ce2ff1cc3d0"
-  integrity sha512-sOq3+q4UpKmAl/LxGvraMVe9GnhDkmQLZrRkFswpWp46Vz3dv79LylMwebo047/xIc9dlOi9VMrNN5yLafCpGg==
+puppeteer@17.1.2:
+  version "17.1.2"
+  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-17.1.2.tgz#1e8ea8b0eee0e6afc5d95e2db6ae828a51ad63c9"
+  integrity sha512-xgFOxUl4hRjwQpODZSeJlE/rUzi8OmHtc3T4ir4CRYGzVmaTVHAl8VGpI0ooy752u2DFeMxvQdHmxNnLqPImIg==
   dependencies:
     cross-fetch "3.1.5"
     debug "4.3.4"

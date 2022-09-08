@@ -908,6 +908,7 @@ export class ExperienceLearningResolver {
               academicPeriodId,
               evaluativeComponentId,
               studentId,
+              experienceLearningType
             },
           });
           if (studentAverageList.length > 0) {
@@ -1337,15 +1338,31 @@ export class ExperienceLearningResolver {
         let average = 0;
         let perf = null;
         let performanceLevelId = undefined;
+        let valuationType = "CALCULATE";
+        if (experienceLearningType == ExperienceLearningType.NORMAL) {
+          valuationType = ValuationType.CALCULATE;
+        }
+        if (experienceLearningType == ExperienceLearningType.RECOVERY) {
+          valuationType = ValuationType.RECOVERY;
+        }
+        // if (academicAsignatureCourseId == "62cf1dbe720ef6a563ecfd9a" && studentId == "629ee6cbd6a11b4cf553db9b") {
+        //   console.log("academicAsignatureCourseId", academicAsignatureCourseId);
+        //   console.log("academicPeriodId", academicPeriodId);
+        //   console.log("studentId", studentId);
+        //   console.log("valuationType", valuationType);
+        // }
         let studentPeriodValuationList =
           await this.repositoryAcademicAsignatureCoursePeriodValuation.findBy({
             where: {
               academicAsignatureCourseId,
               academicPeriodId,
               studentId,
-              experienceLearningType
+              valuationType
             },
           });
+        // if (academicAsignatureCourseId == "62cf1dbe720ef6a563ecfd9a" && studentId == "629ee6cbd6a11b4cf553db9b") {
+        //   console.log(studentPeriodValuationList?.length);
+        // }
         let countDefinitive = 0;
         let countCalculate = 0;
         let countRecovery = 0;
@@ -1363,6 +1380,11 @@ export class ExperienceLearningResolver {
                 break;
             }
           }
+          // if (academicAsignatureCourseId == "62cf1dbe720ef6a563ecfd9a" && studentId == "629ee6cbd6a11b4cf553db9b") {
+          //   console.log(countRecovery, countRecovery);
+          //   console.log(countCalculate, countCalculate);
+          //   console.log(countDefinitive, countDefinitive);
+          // }
           if (countCalculate > 1) {
             for (let studentPeriodValuation of studentPeriodValuationList) {
               if (studentPeriodValuation?.valuationType == ValuationType?.CALCULATE) {
@@ -1412,6 +1434,7 @@ export class ExperienceLearningResolver {
                   academicPeriodId,
                   studentId,
                   evaluativeComponentId: evaluativeComponent.id.toString(),
+                  experienceLearningType
                 },
               });
             if (experienceLearningAverageValuation.length > 0) {
@@ -1456,7 +1479,6 @@ export class ExperienceLearningResolver {
               studentPeriodValuation.performanceLevelId = performanceLevelId;
               break;
           }
-          studentPeriodValuation.valuationType = ValuationType.CALCULATE;
           if (studentPeriodValuation.id) {
             studentPeriodValuation =
               await this.repositoryAcademicAsignatureCoursePeriodValuation.save({
@@ -1471,8 +1493,6 @@ export class ExperienceLearningResolver {
               });
           }
         }
-
-
       }
     }
     return true;
@@ -1539,12 +1559,26 @@ export class ExperienceLearningResolver {
         let average = 0;
         let perf = null;
         let performanceLevelId = undefined;
+        let valuationType = "CALCULATE";
+        if (experienceLearningType == ExperienceLearningType.NORMAL) {
+          valuationType = ValuationType.CALCULATE;
+        }
+        if (experienceLearningType == ExperienceLearningType.RECOVERY) {
+          valuationType = ValuationType.RECOVERY;
+        }
+        // if (academicAsignatureCourseId == "62cf1dbe720ef6a563ecfd9a" && studentId == "629ee6cbd6a11b4cf553db9b") {
+        //   console.log("academicAsignatureCourseId", academicAsignatureCourseId);
+        //   console.log("academicPeriodId", academicPeriodId);
+        //   console.log("studentId", studentId);
+        //   console.log("valuationType", valuationType);
+        // }
         let studentPeriodValuationList =
           await this.repositoryAcademicAsignatureCoursePeriodValuation.findBy({
             where: {
               academicAsignatureCourseId,
               academicPeriodId,
               studentId,
+              valuationType
             },
           });
         let countDefinitive = 0;
@@ -1572,8 +1606,16 @@ export class ExperienceLearningResolver {
             }
             studentPeriodValuationList = [];
           }
+          if (countRecovery > 1) {
+            for (let studentPeriodValuation of studentPeriodValuationList) {
+              if (studentPeriodValuation?.valuationType == ValuationType?.RECOVERY) {
+                let result = await this.repositoryAcademicAsignatureCoursePeriodValuation.deleteOne({ _id: new ObjectId(studentPeriodValuation?.id?.toString()) });
+              }
+            }
+            studentPeriodValuationList = [];
+          }
         }
-        if (countDefinitive == 0 && countRecovery == 0) {
+        if (countDefinitive == 0) {
           if (studentPeriodValuationList.length > 0) {
             studentPeriodValuation = studentPeriodValuationList[0];
           } else {
@@ -1584,7 +1626,14 @@ export class ExperienceLearningResolver {
             studentPeriodValuation.academicPeriodId = academicPeriodId;
             studentPeriodValuation.academicAsignatureCourseId = academicAsignatureCourseId;
             studentPeriodValuation.assessment = 0;
+            if (experienceLearningType == ExperienceLearningType?.NORMAL) {
+              studentPeriodValuation.valuationType = ValuationType?.CALCULATE;
+            }
+            if (experienceLearningType == ExperienceLearningType?.RECOVERY) {
+              studentPeriodValuation.valuationType = ValuationType?.RECOVERY;
+            }
           }
+          console.log(studentPeriodValuation);
           let performanceLevelType: any = null;
           let performanceLevels = await this.performanceLevelResolver.getAllPerformanceLevelAcademicAsignatureCourseFinal({}, academicAsignatureCourseId + "");
           if (performanceLevels) {
@@ -1599,6 +1648,7 @@ export class ExperienceLearningResolver {
                   academicPeriodId,
                   studentId,
                   evaluativeComponentId: evaluativeComponent.id.toString(),
+                  experienceLearningType
                 },
               });
             if (experienceLearningAverageValuation.length > 0) {
@@ -1643,7 +1693,6 @@ export class ExperienceLearningResolver {
               studentPeriodValuation.performanceLevelId = performanceLevelId;
               break;
           }
-          studentPeriodValuation.valuationType = ValuationType.CALCULATE;
           if (studentPeriodValuation.id) {
             studentPeriodValuation =
               await this.repositoryAcademicAsignatureCoursePeriodValuation.save({
@@ -1720,6 +1769,14 @@ export class ExperienceLearningResolver {
       if (countCalculate > 1) {
         for (let studentAreaPeriodValuation of studentAreaPeriodValuationList) {
           let result = await this.repositoryAcademicAreaCoursePeriodValuation.deleteOne({ _id: new ObjectId(studentAreaPeriodValuation?.id?.toString()) });
+        }
+        studentAreaPeriodValuationList = [];
+      }
+      if (countRecovery > 1) {
+        for (let studentPeriodValuation of studentAreaPeriodValuationList) {
+          if (studentPeriodValuation?.valuationType == ValuationType?.RECOVERY) {
+            let result = await this.repositoryAcademicAsignatureCoursePeriodValuation.deleteOne({ _id: new ObjectId(studentPeriodValuation?.id?.toString()) });
+          }
         }
         studentAreaPeriodValuationList = [];
       }
@@ -1833,7 +1890,7 @@ export class ExperienceLearningResolver {
           studentAreaPeriodValuation.performanceLevelId = performanceLevelId;
           break;
       }
-      studentAreaPeriodValuation.valuationType = ValuationType.CALCULATE;
+      //studentAreaPeriodValuation.valuationType = ValuationType.CALCULATE;
       if (studentAreaPeriodValuation.id) {
         studentAreaPeriodValuation =
           await this.repositoryAcademicAreaCoursePeriodValuation.save({
