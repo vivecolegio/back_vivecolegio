@@ -6,6 +6,7 @@ import { InjectRepository } from 'typeorm-typedi-extensions';
 
 import { AcademicAreaCoursePeriodValuationRepository, AcademicAreaRepository, AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicAsignatureRepository, AcademicDayRepository, AcademicGradeRepository, AcademicPeriodRepository, AverageAcademicPeriodCourseRepository, AverageAcademicPeriodStudentRepository, CampusRepository, CourseRepository, EvidenceLearningRepository, ExperienceLearningRepository, LearningRepository, PerformanceLevelRepository, SchoolConfigurationRepository, SchoolRepository, StudentBehaviourRepository, StudentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
 import { PerformanceLevelType } from '../../enums/PerformanceLevelType';
+import { ValuationType } from '../../enums/ValuationType';
 import { IContext } from '../../interfaces/IContext';
 import { AcademicAreaCoursePeriodValuation } from '../../models/CampusAdministrator/AcademicAreaCoursePeriodValuation';
 import { AcademicAsignatureCourse } from '../../models/CampusAdministrator/AcademicAsignatureCourse';
@@ -522,23 +523,32 @@ export class PerformanceReportResolver {
                       } else {
                         let valuationAsignatureCalculate;
                         let valuationAsignatureDefinitive;
+                        let valuationAsignatureRecovery;
                         for (let notesAsigna of notesAsignature) {
                           switch (notesAsigna?.valuationType) {
-                            case "CALCULATE":
+                            case ValuationType.CALCULATE:
                               valuationAsignatureCalculate = notesAsigna;
                               break;
-                            case "DEFINITIVE":
+                            case ValuationType.DEFINITIVE:
                               valuationAsignatureDefinitive = notesAsigna;
+                              break;
+                            case ValuationType.RECOVERY:
+                              valuationAsignatureRecovery = notesAsigna;
                               break;
                           }
                         }
-                        if (valuationAsignatureDefinitive) {
-                          let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(valuationAsignatureDefinitive?.performanceLevelId);
-                          notesAsignatures.push({ assessment: valuationAsignatureDefinitive?.assessment?.toFixed(countDigitsPerformanceLevel), academicPeriodId: valuationAsignatureDefinitive?.academicPeriodId, performanceLevel: performanceLevel?.name, "asignatureId": academicAsignature?.id?.toString(), "areaId": academicArea?.id?.toString(), "teacher": teacherUserAsignatureCourse?.name + " " + teacherUserAsignatureCourse?.lastName })
+                        if (valuationAsignatureRecovery) {
+                          let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(valuationAsignatureRecovery?.performanceLevelId);
+                          notesAsignatures.push({ assessment: valuationAsignatureRecovery?.assessment?.toFixed(countDigitsPerformanceLevel), academicPeriodId: valuationAsignatureRecovery?.academicPeriodId, performanceLevel: performanceLevel?.name, "asignatureId": academicAsignature?.id?.toString(), "areaId": academicArea?.id?.toString(), "teacher": teacherUserAsignatureCourse?.name + " " + teacherUserAsignatureCourse?.lastName })
                         } else {
-                          if (valuationAsignatureCalculate) {
-                            let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(valuationAsignatureCalculate?.performanceLevelId);
-                            notesAsignatures.push({ assessment: valuationAsignatureCalculate?.assessment?.toFixed(countDigitsPerformanceLevel), academicPeriodId: valuationAsignatureCalculate?.academicPeriodId, performanceLevel: performanceLevel?.name, "asignatureId": academicAsignature?.id?.toString(), "areaId": academicArea?.id?.toString(), "teacher": teacherUserAsignatureCourse?.name + " " + teacherUserAsignatureCourse?.lastName })
+                          if (valuationAsignatureDefinitive) {
+                            let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(valuationAsignatureDefinitive?.performanceLevelId);
+                            notesAsignatures.push({ assessment: valuationAsignatureDefinitive?.assessment?.toFixed(countDigitsPerformanceLevel), academicPeriodId: valuationAsignatureDefinitive?.academicPeriodId, performanceLevel: performanceLevel?.name, "asignatureId": academicAsignature?.id?.toString(), "areaId": academicArea?.id?.toString(), "teacher": teacherUserAsignatureCourse?.name + " " + teacherUserAsignatureCourse?.lastName })
+                          } else {
+                            if (valuationAsignatureCalculate) {
+                              let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(valuationAsignatureCalculate?.performanceLevelId);
+                              notesAsignatures.push({ assessment: valuationAsignatureCalculate?.assessment?.toFixed(countDigitsPerformanceLevel), academicPeriodId: valuationAsignatureCalculate?.academicPeriodId, performanceLevel: performanceLevel?.name, "asignatureId": academicAsignature?.id?.toString(), "areaId": academicArea?.id?.toString(), "teacher": teacherUserAsignatureCourse?.name + " " + teacherUserAsignatureCourse?.lastName })
+                            }
                           }
                         }
                       }
