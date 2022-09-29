@@ -1,5 +1,6 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Column, Entity, Index } from 'typeorm';
+
 import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { GeneralAcademicCycle } from '../GeneralAdministrator/GeneralAcademicCycle';
@@ -46,6 +47,9 @@ export class AcademicGrade extends IModelSchoolData {
 
   @Field({ nullable: true })
   generalAcademicGrade?: GeneralAcademicGrade;
+
+  @Field({ nullable: true })
+  countStudent?: number;
 }
 
 @ObjectType()

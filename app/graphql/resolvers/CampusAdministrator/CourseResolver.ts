@@ -2,17 +2,8 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import {
-  AcademicDayRepository,
-  AcademicGradeRepository,
-  CampusRepository,
-  CourseRepository,
-  CursosRepository,
-  SchoolRepository,
-  StudentRepository,
-  TeacherRepository,
-  UserRepository
-} from '../../../servers/DataSource';
+
+import { AcademicDayRepository, AcademicGradeRepository, CampusRepository, CourseRepository, CursosRepository, SchoolRepository, StudentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewCourse } from '../../inputs/CampusAdministrator/NewCourse';
 import { IContext } from '../../interfaces/IContext';
@@ -609,5 +600,19 @@ export class CourseResolver {
       return result;
     }
     return null;
+  }
+
+  @FieldResolver((_type) => Number, { nullable: true })
+  async countStudent(@Root() data: AcademicGrade) {
+    let id = data.schoolId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryStudent.findBy({
+        where: {
+          courseId: data?.id?.toString()
+        }
+      })
+      return result?.length;
+    }
+    return 0;
   }
 }

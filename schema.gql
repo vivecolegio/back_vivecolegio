@@ -274,6 +274,7 @@ type AcademicDayEdge {
 """The AcademicGrade model"""
 type AcademicGrade implements IModelSchoolData {
   active: Boolean
+  countStudent: Float
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
@@ -668,6 +669,7 @@ type Course implements IModelCampusData {
   active: Boolean
   campus: Campus
   campusId: String
+  countStudent: Float
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String

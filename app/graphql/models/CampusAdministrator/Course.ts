@@ -1,5 +1,6 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Column, Entity } from 'typeorm';
+
 import { IModelCampusData } from '../../interfaces/IModelCampusData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { AcademicGrade } from '../SchoolAdministrator/AcademicGrade';
@@ -53,10 +54,13 @@ export class Course extends IModelCampusData {
   @Field({ nullable: true })
   @Column({ nullable: true })
   grupoSIMAT?: string;
+
+  @Field({ nullable: true })
+  countStudent?: number;
 }
 
 @ObjectType()
-export class CourseEdge extends EdgeType('Course', Course) {}
+export class CourseEdge extends EdgeType('Course', Course) { }
 
 @ObjectType()
-export class CourseConnection extends ConnectionType<CourseEdge>('Course', CourseEdge) {}
+export class CourseConnection extends ConnectionType<CourseEdge>('Course', CourseEdge) { }
