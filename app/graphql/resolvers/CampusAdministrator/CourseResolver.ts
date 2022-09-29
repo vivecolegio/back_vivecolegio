@@ -603,8 +603,8 @@ export class CourseResolver {
   }
 
   @FieldResolver((_type) => Number, { nullable: true })
-  async countStudent(@Root() data: AcademicGrade) {
-    let id = data.schoolId;
+  async countStudent(@Root() data: Course) {
+    let id = data.academicGradeId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryStudent.findBy({
         where: {
