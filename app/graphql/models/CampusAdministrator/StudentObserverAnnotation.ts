@@ -36,13 +36,13 @@ export class StudentObserverAnnotation extends IModelCampusData {
   @Field({ nullable: true })
   student?: Student;
 
-  @Index("index_observerAnnotacionTypeId")
+  @Index("index_observerAnnotationTypeId")
   @Field({ nullable: true })
   @Column({ nullable: true })
-  observerAnnotacionTypeId?: string;
+  observerAnnotationTypeId?: string;
 
   @Field({ nullable: true })
-  observerAnnotacionType?: ObserverAnnotationType;
+  observerAnnotationType?: ObserverAnnotationType;
 
   @Field({ nullable: true })
   @Column({ nullable: true })

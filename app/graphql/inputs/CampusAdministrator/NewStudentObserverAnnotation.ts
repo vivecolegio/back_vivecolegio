@@ -15,7 +15,7 @@ export class NewStudentObserverAnnotation implements Partial<StudentObserverAnno
   studentId?: String;
 
   @Field({ nullable: true })
-  observerAnnotacionTypeId?: string;
+  observerAnnotationTypeId?: string;
 
   @Field({ nullable: true })
   observation?: string;

@@ -303,8 +303,8 @@ export class StudentObserverAnnotationResolver {
   }
 
   @FieldResolver((_type) => ObserverAnnotationType, { nullable: true })
-  async observerAnnotacionType(@Root() data: StudentObserverAnnotation) {
-    let id = data.observerAnnotacionTypeId;
+  async observerAnnotationType(@Root() data: StudentObserverAnnotation) {
+    let id = data.observerAnnotationTypeId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryObserverAnnotationType.findOneBy(id);
       return result;
