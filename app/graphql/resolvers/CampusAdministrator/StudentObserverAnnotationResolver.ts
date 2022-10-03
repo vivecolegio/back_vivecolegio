@@ -50,18 +50,16 @@ export class StudentObserverAnnotationResolver {
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
-    @Arg('courseId', () => String) courseId: String,
-    @Arg('academicPeriodId', () => String) academicPeriodId: String,
-    @Arg('studentId', () => String, { nullable: true }) studentId: String,
+    @Arg('studentId', () => String) studentId: String,
+    @Arg('courseId', () => String, { nullable: true }) courseId: String,
   ): Promise<StudentObserverAnnotationConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
-        if (courseId && academicPeriodId && studentId) {
+        if (courseId) {
           result = await this.repository.findBy({
             where: {
               courseId,
-              academicPeriodId,
               studentId
             },
             order: { createdAt: 'DESC' },
@@ -69,37 +67,33 @@ export class StudentObserverAnnotationResolver {
         } else {
           result = await this.repository.findBy({
             where: {
-              courseId,
-              academicPeriodId,
+              studentId
             },
             order: { createdAt: 'DESC' },
           });
         }
       } else {
-        if (courseId && academicPeriodId && studentId) {
+        if (courseId) {
           result = await this.repository.findBy({
             where: {
               courseId,
-              academicPeriodId,
               studentId
             },
           });
         } else {
           result = await this.repository.findBy({
             where: {
-              courseId,
-              academicPeriodId,
+              studentId
             },
           });
         }
       }
     } else {
       if (orderCreated) {
-        if (courseId && academicPeriodId && studentId) {
+        if (courseId) {
           result = await this.repository.findBy({
             where: {
               courseId,
-              academicPeriodId,
               studentId,
               active: true,
             },
@@ -108,19 +102,17 @@ export class StudentObserverAnnotationResolver {
         } else {
           result = await this.repository.findBy({
             where: {
-              courseId,
-              academicPeriodId,
+              studentId,
               active: true,
             },
             order: { createdAt: 'DESC' },
           });
         }
       } else {
-        if (courseId && academicPeriodId && studentId) {
+        if (courseId) {
           result = await this.repository.findBy({
             where: {
               courseId,
-              academicPeriodId,
               studentId,
               active: true,
             },
@@ -128,8 +120,7 @@ export class StudentObserverAnnotationResolver {
         } else {
           result = await this.repository.findBy({
             where: {
-              courseId,
-              academicPeriodId,
+              studentId,
               active: true,
             },
           });
