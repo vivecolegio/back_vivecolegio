@@ -8,7 +8,7 @@ import { AcademicPeriod } from '../SchoolAdministrator/AcademicPeriod';
 import { ObserverAnnotationType } from '../SchoolAdministrator/ObserverAnnotationType';
 import { Course } from './Course';
 
-@Index("index_full", ["courseId", "academicPeriodId", "studentId", "observerAnnotacionTypeId", "campusId"])
+@Index("index_full", ["courseId", "academicPeriodId", "studentId", "observerAnnotationTypeId", "campusId"])
 @ObjectType({ description: 'The StudentObserverAnnotation model', implements: IModelCampusData })
 @Entity()
 export class StudentObserverAnnotation extends IModelCampusData {
