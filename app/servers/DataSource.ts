@@ -27,6 +27,7 @@ import { QuestionCategoryTestOnline } from '../graphql/models/CampusAdministrato
 import { QuestionTestOnline } from '../graphql/models/CampusAdministrator/QuestionTestOnline';
 import { StudentAttendance } from '../graphql/models/CampusAdministrator/StudentAttendance';
 import { StudentBehaviour } from '../graphql/models/CampusAdministrator/StudentBehaviour';
+import { StudentObserverAnnotation } from '../graphql/models/CampusAdministrator/StudentObserverAnnotation';
 import { Teacher } from '../graphql/models/CampusAdministrator/Teacher';
 import { Estudiantes } from '../graphql/models/Data/Estudiantes';
 import { Estudiantes2 } from '../graphql/models/Data/Estudiantes2';
@@ -70,6 +71,7 @@ import { ForumInteraction } from '../graphql/models/SchoolAdministrator/ForumInt
 import { GradeAssignment } from '../graphql/models/SchoolAdministrator/GradeAssignment';
 import { Learning } from '../graphql/models/SchoolAdministrator/Learning';
 import { Modality } from '../graphql/models/SchoolAdministrator/Modality';
+import { ObserverAnnotationType } from '../graphql/models/SchoolAdministrator/ObserverAnnotationType';
 import { PerformanceLevel } from '../graphql/models/SchoolAdministrator/PerformanceLevel';
 import { SchoolConfiguration } from '../graphql/models/SchoolAdministrator/SchoolConfiguration';
 import { SchoolYear } from '../graphql/models/SchoolAdministrator/SchoolYear';
@@ -156,7 +158,9 @@ export const dataSource = new DataSource({
     AcademicAsignatureCoursePeriodEvidenceLearningValuation,
     AverageAcademicPeriodStudent,
     AverageAcademicPeriodCourse,
-    StudentBehaviour
+    StudentBehaviour,
+    ObserverAnnotationType,
+    StudentObserverAnnotation
   ],
   synchronize: true,
   logger: 'advanced-console',
@@ -269,3 +273,5 @@ export const AcademicAsignatureCoursePeriodEvidenceLearningValuationRepository =
 export const AverageAcademicPeriodStudentRepository = dataSource.getMongoRepository(AverageAcademicPeriodStudent);
 export const AverageAcademicPeriodCourseRepository = dataSource.getMongoRepository(AverageAcademicPeriodCourse);
 export const StudentBehaviourRepository = dataSource.getMongoRepository(StudentBehaviour);
+export const ObserverAnnotationTypeRepository = dataSource.getMongoRepository(ObserverAnnotationType);
+export const StudentObserverAnnotationRepository = dataSource.getMongoRepository(StudentObserverAnnotation);

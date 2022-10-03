@@ -88,6 +88,8 @@ import { SpecialtyResolver } from './../graphql/resolvers/SchoolAdministrator/Sp
 import { dataSource } from './DataSource';
 
 import 'reflect-metadata';
+import { StudentObserverAnnotationResolver } from '../graphql/resolvers/CampusAdministrator/StudentObserverAnnotationResolver';
+import { ObserverAnnotationTypeResolver } from '../graphql/resolvers/SchoolAdministrator/ObserverAnnotationTypeResolver';
 
 const PORT = SERVER_PORT_APP;
 const SERVER_NAME = SERVER_NAME_APP;
@@ -174,7 +176,9 @@ async function app() {
         SchoolConfigurationResolver,
         AcademicAreaCoursePeriodValuationResolver,
         AcademicAsignatureCoursePeriodEvidenceLearningValuationResolver,
-        StudentBehaviourResolver
+        StudentBehaviourResolver,
+        ObserverAnnotationTypeResolver,
+        StudentObserverAnnotationResolver
       ],
       emitSchemaFile: true,
       validate: false,
