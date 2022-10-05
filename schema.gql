@@ -2027,6 +2027,7 @@ type Mutation {
   changeActiveModule(active: Boolean!, id: String!): Boolean!
   changeActiveMunicipality(active: Boolean!, id: String!): Boolean!
   changeActiveNotification(active: Boolean!, id: String!): Boolean!
+  changeActiveObserverAnnotationType(active: Boolean!, id: String!): Boolean!
   changeActivePerformanceLevel(active: Boolean!, id: String!): Boolean!
   changeActiveQuestionBankTestOnline(active: Boolean!, id: String!): Boolean!
   changeActiveQuestionCategoryTestOnline(active: Boolean!, id: String!): Boolean!
@@ -2041,6 +2042,7 @@ type Mutation {
   changeActiveStudent(active: Boolean!, id: String!): Boolean!
   changeActiveStudentAttendance(active: Boolean!, id: String!): Boolean!
   changeActiveStudentBehaviour(active: Boolean!, id: String!): Boolean!
+  changeActiveStudentObserverAnnotation(active: Boolean!, id: String!): Boolean!
   changeActiveTeacher(active: Boolean!, id: String!): Boolean!
   changeActiveUser(active: Boolean!, id: String!): Boolean!
   changePasswordUser(id: String!, password: String!): Boolean!
@@ -2117,8 +2119,10 @@ type Mutation {
   createModule(data: NewModule!): Module!
   createMunicipality(data: NewMunicipality!): Municipality!
   createNotification(data: NewNotification!): Notification!
+  createObserverAnnotationType(data: NewObserverAnnotationType!): ObserverAnnotationType!
   createPerformanceLevel(data: NewPerformanceLevel!): PerformanceLevel!
   createPeriodStudentBehaviour(academicPeriodId: String!, courseId: String!): Boolean!
+  createPeriodStudentObserverAnnotation(academicPeriodId: String!, courseId: String!): Boolean!
   createQuestionBankTestOnline(data: NewQuestionBankTestOnline!): QuestionBankTestOnline!
   createQuestionCategoryTestOnline(data: NewQuestionCategoryTestOnline!): QuestionCategoryTestOnline!
   createQuestionTestOnline(data: NewQuestionTestOnline!): QuestionTestOnline!
@@ -2132,6 +2136,7 @@ type Mutation {
   createStudent(data: NewStudent!): Student!
   createStudentAttendance(data: NewStudentAttendance!): StudentAttendance!
   createStudentBehaviour(data: NewStudentBehaviour!): StudentBehaviour!
+  createStudentObserverAnnotation(data: NewStudentObserverAnnotation!): StudentObserverAnnotation!
   createTeacher(data: NewTeacher!): Teacher!
   createUser(data: NewUser!): User!
   deleteAcademicArea(id: String!): Boolean!
@@ -2185,6 +2190,7 @@ type Mutation {
   deleteModule(id: String!): Boolean!
   deleteMunicipality(id: String!): Boolean!
   deleteNotification(id: String!): Boolean!
+  deleteObserverAnnotationType(id: String!): Boolean!
   deletePerformanceLevel(id: String!): Boolean!
   deleteQuestionBankTestOnline(id: String!): Boolean!
   deleteQuestionCategoryTestOnline(id: String!): Boolean!
@@ -2199,6 +2205,7 @@ type Mutation {
   deleteStudent(id: String!): Boolean!
   deleteStudentAttendance(id: String!): Boolean!
   deleteStudentBehaviour(id: String!): Boolean!
+  deleteStudentObserverAnnotation(id: String!): Boolean!
   deleteTeacher(id: String!): Boolean!
   deleteUser(id: String!): Boolean!
   generatePerformanceLevelExample(id: String!): Boolean!
@@ -2270,6 +2277,7 @@ type Mutation {
   updateModule(data: NewModule!, id: String!): Module!
   updateMunicipality(data: NewMunicipality!, id: String!): Municipality!
   updateNotification(data: NewNotification!, id: String!): Notification!
+  updateObserverAnnotationType(data: NewObserverAnnotationType!, id: String!): ObserverAnnotationType!
   updatePerformanceLevel(data: NewPerformanceLevel!, id: String!): PerformanceLevel!
   updateQuestionBankTestOnline(data: NewQuestionBankTestOnline!, id: String!): QuestionBankTestOnline!
   updateQuestionCategoryTestOnline(data: NewQuestionCategoryTestOnline!, id: String!): QuestionCategoryTestOnline!
@@ -2284,6 +2292,7 @@ type Mutation {
   updateStudent(data: NewStudent!, id: String!): Student!
   updateStudentAttendance(data: NewStudentAttendance!, id: String!): StudentAttendance!
   updateStudentBehaviour(data: NewStudentBehaviour!, id: String!): StudentBehaviour!
+  updateStudentObserverAnnotation(data: NewStudentObserverAnnotation!, id: String!): StudentObserverAnnotation!
   updateStudentsAllInitialsCourse: Boolean!
   updateTeacher(data: NewTeacher!, id: String!): Teacher!
   updateUser(data: NewUser!, id: String!): User!
@@ -2764,6 +2773,12 @@ input NewNotification {
   userId: String
 }
 
+input NewObserverAnnotationType {
+  code: String
+  name: String
+  schoolId: String
+}
+
 input NewPerformanceLevel {
   abbreviation: String
   academicGradesId: [String!]
@@ -2887,6 +2902,15 @@ input NewStudentBehaviour {
   studentId: String
 }
 
+input NewStudentObserverAnnotation {
+  academicPeriodId: String
+  commitment: String
+  courseId: String
+  observation: String
+  observerAnnotationTypeId: String
+  studentId: String
+}
+
 input NewTeacher {
   academicAsignatureId: [String!]
   attentionSchedule: String
@@ -2942,6 +2966,37 @@ type NotificationEdge {
   """Used in `before` and `after` args"""
   cursor: String!
   node: Notification!
+}
+
+"""The ObserverAnnotationType model"""
+type ObserverAnnotationType implements IModelSchoolData {
+  active: Boolean
+  code: String
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  id: ID!
+  name: String
+  school: School
+  schoolId: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type ObserverAnnotationTypeConnection {
+  edges: [ObserverAnnotationTypeEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type ObserverAnnotationTypeEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: ObserverAnnotationType!
 }
 
 type PageInfo {
@@ -4050,6 +4105,22 @@ type Query {
     orderCreated: Boolean!
     userId: String!
   ): NotificationConnection!
+  getAllObserverAnnotationType(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+    schoolId: String!
+  ): ObserverAnnotationTypeConnection!
   getAllPerformanceLevel(
     """Paginate after opaque cursor"""
     after: String
@@ -4400,6 +4471,23 @@ type Query {
     orderCreated: Boolean!
     studentId: String
   ): StudentBehaviourConnection!
+  getAllStudentObserverAnnotation(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+    courseId: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+    studentId: String!
+  ): StudentObserverAnnotationConnection!
   getAllTeacher(
     """Paginate after opaque cursor"""
     after: String
@@ -4473,6 +4561,7 @@ type Query {
   getModule(id: String!): Module
   getMunicipality(id: String!): Municipality
   getNotification(id: String!): Notification
+  getObserverAnnotationType(id: String!): ObserverAnnotationType
   getPerformanceLevel(id: String!): PerformanceLevel
   getQuestionBankTestOnline(id: String!): QuestionBankTestOnline
   getQuestionCategoryTestOnline(id: String!): QuestionCategoryTestOnline
@@ -4487,6 +4576,7 @@ type Query {
   getStudent(id: String!): Student
   getStudentAttendance(id: String!): StudentAttendance
   getStudentBehaviour(id: String!): StudentBehaviour
+  getStudentObserverAnnotation(id: String!): StudentObserverAnnotation
   getTeacher(id: String!): Teacher
   getUser(id: String!): User
   getValidationDocumentNumberUser(documentNumber: String!): Boolean!
@@ -4952,6 +5042,45 @@ type StudentEdge {
   """Used in `before` and `after` args"""
   cursor: String!
   node: Student!
+}
+
+"""The StudentObserverAnnotation model"""
+type StudentObserverAnnotation implements IModelCampusData {
+  academicPeriod: AcademicPeriod
+  academicPeriodId: String
+  active: Boolean
+  campus: Campus
+  campusId: String
+  commitment: String
+  course: Course
+  courseId: String
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  id: ID!
+  observation: String
+  observerAnnotationType: ObserverAnnotationType
+  observerAnnotationTypeId: String
+  student: Student
+  studentId: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type StudentObserverAnnotationConnection {
+  edges: [StudentObserverAnnotationEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type StudentObserverAnnotationEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: StudentObserverAnnotation!
 }
 
 """The Teacher model"""

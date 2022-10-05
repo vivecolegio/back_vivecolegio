@@ -1751,7 +1751,7 @@ export class ExperienceLearningResolver {
     let countDefinitive = 0;
     let countCalculate = 0;
     let countRecovery = 0;
-
+    let valuationType = "CALCULATE";
     if (studentAreaPeriodValuationList.length > 1) {
       for (let studentAreaPeriodValuation of studentAreaPeriodValuationList) {
         switch (studentAreaPeriodValuation?.valuationType) {
@@ -1768,7 +1768,9 @@ export class ExperienceLearningResolver {
       }
       if (countCalculate > 1) {
         for (let studentAreaPeriodValuation of studentAreaPeriodValuationList) {
-          let result = await this.repositoryAcademicAreaCoursePeriodValuation.deleteOne({ _id: new ObjectId(studentAreaPeriodValuation?.id?.toString()) });
+          if (studentAreaPeriodValuation?.valuationType == ValuationType?.CALCULATE) {
+            let result = await this.repositoryAcademicAreaCoursePeriodValuation.deleteOne({ _id: new ObjectId(studentAreaPeriodValuation?.id?.toString()) });
+          }
         }
         studentAreaPeriodValuationList = [];
       }
@@ -1784,6 +1786,9 @@ export class ExperienceLearningResolver {
     if (countDefinitive == 0 && countRecovery == 0) {
       if (studentAreaPeriodValuationList.length > 0) {
         studentAreaPeriodValuation = studentAreaPeriodValuationList[0];
+        if (studentAreaPeriodValuation.valuationType == null) {
+          studentAreaPeriodValuation.valuationType = ValuationType?.CALCULATE;
+        }
       } else {
         studentAreaPeriodValuation = new AcademicAreaCoursePeriodValuation();
         studentAreaPeriodValuation.version = 0;
@@ -1792,6 +1797,7 @@ export class ExperienceLearningResolver {
         studentAreaPeriodValuation.academicPeriodId = academicPeriodId;
         studentAreaPeriodValuation.academicAreaId = academicArea?.id?.toString();
         studentAreaPeriodValuation.assessment = 0;
+        studentAreaPeriodValuation.valuationType = ValuationType?.CALCULATE;
       }
       let performanceLevelType: any = null;
       let performanceLevels = await this.performanceLevelResolver.getAllPerformanceLevelAcademicAsignatureCourseFinal({}, academicAsignatureCourseId + "");
