@@ -90,6 +90,7 @@ import { dataSource } from './DataSource';
 import 'reflect-metadata';
 import { AcademicAreaCourseYearValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAreaCourseYearValuationResolver';
 import { AcademicAsignatureCourseYearValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAsignatureCourseYearValuationResolver';
+import { AverageAcademicPeriodStudentResolver } from '../graphql/resolvers/CampusAdministrator/AverageAcademicPeriodStudentResolver';
 import { StudentObserverAnnotationResolver } from '../graphql/resolvers/CampusAdministrator/StudentObserverAnnotationResolver';
 import { ObserverAnnotationTypeResolver } from '../graphql/resolvers/SchoolAdministrator/ObserverAnnotationTypeResolver';
 
@@ -183,6 +184,7 @@ async function app() {
         StudentObserverAnnotationResolver,
         AcademicAsignatureCourseYearValuationResolver,
         AcademicAreaCourseYearValuationResolver,
+        AverageAcademicPeriodStudentResolver
       ],
       emitSchemaFile: true,
       validate: false,
