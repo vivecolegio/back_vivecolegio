@@ -1713,7 +1713,6 @@ export class ExperienceLearningResolver {
     return true;
   }
 
-
   //este es el que actualiza el area de un estudiante
   @Mutation(() => Boolean)
   async createAcademicAreaCoursePeriodValuationStudent(
@@ -1915,6 +1914,22 @@ export class ExperienceLearningResolver {
     }
   }
 
+  @Mutation(() => Boolean)
+  async updateAllAverageStudentCoursePeriod(
+    @Arg('courseId', () => String) courseId: string,
+    @Arg('academicPeriodId', () => String) academicPeriodId: string
+  ) {
+    const course = await this.repositoryCourse.findOneBy(courseId);
+    if (course) {
+      let students = course.studentsId;
+      if (students) {
+        for (let student of students) {
+          await this.createAveragePeriodValuationStudent(course?.id?.toString(), academicPeriodId, student + "")
+        }
+        return true;
+      }
+    }
+  }
   //aca voy
   // este actualiza el promedio de un estudiante
   @Mutation(() => Boolean)
