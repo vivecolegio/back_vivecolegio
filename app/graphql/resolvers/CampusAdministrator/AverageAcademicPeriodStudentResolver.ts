@@ -3,14 +3,14 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicDayRepository, AverageAcademicPeriodStudentRepository, CampusRepository, UserRepository } from '../../../servers/DataSource';
+import { AverageAcademicPeriodStudentRepository, CampusRepository, PerformanceLevelRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAverageAcademicPeriodStudent } from '../../inputs/CampusAdministrator/NewAverageAcademicPeriodStudent';
 import { IContext } from '../../interfaces/IContext';
-import { AcademicDay } from '../../models/CampusAdministrator/AcademicDay';
 import { AverageAcademicPeriodStudent, AverageAcademicPeriodStudentConnection } from '../../models/CampusAdministrator/AverageAcademicPeriodStudent';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { User } from '../../models/GeneralAdministrator/User';
+import { PerformanceLevel } from '../../models/SchoolAdministrator/PerformanceLevel';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
 @Resolver(AverageAcademicPeriodStudent)
@@ -24,8 +24,8 @@ export class AverageAcademicPeriodStudentResolver {
   @InjectRepository(Campus)
   private repositoryCampus = CampusRepository;
 
-  @InjectRepository(AcademicDay)
-  private repositoryAcademicDay = AcademicDayRepository;
+  @InjectRepository(PerformanceLevel)
+  private repositoryPerformanceLevel = PerformanceLevelRepository;
 
   @Query(() => AverageAcademicPeriodStudent, { nullable: true })
   async getAverageAcademicPeriodStudent(@Arg('id', () => String) id: string) {
@@ -239,6 +239,16 @@ export class AverageAcademicPeriodStudentResolver {
     let id = data.campusId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryCampus.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => PerformanceLevel, { nullable: true })
+  async performanceLevel(@Root() data: AverageAcademicPeriodStudent) {
+    let id = data.performanceLevelId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryPerformanceLevel.findOneBy(id);
       return result;
     }
     return null;
