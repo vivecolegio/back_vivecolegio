@@ -33,4 +33,7 @@ export class NewSchool implements Partial<School> {
 
   @Field({ nullable: true })
   textPrincipalSignature?: string;
+
+  @Field({ nullable: true })
+  imgPrincipalSignature?: string;
 }

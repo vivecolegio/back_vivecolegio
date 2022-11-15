@@ -2834,6 +2834,7 @@ input NewSchool {
   curricularComponent: String
   daneCode: String
   educationalModel: String
+  imgPrincipalSignature: String
   logo: String
   name: String
   pedagogicalModel: String
@@ -4740,6 +4741,7 @@ type School implements IModelData {
   daneCode: String
   educationalModel: String
   id: ID!
+  imgPrincipalSignature: String
   logo: String
   name: String
   pedagogicalModel: String

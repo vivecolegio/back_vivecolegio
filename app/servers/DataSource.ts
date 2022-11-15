@@ -2,9 +2,11 @@ import { env } from 'process';
 import { DataSource } from 'typeorm';
 
 import { AcademicAreaCoursePeriodValuation } from '../graphql/models/CampusAdministrator/AcademicAreaCoursePeriodValuation';
+import { AcademicAreaCourseYearValuation } from '../graphql/models/CampusAdministrator/AcademicAreaCourseYearValuation';
 import { AcademicAsignatureCourse } from '../graphql/models/CampusAdministrator/AcademicAsignatureCourse';
 import { AcademicAsignatureCoursePeriodEvidenceLearningValuation } from '../graphql/models/CampusAdministrator/AcademicAsignatureCoursePeriodEvidenceLearningValuation';
 import { AcademicAsignatureCoursePeriodValuation } from '../graphql/models/CampusAdministrator/AcademicAsignatureCoursePeriodValuation';
+import { AcademicAsignatureCourseYearValuation } from '../graphql/models/CampusAdministrator/AcademicAsignatureCourseYearValuation';
 import { AcademicDay } from '../graphql/models/CampusAdministrator/AcademicDay';
 import { AcademicHour } from '../graphql/models/CampusAdministrator/AcademicHour';
 import { AcademicSchedule } from '../graphql/models/CampusAdministrator/AcademicSchedule';
@@ -160,7 +162,9 @@ export const dataSource = new DataSource({
     AverageAcademicPeriodCourse,
     StudentBehaviour,
     ObserverAnnotationType,
-    StudentObserverAnnotation
+    StudentObserverAnnotation,
+    AcademicAsignatureCourseYearValuation,
+    AcademicAreaCourseYearValuation,
   ],
   synchronize: true,
   logger: 'advanced-console',
@@ -275,3 +279,5 @@ export const AverageAcademicPeriodCourseRepository = dataSource.getMongoReposito
 export const StudentBehaviourRepository = dataSource.getMongoRepository(StudentBehaviour);
 export const ObserverAnnotationTypeRepository = dataSource.getMongoRepository(ObserverAnnotationType);
 export const StudentObserverAnnotationRepository = dataSource.getMongoRepository(StudentObserverAnnotation);
+export const AcademicAsignatureCourseYearValuationRepository = dataSource.getMongoRepository(AcademicAsignatureCourseYearValuation);
+export const AcademicAreaCourseYearValuationRepository = dataSource.getMongoRepository(AcademicAreaCourseYearValuation);
