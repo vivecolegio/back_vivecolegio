@@ -50,17 +50,17 @@ export class AcademicAsignatureCourseYearValuationResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: String,
-    @Arg('academicPeriodId', () => String) academicPeriodId: String,
+    @Arg('schoolYearId', () => String) schoolYearId: String,
     @Arg('studentId', () => String, { nullable: true }) studentId: String,
   ): Promise<AcademicAsignatureCourseYearValuationConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
-        if (academicAsignatureCourseId && academicPeriodId && studentId) {
+        if (academicAsignatureCourseId && schoolYearId && studentId) {
           result = await this.repository.findBy({
             where: {
               academicAsignatureCourseId,
-              academicPeriodId,
+              schoolYearId,
               studentId
             },
             order: { createdAt: 'DESC' },
@@ -69,17 +69,17 @@ export class AcademicAsignatureCourseYearValuationResolver {
           result = await this.repository.findBy({
             where: {
               academicAsignatureCourseId,
-              academicPeriodId,
+              schoolYearId,
             },
             order: { createdAt: 'DESC' },
           });
         }
       } else {
-        if (academicAsignatureCourseId && academicPeriodId && studentId) {
+        if (academicAsignatureCourseId && schoolYearId && studentId) {
           result = await this.repository.findBy({
             where: {
               academicAsignatureCourseId,
-              academicPeriodId,
+              schoolYearId,
               studentId
             },
           });
@@ -87,18 +87,18 @@ export class AcademicAsignatureCourseYearValuationResolver {
           result = await this.repository.findBy({
             where: {
               academicAsignatureCourseId,
-              academicPeriodId,
+              schoolYearId,
             },
           });
         }
       }
     } else {
       if (orderCreated) {
-        if (academicAsignatureCourseId && academicPeriodId && studentId) {
+        if (academicAsignatureCourseId && schoolYearId && studentId) {
           result = await this.repository.findBy({
             where: {
               academicAsignatureCourseId,
-              academicPeriodId,
+              schoolYearId,
               studentId,
               active: true,
             },
@@ -108,18 +108,18 @@ export class AcademicAsignatureCourseYearValuationResolver {
           result = await this.repository.findBy({
             where: {
               academicAsignatureCourseId,
-              academicPeriodId,
+              schoolYearId,
               active: true,
             },
             order: { createdAt: 'DESC' },
           });
         }
       } else {
-        if (academicAsignatureCourseId && academicPeriodId && studentId) {
+        if (academicAsignatureCourseId && schoolYearId && studentId) {
           result = await this.repository.findBy({
             where: {
               academicAsignatureCourseId,
-              academicPeriodId,
+              schoolYearId,
               studentId,
               active: true,
             },
@@ -128,7 +128,7 @@ export class AcademicAsignatureCourseYearValuationResolver {
           result = await this.repository.findBy({
             where: {
               academicAsignatureCourseId,
-              academicPeriodId,
+              schoolYearId,
               active: true,
             },
           });
