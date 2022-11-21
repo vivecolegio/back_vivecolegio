@@ -3,20 +3,20 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicDayRepository, AverageAcademicPeriodCourseRepository, CampusRepository, UserRepository } from '../../../servers/DataSource';
+import { AverageAcademicYearStudentRepository, CampusRepository, PerformanceLevelRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
-import { NewAverageAcademicPeriodCourse } from '../../inputs/CampusAdministrator/NewAverageAcademicPeriodCourse';
+import { NewAverageAcademicYearStudent } from '../../inputs/CampusAdministrator/NewAverageAcademicYearStudent';
 import { IContext } from '../../interfaces/IContext';
-import { AcademicDay } from '../../models/CampusAdministrator/AcademicDay';
-import { AverageAcademicPeriodCourse, AverageAcademicPeriodCourseConnection } from '../../models/CampusAdministrator/AverageAcademicPeriodCourse';
+import { AverageAcademicYearStudent, AverageAcademicYearStudentConnection } from '../../models/CampusAdministrator/AverageAcademicYearStudent';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { User } from '../../models/GeneralAdministrator/User';
+import { PerformanceLevel } from '../../models/SchoolAdministrator/PerformanceLevel';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
-@Resolver(AverageAcademicPeriodCourse)
-export class AverageAcademicPeriodCourseResolver {
-  @InjectRepository(AverageAcademicPeriodCourse)
-  private repository = AverageAcademicPeriodCourseRepository;
+@Resolver(AverageAcademicYearStudent)
+export class AverageAcademicYearStudentResolver {
+  @InjectRepository(AverageAcademicYearStudent)
+  private repository = AverageAcademicYearStudentRepository;
 
   @InjectRepository(User)
   private repositoryUser = UserRepository;
@@ -24,77 +24,77 @@ export class AverageAcademicPeriodCourseResolver {
   @InjectRepository(Campus)
   private repositoryCampus = CampusRepository;
 
-  @InjectRepository(AcademicDay)
-  private repositoryAcademicDay = AcademicDayRepository;
+  @InjectRepository(PerformanceLevel)
+  private repositoryPerformanceLevel = PerformanceLevelRepository;
 
-  @Query(() => AverageAcademicPeriodCourse, { nullable: true })
-  async getAverageAcademicPeriodCourse(@Arg('id', () => String) id: string) {
+  @Query(() => AverageAcademicYearStudent, { nullable: true })
+  async getAverageAcademicYearStudent(@Arg('id', () => String) id: string) {
     const result = await this.repository.findOneBy(id);
     return result;
   }
 
-  @Query(() => AverageAcademicPeriodCourseConnection)
-  async getAllAverageAcademicPeriodCourse(
+  @Query(() => AverageAcademicYearStudentConnection)
+  async getAllAverageAcademicYearStudent(
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
-    @Arg('academicPeriodId', () => String, { nullable: true }) academicPeriodId: String,
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String,
     @Arg('courseId', () => String, { nullable: true }) courseId: String
-  ): Promise<AverageAcademicPeriodCourseConnection> {
+  ): Promise<AverageAcademicYearStudentConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
-        if (courseId && academicPeriodId) {
+        if (schoolYearId && courseId) {
           result = await this.repository.findBy({
-            where: { courseId, academicPeriodId },
+            where: { schoolYearId, courseId },
             order: { createdAt: 'DESC' },
           });
         } else {
-          if (courseId) {
+          if (schoolYearId) {
             result = await this.repository.findBy({
-              where: { courseId },
+              where: { schoolYearId },
               order: { createdAt: 'DESC' },
             });
           } else {
             result = await this.repository.findBy({
-              where: { academicPeriodId },
+              where: { courseId },
               order: { createdAt: 'DESC' },
             });
           }
         }
       } else {
-        if (courseId && academicPeriodId) {
+        if (schoolYearId && courseId) {
           result = await this.repository.findBy({
-            where: { courseId, academicPeriodId },
+            where: { schoolYearId, courseId },
           });
         } else {
-          if (courseId) {
+          if (schoolYearId) {
             result = await this.repository.findBy({
-              where: { courseId },
+              where: { schoolYearId },
             });
           } else {
             result = await this.repository.findBy({
-              where: { academicPeriodId },
+              where: { courseId },
             });
           }
         }
       }
     } else {
       if (orderCreated) {
-        if (courseId && academicPeriodId) {
+        if (schoolYearId && courseId) {
           result = await this.repository.findBy({
             where: {
+              schoolYearId,
               courseId,
-              academicPeriodId,
               active: true,
             },
             order: { createdAt: 'DESC' },
           });
         } else {
-          if (courseId) {
+          if (schoolYearId) {
             result = await this.repository.findBy({
               where: {
-                courseId,
+                schoolYearId,
                 active: true,
               },
               order: { createdAt: 'DESC' },
@@ -102,7 +102,7 @@ export class AverageAcademicPeriodCourseResolver {
           } else {
             result = await this.repository.findBy({
               where: {
-                academicPeriodId,
+                courseId,
                 active: true,
               },
               order: { createdAt: 'DESC' },
@@ -110,26 +110,26 @@ export class AverageAcademicPeriodCourseResolver {
           }
         }
       } else {
-        if (courseId && academicPeriodId) {
+        if (schoolYearId && courseId) {
           result = await this.repository.findBy({
             where: {
+              schoolYearId,
               courseId,
-              academicPeriodId,
               active: true,
             },
           });
         } else {
-          if (courseId) {
+          if (schoolYearId) {
             result = await this.repository.findBy({
               where: {
-                courseId,
+                schoolYearId,
                 active: true,
               },
             });
           } else {
             result = await this.repository.findBy({
               where: {
-                academicPeriodId,
+                courseId,
                 active: true,
               },
             });
@@ -137,7 +137,7 @@ export class AverageAcademicPeriodCourseResolver {
         }
       }
     }
-    let resultConn = new AverageAcademicPeriodCourseConnection();
+    let resultConn = new AverageAcademicYearStudentConnection();
     let resultConnection = connectionFromArraySlice(result, args, {
       sliceStart: 0,
       arrayLength: result.length,
@@ -146,12 +146,12 @@ export class AverageAcademicPeriodCourseResolver {
     return resultConn;
   }
 
-  @Mutation(() => AverageAcademicPeriodCourse)
-  async createAverageAcademicPeriodCourse(
-    @Arg('data') data: NewAverageAcademicPeriodCourse,
+  @Mutation(() => AverageAcademicYearStudent)
+  async createAverageAcademicYearStudent(
+    @Arg('data') data: NewAverageAcademicYearStudent,
     @Ctx() context: IContext
-  ): Promise<AverageAcademicPeriodCourse> {
-    let dataProcess: NewAverageAcademicPeriodCourse = removeEmptyStringElements(data);
+  ): Promise<AverageAcademicYearStudent> {
+    let dataProcess: NewAverageAcademicYearStudent = removeEmptyStringElements(data);
     let createdByUserId = context?.user?.authorization?.id;
     const model = await this.repository.create({
       ...dataProcess,
@@ -163,12 +163,12 @@ export class AverageAcademicPeriodCourseResolver {
     return result;
   }
 
-  @Mutation(() => AverageAcademicPeriodCourse)
-  async updateAverageAcademicPeriodCourse(
-    @Arg('data') data: NewAverageAcademicPeriodCourse,
+  @Mutation(() => AverageAcademicYearStudent)
+  async updateAverageAcademicYearStudent(
+    @Arg('data') data: NewAverageAcademicYearStudent,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
-  ): Promise<AverageAcademicPeriodCourse | null> {
+  ): Promise<AverageAcademicYearStudent | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOneBy(id);
@@ -183,7 +183,7 @@ export class AverageAcademicPeriodCourseResolver {
   }
 
   @Mutation(() => Boolean)
-  async changeActiveAverageAcademicPeriodCourse(
+  async changeActiveAverageAcademicYearStudent(
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
@@ -205,7 +205,7 @@ export class AverageAcademicPeriodCourseResolver {
   }
 
   @Mutation(() => Boolean)
-  async deleteAverageAcademicPeriodCourse(
+  async deleteAverageAcademicYearStudent(
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext
   ): Promise<Boolean | null> {
@@ -215,7 +215,7 @@ export class AverageAcademicPeriodCourseResolver {
   }
 
   @FieldResolver((_type) => User, { nullable: true })
-  async createdByUser(@Root() data: AverageAcademicPeriodCourse) {
+  async createdByUser(@Root() data: AverageAcademicYearStudent) {
     let id = data.createdByUserId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryUser.findOneBy(id);
@@ -225,7 +225,7 @@ export class AverageAcademicPeriodCourseResolver {
   }
 
   @FieldResolver((_type) => User, { nullable: true })
-  async updatedByUser(@Root() data: AverageAcademicPeriodCourse) {
+  async updatedByUser(@Root() data: AverageAcademicYearStudent) {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryUser.findOneBy(id);
@@ -235,10 +235,20 @@ export class AverageAcademicPeriodCourseResolver {
   }
 
   @FieldResolver((_type) => Campus, { nullable: true })
-  async campus(@Root() data: AverageAcademicPeriodCourse) {
+  async campus(@Root() data: AverageAcademicYearStudent) {
     let id = data.campusId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryCampus.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => PerformanceLevel, { nullable: true })
+  async performanceLevel(@Root() data: AverageAcademicYearStudent) {
+    let id = data.performanceLevelId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositoryPerformanceLevel.findOneBy(id);
       return result;
     }
     return null;

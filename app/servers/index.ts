@@ -12,11 +12,16 @@ import { buildSchemaSync, createResolversMap } from 'type-graphql';
 
 import { SERVER_NAME_APP, SERVER_PORT_APP } from '../config';
 import { AcademicAreaCoursePeriodValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAreaCoursePeriodValuationResolver';
+import { AcademicAreaCourseYearValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAreaCourseYearValuationResolver';
 import { AcademicAsignatureCoursePeriodEvidenceLearningValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAsignatureCoursePeriodEvidenceLearningValuationResolver';
 import { AcademicAsignatureCoursePeriodValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAsignatureCoursePeriodValuationResolver';
 import { AcademicAsignatureCourseResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAsignatureCourseResolver';
+import { AcademicAsignatureCourseYearValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAsignatureCourseYearValuationResolver';
 import { AcademicHourResolver } from '../graphql/resolvers/CampusAdministrator/AcademicHourResolver';
 import { AcademicScheduleResolver } from '../graphql/resolvers/CampusAdministrator/AcademicScheduleResolver';
+import { AverageAcademicPeriodStudentResolver } from '../graphql/resolvers/CampusAdministrator/AverageAcademicPeriodStudentResolver';
+import { AverageAcademicYearCourseResolver } from '../graphql/resolvers/CampusAdministrator/AverageAcademicYearCourseResolver';
+import { AverageAcademicYearStudentResolver } from '../graphql/resolvers/CampusAdministrator/AverageAcademicYearStudentResolver';
 import { ClassroomPlanExpectedPerformanceResolver } from '../graphql/resolvers/CampusAdministrator/ClassroomPlanExpectedPerformanceResolver';
 import { ClassroomPlanPerformanceAppraisalStrategyResolver } from '../graphql/resolvers/CampusAdministrator/ClassroomPlanPerformanceAppraisalStrategyResolver';
 import { ClassroomPlanResolver } from '../graphql/resolvers/CampusAdministrator/ClassroomPlanResolver';
@@ -37,6 +42,7 @@ import { QuestionCategoryTestOnlineResolver } from '../graphql/resolvers/CampusA
 import { QuestionTestOnlineResolver } from '../graphql/resolvers/CampusAdministrator/QuestionTestOnlineResolver';
 import { StudentAttendanceResolver } from '../graphql/resolvers/CampusAdministrator/StudentAttendanceResolver';
 import { StudentBehaviourResolver } from '../graphql/resolvers/CampusAdministrator/StudentBehaviourResolver';
+import { StudentObserverAnnotationResolver } from '../graphql/resolvers/CampusAdministrator/StudentObserverAnnotationResolver';
 import { AuditLoginResolver } from '../graphql/resolvers/GeneralAdministrator/AuditLoginResolver';
 import { GenderResolver } from '../graphql/resolvers/GeneralAdministrator/GenderResolver';
 import { GeneralAcademicAsignatureResolver } from '../graphql/resolvers/GeneralAdministrator/GeneralAcademicAsignatureResolver';
@@ -46,6 +52,7 @@ import { EvidenceLearningResolver } from '../graphql/resolvers/SchoolAdministrat
 import { ForumInteractionResolver } from '../graphql/resolvers/SchoolAdministrator/ForumInteractionResolver';
 import { ForumResolver } from '../graphql/resolvers/SchoolAdministrator/ForumResolver';
 import { LearningResolver } from '../graphql/resolvers/SchoolAdministrator/LearningResolver';
+import { ObserverAnnotationTypeResolver } from '../graphql/resolvers/SchoolAdministrator/ObserverAnnotationTypeResolver';
 import { PerformanceReportResolver } from '../graphql/resolvers/SchoolAdministrator/PerformanceReportResolver';
 import { SchoolConfigurationResolver } from '../graphql/resolvers/SchoolAdministrator/SchoolConfigurationResolver';
 import { AcademicDayResolver } from './../graphql/resolvers/CampusAdministrator/AcademicDayResolver';
@@ -88,11 +95,6 @@ import { SpecialtyResolver } from './../graphql/resolvers/SchoolAdministrator/Sp
 import { dataSource } from './DataSource';
 
 import 'reflect-metadata';
-import { AcademicAreaCourseYearValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAreaCourseYearValuationResolver';
-import { AcademicAsignatureCourseYearValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAsignatureCourseYearValuationResolver';
-import { AverageAcademicPeriodStudentResolver } from '../graphql/resolvers/CampusAdministrator/AverageAcademicPeriodStudentResolver';
-import { StudentObserverAnnotationResolver } from '../graphql/resolvers/CampusAdministrator/StudentObserverAnnotationResolver';
-import { ObserverAnnotationTypeResolver } from '../graphql/resolvers/SchoolAdministrator/ObserverAnnotationTypeResolver';
 
 const PORT = SERVER_PORT_APP;
 const SERVER_NAME = SERVER_NAME_APP;
@@ -184,7 +186,9 @@ async function app() {
         StudentObserverAnnotationResolver,
         AcademicAsignatureCourseYearValuationResolver,
         AcademicAreaCourseYearValuationResolver,
-        AverageAcademicPeriodStudentResolver
+        AverageAcademicPeriodStudentResolver,
+        AverageAcademicYearCourseResolver,
+        AverageAcademicYearStudentResolver
       ],
       emitSchemaFile: true,
       validate: false,

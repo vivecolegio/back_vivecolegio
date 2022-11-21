@@ -12,6 +12,8 @@ import { AcademicHour } from '../graphql/models/CampusAdministrator/AcademicHour
 import { AcademicSchedule } from '../graphql/models/CampusAdministrator/AcademicSchedule';
 import { AverageAcademicPeriodCourse } from '../graphql/models/CampusAdministrator/AverageAcademicPeriodCourse';
 import { AverageAcademicPeriodStudent } from '../graphql/models/CampusAdministrator/AverageAcademicPeriodStudent';
+import { AverageAcademicYearCourse } from '../graphql/models/CampusAdministrator/AverageAcademicYearCourse';
+import { AverageAcademicYearStudent } from '../graphql/models/CampusAdministrator/AverageAcademicYearStudent';
 import { ClassroomPlan } from '../graphql/models/CampusAdministrator/ClassroomPlan';
 import { Course } from '../graphql/models/CampusAdministrator/Course';
 import { ExperienceLearning } from '../graphql/models/CampusAdministrator/ExperienceLearning';
@@ -165,6 +167,8 @@ export const dataSource = new DataSource({
     StudentObserverAnnotation,
     AcademicAsignatureCourseYearValuation,
     AcademicAreaCourseYearValuation,
+    AverageAcademicYearStudent,
+    AverageAcademicYearCourse
   ],
   synchronize: true,
   logger: 'advanced-console',
@@ -281,3 +285,5 @@ export const ObserverAnnotationTypeRepository = dataSource.getMongoRepository(Ob
 export const StudentObserverAnnotationRepository = dataSource.getMongoRepository(StudentObserverAnnotation);
 export const AcademicAsignatureCourseYearValuationRepository = dataSource.getMongoRepository(AcademicAsignatureCourseYearValuation);
 export const AcademicAreaCourseYearValuationRepository = dataSource.getMongoRepository(AcademicAreaCourseYearValuation);
+export const AverageAcademicYearStudentRepository = dataSource.getMongoRepository(AverageAcademicYearStudent);
+export const AverageAcademicYearCourseRepository = dataSource.getMongoRepository(AverageAcademicYearCourse);

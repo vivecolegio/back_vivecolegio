@@ -48,7 +48,7 @@
     "bcrypt": "5.1.0",
     "class-validator": "0.13.2",
     "cluster": "0.7.7",
-    "concurrently": "7.5.0",
+    "concurrently": "7.6.0",
     "cors": "2.8.5",
     "dotenv": "16.0.3",
     "easy-pdf-merge": "0.2.6",
@@ -92,12 +92,12 @@
     "typedi": "0.10.0",
     "typeorm": "0.3.10",
     "typeorm-typedi-extensions": "0.4.1",
-    "typescript": "4.8.4",
+    "typescript": "4.9.3",
     "wait-on": "6.0.1"
   },
   "devDependencies": {
     "chalk": "5.1.2",
-    "eslint": "8.27.0",
+    "eslint": "8.28.0",
     "eslint-config-prettier": "8.5.0",
     "eslint-plugin-prettier": "4.2.1",
     "husky": "8.0.2",
