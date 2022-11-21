@@ -575,7 +575,6 @@ export class PerformanceReportResolver {
                 schoolYearId: academicPeriods[0]?.schoolYearId?.toString(),
                 studentId
               });
-              console.log("notesAsignature", notesAsignature)
               if (notesAsignature?.length > 0) {
                 if (notesAsignature?.length == 1) {
                   let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(notesAsignature[0]?.performanceLevelId);
