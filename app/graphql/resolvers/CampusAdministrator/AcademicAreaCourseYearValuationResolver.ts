@@ -51,17 +51,17 @@ export class AcademicAreaCourseYearValuationResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('academicAreaId', () => String) academicAreaId: String,
-    @Arg('academicPeriodId', () => String) academicPeriodId: String,
+    @Arg('schoolYearId', () => String) schoolYearId: String,
     @Arg('studentId', () => String, { nullable: true }) studentId: String,
   ): Promise<AcademicAreaCourseYearValuationConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
-        if (academicAreaId && academicPeriodId && studentId) {
+        if (academicAreaId && schoolYearId && studentId) {
           result = await this.repository.findBy({
             where: {
               academicAreaId,
-              academicPeriodId,
+              schoolYearId,
               studentId
             },
             order: { createdAt: 'DESC' },
@@ -70,17 +70,17 @@ export class AcademicAreaCourseYearValuationResolver {
           result = await this.repository.findBy({
             where: {
               academicAreaId,
-              academicPeriodId,
+              schoolYearId,
             },
             order: { createdAt: 'DESC' },
           });
         }
       } else {
-        if (academicAreaId && academicPeriodId && studentId) {
+        if (academicAreaId && schoolYearId && studentId) {
           result = await this.repository.findBy({
             where: {
               academicAreaId,
-              academicPeriodId,
+              schoolYearId,
               studentId
             },
           });
@@ -88,18 +88,18 @@ export class AcademicAreaCourseYearValuationResolver {
           result = await this.repository.findBy({
             where: {
               academicAreaId,
-              academicPeriodId,
+              schoolYearId,
             },
           });
         }
       }
     } else {
       if (orderCreated) {
-        if (academicAreaId && academicPeriodId && studentId) {
+        if (academicAreaId && schoolYearId && studentId) {
           result = await this.repository.findBy({
             where: {
               academicAreaId,
-              academicPeriodId,
+              schoolYearId,
               studentId,
               active: true,
             },
@@ -109,18 +109,18 @@ export class AcademicAreaCourseYearValuationResolver {
           result = await this.repository.findBy({
             where: {
               academicAreaId,
-              academicPeriodId,
+              schoolYearId,
               active: true,
             },
             order: { createdAt: 'DESC' },
           });
         }
       } else {
-        if (academicAreaId && academicPeriodId && studentId) {
+        if (academicAreaId && schoolYearId && studentId) {
           result = await this.repository.findBy({
             where: {
               academicAreaId,
-              academicPeriodId,
+              schoolYearId,
               studentId,
               active: true,
             },
@@ -129,7 +129,7 @@ export class AcademicAreaCourseYearValuationResolver {
           result = await this.repository.findBy({
             where: {
               academicAreaId,
-              academicPeriodId,
+              schoolYearId,
               active: true,
             },
           });
