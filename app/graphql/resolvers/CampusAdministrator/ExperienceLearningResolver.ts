@@ -2273,6 +2273,8 @@ export class ExperienceLearningResolver {
             }
             let assessmentYear = 0;
             if (academicAsignatureCourse) {
+              //console.log("########################################")
+              //console.log("assessmentYear", assessmentYear)
               for (let academicPeriod of academicPeriods) {
                 let academicPeriodPercentage = 0;
                 if (academicPeriod?.weight) {
@@ -2327,13 +2329,18 @@ export class ExperienceLearningResolver {
                     }
                   }
                 }
-                if (studentAsignaturePeriodValuationAux?.assessment) {
-                  assessmentYear += (academicPeriodPercentage * studentAsignaturePeriodValuationAux?.assessment);
-                }
+                // if (studentAsignaturePeriodValuationAux?.assessment) {
+                //   assessmentYear += (academicPeriodPercentage * studentAsignaturePeriodValuationAux?.assessment);
+                // }
                 switch (performanceLevelType) {
                   case PerformanceLevelType.QUALITATIVE:
                     let performanceLevelIndex = performanceLevelsFinal?.edges?.findIndex((i: any) => i.node.id.toString() === studentAsignaturePeriodValuationAux?.performanceLevelId) + 1;
+                    //console.log("assessmentYear", assessmentYear)
+                    //console.log("academicPeriodPercentage", academicPeriodPercentage)
+                    //console.log("performanceLevelIndex", performanceLevelIndex)
+                    //console.log("***", (academicPeriodPercentage * performanceLevelIndex))
                     assessmentYear += (academicPeriodPercentage * performanceLevelIndex);
+                    //console.log("assessmentYear", assessmentYear)
                     break;
                   case PerformanceLevelType.QUANTITATIVE:
                     if (studentAsignaturePeriodValuationAux?.assessment) {
@@ -2345,6 +2352,7 @@ export class ExperienceLearningResolver {
                 //   this.updateAllStudentAcademicAsignatureCoursePeriodValuation(academicAsignatureCourse?.id?.toString(), academicPeriodId, experienceLearningType)
                 // );
               }
+              //console.log("########################################")
               let studentYearValuations = await this.repositoryAcademicAsignatureCourseYearValuation.findBy({
                 where: {
                   academicAsignatureCourseId,
