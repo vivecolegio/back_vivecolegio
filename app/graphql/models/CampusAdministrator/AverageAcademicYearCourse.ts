@@ -7,7 +7,7 @@ import { PerformanceLevel } from '../SchoolAdministrator/PerformanceLevel';
 import { SchoolYear } from '../SchoolAdministrator/SchoolYear';
 import { Course } from './Course';
 
-@Index("index_full", ["academicPeriodId", "courseId", "performanceLevelId", "campusId"])
+@Index("index_full", ["schoolYearId", "courseId", "performanceLevelId", "campusId"])
 @ObjectType({ description: 'The AverageAcademicYearCourse model', implements: IModelCampusData })
 @Entity()
 export class AverageAcademicYearCourse extends IModelCampusData {
