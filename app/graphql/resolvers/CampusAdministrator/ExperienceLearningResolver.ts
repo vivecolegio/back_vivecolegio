@@ -2858,7 +2858,7 @@ export class ExperienceLearningResolver {
   }
 
   @Mutation(() => Boolean)
-  async createAverageBehaviourYearValuationStudent(
+  async createAverageBehaviourYearValuationCourse(
     @Arg('courseId', () => String) courseId: string,
     @Arg('schoolYearId', () => String) schoolYearId: string,
   ) {
