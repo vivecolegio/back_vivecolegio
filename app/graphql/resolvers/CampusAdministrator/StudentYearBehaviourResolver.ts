@@ -51,17 +51,17 @@ export class StudentYearBehaviourResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('courseId', () => String) courseId: String,
-    @Arg('academicPeriodId', () => String) academicPeriodId: String,
+    @Arg('schoolYearId', () => String) schoolYearId: String,
     @Arg('studentId', () => String, { nullable: true }) studentId: String,
   ): Promise<StudentYearBehaviourConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
-        if (courseId && academicPeriodId && studentId) {
+        if (courseId && schoolYearId && studentId) {
           result = await this.repository.findBy({
             where: {
               courseId,
-              academicPeriodId,
+              schoolYearId,
               studentId
             },
             order: { createdAt: 'DESC' },
@@ -70,17 +70,17 @@ export class StudentYearBehaviourResolver {
           result = await this.repository.findBy({
             where: {
               courseId,
-              academicPeriodId,
+              schoolYearId,
             },
             order: { createdAt: 'DESC' },
           });
         }
       } else {
-        if (courseId && academicPeriodId && studentId) {
+        if (courseId && schoolYearId && studentId) {
           result = await this.repository.findBy({
             where: {
               courseId,
-              academicPeriodId,
+              schoolYearId,
               studentId
             },
           });
@@ -88,18 +88,18 @@ export class StudentYearBehaviourResolver {
           result = await this.repository.findBy({
             where: {
               courseId,
-              academicPeriodId,
+              schoolYearId,
             },
           });
         }
       }
     } else {
       if (orderCreated) {
-        if (courseId && academicPeriodId && studentId) {
+        if (courseId && schoolYearId && studentId) {
           result = await this.repository.findBy({
             where: {
               courseId,
-              academicPeriodId,
+              schoolYearId,
               studentId,
               active: true,
             },
@@ -109,18 +109,18 @@ export class StudentYearBehaviourResolver {
           result = await this.repository.findBy({
             where: {
               courseId,
-              academicPeriodId,
+              schoolYearId,
               active: true,
             },
             order: { createdAt: 'DESC' },
           });
         }
       } else {
-        if (courseId && academicPeriodId && studentId) {
+        if (courseId && schoolYearId && studentId) {
           result = await this.repository.findBy({
             where: {
               courseId,
-              academicPeriodId,
+              schoolYearId,
               studentId,
               active: true,
             },
@@ -129,7 +129,7 @@ export class StudentYearBehaviourResolver {
           result = await this.repository.findBy({
             where: {
               courseId,
-              academicPeriodId,
+              schoolYearId,
               active: true,
             },
           });
@@ -293,7 +293,7 @@ export class StudentYearBehaviourResolver {
 
   // @FieldResolver((_type) => AcademicPeriod, { nullable: true })
   // async academicPeriod(@Root() data: StudentYearBehaviour) {
-  //   let id = data.academicPeriodId;
+  //   let id = data.schoolYearId;
   //   if (id !== null && id !== undefined) {
   //     const result = await this.repositoryAcademicPeriod.findOneBy(id);
   //     return result;
