@@ -2897,7 +2897,7 @@ export class ExperienceLearningResolver {
                 break;
             }
           }
-          average = average / 1;
+          average = average / studentBehaviours?.length;
           let perf = null;
           let performanceLevelId = undefined;
           let averageYearStudent: StudentYearBehaviour;
