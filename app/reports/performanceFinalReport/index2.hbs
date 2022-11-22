@@ -41,7 +41,7 @@
     .app-student-notes {
       display: grid;
       background-color: #e6e7e9;
-      grid-template-columns: 25% 50% 25%;
+      grid-template-columns: 28% 44% 28%;
       width: 100%;
       height: 113px;
       background-image: url("http://vivecolegios.nortedesantander.gov.co:4000/public/uploads/users/profile/61faa0716770295e7c3775ab/VCpmSvM0jrd93e.svg");
@@ -98,7 +98,7 @@
 
     .nombre-instituto-note p {
       font-weight: 100;
-      font-size: 11px;
+      font-size: 10px;
     }
 
     .content-student-notes {
@@ -143,15 +143,6 @@
       margin-top: 2rem;
     }
 
-    .data-note-student-behaviour {
-      display: grid;
-      grid-template-columns: 80% 18.5%;
-      grid-template-rows: 1fr;
-      grid-column-gap: 1rem;
-      grid-row-gap: 0.5rem;
-      margin-top: 2rem;
-    }
-
     .item-data {
       background-color: #c1e7f5;
       border-radius: 5px;
@@ -180,6 +171,15 @@
     .data-materia {
       display: grid;
       grid-template-columns: 2fr 6fr 1fr 1fr 2fr 6fr 3fr;
+      grid-template-rows: 1fr;
+      grid-column-gap: 0.5rem;
+      grid-row-gap: 0px;
+      margin-top: 0.5rem;
+    }
+
+    .data-behaviour {
+      display: grid;
+      grid-template-columns: 6fr 2fr 6fr 3fr;
       grid-template-rows: 1fr;
       grid-column-gap: 0.5rem;
       grid-row-gap: 0px;
@@ -280,7 +280,7 @@
 <body>
   <div class="page">
     <div id="header" style="padding-bottom: 2%;">
-      <div class="app-student-notes" id="header">
+      <div class="app-student-notes">
         <div>
           <img class="header-img-school" src="http://vivecolegios.nortedesantander.gov.co:4000/{{schoolLogo}}" alt="" />
         </div>
@@ -303,7 +303,7 @@
     </div>
     <div class="titulo">
       <h1>
-        Informe de Desempeño <br />
+        Informe de Desempeño Detallado<br />
       </h1>
     </div>
     <div class="content-student-notes">
@@ -335,105 +335,79 @@
         <div class="item-data">Sede</div>
         <div class="item-data item-data-white">{{campusName}}</div>
       </div>
-      <div class="data-note-student" style="grid-template-columns: {{academicPeriodsCount}}">
-        {{#iff reportPerformanceAreaAsignatureType '==' 'AREA_ASIGNATURE'}}
-        <div class="item-data item-note-gris">Áreas / Asignaturas</div>
-        {{/iff }}
-        {{#iff reportPerformanceAreaAsignatureType '==' 'AREA'}}
-        <div class="item-data item-note-gris">Áreas</div>
-        {{/iff }}
-        {{#iff reportPerformanceAreaAsignatureType '==' 'ASIGNATURE'}}
-        <div class="item-data item-note-gris">Asignaturas</div>
-        {{/iff }}
-        {{#each academicPeriods as | academicPeriod academicPeriodId|}}
-        <div class="item-data item-note-gris">{{academicPeriod.name}}</div>
-        {{/each}}
+      <div class="observaciones-note">
         {{#each areas as | area areaId|}}
-        {{#iff ../reportPerformanceAreaAsignatureType '==' 'AREA_ASIGNATURE'}}
-        <div class="item-data">{{area.name}}</div>
-        {{#each area.academicPeriods as | academicPeriod2 academicPeriodId2|}}
-        {{#each ../../../notesAreas as | notesArea notesAreaId|}}
-        {{#iff notesArea.areaId '===' area.id}}
-        {{#iff academicPeriod2.id '===' notesArea.academicPeriodId}}
-        <div class="item-data item-data-flex item-data-flex-azul">
-          {{#iff ../../../../../performanceLevelType '==' 'QUANTITATIVE'}}
-          <div>{{notesArea.assessment}}</div>
-          {{/iff }}
-          <div>{{notesArea.performanceLevel}}</div>
-        </div>
-        {{/iff }}
-        {{/iff }}
-        {{/each}}
-        {{/each}}
-        {{/iff }}
-        {{#iff ../reportPerformanceAreaAsignatureType '==' 'AREA'}}
-        <div class="item-data">{{area.name}}</div>
-        {{#each area.academicPeriods as | academicPeriod2 academicPeriodId2|}}
-        {{#each ../../../notesAreas as | notesArea notesAreaId|}}
-        {{#iff notesArea.areaId '===' area.id}}
-        {{#iff academicPeriod2.id '===' notesArea.academicPeriodId}}
-        <div class="item-data item-data-flex item-data-flex-azul">
-          {{#iff ../../../../../performanceLevelType '==' 'QUANTITATIVE'}}
-          <div>{{notesArea.assessment}}</div>
-          {{/iff }}
-          <div>{{notesArea.performanceLevel}}</div>
-        </div>
-        {{/iff }}
-        {{/iff }}
-        {{/each}}
-        {{/each}}
-        {{/iff }}
-        {{#iff ../reportPerformanceAreaAsignatureType '==' 'AREA_ASIGNATURE'}}
         {{#each area.asignatures as | asignature asignatureId|}}
-        <div class="item-data item-data-white">{{asignature.name}}</div>
-        {{#each ../../../academicPeriods as | academicPeriods3 academicPeriodId3|}}
-        {{#each ../../../../notesAsignatures as | notesAsignature notesAsignatureId|}}
+        {{#each ../../notesAsignatures as | notesAsignature notesAsignatureId|}}
         {{#iff notesAsignature.asignatureId '===' asignature.id}}
-        {{#iff academicPeriods3.id '===' notesAsignature.academicPeriodId}}
-        <div class="item-data item-data-flex">
-          {{#iff ../../../../../../performanceLevelType '==' 'QUANTITATIVE'}}
-          <div>{{notesAsignature.assessment}}</div>
-          {{/iff }}
-          <div>{{notesAsignature.performanceLevel}}</div>
+        {{#iff notesAsignature.academicPeriodId '===' ../../../../academicPeriodId}}
+        <div class="data-materia">
+          <div class="item-data">Asignatura</div>
+          <div class="item-data item-data-white">{{asignature.name}}</div>
+          <div class="item-data">I.H.S.</div>
+          <div class="item-data item-data-white">{{asignature.ihs}}</div>
+          <div class="item-data">Docente</div>
+          <div class="item-data item-data-white">{{notesAsignature.teacher}}</div>
+          <div class="item-data">
+            {{#iff ../../../../performanceLevelType '==' 'QUANTITATIVE'}}
+            {{notesAsignature.assessment}} -
+            {{/iff }}
+            {{notesAsignature.performanceLevel}}
+          </div>
+        </div>
+        <div class="data-observacion">
+          <div class="item-data item-data-white observacion">
+            <ul>
+              {{#iff ../../../../typeDisplayDetails '==' 'LEARNING'}}
+              {{#each asignature.learnings as | learning learnignsId|}}
+              <li>
+                <p>{{learning.statement}}</p>
+              </li>
+              {{/each}}
+              {{/iff }}
+              {{#iff ../../../../typeDisplayDetails '==' 'EVIDENCE_LEARNING'}}
+              {{#each asignature.evidenceLearnings as | evidenceLearning evidenceLearningsId|}}
+              <li>
+                <p>{{evidenceLearning.statement}}</p>
+              </li>
+              {{/each}}
+              {{/iff }}
+            </ul>
+          </div>
+          {{!-- <div class="item-data item-data-white desempeño">
+            <div class="item-data item-data-white"> - </div>
+          </div> --}}
         </div>
         {{/iff }}
         {{/iff }}
         {{/each}}
         {{/each}}
         {{/each}}
-        {{/iff }}
-        {{#iff ../reportPerformanceAreaAsignatureType '==' 'ASIGNATURE'}}
-        {{#each area.asignatures as | asignature asignatureId|}}
-        <div class="item-data item-data-white">{{asignature.name}}</div>
-        {{#each ../../../academicPeriods as | academicPeriods3 academicPeriodId3|}}
-        {{#each ../../../../notesAsignatures as | notesAsignature notesAsignatureId|}}
-        {{#iff notesAsignature.asignatureId '===' asignature.id}}
-        {{#iff academicPeriods3.id '===' notesAsignature.academicPeriodId}}
-        <div class="item-data item-data-flex">
-          {{#iff ../../../../../../performanceLevelType '==' 'QUANTITATIVE'}}
-          <div>{{notesAsignature.assessment}}</div>
-          {{/iff }}
-          <div>{{notesAsignature.performanceLevel}}</div>
-        </div>
-        {{/iff }}
-        {{/iff }}
-        {{/each}}
-        {{/each}}
-        {{/each}}
-        {{/iff }}
-        {{/each}}
-      </div>
-      <div class="data-note-student-behaviour">
         {{#iff reportPerformanceBehaviourStudent '==' 'DISPLAY'}}
-        <div class="item-data item-note-gris">Comportamiento Escolar</div>
-        {{#each ../noteBehaviour as | behaviour noteBehaviourId|}}
-        <div class="item-data item-note-gris">
-          {{#iff ../../reportPerformanceBehaviourStudentType '==' 'QUANTITATIVE'}}
-          {{behaviour.assessment}} -
-          {{/iff }}
-          {{behaviour.performanceLevel}}
+        <div class="data-behaviour">
+          <div class="item-data item-data-white">Comportamiento Escolar</div>
+          <div class="item-data">Docente</div>
+          <div class="item-data item-data-white">{{../titular}}</div>
+          <div class="item-data">
+            {{#each ../noteBehaviour as | behaviour noteBehaviourId|}}
+            {{#iff ../../reportPerformanceBehaviourStudentType '==' 'QUANTITATIVE'}}
+            {{behaviour.assessment}} -
+            {{/iff }}
+            {{behaviour.performanceLevel}}
+            {{/each}}
+          </div>
         </div>
-        {{/each}}
+        <div class="data-observacion">
+          <div class="item-data item-data-white observacion">
+            <ul>
+              {{#each ../noteBehaviour as | behaviour noteBehaviourId|}}
+              <li>
+                <p>{{behaviour.observation}}</p>
+              </li>
+              {{/each}}
+            </ul>
+          </div>
+        </div>
         {{/iff }}
       </div>
       <div class="container-firma-nombre">
@@ -450,7 +424,6 @@
           <p>{{../titular}}</p>
           <p>{{../reportPerformanceTitleSignatureTeacherCourse}}</p>
         </div>
-        <img src="http://vivecolegios.nortedesantander.gov.co:4000/{{imgPrincipalSignature}}" alt="" />
         <div class="container-firma">
           <div class="firma"></div>
           <p>{{../schoolPrincipalSignature}}</p>

@@ -74,6 +74,46 @@ type AcademicAreaCoursePeriodValuationEdge {
   node: AcademicAreaCoursePeriodValuation!
 }
 
+"""The AcademicAreaCourseYearValuation model"""
+type AcademicAreaCourseYearValuation implements IModelCampusData {
+  academicArea: AcademicArea
+  academicAreaId: String
+  academicAsignatureCourse: AcademicArea
+  active: Boolean
+  assessment: Float
+  campus: Campus
+  campusId: String
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  id: ID!
+  performanceLevel: PerformanceLevel
+  performanceLevelId: String
+  schoolYear: SchoolYear
+  schoolYearId: String
+  student: Student
+  studentId: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  valuationType: ValuationType
+  version: Float
+}
+
+type AcademicAreaCourseYearValuationConnection {
+  edges: [AcademicAreaCourseYearValuationEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type AcademicAreaCourseYearValuationEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: AcademicAreaCourseYearValuation!
+}
+
 type AcademicAreaEdge {
   """Used in `before` and `after` args"""
   cursor: String!
@@ -231,6 +271,46 @@ type AcademicAsignatureCoursePeriodValuationEdge {
   """Used in `before` and `after` args"""
   cursor: String!
   node: AcademicAsignatureCoursePeriodValuation!
+}
+
+"""The AcademicAsignatureCourseYearValuation model"""
+type AcademicAsignatureCourseYearValuation implements IModelCampusData {
+  academicAsignatureCourse: AcademicAsignatureCourse
+  academicAsignatureCourseId: String
+  academicPeriod: SchoolYear
+  active: Boolean
+  assessment: Float
+  campus: Campus
+  campusId: String
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  id: ID!
+  performanceLevel: PerformanceLevel
+  performanceLevelId: String
+  schoolYear: SchoolYear
+  schoolYearId: String
+  student: Student
+  studentId: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  valuationType: ValuationType
+  version: Float
+}
+
+type AcademicAsignatureCourseYearValuationConnection {
+  edges: [AcademicAsignatureCourseYearValuationEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type AcademicAsignatureCourseYearValuationEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: AcademicAsignatureCourseYearValuation!
 }
 
 type AcademicAsignatureEdge {
@@ -491,6 +571,120 @@ type AuditLoginEdge {
   """Used in `before` and `after` args"""
   cursor: String!
   node: AuditLogin!
+}
+
+"""The AverageAcademicPeriodStudent model"""
+type AverageAcademicPeriodStudent implements IModelCampusData {
+  academicPeriod: AcademicPeriod
+  academicPeriodId: String
+  active: Boolean
+  assessment: Float
+  campus: Campus
+  campusId: String
+  course: Course
+  courseId: String
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  id: ID!
+  performanceLevel: PerformanceLevel
+  performanceLevelId: String
+  score: Float
+  student: Student
+  studentId: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type AverageAcademicPeriodStudentConnection {
+  edges: [AverageAcademicPeriodStudentEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type AverageAcademicPeriodStudentEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: AverageAcademicPeriodStudent!
+}
+
+"""The AverageAcademicYearCourse model"""
+type AverageAcademicYearCourse implements IModelCampusData {
+  active: Boolean
+  assessment: Float
+  campus: Campus
+  campusId: String
+  course: Course
+  courseId: String
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  id: ID!
+  performanceLevel: PerformanceLevel
+  performanceLevelId: String
+  schoolYear: SchoolYear
+  schoolYearId: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type AverageAcademicYearCourseConnection {
+  edges: [AverageAcademicYearCourseEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type AverageAcademicYearCourseEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: AverageAcademicYearCourse!
+}
+
+"""The AverageAcademicYearStudent model"""
+type AverageAcademicYearStudent implements IModelCampusData {
+  active: Boolean
+  assessment: Float
+  campus: Campus
+  campusId: String
+  course: Course
+  courseId: String
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  id: ID!
+  performanceLevel: PerformanceLevel
+  performanceLevelId: String
+  schoolYear: SchoolYear
+  schoolYearId: String
+  score: Float
+  student: Student
+  studentId: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type AverageAcademicYearStudentConnection {
+  edges: [AverageAcademicYearStudentEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type AverageAcademicYearStudentEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: AverageAcademicYearStudent!
 }
 
 """The Campus model"""
@@ -1977,10 +2171,12 @@ type MunicipalityEdge {
 type Mutation {
   changeActiveAcademicArea(active: Boolean!, id: String!): Boolean!
   changeActiveAcademicAreaCoursePeriodValuation(active: Boolean!, id: String!): Boolean!
+  changeActiveAcademicAreaCourseYearValuation(active: Boolean!, id: String!): Boolean!
   changeActiveAcademicAsignature(active: Boolean!, id: String!): Boolean!
   changeActiveAcademicAsignatureCourse(active: Boolean!, id: String!): Boolean!
   changeActiveAcademicAsignatureCoursePeriodEvidenceLearningValuation(active: Boolean!, id: String!): Boolean!
   changeActiveAcademicAsignatureCoursePeriodValuation(active: Boolean!, id: String!): Boolean!
+  changeActiveAcademicAsignatureCourseYearValuation(active: Boolean!, id: String!): Boolean!
   changeActiveAcademicDay(active: Boolean!, id: String!): Boolean!
   changeActiveAcademicGrade(active: Boolean!, id: String!): Boolean!
   changeActiveAcademicHour(active: Boolean!, id: String!): Boolean!
@@ -1988,6 +2184,9 @@ type Mutation {
   changeActiveAcademicSchedule(active: Boolean!, id: String!): Boolean!
   changeActiveAcademicStandard(active: Boolean!, id: String!): Boolean!
   changeActiveAuditLogin(active: Boolean!, id: String!): Boolean!
+  changeActiveAverageAcademicPeriodStudent(active: Boolean!, id: String!): Boolean!
+  changeActiveAverageAcademicYearCourse(active: Boolean!, id: String!): Boolean!
+  changeActiveAverageAcademicYearStudent(active: Boolean!, id: String!): Boolean!
   changeActiveCampus(active: Boolean!, id: String!): Boolean!
   changeActiveCampusAdministrator(active: Boolean!, id: String!): Boolean!
   changeActiveCampusCoordinator(active: Boolean!, id: String!): Boolean!
@@ -2043,12 +2242,14 @@ type Mutation {
   changeActiveStudentAttendance(active: Boolean!, id: String!): Boolean!
   changeActiveStudentBehaviour(active: Boolean!, id: String!): Boolean!
   changeActiveStudentObserverAnnotation(active: Boolean!, id: String!): Boolean!
+  changeActiveStudentYearBehaviour(active: Boolean!, id: String!): Boolean!
   changeActiveTeacher(active: Boolean!, id: String!): Boolean!
   changeActiveUser(active: Boolean!, id: String!): Boolean!
   changePasswordUser(id: String!, password: String!): Boolean!
   createAcademicArea(data: NewAcademicArea!): AcademicArea!
   createAcademicAreaCoursePeriodValuation(data: NewAcademicAreaCoursePeriodValuation!): AcademicAreaCoursePeriodValuation!
   createAcademicAreaCoursePeriodValuationStudent(academicAsignatureCourseId: String!, academicPeriodId: String!, studentId: String!): Boolean!
+  createAcademicAreaCourseYearValuation(data: NewAcademicAreaCourseYearValuation!): AcademicAreaCourseYearValuation!
   createAcademicAsignature(data: NewAcademicAsignature!): AcademicAsignature!
   createAcademicAsignatureCourse(data: NewAcademicAsignatureCourse!): AcademicAsignatureCourse!
   createAcademicAsignatureCoursePeriodEvidenceLearningValuation(data: NewAcademicAsignatureCoursePeriodEvidenceLearningValuation!): AcademicAsignatureCoursePeriodEvidenceLearningValuation!
@@ -2056,6 +2257,7 @@ type Mutation {
   createAcademicAsignatureCoursePeriodValuationStudent(academicAsignatureCourseId: String!, academicPeriodId: String!, experienceLearningType: ExperienceLearningType!, studentId: String!): Boolean!
   createAcademicAsignatureCoursePeriodValuationStudentBulk(academicAsignatureCourseId: String!, academicPeriodId: String!, experienceLearningType: ExperienceLearningType!, studentId: String!): Boolean!
   createAcademicAsignatureCoursePeriodValuationStudents(academicAsignatureCourseId: String!, academicPeriodId: String!, experienceLearningType: ExperienceLearningType!, schoolId: String!): Boolean!
+  createAcademicAsignatureCourseYearValuation(data: NewAcademicAsignatureCourseYearValuation!): AcademicAsignatureCourseYearValuation!
   createAcademicDay(data: NewAcademicDay!): AcademicDay!
   createAcademicGrade(data: NewAcademicGrade!): AcademicGrade!
   createAcademicHour(data: NewAcademicHour!): AcademicHour!
@@ -2070,6 +2272,9 @@ type Mutation {
   createAllInitialsStudents: Boolean!
   createAllInitialsTeachers: Boolean!
   createAuditLogin(data: NewAuditLogin!): AuditLogin!
+  createAverageAcademicPeriodStudent(data: NewAverageAcademicPeriodStudent!): AverageAcademicPeriodStudent!
+  createAverageAcademicYearCourse(data: NewAverageAcademicYearCourse!): AverageAcademicYearCourse!
+  createAverageAcademicYearStudent(data: NewAverageAcademicYearStudent!): AverageAcademicYearStudent!
   createAveragePeriodValuationCourse(academicPeriodId: String!, courseId: String!): Boolean!
   createAveragePeriodValuationStudent(academicPeriodId: String!, courseId: String!, studentId: String!): Boolean!
   createCampus(data: NewCampus!): Campus!
@@ -2123,6 +2328,7 @@ type Mutation {
   createPerformanceLevel(data: NewPerformanceLevel!): PerformanceLevel!
   createPeriodStudentBehaviour(academicPeriodId: String!, courseId: String!): Boolean!
   createPeriodStudentObserverAnnotation(academicPeriodId: String!, courseId: String!): Boolean!
+  createPeriodStudentYearBehaviour(courseId: String!, schoolYearId: String!): Boolean!
   createQuestionBankTestOnline(data: NewQuestionBankTestOnline!): QuestionBankTestOnline!
   createQuestionCategoryTestOnline(data: NewQuestionCategoryTestOnline!): QuestionCategoryTestOnline!
   createQuestionTestOnline(data: NewQuestionTestOnline!): QuestionTestOnline!
@@ -2137,20 +2343,26 @@ type Mutation {
   createStudentAttendance(data: NewStudentAttendance!): StudentAttendance!
   createStudentBehaviour(data: NewStudentBehaviour!): StudentBehaviour!
   createStudentObserverAnnotation(data: NewStudentObserverAnnotation!): StudentObserverAnnotation!
+  createStudentYearBehaviour(data: NewStudentYearBehaviour!): StudentYearBehaviour!
   createTeacher(data: NewTeacher!): Teacher!
   createUser(data: NewUser!): User!
   deleteAcademicArea(id: String!): Boolean!
   deleteAcademicAreaCoursePeriodValuation(id: String!): Boolean!
+  deleteAcademicAreaCourseYearValuation(id: String!): Boolean!
   deleteAcademicAsignature(id: String!): Boolean!
   deleteAcademicAsignatureCourse(id: String!): Boolean!
   deleteAcademicAsignatureCoursePeriodEvidenceLearningValuation(id: String!): Boolean!
   deleteAcademicAsignatureCoursePeriodValuation(id: String!): Boolean!
+  deleteAcademicAsignatureCourseYearValuation(id: String!): Boolean!
   deleteAcademicDay(id: String!): Boolean!
   deleteAcademicGrade(id: String!): Boolean!
   deleteAcademicHour(id: String!): Boolean!
   deleteAcademicPeriod(id: String!): Boolean!
   deleteAcademicSchedule(id: String!): Boolean!
   deleteAcademicStandard(id: String!): Boolean!
+  deleteAverageAcademicPeriodStudent(id: String!): Boolean!
+  deleteAverageAcademicYearCourse(id: String!): Boolean!
+  deleteAverageAcademicYearStudent(id: String!): Boolean!
   deleteCampus(id: String!): Boolean!
   deleteCampusAdministrator(id: String!): Boolean!
   deleteCampusCoordinator(id: String!): Boolean!
@@ -2206,8 +2418,11 @@ type Mutation {
   deleteStudentAttendance(id: String!): Boolean!
   deleteStudentBehaviour(id: String!): Boolean!
   deleteStudentObserverAnnotation(id: String!): Boolean!
+  deleteStudentYearBehaviour(id: String!): Boolean!
   deleteTeacher(id: String!): Boolean!
   deleteUser(id: String!): Boolean!
+  generateCertificateFinalReportCourse(format: String!, id: String!, schoolId: String!, schoolYearId: String!, studentId: String): String!
+  generatePerformanceFinalReportCourse(format: String!, id: String!, schoolId: String!, schoolYearId: String!, studentId: String): String!
   generatePerformanceLevelExample(id: String!): Boolean!
   generatePerformanceLevelExample2(id: String!): Boolean!
   generatePerformanceReportCourse(academicPeriodId: String!, format: String!, id: String!, schoolId: String!, schoolYearId: String!, studentId: String): String!
@@ -2216,24 +2431,31 @@ type Mutation {
   singleUpload(file: Upload, id: String!): Boolean!
   updateAcademicArea(data: NewAcademicArea!, id: String!): AcademicArea!
   updateAcademicAreaCoursePeriodValuation(data: NewAcademicAreaCoursePeriodValuation!, id: String!): AcademicAreaCoursePeriodValuation!
+  updateAcademicAreaCourseYearValuation(data: NewAcademicAreaCourseYearValuation!, id: String!): AcademicAreaCourseYearValuation!
   updateAcademicAsignature(data: NewAcademicAsignature!, id: String!): AcademicAsignature!
   updateAcademicAsignatureCourse(data: NewAcademicAsignatureCourse!, id: String!): AcademicAsignatureCourse!
   updateAcademicAsignatureCourseHourltIntensity(data: NewAcademicAsignatureCourse!, id: String!): AcademicAsignatureCourse!
   updateAcademicAsignatureCoursePeriodEvidenceLearningValuation(data: NewAcademicAsignatureCoursePeriodEvidenceLearningValuation!, id: String!): AcademicAsignatureCoursePeriodEvidenceLearningValuation!
   updateAcademicAsignatureCoursePeriodValuation(data: NewAcademicAsignatureCoursePeriodValuation!, id: String!): AcademicAsignatureCoursePeriodValuation!
+  updateAcademicAsignatureCourseYearValuation(data: NewAcademicAsignatureCourseYearValuation!, id: String!): AcademicAsignatureCourseYearValuation!
   updateAcademicDay(data: NewAcademicDay!, id: String!): AcademicDay!
   updateAcademicGrade(data: NewAcademicGrade!, id: String!): AcademicGrade!
   updateAcademicHour(data: NewAcademicHour!, id: String!): AcademicHour!
   updateAcademicPeriod(data: NewAcademicPeriod!, id: String!): AcademicPeriod!
   updateAcademicSchedule(data: NewAcademicSchedule!, id: String!): AcademicSchedule!
   updateAcademicStandard(data: NewAcademicStandard!, id: String!): AcademicStandard!
+  updateAllAverageStudentCoursePeriod(academicPeriodId: String!, courseId: String!): Boolean!
   updateAllIStudentsName: Boolean!
   updateAllStudentAcademicAsignatureCoursePeriodValuation(academicAsignatureCourseId: String!, academicPeriodId: String!, experienceLearningType: ExperienceLearningType!): Boolean!
   updateAllStudentCoursePeriodValuation(academicPeriodId: String!, courseId: String!, experienceLearningType: ExperienceLearningType!): Boolean!
+  updateAllStudentCourseYearValuation(courseId: String!, schoolId: String!, schoolYearId: String!): Boolean!
   updateAllStudentGradePeriodValuation(academicGradeId: String!, academicPeriodId: String!, experienceLearningType: ExperienceLearningType!): Boolean!
   updateAllStudentSchoolPeriodValuation(academicPeriodId: String!, experienceLearningType: ExperienceLearningType!, schoolId: String!): Boolean!
   updateAssessmentExperienceLearningRubricValuation(id: String!): ExperienceLearningRubricValuation!
   updateAuditLogin(data: NewAuditLogin!, id: String!): AuditLogin!
+  updateAverageAcademicPeriodStudent(data: NewAverageAcademicPeriodStudent!, id: String!): AverageAcademicPeriodStudent!
+  updateAverageAcademicYearCourse(data: NewAverageAcademicYearCourse!, id: String!): AverageAcademicYearCourse!
+  updateAverageAcademicYearStudent(data: NewAverageAcademicYearStudent!, id: String!): AverageAcademicYearStudent!
   updateCampus(data: NewCampus!, id: String!): Campus!
   updateCampusAdministrator(data: NewCampusAdministrator!, id: String!): CampusAdministrator!
   updateCampusCoordinator(data: NewCampusCoordinator!, id: String!): CampusCoordinator!
@@ -2293,6 +2515,7 @@ type Mutation {
   updateStudentAttendance(data: NewStudentAttendance!, id: String!): StudentAttendance!
   updateStudentBehaviour(data: NewStudentBehaviour!, id: String!): StudentBehaviour!
   updateStudentObserverAnnotation(data: NewStudentObserverAnnotation!, id: String!): StudentObserverAnnotation!
+  updateStudentYearBehaviour(data: NewStudentYearBehaviour!, id: String!): StudentYearBehaviour!
   updateStudentsAllInitialsCourse: Boolean!
   updateTeacher(data: NewTeacher!, id: String!): Teacher!
   updateUser(data: NewUser!, id: String!): User!
@@ -2320,6 +2543,15 @@ input NewAcademicAreaCoursePeriodValuation {
   academicPeriodId: String
   assessment: Float
   performanceLevelId: String
+  studentId: String
+  valuationType: ValuationType
+}
+
+input NewAcademicAreaCourseYearValuation {
+  academicAreaId: String
+  assessment: Float
+  performanceLevelId: String
+  schoolYearId: String
   studentId: String
   valuationType: ValuationType
 }
@@ -2361,6 +2593,15 @@ input NewAcademicAsignatureCoursePeriodValuation {
   academicPeriodId: String
   assessment: Float
   performanceLevelId: String
+  studentId: String
+  valuationType: ValuationType
+}
+
+input NewAcademicAsignatureCourseYearValuation {
+  academicAsignatureCourseId: String
+  assessment: Float
+  performanceLevelId: String
+  schoolYearId: String
   studentId: String
   valuationType: ValuationType
 }
@@ -2423,6 +2664,31 @@ input NewAuditLogin {
   userIp: String
   userPort: String
   username: String
+}
+
+input NewAverageAcademicPeriodStudent {
+  academicPeriodId: String
+  assessment: Float
+  courseId: String
+  performanceLevelId: String
+  score: Float
+  studentId: String
+}
+
+input NewAverageAcademicYearCourse {
+  assessment: Float
+  courseId: String
+  performanceLevelId: String
+  schoolYearId: String
+}
+
+input NewAverageAcademicYearStudent {
+  assessment: Float
+  courseId: String
+  performanceLevelId: String
+  schoolYearId: String
+  score: Float
+  studentId: String
 }
 
 input NewCampus {
@@ -2912,6 +3178,15 @@ input NewStudentObserverAnnotation {
   studentId: String
 }
 
+input NewStudentYearBehaviour {
+  assessment: Float
+  courseId: String
+  observation: String
+  performanceLevelId: String
+  schoolYearId: String
+  studentId: String
+}
+
 input NewTeacher {
   academicAsignatureId: [String!]
   attentionSchedule: String
@@ -3074,10 +3349,12 @@ enum PerformanceLevelType {
 type Query {
   getAcademicArea(id: String!): AcademicArea
   getAcademicAreaCoursePeriodValuation(id: String!): AcademicAreaCoursePeriodValuation
+  getAcademicAreaCourseYearValuation(id: String!): AcademicAreaCourseYearValuation
   getAcademicAsignature(id: String!): AcademicAsignature
   getAcademicAsignatureCourse(id: String!): AcademicAsignatureCourse
   getAcademicAsignatureCoursePeriodEvidenceLearningValuation(id: String!): AcademicAsignatureCoursePeriodEvidenceLearningValuation
   getAcademicAsignatureCoursePeriodValuation(id: String!): AcademicAsignatureCoursePeriodValuation
+  getAcademicAsignatureCourseYearValuation(id: String!): AcademicAsignatureCourseYearValuation
   getAcademicDay(id: String!): AcademicDay
   getAcademicGrade(id: String!): AcademicGrade
   getAcademicHour(id: String!): AcademicHour
@@ -3134,6 +3411,25 @@ type Query {
     orderCreated: Boolean!
     studentId: String
   ): AcademicAreaCoursePeriodValuationConnection!
+  getAllAcademicAreaCourseYearValuation(
+    academicAreaId: String!
+
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+    schoolYearId: String!
+    studentId: String
+  ): AcademicAreaCourseYearValuationConnection!
   getAllAcademicAsignature(
     academicAreaId: String
 
@@ -3234,6 +3530,25 @@ type Query {
     last: Float
     teacherId: String!
   ): AcademicAsignatureCourseConnection!
+  getAllAcademicAsignatureCourseYearValuation(
+    academicAsignatureCourseId: String!
+
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+    schoolYearId: String!
+    studentId: String
+  ): AcademicAsignatureCourseYearValuationConnection!
   getAllAcademicAsignatureNotAssignedInAcademicGrade(
     academicGradeId: String!
 
@@ -3368,6 +3683,58 @@ type Query {
     last: Float
     orderCreated: Boolean!
   ): AuditLoginConnection!
+  getAllAverageAcademicPeriodStudent(
+    academicPeriodId: String
+
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+    courseId: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): AverageAcademicPeriodStudentConnection!
+  getAllAverageAcademicYearCourse(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+    campusId: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+    schoolYearId: String
+  ): AverageAcademicYearCourseConnection!
+  getAllAverageAcademicYearStudent(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+    courseId: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+    schoolYearId: String
+  ): AverageAcademicYearStudentConnection!
   getAllCampus(
     """Paginate after opaque cursor"""
     after: String
@@ -4489,6 +4856,25 @@ type Query {
     orderCreated: Boolean!
     studentId: String!
   ): StudentObserverAnnotationConnection!
+  getAllStudentYearBehaviour(
+    academicPeriodId: String!
+
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+    courseId: String!
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+    studentId: String
+  ): StudentYearBehaviourConnection!
   getAllTeacher(
     """Paginate after opaque cursor"""
     after: String
@@ -4522,6 +4908,9 @@ type Query {
     orderCreated: Boolean!
   ): UserConnection!
   getAuditLogin(id: String!): AuditLogin
+  getAverageAcademicPeriodStudent(id: String!): AverageAcademicPeriodStudent
+  getAverageAcademicYearCourse(id: String!): AverageAcademicYearCourse
+  getAverageAcademicYearStudent(id: String!): AverageAcademicYearStudent
   getCampus(id: String!): Campus
   getCampusAdministrator(id: String!): CampusAdministrator
   getCampusCoordinator(id: String!): CampusCoordinator
@@ -4578,6 +4967,7 @@ type Query {
   getStudentAttendance(id: String!): StudentAttendance
   getStudentBehaviour(id: String!): StudentBehaviour
   getStudentObserverAnnotation(id: String!): StudentObserverAnnotation
+  getStudentYearBehaviour(id: String!): StudentYearBehaviour
   getTeacher(id: String!): Teacher
   getUser(id: String!): User
   getValidationDocumentNumberUser(documentNumber: String!): Boolean!
@@ -5083,6 +5473,45 @@ type StudentObserverAnnotationEdge {
   """Used in `before` and `after` args"""
   cursor: String!
   node: StudentObserverAnnotation!
+}
+
+"""The StudentYearBehaviour model"""
+type StudentYearBehaviour implements IModelCampusData {
+  active: Boolean
+  assessment: Float
+  campus: Campus
+  campusId: String
+  course: Course
+  courseId: String
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  id: ID!
+  observation: String
+  performanceLevel: PerformanceLevel
+  performanceLevelId: String
+  schoolYear: SchoolYear
+  schoolYearId: String
+  student: Student
+  studentId: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type StudentYearBehaviourConnection {
+  edges: [StudentYearBehaviourEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type StudentYearBehaviourEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: StudentYearBehaviour!
 }
 
 """The Teacher model"""
