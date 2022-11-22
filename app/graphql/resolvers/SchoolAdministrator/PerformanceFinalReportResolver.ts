@@ -547,11 +547,11 @@ export class PerformanceFinalReportResolver {
             }
             switch (reportPerformanceType) {
               case "DETAILS":
-                promisesGeneratePDF.push(
-                  this.generatePerformanceReportStudentDetails(dataPDF, studentId, format).then((dataUrl) => {
-                    urls.push(dataUrl);
-                  })
-                );
+                // promisesGeneratePDF.push(
+                //   this.generatePerformanceReportStudentDetails(dataPDF, studentId, format).then((dataUrl) => {
+                //     urls.push(dataUrl);
+                //   })
+                // );
                 promisesGeneratePDF.push(
                   this.generatePerformanceReportStudent(dataPDF, studentId, format).then((dataUrl) => {
                     urls.push(dataUrl);
@@ -576,7 +576,7 @@ export class PerformanceFinalReportResolver {
                 maxHeap: '2g' // for setting JVM heap limits to 2GB
               };
               //console.log(urls);
-              var dir = './public/downloads/reports/courses/' + id;
+              var dir = './public/downloads/reports/final/courses/' + id;
               const fs = require("fs-extra");
               if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir, { recursive: true });
@@ -641,7 +641,7 @@ export class PerformanceFinalReportResolver {
       const content = await this.compile('index', data);
 
       await page.setContent(content);
-      var dir = './public/downloads/reports/students/' + id;
+      var dir = './public/downloads/reports/final/students/' + id;
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
