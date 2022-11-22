@@ -2561,7 +2561,10 @@ export class ExperienceLearningResolver {
             this.createAverageYearValuationStudent(course?.id?.toString(), schoolYearId, student + "")
           );
         }
-        return true;
+        await Promise.all(promisesListStudents).then(async () => {
+          return true;
+        });
+        //return true;
       }
     }
   }
@@ -2734,6 +2737,7 @@ export class ExperienceLearningResolver {
         });
     }
     await this.createAverageYearValuationCourse(courseId, schoolYearId);
+    await this.createAverageBehaviourYearValuationCourse(courseId, schoolYearId);
     return true;
   }
 
