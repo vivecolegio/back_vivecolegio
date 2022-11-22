@@ -2547,13 +2547,12 @@ export class ExperienceLearningResolver {
             }
           }
         }
-        // let promisesListStudents: any[] = [];
-        // for (let student of students) {
-        //   promisesListStudents.push(
-        //     this.createAveragePeriodValuationStudent(course?.id?.toString(), academicPeriodId, student + "")
-        //   );
-        // }
-
+        let promisesListStudents: any[] = [];
+        for (let student of students) {
+          promisesListStudents.push(
+            this.createAverageYearValuationStudent(course?.id?.toString(), schoolYearId, student + "")
+          );
+        }
         return true;
       }
     }
