@@ -49,6 +49,10 @@ export class School extends IModelData {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
+  textSecretarySignature?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   imgPrincipalSignature?: string;
 }
 

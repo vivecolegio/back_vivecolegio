@@ -321,7 +321,7 @@
     </div>
     <div class="titulo">
       <p>
-        Los suscritos Rector(A) y Secretario General de
+        {{reportCertificateFinalTitle}}
       </p>
       <h2>
         <b>{{schoolName}}</b>
@@ -461,14 +461,14 @@
     <br />
     <div style="font-size: 12px"> Aprobó: <b>{{promocion}}</b></div>
     <div class="container-firma-nombre">
-      {{#iff reportPerformanceSignatureType '==' 'TEACHER_COURSE'}}
+      {{#iff reportCertificateFinalSignatureType '==' 'TEACHER_COURSE'}}
       <div class="container-firma">
         <div class="firma"></div>
         <p>{{../titular}}</p>
         <p>{{../reportPerformanceTitleSignatureTeacherCourse}}</p>
       </div>
       {{/iff }}
-      {{#iff reportPerformanceSignatureType '==' 'TEACHER_COURSE_AND_PRINCIPAL'}}
+      {{#iff reportCertificateFinalSignatureType '==' 'TEACHER_COURSE_AND_PRINCIPAL'}}
       <div class="container-firma">
         <div class="firma"></div>
         <p>{{../titular}}</p>
@@ -479,6 +479,18 @@
         <div class="firma"></div>
         <p>{{../schoolPrincipalSignature}}</p>
         <p>{{../reportPerformanceTitleSignaturePrincipal}}</p>
+      </div>
+      {{/iff }}
+      {{#iff reportCertificateFinalSignatureType '==' 'PRINCIPAL_SECRETARY'}}
+      <div class="container-firma">
+        <div class="firma"></div>
+        <p>{{../schoolPrincipalSignature}}</p>
+        <p>{{../reportPerformanceTitleSignaturePrincipal}}</p>
+      </div>
+      <div class="container-firma">
+        <div class="firma"></div>
+        <p>{{../schoolSecretarySignature}}</p>
+        <p>{{../reportCertificateFinalSignatureSecretary}}</p>
       </div>
       {{/iff }}
     </div>

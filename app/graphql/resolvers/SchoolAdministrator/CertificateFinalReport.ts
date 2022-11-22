@@ -163,6 +163,16 @@ export class CertificateFinalReportResolver {
       let schoolConfigurationReportPerformanceFinalNotPromoted = await this.repositorySchoolConfiguration.findBy({
         where: { schoolId, code: "REPORT_PERFORMANCE_FINAL_NOT_PROMOTED", active: true },
       });
+
+      let schoolConfigurationReportCertificateFinalTitle = await this.repositorySchoolConfiguration.findBy({
+        where: { schoolId, code: "REPORT_CERTIFICATE_FINAL_TITLE", active: true },
+      });
+      let schoolConfigurationReportCertificateFinalSignatureType = await this.repositorySchoolConfiguration.findBy({
+        where: { schoolId, code: "REPORT_CERTIFICATE_FINAL_SIGNATURE_TYPE", active: true },
+      });
+      let schoolConfigurationReportCertificateFinalSecretary = await this.repositorySchoolConfiguration.findBy({
+        where: { schoolId, code: "REPORT_CERTIFICATE_FINAL_SIGNATURE_SECREATARY", active: true },
+      });
       let academicGrade = await this.repositoryAcademicGrade.findOneBy(course?.academicGradeId);
       let titular = await this.repositoryTeacher.findOneBy(course?.teacherId);
       let titularUser = await this.repositoryUser.findOneBy(titular?.userId);
@@ -180,6 +190,7 @@ export class CertificateFinalReportResolver {
       let academicAsignaturesCourse = await this.repositoryAcademicAsignatureCourse.findBy({ where: { courseId: course?.id?.toString() } });
       if (academicAsignaturesCourse?.length > 0) {
         data = { ...data, "schoolPrincipalSignature": school?.textPrincipalSignature };
+        data = { ...data, "schoolSecretarySignature": school?.textSecretarySignature };
         data = { ...data, "imgPrincipalSignature": school?.imgPrincipalSignature };
         data = { ...data, "schoolName": school?.name };
         data = { ...data, "schoolResolution": school?.textResolution };
@@ -296,12 +307,27 @@ export class CertificateFinalReportResolver {
         if (schoolConfigurationReportPerformanceFinalNotPromoted?.length > 0) {
           reportPerformanceFinalNotPromoted = schoolConfigurationReportPerformanceFinalNotPromoted[0]?.valueString ? schoolConfigurationReportPerformanceFinalNotPromoted[0]?.valueString : "";
         }
+        let reportCertificateFinalTitle = "Los suscritos Rector(A) y Secretario General de"
+        if (schoolConfigurationReportCertificateFinalTitle?.length > 0) {
+          reportCertificateFinalTitle = schoolConfigurationReportCertificateFinalTitle[0]?.valueString ? schoolConfigurationReportCertificateFinalTitle[0]?.valueString : "Los suscritos Rector(A) y Secretario General de";
+        }
+        let reportCertificateFinalSignatureType = "PRINCIPAL_SECRETARY"
+        if (schoolConfigurationReportCertificateFinalSignatureType?.length > 0) {
+          reportCertificateFinalSignatureType = schoolConfigurationReportCertificateFinalSignatureType[0]?.valueString ? schoolConfigurationReportCertificateFinalSignatureType[0]?.valueString : "PRINCIPAL_SECRETARY";
+        }
+
+        let reportCertificateFinalSignatureSecretary = "Secretaria"
+        if (schoolConfigurationReportCertificateFinalSecretary?.length > 0) {
+          reportCertificateFinalSignatureSecretary = schoolConfigurationReportCertificateFinalSecretary[0]?.valueString ? schoolConfigurationReportCertificateFinalSecretary[0]?.valueString : "PRINCIPAL_SECRETARY";
+        }
+        data = { ...data, "reportCertificateFinalTitle": reportCertificateFinalTitle };
         data = { ...data, "reportPerformanceTitleSignatureTeacherCourse": reportPerformanceTitleSignatureTeacherCourse };
+        data = { ...data, "reportCertificateFinalSignatureSecretary": reportCertificateFinalSignatureSecretary };
         data = { ...data, "reportPerformanceTitleSignaturePrincipal": reportPerformanceTitleSignaturePrincipal };
         data = { ...data, "reportPerformanceAreaAsignatureType": reportPerformanceAreaAsignatureType };
         data = { ...data, "reportPerformanceBehaviourStudent": reportPerformanceBehaviourStudent };
         data = { ...data, "reportPerformanceBehaviourStudentType": reportPerformanceBehaviourStudentType };
-        data = { ...data, "reportPerformanceSignatureType": reportPerformanceSignatureType };
+        data = { ...data, "reportCertificateFinalSignatureType": reportCertificateFinalSignatureType };
         data = { ...data, "countDigitsAverageCourse": countDigitsAverageCourse };
         data = { ...data, "countDigitsPerformanceLevel": countDigitsPerformanceLevel };
         data = { ...data, "countDigitsAverageStudent": countDigitsAverageStudent };
