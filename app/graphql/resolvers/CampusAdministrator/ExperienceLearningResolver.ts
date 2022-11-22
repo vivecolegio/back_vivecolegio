@@ -2400,7 +2400,7 @@ export class ExperienceLearningResolver {
                     });
                   }
                   if (perf && perf?.node?.id) {
-                    studentYearValuation.performanceLevelId = perf.node.id;
+                    studentYearValuation.performanceLevelId = perf.node.id.toString();
                   }
                   break;
               }
@@ -2539,7 +2539,7 @@ export class ExperienceLearningResolver {
                     });
                   }
                   if (perf && perf?.node?.id) {
-                    studentYearValuation.performanceLevelId = perf.node.id;
+                    studentYearValuation.performanceLevelId = perf.node.id.toString();
                   }
                   break;
               }
@@ -2667,6 +2667,7 @@ export class ExperienceLearningResolver {
       let countDefinitive = 0;
       let countCalculate = 0;
       let countRecovery = 0;
+      console.log("studentAreaYearValuationList", studentAreaYearValuationList)
       for (let studentAsignatureYearValuation of studentAreaYearValuationList) {
         switch (studentAsignatureYearValuation?.valuationType) {
           case ValuationType?.DEFINITIVE:
@@ -2680,6 +2681,7 @@ export class ExperienceLearningResolver {
             break;
         }
       }
+
       let studentAsignatureYearValuationAux: AcademicAsignatureCoursePeriodValuation | null = null;
       if (countCalculate > 0) {
         for (let studentAsignatureYearValuation of studentAreaYearValuationList) {
@@ -2702,13 +2704,15 @@ export class ExperienceLearningResolver {
           }
         }
       }
-      let performanceLevel = performanceLevels?.edges?.find((i: any) => i.node.id.toString() === studentAsignatureYearValuationAux?.performanceLevelId);
+      console.log("studentAsignatureYearValuationAux", studentAsignatureYearValuationAux)
+      let performanceLevel = performanceLevels?.edges?.find((i: any) => i.node.id.toString() === studentAsignatureYearValuationAux?.performanceLevelId?.toString());
+      console.log("performanceLevel, performanceLevel", performanceLevel)
       if (performanceLevel?.node?.isRecovery) {
         countNoPromotedArea += 1;
       }
       switch (performanceLevelType) {
         case PerformanceLevelType.QUALITATIVE:
-          let performanceLevelIndex = performanceLevels?.edges?.findIndex((i: any) => i.node.id.toString() === studentAsignatureYearValuationAux?.performanceLevelId) + 1;
+          let performanceLevelIndex = performanceLevels?.edges?.findIndex((i: any) => i.node.id.toString() === studentAsignatureYearValuationAux?.performanceLevelId?.toString()) + 1;
           averageArea = performanceLevelIndex;
           average += averageArea * hourlyIntensityArea;
           break;
@@ -2757,6 +2761,8 @@ export class ExperienceLearningResolver {
       averageAcademicYearStudent.assessment = 0;
       averageAcademicYearStudent.promoted = true;
     }
+    console.log("countNoPromotedArea", countNoPromotedArea)
+    console.log("countPromotedIndicate", countPromotedIndicate)
     if (countNoPromotedArea >= countPromotedIndicate) {
       averageAcademicYearStudent.promoted = false;
     } else {
