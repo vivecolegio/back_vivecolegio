@@ -52,6 +52,10 @@ export class AverageAcademicYearStudent extends IModelCampusData {
   @Field({ nullable: true })
   @Column({ nullable: true })
   score?: number;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  promoted?: boolean;
 }
 
 @ObjectType()

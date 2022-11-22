@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicAreaCoursePeriodValuationRepository, AcademicAreaCourseYearValuationRepository, AcademicAreaRepository, AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicAsignatureCourseYearValuationRepository, AcademicAsignatureRepository, AcademicGradeRepository, AcademicPeriodRepository, AverageAcademicPeriodCourseRepository, AverageAcademicPeriodStudentRepository, AverageAcademicYearCourseRepository, AverageAcademicYearStudentRepository, CampusRepository, CourseRepository, EvaluativeComponentRepository, EvidenceLearningRepository, ExperienceLearningAverageValuationRepository, ExperienceLearningCoEvaluationRepository, ExperienceLearningCoEvaluationValuationRepository, ExperienceLearningRepository, ExperienceLearningRubricCriteriaRepository, ExperienceLearningRubricCriteriaValuationRepository, ExperienceLearningRubricValuationRepository, ExperienceLearningSelfAssessmentValuationRepository, ExperienceLearningTraditionalValuationRepository, LearningRepository, PerformanceLevelRepository, SchoolRepository, StudentBehaviourRepository, StudentYearBehaviourRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAreaCoursePeriodValuationRepository, AcademicAreaCourseYearValuationRepository, AcademicAreaRepository, AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicAsignatureCourseYearValuationRepository, AcademicAsignatureRepository, AcademicGradeRepository, AcademicPeriodRepository, AverageAcademicPeriodCourseRepository, AverageAcademicPeriodStudentRepository, AverageAcademicYearCourseRepository, AverageAcademicYearStudentRepository, CampusRepository, CourseRepository, EvaluativeComponentRepository, EvidenceLearningRepository, ExperienceLearningAverageValuationRepository, ExperienceLearningCoEvaluationRepository, ExperienceLearningCoEvaluationValuationRepository, ExperienceLearningRepository, ExperienceLearningRubricCriteriaRepository, ExperienceLearningRubricCriteriaValuationRepository, ExperienceLearningRubricValuationRepository, ExperienceLearningSelfAssessmentValuationRepository, ExperienceLearningTraditionalValuationRepository, LearningRepository, PerformanceLevelRepository, SchoolConfigurationRepository, SchoolRepository, StudentBehaviourRepository, StudentYearBehaviourRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { ExperienceLearningType } from '../../enums/ExperienceLearningType';
 import { ExperienceType } from '../../enums/ExperienceType';
@@ -44,6 +44,7 @@ import { EvaluativeComponent } from '../../models/SchoolAdministrator/Evaluative
 import { EvidenceLearning } from '../../models/SchoolAdministrator/EvidenceLearning';
 import { Learning } from '../../models/SchoolAdministrator/Learning';
 import { PerformanceLevel } from '../../models/SchoolAdministrator/PerformanceLevel';
+import { SchoolConfiguration } from '../../models/SchoolAdministrator/SchoolConfiguration';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 import { PerformanceLevelResolver } from '../SchoolAdministrator/PerformanceLevelResolver';
 
@@ -144,6 +145,9 @@ export class ExperienceLearningResolver {
 
   @InjectRepository(StudentYearBehaviour)
   private repositoryStudentYearBehaviour = StudentYearBehaviourRepository;
+
+  @InjectRepository(SchoolConfiguration)
+  private repositorySchoolConfiguration = SchoolConfigurationRepository;
 
   private performanceLevelResolver = new PerformanceLevelResolver();
 
@@ -2558,7 +2562,7 @@ export class ExperienceLearningResolver {
         let promisesListStudents: any[] = [];
         for (let student of students) {
           promisesListStudents.push(
-            this.createAverageYearValuationStudent(course?.id?.toString(), schoolYearId, student + "")
+            this.createAverageYearValuationStudent(course?.id?.toString(), schoolYearId, schoolId, student + "")
           );
         }
         await Promise.all(promisesListStudents).then(async () => {
@@ -2569,30 +2573,49 @@ export class ExperienceLearningResolver {
     }
   }
 
-  @Mutation(() => Boolean)
-  async updateAllAverageStudentCourseYear(
-    @Arg('courseId', () => String) courseId: string,
-    @Arg('schoolYearId', () => String) schoolYearId: string
-  ) {
-    const course = await this.repositoryCourse.findOneBy(courseId);
-    if (course) {
-      let students = course.studentsId;
-      if (students) {
-        for (let student of students) {
-          await this.createAverageYearValuationStudent(course?.id?.toString(), schoolYearId, student + "")
-        }
-        return true;
-      }
-    }
-  }
+  // @Mutation(() => Boolean)
+  // async updateAllAverageStudentCourseYear(
+  //   @Arg('courseId', () => String) courseId: string,
+  //   @Arg('schoolYearId', () => String) schoolYearId: string
+  // ) {
+  //   const course = await this.repositoryCourse.findOneBy(courseId);
+  //   if (course) {
+  //     let students = course.studentsId;
+  //     if (students) {
+  //       for (let student of students) {
+  //         await this.createAverageYearValuationStudent(course?.id?.toString(), schoolYearId, student + "")
+  //       }
+  //       return true;
+  //     }
+  //   }
+  // }
   //aca voy
   // este actualiza el promedio de un estudiante
   @Mutation(() => Boolean)
   async createAverageYearValuationStudent(
     @Arg('courseId', () => String) courseId: string,
     @Arg('schoolYearId', () => String) schoolYearId: string,
+    @Arg('schoolId', () => String) schoolId: string,
     @Arg('studentId', () => String) studentId: string
   ) {
+    let schoolConfigurationPromotedIndicate = await this.repositorySchoolConfiguration.findBy({
+      where: { schoolId, code: "PROMOTED_INDICATE", active: true },
+    });
+    let schoolConfigurationCountPromotedIndicate = await this.repositorySchoolConfiguration.findBy({
+      where: { schoolId, code: "COUNT_PROMOTED_INDICATE", active: true },
+    });
+    let promotedIndicate = "AREA";
+    if (schoolConfigurationPromotedIndicate?.length > 0) {
+      promotedIndicate = schoolConfigurationPromotedIndicate[0]?.valueString ? schoolConfigurationPromotedIndicate[0]?.valueString : "AREA";
+    }
+    let countPromotedIndicate = 1;
+    if (schoolConfigurationCountPromotedIndicate?.length > 0) {
+      countPromotedIndicate = schoolConfigurationCountPromotedIndicate[0]?.valueNumber ? schoolConfigurationCountPromotedIndicate[0]?.valueNumber : 0;
+    }
+    let countNoPromotedArea = 0;
+    let countNoPromotedAsignature = 0;
+
+
     //console.log("llamando ", courseId, academicPeriodId, studentId)
     let academicAsignaturesCourses = await this.repositoryAcademicAsignatureCourse.findBy({ where: { courseId: courseId } });
     let areasAux: any[] = []
@@ -2632,6 +2655,7 @@ export class ExperienceLearningResolver {
         }
       }
       hourlyIntensityTotal += hourlyIntensityArea;
+      let averageArea = 0;
       let studentAreaYearValuationList = await this.repositoryAcademicAreaCourseYearValuation.findBy({
         where:
         {
@@ -2640,16 +2664,57 @@ export class ExperienceLearningResolver {
           studentId,
         }
       });
-      let averageArea = 0;
+      let countDefinitive = 0;
+      let countCalculate = 0;
+      let countRecovery = 0;
+      for (let studentAsignatureYearValuation of studentAreaYearValuationList) {
+        switch (studentAsignatureYearValuation?.valuationType) {
+          case ValuationType?.DEFINITIVE:
+            countDefinitive++;
+            break;
+          case ValuationType?.CALCULATE:
+            countCalculate++;
+            break;
+          case ValuationType?.RECOVERY:
+            countRecovery++;
+            break;
+        }
+      }
+      let studentAsignatureYearValuationAux: AcademicAsignatureCoursePeriodValuation | null = null;
+      if (countCalculate > 0) {
+        for (let studentAsignatureYearValuation of studentAreaYearValuationList) {
+          if (studentAsignatureYearValuation?.valuationType == ValuationType?.CALCULATE) {
+            studentAsignatureYearValuationAux = studentAsignatureYearValuation;
+          }
+        }
+      }
+      if (countDefinitive > 0) {
+        for (let studentAsignatureYearValuation of studentAreaYearValuationList) {
+          if (studentAsignatureYearValuation?.valuationType == ValuationType?.DEFINITIVE) {
+            studentAsignatureYearValuationAux = studentAsignatureYearValuation;
+          }
+        }
+      }
+      if (countRecovery > 0) {
+        for (let studentAsignatureYearValuation of studentAreaYearValuationList) {
+          if (studentAsignatureYearValuation?.valuationType == ValuationType?.RECOVERY) {
+            studentAsignatureYearValuationAux = studentAsignatureYearValuation;
+          }
+        }
+      }
+      let performanceLevel = performanceLevels?.edges?.find((i: any) => i.node.id.toString() === studentAsignatureYearValuationAux?.performanceLevelId);
+      if (performanceLevel?.node?.isRecovery) {
+        countNoPromotedArea += 1;
+      }
       switch (performanceLevelType) {
         case PerformanceLevelType.QUALITATIVE:
-          let performanceLevelIndex = performanceLevels?.edges?.findIndex((i: any) => i.node.id.toString() === studentAreaYearValuationList[0]?.performanceLevelId) + 1;
+          let performanceLevelIndex = performanceLevels?.edges?.findIndex((i: any) => i.node.id.toString() === studentAsignatureYearValuationAux?.performanceLevelId) + 1;
           averageArea = performanceLevelIndex;
           average += averageArea * hourlyIntensityArea;
           break;
         case PerformanceLevelType.QUANTITATIVE:
-          averageArea = studentAreaYearValuationList[0]?.assessment
-            ? studentAreaYearValuationList[0]?.assessment
+          averageArea = studentAsignatureYearValuationAux?.assessment
+            ? studentAsignatureYearValuationAux?.assessment
             : 0;
           average += averageArea * hourlyIntensityArea;
           break;
@@ -2690,6 +2755,12 @@ export class ExperienceLearningResolver {
       averageAcademicYearStudent.schoolYearId = schoolYearId;
       averageAcademicYearStudent.courseId = courseId;
       averageAcademicYearStudent.assessment = 0;
+      averageAcademicYearStudent.promoted = true;
+    }
+    if (countNoPromotedArea >= countPromotedIndicate) {
+      averageAcademicYearStudent.promoted = false;
+    } else {
+      averageAcademicYearStudent.promoted = true;
     }
     if (Number.isNaN(average) || average < 0) {
       averageAcademicYearStudent.assessment = 0;

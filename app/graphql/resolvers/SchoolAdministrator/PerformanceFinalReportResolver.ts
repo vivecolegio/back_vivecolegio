@@ -539,7 +539,7 @@ export class PerformanceFinalReportResolver {
             dataPDF = { ...dataPDF, "notesAsignatures": notesAsignatures };
             dataPDF = { ...dataPDF, "notesAreas": notesAreas };
             /// incluir la logica de promocion o no
-            let promoted = true;
+            let promoted = averageAcademicYearStudentList[0]?.promoted;
             if (promoted) {
               dataPDF = { ...dataPDF, "promocion": reportPerformanceFinalPromoted };
             } else {
