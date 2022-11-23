@@ -1752,15 +1752,12 @@ export class ExperienceLearningResolver {
     let configurationAverageArea = "IHS";
     let academicPeriod = await this.repositoryAcademicPeriod.findOneBy(academicPeriodId);
     if (academicPeriod) {
-
       schoolConfigurationAverageArea = await this.repositorySchoolConfiguration.findBy({
         where: { schoolId: academicPeriod?.schoolId?.toString(), code: "AVERAGE_AREA", active: true },
       });
-      console.log("schoolConfigurationAverageArea", schoolConfigurationAverageArea)
       if (schoolConfigurationAverageArea?.length > 0) {
         configurationAverageArea = schoolConfigurationAverageArea[0]?.valueString ? schoolConfigurationAverageArea[0]?.valueString : "IHS";
       }
-
     }
     let academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(
       academicAsignatureCourseId
@@ -1920,13 +1917,9 @@ export class ExperienceLearningResolver {
           }
         }
       }
-      console.log("configurationAverageArea", configurationAverageArea)
-      console.log("average", average)
-      console.log("academicAsignaturesCourses", academicAsignaturesCourses?.length)
       if (configurationAverageArea == "PROM") {
         average = average / academicAsignaturesCourses?.length;
       }
-      console.log("average", average)
       if (Number.isNaN(average) || average < 0) {
         studentAreaPeriodValuation.assessment = 0;
       }
