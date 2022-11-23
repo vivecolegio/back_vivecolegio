@@ -1748,6 +1748,20 @@ export class ExperienceLearningResolver {
     @Arg('academicPeriodId', () => String) academicPeriodId: string,
     @Arg('studentId', () => String) studentId: string
   ) {
+    let schoolConfigurationAverageArea;
+    let configurationAverageArea = "IHS";
+    let student = await this.repositoryStudentBehaviour.findOneBy(studentId);
+    if (student) {
+      let campus = await this.repositoryCampus.findOneBy(student?.campusId?.toString());
+      if (campus) {
+        schoolConfigurationAverageArea = await this.repositorySchoolConfiguration.findBy({
+          where: { schoolId: campus?.schoolId?.toString(), code: "AVERAGE_AREA", active: true },
+        });
+        if (schoolConfigurationAverageArea?.length > 0) {
+          configurationAverageArea = schoolConfigurationAverageArea[0]?.valueString ? schoolConfigurationAverageArea[0]?.valueString : "IHS";
+        }
+      }
+    }
     let academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(
       academicAsignatureCourseId
     );
@@ -1886,17 +1900,28 @@ export class ExperienceLearningResolver {
               let performanceLevelIndex = performanceLevels?.edges?.findIndex((i: any) => i.node.id.toString() === studentAsignaturePeriodValuationAux?.performanceLevelId) + 1;
               averageAsignatureCourse = performanceLevelIndex;
               horlyIntensityAsignature = academicAsignature?.hourlyIntensity ? academicAsignature?.hourlyIntensity : 0;
-              average += averageAsignatureCourse * (horlyIntensityAsignature / hourlyIntensityTotal);
+              if (configurationAverageArea == "IHS") {
+                average += averageAsignatureCourse * (horlyIntensityAsignature / hourlyIntensityTotal);
+              } else {
+                average += averageAsignatureCourse;
+              }
               break;
             case PerformanceLevelType.QUANTITATIVE:
               averageAsignatureCourse = studentAsignaturePeriodValuationAux.assessment
                 ? studentAsignaturePeriodValuationAux.assessment
                 : 0;
               horlyIntensityAsignature = academicAsignature.hourlyIntensity ? academicAsignature.hourlyIntensity : 0;
-              average += averageAsignatureCourse * (horlyIntensityAsignature / hourlyIntensityTotal);
+              if (configurationAverageArea == "IHS") {
+                average += averageAsignatureCourse * (horlyIntensityAsignature / hourlyIntensityTotal);
+              } else {
+                average += averageAsignatureCourse;
+              }
               break;
           }
         }
+      }
+      if (configurationAverageArea == "PROM") {
+        average = average / academicAsignaturesCourses?.length;
       }
       if (Number.isNaN(average) || average < 0) {
         studentAreaPeriodValuation.assessment = 0;
