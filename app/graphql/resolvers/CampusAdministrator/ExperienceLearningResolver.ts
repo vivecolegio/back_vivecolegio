@@ -2285,6 +2285,29 @@ export class ExperienceLearningResolver {
   }
 
   @Mutation(() => Boolean)
+  async updateAllStudentGradeYearValuation(
+    @Arg('academicGradeId', () => String) academicGradeId: string,
+    @Arg('schoolId', () => String) schoolId: string,
+    @Arg('schoolYearId', () => String) schoolYearId: string
+  ) {
+    const academicGrade = await this.repositoryAcademicGrade.findOneBy(academicGradeId);
+    if (academicGrade) {
+      const courses = await this.repositoryCourse.findBy({ where: { academicGradeId: academicGrade?.id?.toString() } });
+      for (let course of courses) {
+        let promisesList: any[] = [];
+        console.log("Generando =", course?.name + " " + course?.academicGradeId)
+        promisesList.push(
+          this.updateAllStudentCourseYearValuation(course?.id?.toString(), schoolId, schoolYearId)
+        );
+        await Promise.all(promisesList).then(() => {
+          return true;
+        });
+      }
+      return true;
+    }
+  }
+
+  @Mutation(() => Boolean)
   async updateAllStudentCourseYearValuation(
     @Arg('courseId', () => String) courseId: string,
     @Arg('schoolId', () => String) schoolId: string,
