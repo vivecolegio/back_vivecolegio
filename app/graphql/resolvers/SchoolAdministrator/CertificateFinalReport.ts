@@ -3,7 +3,7 @@ import report from "puppeteer-report";
 import { Arg, Ctx, Mutation, Resolver } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicAreaCoursePeriodValuationRepository, AcademicAreaCourseYearValuationRepository, AcademicAreaRepository, AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicAsignatureCourseYearValuationRepository, AcademicAsignatureRepository, AcademicDayRepository, AcademicGradeRepository, AcademicPeriodRepository, AverageAcademicYearCourseRepository, AverageAcademicYearStudentRepository, CampusRepository, CourseRepository, PerformanceLevelRepository, SchoolConfigurationRepository, SchoolRepository, SchoolYearRepository, StudentRepository, StudentYearBehaviourRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAreaCoursePeriodValuationRepository, AcademicAreaCourseYearValuationRepository, AcademicAreaRepository, AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicAsignatureCourseYearValuationRepository, AcademicAsignatureRepository, AcademicDayRepository, AcademicGradeRepository, AcademicPeriodRepository, AverageAcademicYearCourseRepository, AverageAcademicYearStudentRepository, CampusRepository, CourseRepository, EducationLevelRepository, PerformanceLevelRepository, SchoolConfigurationRepository, SchoolRepository, SchoolYearRepository, StudentRepository, StudentYearBehaviourRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
 import { PerformanceLevelType } from '../../enums/PerformanceLevelType';
 import { ValuationType } from '../../enums/ValuationType';
 import { IContext } from '../../interfaces/IContext';
@@ -26,6 +26,7 @@ import { AcademicArea } from '../../models/SchoolAdministrator/AcademicArea';
 import { AcademicAsignature } from '../../models/SchoolAdministrator/AcademicAsignature';
 import { AcademicGrade } from '../../models/SchoolAdministrator/AcademicGrade';
 import { AcademicPeriod } from '../../models/SchoolAdministrator/AcademicPeriod';
+import { EducationLevel } from '../../models/SchoolAdministrator/EducationLevel';
 import { PerformanceLevel } from '../../models/SchoolAdministrator/PerformanceLevel';
 import { SchoolConfiguration } from '../../models/SchoolAdministrator/SchoolConfiguration';
 import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
@@ -100,6 +101,9 @@ export class CertificateFinalReportResolver {
   @InjectRepository(StudentYearBehaviour)
   private repositoryStudentYearBehaviour = StudentYearBehaviourRepository;
 
+  @InjectRepository(EducationLevel)
+  private repositoryEducationLevel = EducationLevelRepository;
+
   private performanceLevelResolver = new PerformanceLevelResolver();
 
   @Mutation(() => String)
@@ -173,7 +177,11 @@ export class CertificateFinalReportResolver {
       let schoolConfigurationReportCertificateFinalSecretary = await this.repositorySchoolConfiguration.findBy({
         where: { schoolId, code: "REPORT_CERTIFICATE_FINAL_SIGNATURE_SECREATARY", active: true },
       });
+      let schoolConfigurationReportCertificateFinalTextCertificate = await this.repositorySchoolConfiguration.findBy({
+        where: { schoolId, code: "REPORT_CERTIFICATE_FINAL_TEXT_CERTIFICATE", active: true },
+      });
       let academicGrade = await this.repositoryAcademicGrade.findOneBy(course?.academicGradeId);
+      let educationLevel = await this.repositoryEducationLevel.findOneBy(academicGrade?.educationLevelId);
       let titular = await this.repositoryTeacher.findOneBy(course?.teacherId);
       let titularUser = await this.repositoryUser.findOneBy(titular?.userId);
       let academicDay = await this.repositoryAcademicDay.findOneBy(course?.academicDayId);
@@ -198,6 +206,7 @@ export class CertificateFinalReportResolver {
         data = { ...data, "schoolDaneNit": school?.textDaneNit };
         data = { ...data, "schoolLogo": school?.logo };
         data = { ...data, "studentAcademicGradeName": academicGrade?.name };
+        data = { ...data, "studentEducationlevelName": educationLevel?.name };
         data = { ...data, "studentAcademicCourseName": course?.name };
         data = { ...data, "campusName": campus?.name };
         data = { ...data, "titular": titularUser?.name + " " + titularUser?.lastName };
@@ -315,10 +324,13 @@ export class CertificateFinalReportResolver {
         if (schoolConfigurationReportCertificateFinalSignatureType?.length > 0) {
           reportCertificateFinalSignatureType = schoolConfigurationReportCertificateFinalSignatureType[0]?.valueString ? schoolConfigurationReportCertificateFinalSignatureType[0]?.valueString : "PRINCIPAL_SECRETARY";
         }
-
         let reportCertificateFinalSignatureSecretary = "Secretaria"
         if (schoolConfigurationReportCertificateFinalSecretary?.length > 0) {
           reportCertificateFinalSignatureSecretary = schoolConfigurationReportCertificateFinalSecretary[0]?.valueString ? schoolConfigurationReportCertificateFinalSecretary[0]?.valueString : "PRINCIPAL_SECRETARY";
+        }
+        let reportCertificateFinalTextCertificate = "MODEL_A"
+        if (schoolConfigurationReportCertificateFinalTextCertificate?.length > 0) {
+          reportCertificateFinalTextCertificate = schoolConfigurationReportCertificateFinalTextCertificate[0]?.valueString ? schoolConfigurationReportCertificateFinalTextCertificate[0]?.valueString : "MODEL_A";
         }
         data = { ...data, "reportCertificateFinalTitle": reportCertificateFinalTitle };
         data = { ...data, "reportPerformanceTitleSignatureTeacherCourse": reportPerformanceTitleSignatureTeacherCourse };
@@ -335,6 +347,7 @@ export class CertificateFinalReportResolver {
         data = { ...data, "typeEvidenceLearningsDisplay": typeEvidenceLearningsDisplay };
         data = { ...data, "typeLearningsDisplay": typeLearningsDisplay };
         data = { ...data, "reportPerformanceType": reportPerformanceType };
+        data = { ...data, "reportCertificateFinalTextCertificate": reportCertificateFinalTextCertificate };
         for (let area of areasAux) {
           let asignaturesAreaData: any[] = [];
           for (let asignature of asignaturesAux) {
