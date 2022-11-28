@@ -350,6 +350,7 @@ export class CertificateFinalReportResolver {
         data = { ...data, "reportCertificateFinalTextCertificate": reportCertificateFinalTextCertificate };
         for (let area of areasAux) {
           let asignaturesAreaData: any[] = [];
+          let hourlyIntensityArea = 0;
           for (let asignature of asignaturesAux) {
             if (asignature?.academicAreaId === area?.id?.toString()) {
               let evidencesIdAux: String[] = [];
@@ -362,12 +363,13 @@ export class CertificateFinalReportResolver {
                   hourlyIntensity = asignatureCourse?.hourlyIntensity ? asignatureCourse?.hourlyIntensity : 0;
                 }
               }
+              hourlyIntensityArea += hourlyIntensity;
               let asignaturesData = { "name": asignature?.name, "id": asignature?.id?.toString(), "academicPeriods": academicPeriodsData, "evidenceLearnings": evidenceLearnings, "learnings": learnings, "ihs": hourlyIntensity }
               //console.log(asignaturesData)
               asignaturesAreaData.push(asignaturesData)
             }
           }
-          let areaData = { "name": area?.name, "id": area?.id?.toString(), "asignatures": asignaturesAreaData, "academicPeriods": academicPeriodsData }
+          let areaData = { "name": area?.name, "id": area?.id?.toString(), "asignatures": asignaturesAreaData, "academicPeriods": academicPeriodsData, "ihs": hourlyIntensityArea }
           areas.push(areaData);
         }
         data = { ...data, "areas": areas };
