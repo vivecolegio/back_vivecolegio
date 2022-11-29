@@ -2550,56 +2550,95 @@ export class ExperienceLearningResolver {
                 },
               })
               if (studentYearValuations?.length > 1) {
-                for (let studentYearValuation of studentYearValuations) {
-                  let result = await this.repositoryAcademicAreaCourseYearValuation.deleteOne({ _id: new ObjectId(studentYearValuation?.id?.toString()) });
+                let countDefinitive = 0;
+                let countCalculate = 0;
+                let countRecovery = 0;
+                let valuationType = "CALCULATE";
+                if (studentYearValuations.length > 1) {
+                  for (let studentAreaYearValuation of studentYearValuations) {
+                    switch (studentAreaYearValuation?.valuationType) {
+                      case ValuationType?.DEFINITIVE:
+                        countDefinitive++;
+                        break;
+                      case ValuationType?.CALCULATE:
+                        countCalculate++;
+                        break;
+                      case ValuationType?.RECOVERY:
+                        countRecovery++;
+                        break;
+                    }
+                  }
+                  if (countCalculate > 1) {
+                    for (let studentAreaYearValuation of studentYearValuations) {
+                      if (studentAreaYearValuation?.valuationType == ValuationType?.CALCULATE) {
+                        let result = await this.repositoryAcademicAreaCourseYearValuation.deleteOne({ _id: new ObjectId(studentAreaYearValuation?.id?.toString()) });
+                      }
+                    }
+                    studentYearValuations = [];
+                  }
+                  if (countRecovery > 1) {
+                    for (let studentAreaYearValuation of studentYearValuations) {
+                      if (studentAreaYearValuation?.valuationType == ValuationType?.RECOVERY) {
+                        let result = await this.repositoryAcademicAreaCourseYearValuation.deleteOne({ _id: new ObjectId(studentAreaYearValuation?.id?.toString()) });
+                      }
+                    }
+                    studentYearValuations = [];
+                  }
                 }
               }
-              let studentYearValuation: AcademicAreaCourseYearValuation;
-              if (studentYearValuations.length > 0) {
-                studentYearValuation = studentYearValuations[0];
-              } else {
-                studentYearValuation = new AcademicAreaCourseYearValuation();
-                studentYearValuation.version = 0;
-                studentYearValuation.active = true;
-                studentYearValuation.studentId = studentId;
-                studentYearValuation.schoolYearId = schoolYearId;
-                studentYearValuation.academicAreaId = academicArea?.id?.toString();
-                studentYearValuation.assessment = 0;
-                studentYearValuation.valuationType = ValuationType.CALCULATE;
-              }
-              switch (performanceLevelType) {
-                case PerformanceLevelType.QUALITATIVE:
-                  let averagePerfomanceLevel = Number(assessmentYear.toFixed(0));
-                  studentYearValuation.performanceLevelId = performanceLevelsFinal?.edges[averagePerfomanceLevel - 1]?.node?.id.toString();
-                  break;
-                case PerformanceLevelType.QUANTITATIVE:
-                  let perf = null;
-                  studentYearValuation.assessment = assessmentYear;
-                  perf = performanceLevelsFinal?.edges?.find((c: any) => {
-                    return assessmentYear < c.node.topScore && assessmentYear >= c.node.minimumScore;
-                  });
-                  if (perf === undefined) {
+              //for (let studentAreaYearValuation of studentYearValuations) {
+              if (countDefinitive == 0 && countRecovery == 0) {
+                let studentYearValuation: AcademicAreaCourseYearValuation;
+                if (studentYearValuations.length > 0) {
+                  studentYearValuation = studentYearValuations[0];
+                  if (studentYearValuation.valuationType == null) {
+                    studentYearValuation.valuationType = ValuationType?.CALCULATE;
+                  }
+                } else {
+                  studentYearValuation = new AcademicAreaCourseYearValuation();
+                  studentYearValuation.version = 0;
+                  studentYearValuation.active = true;
+                  studentYearValuation.studentId = studentId;
+                  studentYearValuation.schoolYearId = schoolYearId;
+                  studentYearValuation.academicAreaId = academicArea?.id?.toString();
+                  studentYearValuation.assessment = 0;
+                  studentYearValuation.valuationType = ValuationType.CALCULATE;
+                }
+                switch (performanceLevelType) {
+                  case PerformanceLevelType.QUALITATIVE:
+                    let averagePerfomanceLevel = Number(assessmentYear.toFixed(0));
+                    studentYearValuation.performanceLevelId = performanceLevelsFinal?.edges[averagePerfomanceLevel - 1]?.node?.id.toString();
+                    break;
+                  case PerformanceLevelType.QUANTITATIVE:
+                    let perf = null;
+                    studentYearValuation.assessment = assessmentYear;
                     perf = performanceLevelsFinal?.edges?.find((c: any) => {
-                      return assessmentYear <= c.node.topScore && assessmentYear > c.node.minimumScore;
+                      return assessmentYear < c.node.topScore && assessmentYear >= c.node.minimumScore;
                     });
-                  }
-                  if (perf && perf?.node?.id) {
-                    studentYearValuation.performanceLevelId = perf.node.id.toString();
-                  }
-                  break;
-              }
-              if (studentYearValuation.id) {
-                studentYearValuation =
-                  await this.repositoryAcademicAreaCourseYearValuation.save({
-                    _id: new ObjectId(studentYearValuation.id.toString()),
-                    ...studentYearValuation,
-                    version: (studentYearValuation?.version as number) + 1,
-                  });
-              } else {
-                studentYearValuation =
-                  await this.repositoryAcademicAreaCourseYearValuation.save({
-                    ...studentYearValuation,
-                  });
+                    if (perf === undefined) {
+                      perf = performanceLevelsFinal?.edges?.find((c: any) => {
+                        return assessmentYear <= c.node.topScore && assessmentYear > c.node.minimumScore;
+                      });
+                    }
+                    if (perf && perf?.node?.id) {
+                      studentYearValuation.performanceLevelId = perf.node.id.toString();
+                    }
+                    break;
+                }
+                if (studentYearValuation.id) {
+                  studentYearValuation =
+                    await this.repositoryAcademicAreaCourseYearValuation.save({
+                      _id: new ObjectId(studentYearValuation.id.toString()),
+                      ...studentYearValuation,
+                      version: (studentYearValuation?.version as number) + 1,
+                    });
+                } else {
+                  studentYearValuation =
+                    await this.repositoryAcademicAreaCourseYearValuation.save({
+                      ...studentYearValuation,
+                    });
+                }
+                //}
               }
             }
           }

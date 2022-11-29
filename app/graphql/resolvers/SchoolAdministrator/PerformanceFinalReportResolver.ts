@@ -499,9 +499,37 @@ export class PerformanceFinalReportResolver {
                   academicPeriodId: period?.id?.toString(),
                   studentId
                 });
-                if (notesArea?.length == 1) {
-                  let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(notesArea[0]?.performanceLevelId);
-                  notesAreas.push({ assessment: notesArea[0]?.assessment?.toFixed(countDigitsPerformanceLevel), academicPeriodId: notesArea[0]?.academicPeriodId, performanceLevel: performanceLevel?.name, "areaId": area?.id?.toString() })
+                if (notesArea?.length > 0) {
+                  let valuationAreaCalculate;
+                  let valuationAreaDefinitive;
+                  let valuationAreaRecovery;
+                  for (let notesA of notesArea) {
+                    switch (notesA?.valuationType) {
+                      case ValuationType.CALCULATE:
+                        valuationAreaCalculate = notesA;
+                        break;
+                      case ValuationType.DEFINITIVE:
+                        valuationAreaDefinitive = notesA;
+                        break;
+                      case ValuationType.RECOVERY:
+                        valuationAreaRecovery = notesA;
+                        break;
+                    }
+                  }
+                  if (valuationAreaRecovery) {
+                    let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(valuationAreaRecovery?.performanceLevelId);
+                    notesAreas.push({ assessment: valuationAreaRecovery?.assessment?.toFixed(countDigitsPerformanceLevel), academicPeriodId: valuationAreaRecovery?.academicPeriodId, performanceLevel: performanceLevel?.name, "areaId": area?.id?.toString() })
+                  } else {
+                    if (valuationAreaDefinitive) {
+                      let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(valuationAreaDefinitive?.performanceLevelId);
+                      notesAreas.push({ assessment: valuationAreaDefinitive?.assessment?.toFixed(countDigitsPerformanceLevel), academicPeriodId: valuationAreaDefinitive?.academicPeriodId, performanceLevel: performanceLevel?.name, "areaId": area?.id?.toString() })
+                    } else {
+                      if (valuationAreaCalculate) {
+                        let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(valuationAreaCalculate?.performanceLevelId);
+                        notesAreas.push({ assessment: valuationAreaCalculate?.assessment?.toFixed(countDigitsPerformanceLevel), academicPeriodId: valuationAreaCalculate?.academicPeriodId, performanceLevel: performanceLevel?.name, "areaId": area?.id?.toString() })
+                      }
+                    }
+                  }
                 } else {
                   notesAreas.push({ assessment: "-", academicPeriodId: period?.id?.toString(), performanceLevel: "-", "areaId": area?.id?.toString() })
                 }
@@ -512,9 +540,37 @@ export class PerformanceFinalReportResolver {
                 schoolYearId: academicPeriods[0]?.schoolYearId?.toString(),
                 studentId
               });
-              if (notesArea?.length == 1) {
-                let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(notesArea[0]?.performanceLevelId);
-                notesAreas.push({ assessment: notesArea[0]?.assessment?.toFixed(countDigitsPerformanceLevel), academicPeriodId: "FINAL", performanceLevel: performanceLevel?.name, "areaId": area?.id?.toString() })
+              if (notesArea?.length > 0) {
+                let valuationAreaCalculate;
+                let valuationAreaDefinitive;
+                let valuationAreaRecovery;
+                for (let notesA of notesArea) {
+                  switch (notesA?.valuationType) {
+                    case ValuationType.CALCULATE:
+                      valuationAreaCalculate = notesA;
+                      break;
+                    case ValuationType.DEFINITIVE:
+                      valuationAreaDefinitive = notesA;
+                      break;
+                    case ValuationType.RECOVERY:
+                      valuationAreaRecovery = notesA;
+                      break;
+                  }
+                }
+                if (valuationAreaRecovery) {
+                  let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(valuationAreaRecovery?.performanceLevelId);
+                  notesAreas.push({ assessment: valuationAreaRecovery?.assessment?.toFixed(countDigitsPerformanceLevel), academicPeriodId: "FINAL", performanceLevel: performanceLevel?.name, "areaId": area?.id?.toString() })
+                } else {
+                  if (valuationAreaDefinitive) {
+                    let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(valuationAreaDefinitive?.performanceLevelId);
+                    notesAreas.push({ assessment: valuationAreaDefinitive?.assessment?.toFixed(countDigitsPerformanceLevel), academicPeriodId: "FINAL", performanceLevel: performanceLevel?.name, "areaId": area?.id?.toString() })
+                  } else {
+                    if (valuationAreaCalculate) {
+                      let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(valuationAreaCalculate?.performanceLevelId);
+                      notesAreas.push({ assessment: valuationAreaCalculate?.assessment?.toFixed(countDigitsPerformanceLevel), academicPeriodId: "FINAL", performanceLevel: performanceLevel?.name, "areaId": area?.id?.toString() })
+                    }
+                  }
+                }
               } else {
                 notesAreas.push({ assessment: "-", academicPeriodId: "FINAL", performanceLevel: "-", "areaId": area?.id?.toString() })
               }
