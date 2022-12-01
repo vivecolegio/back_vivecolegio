@@ -439,7 +439,7 @@
       <div class="container-firma-nombre">
         {{#iff reportCertificateFinalSignatureType '==' 'PRINCIPAL'}}
         <div class="container-firma">
-          <img src="http://vivecolegios.nortedesantander.gov.co:4000/{{imgPrincipalSignature}}" alt="" width="200"
+          <img src="http://vivecolegios.nortedesantander.gov.co:4000/{{../imgPrincipalSignature}}" alt="" width="200"
             height="100" />
           <div class="firma"></div>
           <p>{{../schoolPrincipalSignature}}</p>
@@ -448,7 +448,7 @@
         {{/iff }}
         {{#iff reportCertificateFinalSignatureType '==' 'TEACHER_COURSE'}}
         <div class="container-firma">
-          <img src="" alt="" width="200" height="100" />
+          <div width="200" height="100"></div>
           <div class="firma"></div>
           <p>{{../titular}}</p>
           <p>{{../reportPerformanceTitleSignatureTeacherCourse}}</p>
@@ -456,13 +456,13 @@
         {{/iff }}
         {{#iff reportCertificateFinalSignatureType '==' 'TEACHER_COURSE_AND_PRINCIPAL'}}
         <div class="container-firma">
-          <img src="" alt="" width="200" height="100" />
+          <div width="200" height="100"></div>
           <div class="firma"></div>
           <p>{{../titular}}</p>
           <p>{{../reportPerformanceTitleSignatureTeacherCourse}}</p>
         </div>
         <div class="container-firma">
-          <img src="http://vivecolegios.nortedesantander.gov.co:4000/{{imgPrincipalSignature}}" alt="" width="200"
+          <img src="http://vivecolegios.nortedesantander.gov.co:4000/{{../imgPrincipalSignature}}" alt="" width="200"
             height="100" />
           <div class="firma"></div>
           <p>{{../schoolPrincipalSignature}}</p>
@@ -471,14 +471,14 @@
         {{/iff }}
         {{#iff reportCertificateFinalSignatureType '==' 'PRINCIPAL_SECRETARY'}}
         <div class="container-firma">
-          <img src="http://vivecolegios.nortedesantander.gov.co:4000/{{imgPrincipalSignature}}" alt="" width="200"
+          <img src="http://vivecolegios.nortedesantander.gov.co:4000/{{../imgPrincipalSignature}}" alt="" width="200"
             height="100" />
           <div class="firma"></div>
           <p>{{../schoolPrincipalSignature}}</p>
           <p>{{../reportPerformanceTitleSignaturePrincipal}}</p>
         </div>
         <div class="container-firma">
-          <img src="" alt="" width="200" height="100" />
+          <div width="200" height="100"></div>
           <div class="firma"></div>
           <p>{{../schoolSecretarySignature}}</p>
           <p>{{../reportCertificateFinalSignatureSecretary}}</p>
