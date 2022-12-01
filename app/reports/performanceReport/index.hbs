@@ -437,7 +437,7 @@
         {{/iff }}
       </div>
       <div class="container-firma-nombre">
-        {{#iff reportCertificateFinalSignatureType '==' 'PRINCIPAL'}}
+        {{#iff reportPerformanceSignatureType '==' 'PRINCIPAL'}}
         <div class="container-firma">
           <img src="http://vivecolegios.nortedesantander.gov.co:4000/{{../imgPrincipalSignature}}" alt="" width="200"
             height="100" style="padding-bottom: 5px" />
@@ -446,7 +446,7 @@
           <p>{{../reportPerformanceTitleSignaturePrincipal}}</p>
         </div>
         {{/iff }}
-        {{#iff reportCertificateFinalSignatureType '==' 'TEACHER_COURSE'}}
+        {{#iff reportPerformanceSignatureType '==' 'TEACHER_COURSE'}}
         <div class="container-firma">
           <div style="width:200px; height:100px;padding-bottom: 5px"></div>
           <div class="firma"></div>
@@ -454,7 +454,7 @@
           <p>{{../reportPerformanceTitleSignatureTeacherCourse}}</p>
         </div>
         {{/iff }}
-        {{#iff reportCertificateFinalSignatureType '==' 'TEACHER_COURSE_AND_PRINCIPAL'}}
+        {{#iff reportPerformanceSignatureType '==' 'TEACHER_COURSE_AND_PRINCIPAL'}}
         <div class="container-firma">
           <div style="width:200px; height:100px;padding-bottom: 5px"></div>
           <div class="firma"></div>
@@ -469,7 +469,7 @@
           <p>{{../reportPerformanceTitleSignaturePrincipal}}</p>
         </div>
         {{/iff }}
-        {{#iff reportCertificateFinalSignatureType '==' 'PRINCIPAL_SECRETARY'}}
+        {{#iff reportPerformanceSignatureType '==' 'PRINCIPAL_SECRETARY'}}
         <div class="container-firma">
           <img src="http://vivecolegios.nortedesantander.gov.co:4000/{{../imgPrincipalSignature}}" alt="" width="200"
             height="100" style="padding-bottom: 5px" />
