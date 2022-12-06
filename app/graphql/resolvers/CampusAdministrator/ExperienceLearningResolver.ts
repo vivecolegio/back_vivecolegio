@@ -2549,10 +2549,10 @@ export class ExperienceLearningResolver {
                   studentId,
                 },
               })
+              countDefinitive = 0;
+              countCalculate = 0;
+              countRecovery = 0;
               if (studentYearValuations?.length > 1) {
-                let countDefinitive = 0;
-                let countCalculate = 0;
-                let countRecovery = 0;
                 let valuationType = "CALCULATE";
                 if (studentYearValuations.length > 1) {
                   for (let studentAreaYearValuation of studentYearValuations) {
