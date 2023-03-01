@@ -2,12 +2,14 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { SchoolRepository, UserRepository } from '../../../servers/DataSource';
+
+import { SchoolRepository, SchoolYearRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewSchool } from '../../inputs/GeneralAdministrator/NewSchool';
 import { IContext } from '../../interfaces/IContext';
 import { School, SchoolConnection } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
+import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
 @Resolver(School)
@@ -17,6 +19,9 @@ export class SchoolResolver {
 
   @InjectRepository(User)
   private repositoryUser = UserRepository;
+
+  @InjectRepository(SchoolYear)
+  private repositorySchoolYear = SchoolYearRepository;
 
   @Query(() => School, { nullable: true })
   async getSchool(@Arg('id', () => String) id: string) {
@@ -144,6 +149,16 @@ export class SchoolResolver {
     let id = data.updatedByUserId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryUser.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => [SchoolYear], { nullable: true })
+  async schoolYear(@Root() data: School) {
+    let id = data.id.toString();
+    if (id !== null && id !== undefined) {
+      const result = await this.repositorySchoolYear.findBy({ where: { schoolId: id, active: true } });
       return result;
     }
     return null;

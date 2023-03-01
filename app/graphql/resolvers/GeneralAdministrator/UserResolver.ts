@@ -7,24 +7,8 @@ import ShortUniqueId from 'short-unique-id';
 import { finished } from 'stream/promises';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import {
-  AuditLoginRepository,
-  CampusAdministratorRepository,
-  CampusCoordinatorRepository,
-  CampusRepository,
-  DocumentTypeRepository,
-  GenderRepository,
-  GuardianRepository,
-  MenuItemRepository,
-  MenuRepository,
-  RoleRepository,
-  SchoolAdministratorRepository,
-  SchoolRepository,
-  SchoolYearRepository,
-  StudentRepository,
-  TeacherRepository,
-  UserRepository,
-} from '../../../servers/DataSource';
+
+import { AuditLoginRepository, CampusAdministratorRepository, CampusCoordinatorRepository, CampusRepository, DocumentTypeRepository, GenderRepository, GuardianRepository, MenuItemRepository, MenuRepository, RoleRepository, SchoolAdministratorRepository, SchoolRepository, SchoolYearRepository, StudentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
 import { IContext } from '../../interfaces/IContext';
@@ -420,20 +404,20 @@ export class UserResolver {
             school = await this.repositorySchool.findBy({
               where: { _id: { $in: schoolIds } },
             });
-            if (school && school.length === 1) {
-              const currentDate = new Date();
-              const currentYear = await this.repositorySchoolYear.findBy({
-                where: {
-                  schoolId: school[0].id.toString(),
-                  active: true,
-                  startDate: { $lte: currentDate },
-                  endDate: { $gte: currentDate },
-                },
-              });
-              if (currentYear.length > 0) {
-                jwtUtil.schoolYear = currentYear[0];
-              }
-            }
+            // if (school && school.length === 1) {
+            //   const currentDate = new Date();
+            //   const currentYear = await this.repositorySchoolYear.findBy({
+            //     where: {
+            //       schoolId: school[0].id.toString(),
+            //       active: true,
+            //       startDate: { $lte: currentDate },
+            //       endDate: { $gte: currentDate },
+            //     },
+            //   });
+            //   if (currentYear.length > 0) {
+            //     jwtUtil.schoolYear = currentYear[0];
+            //   }
+            // }
           }
           if (campus && campus !== undefined) {
             jwtUtil.campus = campus;
@@ -629,10 +613,10 @@ export class UserResolver {
       const uid = new ShortUniqueId({ length: 14 });
       const out = fs.createWriteStream(
         dir +
-          '/' +
-          uid() +
-          '.' +
-          file?.filename.slice(((file?.filename.lastIndexOf('.') - 1) >>> 0) + 2)
+        '/' +
+        uid() +
+        '.' +
+        file?.filename.slice(((file?.filename.lastIndexOf('.') - 1) >>> 0) + 2)
       );
       stream.pipe(out);
       await finished(out);
