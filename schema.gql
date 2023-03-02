@@ -51,6 +51,8 @@ type AcademicAreaCoursePeriodValuation implements IModelCampusData {
   id: ID!
   performanceLevel: PerformanceLevel
   performanceLevelId: String
+  school: School
+  schoolId: String
   student: Student
   studentId: String
   updatedAt: DateTime
@@ -89,6 +91,8 @@ type AcademicAreaCourseYearValuation implements IModelCampusData {
   id: ID!
   performanceLevel: PerformanceLevel
   performanceLevelId: String
+  school: School
+  schoolId: String
   schoolYear: SchoolYear
   schoolYearId: String
   student: Student
@@ -171,6 +175,8 @@ type AcademicAsignatureCourse implements IModelCampusData {
   gradeAssignmentId: String
   hourlyIntensity: Float
   id: ID!
+  school: School
+  schoolId: String
   teacher: Teacher
   teacherId: String
   updatedAt: DateTime
@@ -212,6 +218,8 @@ type AcademicAsignatureCoursePeriodEvidenceLearningValuation implements IModelCa
   id: ID!
   performanceLevel: PerformanceLevel
   performanceLevelId: String
+  school: School
+  schoolId: String
   student: Student
   studentId: String
   updatedAt: DateTime
@@ -250,6 +258,8 @@ type AcademicAsignatureCoursePeriodValuation implements IModelCampusData {
   id: ID!
   performanceLevel: PerformanceLevel
   performanceLevelId: String
+  school: School
+  schoolId: String
   student: Student
   studentId: String
   updatedAt: DateTime
@@ -288,6 +298,8 @@ type AcademicAsignatureCourseYearValuation implements IModelCampusData {
   id: ID!
   performanceLevel: PerformanceLevel
   performanceLevelId: String
+  school: School
+  schoolId: String
   schoolYear: SchoolYear
   schoolYearId: String
   student: Student
@@ -331,6 +343,8 @@ type AcademicDay implements IModelCampusData {
   id: ID!
   name: String
   nameSIMAT: String
+  school: School
+  schoolId: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -403,6 +417,8 @@ type AcademicHour implements IModelCampusData {
   endTime: String
   id: ID!
   order: Float
+  school: School
+  schoolId: String
   startTime: String
   updatedAt: DateTime
   updatedByUser: User
@@ -476,6 +492,8 @@ type AcademicSchedule implements IModelCampusData {
   endAcademicHour: AcademicHour
   endAcademicHourId: String
   id: ID!
+  school: School
+  schoolId: String
   startAcademicHour: AcademicHour
   startAcademicHourId: String
   teacher: Teacher
@@ -589,6 +607,8 @@ type AverageAcademicPeriodStudent implements IModelCampusData {
   id: ID!
   performanceLevel: PerformanceLevel
   performanceLevelId: String
+  school: School
+  schoolId: String
   score: Float
   student: Student
   studentId: String
@@ -626,6 +646,8 @@ type AverageAcademicYearCourse implements IModelCampusData {
   id: ID!
   performanceLevel: PerformanceLevel
   performanceLevelId: String
+  school: School
+  schoolId: String
   schoolYear: SchoolYear
   schoolYearId: String
   updatedAt: DateTime
@@ -662,6 +684,9 @@ type AverageAcademicYearStudent implements IModelCampusData {
   id: ID!
   performanceLevel: PerformanceLevel
   performanceLevelId: String
+  promoted: Boolean
+  school: School
+  schoolId: String
   schoolYear: SchoolYear
   schoolYearId: String
   score: Float
@@ -812,6 +837,8 @@ type ClassroomPlan implements IModelCampusData {
   id: ID!
   learnigs: [Learning!]
   learningsId: [String!]
+  school: School
+  schoolId: String
   startDate: DateTime
   updatedAt: DateTime
   updatedByUser: User
@@ -873,6 +900,8 @@ type Course implements IModelCampusData {
   jornadaSIMAT: String
   name: String
   order: String
+  school: School
+  schoolId: String
   students: [Student!]
   studentsId: [String!]
   teacher: Teacher
@@ -1113,6 +1142,8 @@ type ExperienceLearning implements IModelCampusData {
   navigationMethod: NavigationMethodTestOnline
   onlineDelivery: Boolean
   openTestDate: DateTime
+  school: School
+  schoolId: String
   shuffleQuestions: Boolean
   title: String
   updatedAt: DateTime
@@ -1140,6 +1171,8 @@ type ExperienceLearningAverageValuation implements IModelCampusData {
   id: ID!
   performanceLevel: PerformanceLevel
   performanceLevelId: String
+  school: School
+  schoolId: String
   student: Student
   studentId: String
   updatedAt: DateTime
@@ -1179,6 +1212,8 @@ type ExperienceLearningCoEvaluation implements IModelCampusData {
   observations: String
   performanceLevel: PerformanceLevel
   performanceLevelId: String
+  school: School
+  schoolId: String
   student: Student
   studentId: String
   updatedAt: DateTime
@@ -1215,6 +1250,8 @@ type ExperienceLearningCoEvaluationValuation implements IModelCampusData {
   id: ID!
   performanceLevel: PerformanceLevel
   performanceLevelId: String
+  school: School
+  schoolId: String
   student: Student
   studentId: String
   updatedAt: DateTime
@@ -1273,6 +1310,8 @@ type ExperienceLearningRubricCriteria implements IModelCampusData {
   experienceLearningId: String
   experienceLearningRubricCriteriaPerformanceLevel: [ExperienceLearningRubricCriteriaPerformanceLevel!]
   id: ID!
+  school: School
+  schoolId: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -1315,6 +1354,8 @@ type ExperienceLearningRubricCriteriaValuation implements IModelCampusData {
   id: ID!
   performanceLevel: PerformanceLevel
   performanceLevelId: String
+  school: School
+  schoolId: String
   student: Student
   studentId: String
   updatedAt: DateTime
@@ -1352,6 +1393,8 @@ type ExperienceLearningRubricValuation implements IModelCampusData {
   observations: String
   performanceLevel: PerformanceLevel
   performanceLevelId: String
+  school: School
+  schoolId: String
   student: Student
   studentId: String
   updatedAt: DateTime
@@ -1389,6 +1432,8 @@ type ExperienceLearningSelfAssessmentValuation implements IModelCampusData {
   observations: String
   performanceLevel: PerformanceLevel
   performanceLevelId: String
+  school: School
+  schoolId: String
   student: Student
   studentId: String
   updatedAt: DateTime
@@ -1425,6 +1470,8 @@ type ExperienceLearningTraditionalValuation implements IModelCampusData {
   id: ID!
   performanceLevel: PerformanceLevel
   performanceLevelId: String
+  school: School
+  schoolId: String
   student: Student
   studentId: String
   updatedAt: DateTime
@@ -1466,6 +1513,8 @@ type ExperienceLearningValuation implements IModelCampusData {
   id: ID!
   performanceLevel: PerformanceLevel
   performanceLevelId: String
+  school: School
+  schoolId: String
   student: Student
   studentId: String
   updatedAt: DateTime
@@ -1872,6 +1921,8 @@ interface IModelCampusData {
   createdAt: DateTime
   createdByUserId: String
   id: ID!
+  school: School
+  schoolId: String
   updatedAt: DateTime
   updatedByUserId: String
   version: Float
@@ -2275,8 +2326,11 @@ type Mutation {
   createAverageAcademicPeriodStudent(data: NewAverageAcademicPeriodStudent!): AverageAcademicPeriodStudent!
   createAverageAcademicYearCourse(data: NewAverageAcademicYearCourse!): AverageAcademicYearCourse!
   createAverageAcademicYearStudent(data: NewAverageAcademicYearStudent!): AverageAcademicYearStudent!
+  createAverageBehaviourYearValuationCourse(courseId: String!, schoolYearId: String!): Boolean!
   createAveragePeriodValuationCourse(academicPeriodId: String!, courseId: String!): Boolean!
   createAveragePeriodValuationStudent(academicPeriodId: String!, courseId: String!, studentId: String!): Boolean!
+  createAverageYearValuationCourse(courseId: String!, schoolYearId: String!): Boolean!
+  createAverageYearValuationStudent(courseId: String!, schoolId: String!, schoolYearId: String!, studentId: String!): Boolean!
   createCampus(data: NewCampus!): Campus!
   createCampusAdministrator(data: NewCampusAdministrator!): CampusAdministrator!
   createCampusCoordinator(data: NewCampusCoordinator!): CampusCoordinator!
@@ -2450,6 +2504,7 @@ type Mutation {
   updateAllStudentCoursePeriodValuation(academicPeriodId: String!, courseId: String!, experienceLearningType: ExperienceLearningType!): Boolean!
   updateAllStudentCourseYearValuation(courseId: String!, schoolId: String!, schoolYearId: String!): Boolean!
   updateAllStudentGradePeriodValuation(academicGradeId: String!, academicPeriodId: String!, experienceLearningType: ExperienceLearningType!): Boolean!
+  updateAllStudentGradeYearValuation(academicGradeId: String!, schoolId: String!, schoolYearId: String!): Boolean!
   updateAllStudentSchoolPeriodValuation(academicPeriodId: String!, experienceLearningType: ExperienceLearningType!, schoolId: String!): Boolean!
   updateAssessmentExperienceLearningRubricValuation(id: String!): ExperienceLearningRubricValuation!
   updateAuditLogin(data: NewAuditLogin!, id: String!): AuditLogin!
@@ -2686,6 +2741,7 @@ input NewAverageAcademicYearStudent {
   assessment: Float
   courseId: String
   performanceLevelId: String
+  promoted: Boolean
   schoolYearId: String
   score: Float
   studentId: String
@@ -3108,6 +3164,7 @@ input NewSchool {
   textDaneNit: String
   textPrincipalSignature: String
   textResolution: String
+  textSecretarySignature: String
 }
 
 input NewSchoolAdministrative {
@@ -4719,21 +4776,6 @@ type Query {
     orderCreated: Boolean!
     schoolId: String!
   ): SchoolYearConnection!
-  getAllSearchGuardian(
-    """Paginate after opaque cursor"""
-    after: String
-
-    """Paginate before opaque cursor"""
-    before: String
-    documentNumber: String!
-    documentTypeId: String!
-
-    """Paginate first"""
-    first: Float
-
-    """Paginate last"""
-    last: Float
-  ): GuardianConnection!
   getAllSpecialty(
     """Paginate after opaque cursor"""
     after: String
@@ -4857,8 +4899,6 @@ type Query {
     studentId: String!
   ): StudentObserverAnnotationConnection!
   getAllStudentYearBehaviour(
-    academicPeriodId: String!
-
     """Paginate after opaque cursor"""
     after: String
     allData: Boolean!
@@ -4873,6 +4913,7 @@ type Query {
     """Paginate last"""
     last: Float
     orderCreated: Boolean!
+    schoolYearId: String!
     studentId: String
   ): StudentYearBehaviourConnection!
   getAllTeacher(
@@ -4988,6 +5029,8 @@ type QuestionBankTestOnline implements IModelCampusData {
   createdByUser: User
   createdByUserId: String
   id: ID!
+  school: School
+  schoolId: String
   teacher: Teacher
   teacherId: String
   updatedAt: DateTime
@@ -5023,6 +5066,8 @@ type QuestionCategoryTestOnline implements IModelCampusData {
   name: String
   questionBankTestOnline: QuestionBankTestOnline
   questionBankTestOnlineId: String
+  school: School
+  schoolId: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -5056,6 +5101,8 @@ type QuestionTestOnline implements IModelCampusData {
   questionCategoryTestOnline: QuestionCategoryTestOnline
   questionCategoryTestOnlineId: String
   questionType: QuestionTypeTestOnline
+  school: School
+  schoolId: String
   statement: String
   updatedAt: DateTime
   updatedByUser: User
@@ -5135,10 +5182,12 @@ type School implements IModelData {
   logo: String
   name: String
   pedagogicalModel: String
+  schoolYear: [SchoolYear!]
   textAddress: String
   textDaneNit: String
   textPrincipalSignature: String
   textResolution: String
+  textSecretarySignature: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -5361,6 +5410,8 @@ type StudentAttendance implements IModelCampusData {
   createdByUserId: String
   day: DateTime
   id: ID!
+  school: School
+  schoolId: String
   student: Student
   studentId: String
   updatedAt: DateTime
@@ -5400,6 +5451,8 @@ type StudentBehaviour implements IModelCampusData {
   observation: String
   performanceLevel: PerformanceLevel
   performanceLevelId: String
+  school: School
+  schoolId: String
   student: Student
   studentId: String
   updatedAt: DateTime
@@ -5453,6 +5506,8 @@ type StudentObserverAnnotation implements IModelCampusData {
   observation: String
   observerAnnotationType: ObserverAnnotationType
   observerAnnotationTypeId: String
+  school: School
+  schoolId: String
   student: Student
   studentId: String
   updatedAt: DateTime
@@ -5490,6 +5545,8 @@ type StudentYearBehaviour implements IModelCampusData {
   observation: String
   performanceLevel: PerformanceLevel
   performanceLevelId: String
+  school: School
+  schoolId: String
   schoolYear: SchoolYear
   schoolYearId: String
   student: Student
@@ -5574,6 +5631,8 @@ type User {
   profilePhoto: String
   role: Role
   roleId: String
+  school: School
+  schoolId: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String

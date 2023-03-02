@@ -34,8 +34,11 @@ import { StudentBehaviour } from '../graphql/models/CampusAdministrator/StudentB
 import { StudentObserverAnnotation } from '../graphql/models/CampusAdministrator/StudentObserverAnnotation';
 import { StudentYearBehaviour } from '../graphql/models/CampusAdministrator/StudentYearBehaviour';
 import { Teacher } from '../graphql/models/CampusAdministrator/Teacher';
+import { Cursos20230125 } from '../graphql/models/Data/Cursos20230125';
 import { Estudiantes } from '../graphql/models/Data/Estudiantes';
 import { Estudiantes2 } from '../graphql/models/Data/Estudiantes2';
+import { Estudiantes20230125 } from '../graphql/models/Data/Estudiantes20230125';
+import { Jornadas20230125 } from '../graphql/models/Data/Jornadas20230125';
 import { PlantaDocente } from '../graphql/models/Data/PlantaDocente';
 import { AuditLogin } from '../graphql/models/GeneralAdministrator/AuditLogin';
 import { Campus } from '../graphql/models/GeneralAdministrator/Campus';
@@ -154,8 +157,11 @@ export const dataSource = new DataSource({
     PlantaDocente,
     Estudiantes,
     Estudiantes2,
+    Estudiantes20230125,
     Jornadas,
+    Jornadas20230125,
     Cursos,
+    Cursos20230125,
     SchoolAdministrative,
     StudentAttendance,
     AcademicAreaCoursePeriodValuation,
@@ -272,9 +278,9 @@ export const QuestionCategoryTestOnlineRepository = dataSource.getMongoRepositor
 );
 export const ClassroomPlanRepository = dataSource.getMongoRepository(ClassroomPlan);
 export const PlantaDocenteRepository = dataSource.getMongoRepository(PlantaDocente);
-export const EstudiantesRepository = dataSource.getMongoRepository(Estudiantes2);
-export const JornadasRepository = dataSource.getMongoRepository(Jornadas);
-export const CursosRepository = dataSource.getMongoRepository(Cursos);
+export const EstudiantesRepository = dataSource.getMongoRepository(Estudiantes20230125);
+export const JornadasRepository = dataSource.getMongoRepository(Jornadas20230125);
+export const CursosRepository = dataSource.getMongoRepository(Cursos20230125);
 export const SchoolAdministrativeRepository = dataSource.getMongoRepository(SchoolAdministrative);
 export const StudentAttendanceRepository = dataSource.getMongoRepository(StudentAttendance);
 export const AcademicAreaCoursePeriodValuationRepository = dataSource.getMongoRepository(AcademicAreaCoursePeriodValuation);

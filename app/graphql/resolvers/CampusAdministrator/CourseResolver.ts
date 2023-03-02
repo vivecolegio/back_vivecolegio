@@ -191,7 +191,7 @@ export class CourseResolver {
 
   @Mutation(() => Boolean)
   public async updateGradeAcademicDayAllInitialsCourse() {
-    let schools = await this.repositorySchool.find();
+    let schools = await this.repositorySchool.findBy({ where: { daneCode: "254172000128" } });
     let count = 0;
     for (let school of schools) {
       let campus = await this.repositoryCampus.findBy({
@@ -227,7 +227,7 @@ export class CourseResolver {
 
   @Mutation(() => Boolean)
   public async updateGradeAllInitialsCourse() {
-    let schools = await this.repositorySchool.find();
+    let schools = await this.repositorySchool.findBy({ where: { daneCode: "254172000128" } });
     let count = 0;
     for (let school of schools) {
       let campus = await this.repositoryCampus.findBy({
@@ -302,7 +302,7 @@ export class CourseResolver {
 
   @Mutation(() => Boolean)
   public async createAllInitialsCourse() {
-    let schools = await this.repositorySchool.find();
+    let schools = await this.repositorySchool.findBy({ where: { daneCode: "254172000128" } });
     let count = 0;
     for (let school of schools) {
       let data = await this.repositoryCursos.findBy({
@@ -341,6 +341,7 @@ export class CourseResolver {
                   gradoCodSIMAT: curso.grado_cod,
                   jornadaSIMAT: curso.jornada,
                   campusId: campus[0].id.toString(),
+                  schoolId: school.id.toString(),
                   active: true,
                   version: 0,
                 });
@@ -352,6 +353,7 @@ export class CourseResolver {
                 let result = await this.repository.save({
                   _id: new ObjectId(course[0].id.toString()),
                   ...course[0],
+                  schoolId: school.id.toString(),
                   active: true,
                   version: (course[0]?.version as number) + 1,
                 });

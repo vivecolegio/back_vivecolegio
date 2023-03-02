@@ -1,6 +1,8 @@
 import { Field, ID, InterfaceType } from 'type-graphql';
 import { Column, CreateDateColumn, Index, ObjectIdColumn, UpdateDateColumn } from 'typeorm';
+
 import { Campus } from '../models/GeneralAdministrator/Campus';
+import { School } from '../models/GeneralAdministrator/School';
 
 @InterfaceType()
 export abstract class IModelCampusData {
@@ -15,6 +17,14 @@ export abstract class IModelCampusData {
 
   @Field(() => Campus, { nullable: true })
   campus?: Campus;
+
+  @Index("index_schoolId")
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  schoolId?: string;
+
+  @Field(() => School, { nullable: true })
+  school?: School;
 
   @Field({ nullable: true })
   @Column({ nullable: true })

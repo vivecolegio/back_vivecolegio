@@ -3,13 +3,8 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { ObjectLiteral } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import {
-  AcademicDayRepository,
-  CampusRepository,
-  JornadasRepository,
-  SchoolRepository,
-  UserRepository,
-} from '../../../servers/DataSource';
+
+import { AcademicDayRepository, CampusRepository, JornadasRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { Day } from '../../enums/Day';
 import { NewAcademicDay } from '../../inputs/CampusAdministrator/NewAcademicDay';
@@ -123,7 +118,7 @@ export class AcademicDayResolver {
 
   @Mutation(() => Boolean)
   public async createAllInitialsAcademicDay() {
-    let schools = await this.repositorySchool.find();
+    let schools = await this.repositorySchool.findBy({ where: { daneCode: "254172000128" } });
     let count = 0;
     let dataSaveBulk: ObjectLiteral[] = [];
     for (let school of schools) {
@@ -151,6 +146,7 @@ export class AcademicDayResolver {
                   nameSIMAT: jornada.jornada,
                   day: [Day.MONDAY, Day.TUESDAY, Day.WEDNESDAY, Day.THURSDAY, Day.FRIDAY],
                   campusId: campus[0].id.toString(),
+                  schoolId: school.id.toString(),
                   active: true,
                   version: 0,
                 };
@@ -159,6 +155,9 @@ export class AcademicDayResolver {
                 //console.log(model);
                 count += 1;
                 //console.log(count);
+              } else {
+                let resultAcademicDay = await this.repository.save({ ...academicDay[0], _id: new ObjectId(academicDay[0].id.toString()), version: (academicDay[0]?.version as number) + 1, schoolId: school.id.toString() });
+                console.log(resultAcademicDay, "guardado")
               }
             }
           }
@@ -166,7 +165,9 @@ export class AcademicDayResolver {
       }
     }
     //console.log(dataSaveBulk);
-    let result = await this.repository.bulkWrite(dataSaveBulk);
+    if (dataSaveBulk.length > 0) {
+      let result = await this.repository.bulkWrite(dataSaveBulk);
+    }
     return true;
   }
 

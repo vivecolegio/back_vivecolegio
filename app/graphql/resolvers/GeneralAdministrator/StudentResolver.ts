@@ -244,159 +244,163 @@ export class StudentResolver {
 
   @Mutation(() => Boolean)
   public async createAllInitialsStudents() {
-    let schools = await this.repositorySchool.find();
+    let schools = await this.repositorySchool.findBy({ where: { daneCode: "254172000128" } });
     let count = 0;
     for (let school of schools) {
-      if (school?.daneCode == "154871000261") {
-        let data = await this.repositoryEstudiantes.findBy({
-          where: { dane: school.daneCode, procesado: null },
-        });
-        for (let estudiante of data) {
+      let data = await this.repositoryEstudiantes.findBy({
+        where: { dane: school.daneCode, procesado: null },
+      });
+      for (let estudiante of data) {
+        if (
+          estudiante.jornada &&
+          estudiante.consecutivo &&
+          estudiante.dane &&
+          estudiante.grado_cod &&
+          estudiante.grupo
+        ) {
           if (
-            estudiante.jornada &&
-            estudiante.consecutivo &&
-            estudiante.dane &&
-            estudiante.grado_cod &&
-            estudiante.grupo
+            estudiante.jornada.length > 1 &&
+            estudiante.consecutivo.length > 1 &&
+            estudiante.dane.length > 1 &&
+            estudiante.grado_cod.length > 0 &&
+            estudiante.grupo.length > 0
           ) {
-            if (
-              estudiante.jornada.length > 1 &&
-              estudiante.consecutivo.length > 1 &&
-              estudiante.dane.length > 1 &&
-              estudiante.grado_cod.length > 0 &&
-              estudiante.grupo.length > 0
-            ) {
-              let user = await this.repositoryUser.findBy({ username: estudiante.doc });
-              if (user.length === 0) {
-                let campus = await this.repositoryCampus.findBy({
-                  where: { consecutive: estudiante.consecutivo },
-                });
-                if (campus.length === 1) {
-                  let course = await this.repositoryCourse.findBy({
-                    jornadaSIMAT: estudiante.jornada,
-                    gradoCodSIMAT: estudiante.grado_cod,
-                    grupoSIMAT: estudiante.grupo,
-                    campusId: campus[0].id.toString(),
-                    active: true,
-                  });
-                  let academicGradeId = undefined;
-                  let courseId = undefined;
-                  if (course.length === 1) {
-                    academicGradeId = course[0].academicGradeId;
-                    courseId = course[0].id.toString();
-                  }
-                  let documentTypeId = '';
-                  switch (estudiante.tipodoc) {
-                    case 'RC:REGISTRO CIVIL DE NACIMIENTO':
-                      documentTypeId = '629eb3e109a7e271df669986';
-                      break;
-                    case 'NES:NÚMERO ESTABLECIDO POR LA SECRETARÍA':
-                      documentTypeId = '629eb3f909a7e271df669987';
-                      break;
-                    case 'TI:TARJETA DE IDENTIDAD':
-                      documentTypeId = '61d5624837ab8e89c425f48a';
-                      break;
-                    case 'CC:CÉDULA DE CIUDADANÍA':
-                      documentTypeId = '60cfc792445f133f9e261eae';
-                      break;
-                    case 'CE:CÉDULA DE EXTRANJERÍA':
-                      documentTypeId = '629eb40a09a7e271df669988';
-                      break;
-                    case 'NUIP:NÚMERO UNICO DE IDENTIFICACIÓN PERSONAL':
-                      documentTypeId = '629eb42a09a7e271df669989';
-                      break;
-                    case 'PEP:PERMISO ESPECIAL DE PERMANENCIA':
-                      documentTypeId = '629eb51e09a7e271df66998e';
-                      break;
-                    case 'PPT: PERMISO DE PROTECCIÃ¿N TEMPORAL':
-                      documentTypeId = '629eb44109a7e271df66998a';
-                      break;
-                    case 'TMF: TARJETA DE MOVILIDAD FRONTERIZA':
-                      documentTypeId = '629eb45209a7e271df66998b';
-                      break;
-                    case 'NIP:NÚMERO DE IDENTIFICACIÓN PERSONAL':
-                      documentTypeId = '629eb46609a7e271df66998c';
-                      break;
-                    case 'VISA':
-                      documentTypeId = '629eb47009a7e271df66998d';
-                      break;
-                  }
-                  let passwordHash = await bcrypt
-                    .hash(estudiante.doc ? estudiante.doc : 'VIVE2022', BCRYPT_SALT_ROUNDS)
-                    .then(function (hashedPassword: any) {
-                      return hashedPassword;
-                    });
-                  let fechaNacimiento = estudiante.fecha_nacimiento?.split('/');
-                  let name = (estudiante.nombre1 ? estudiante.nombre1 : '') + " ";
-                  name += estudiante.nombre2 ? estudiante.nombre2 : '';
-                  let lastName = (estudiante.apellido1 ? estudiante.apellido1 : '') + " ";
-                  lastName += estudiante.apellido2 ? estudiante.apellido2 : '';
-                  console.log(name, lastName)
-                  const modelUser = await this.repositoryUser.create({
-                    name,
-                    lastName,
-                    username: estudiante.doc,
-                    password: passwordHash,
-                    documentTypeId,
-                    documentNumber: estudiante.doc,
-                    genderId:
-                      estudiante.genero == 'FEMENINO'
-                        ? '60cfc51e445f133f9e261ead'
-                        : '60ecc36d6c716a21bee51e00',
-                    birthdate: fechaNacimiento
-                      ? new Date(
-                        Number(fechaNacimiento[2]),
-                        Number(fechaNacimiento[1]) - 1,
-                        Number(fechaNacimiento[0])
-                      )
-                      : undefined,
-                    roleId: '619551d1882a2fb6525a3078',
-                    active: true,
-                    version: 0,
-                  });
-                  let resultUser = await this.repositoryUser.save(modelUser);
-                  const model = await this.repository.create({
-                    schoolId: [school.id.toString()],
-                    campusId: [campus[0].id.toString()],
-                    academicGradeId,
-                    courseId,
-                    userId: resultUser.id.toString(),
-                    active: true,
-                    version: 0,
-                  });
-                  let result = await this.repository.save(model);
-                  if (courseId != null && courseId != undefined) {
-                    let course = await this.repositoryCourse.findOneBy(courseId);
-                    let studentsId = course?.studentsId;
-                    if (studentsId == undefined || studentsId == null) {
-                      studentsId = [];
-                    }
-                    studentsId?.push(result?.id?.toString());
-                    let resultCourse = await this.repositoryCourse.save({
-                      _id: new ObjectId(courseId),
-                      ...course,
-                      studentsId,
-                      version: (result?.version as number) + 1,
-                    });
-                    this.courseResolver.updateCodeStudentsCourse(courseId + "");
-                  }
-                  count += 1;
-                  const model2 = await this.repositoryEstudiantes.create({
-                    ...estudiante,
-                    procesado: true,
-                  });
-                  let result2 = await this.repositoryEstudiantes.save(model2);
-                  console.log(count);
-                }
-              } else {
-                const model = await this.repositoryEstudiantes.create({
-                  ...estudiante,
-                  procesado: true,
-                });
-                //console.log(model);
-                let result = await this.repositoryEstudiantes.save(model);
+            let user = await this.repositoryUser.findBy({ username: estudiante.doc });
+            //if (user.length === 0) {
+            let campus = await this.repositoryCampus.findBy({
+              where: { consecutive: estudiante.consecutivo },
+            });
+            if (campus.length === 1) {
+              let course = await this.repositoryCourse.findBy({
+                jornadaSIMAT: estudiante.jornada,
+                gradoCodSIMAT: estudiante.grado_cod,
+                grupoSIMAT: estudiante.grupo,
+                campusId: campus[0].id.toString(),
+                active: true,
+              });
+              let academicGradeId = undefined;
+              let courseId = undefined;
+              if (course.length === 1) {
+                academicGradeId = course[0].academicGradeId;
+                courseId = course[0].id.toString();
               }
+              let documentTypeId = '';
+              switch (estudiante.tipodoc) {
+                case 'RC:REGISTRO CIVIL DE NACIMIENTO':
+                  documentTypeId = '629eb3e109a7e271df669986';
+                  break;
+                case 'NES:NÚMERO ESTABLECIDO POR LA SECRETARÍA':
+                  documentTypeId = '629eb3f909a7e271df669987';
+                  break;
+                case 'TI:TARJETA DE IDENTIDAD':
+                  documentTypeId = '61d5624837ab8e89c425f48a';
+                  break;
+                case 'CC:CÉDULA DE CIUDADANÍA':
+                  documentTypeId = '60cfc792445f133f9e261eae';
+                  break;
+                case 'CE:CÉDULA DE EXTRANJERÍA':
+                  documentTypeId = '629eb40a09a7e271df669988';
+                  break;
+                case 'NUIP:NÚMERO UNICO DE IDENTIFICACIÓN PERSONAL':
+                  documentTypeId = '629eb42a09a7e271df669989';
+                  break;
+                case 'PEP:PERMISO ESPECIAL DE PERMANENCIA':
+                  documentTypeId = '629eb51e09a7e271df66998e';
+                  break;
+                case 'PPT: PERMISO DE PROTECCIÃ¿N TEMPORAL':
+                  documentTypeId = '629eb44109a7e271df66998a';
+                  break;
+                case 'TMF: TARJETA DE MOVILIDAD FRONTERIZA':
+                  documentTypeId = '629eb45209a7e271df66998b';
+                  break;
+                case 'NIP:NÚMERO DE IDENTIFICACIÓN PERSONAL':
+                  documentTypeId = '629eb46609a7e271df66998c';
+                  break;
+                case 'VISA':
+                  documentTypeId = '629eb47009a7e271df66998d';
+                  break;
+              }
+              let passwordHash = await bcrypt
+                .hash(estudiante.doc ? estudiante.doc : 'VIVE2022', BCRYPT_SALT_ROUNDS)
+                .then(function (hashedPassword: any) {
+                  return hashedPassword;
+                });
+              let fechaNacimiento = estudiante.fecha_nacimiento?.split('/');
+              let name = (estudiante.nombre1 ? estudiante.nombre1 : '') + " ";
+              name += estudiante.nombre2 ? estudiante.nombre2 : '';
+              let lastName = (estudiante.apellido1 ? estudiante.apellido1 : '') + " ";
+              lastName += estudiante.apellido2 ? estudiante.apellido2 : '';
+              console.log(name, lastName)
+              const modelUser = await this.repositoryUser.create({
+                name,
+                lastName,
+                username: estudiante.doc,
+                password: passwordHash,
+                documentTypeId,
+                documentNumber: estudiante.doc,
+                genderId:
+                  estudiante.genero == 'FEMENINO'
+                    ? '60cfc51e445f133f9e261ead'
+                    : '60ecc36d6c716a21bee51e00',
+                birthdate: fechaNacimiento
+                  ? new Date(
+                    Number(fechaNacimiento[2]),
+                    Number(fechaNacimiento[1]) - 1,
+                    Number(fechaNacimiento[0])
+                  )
+                  : undefined,
+                roleId: '619551d1882a2fb6525a3078',
+                schoolId: school.id.toString(),
+                active: true,
+                version: 0,
+              });
+              let resultUser = null;
+              if (user.length > 0) {
+                resultUser = await this.repositoryUser.save({ _id: new ObjectId(user[0]?.id?.toString()), ...modelUser, ...user[0], version: (user[0]?.version as number) + 1, });
+              } else {
+                resultUser = await this.repositoryUser.save(modelUser);
+              }
+              const model = await this.repository.create({
+                schoolId: [school.id.toString()],
+                campusId: [campus[0].id.toString()],
+                academicGradeId,
+                courseId,
+                userId: resultUser.id.toString(),
+                active: true,
+                version: 0,
+              });
+              let result = await this.repository.save(model);
+              if (courseId != null && courseId != undefined) {
+                let course = await this.repositoryCourse.findOneBy(courseId);
+                let studentsId = course?.studentsId;
+                if (studentsId == undefined || studentsId == null) {
+                  studentsId = [];
+                }
+                studentsId?.push(result?.id?.toString());
+                let resultCourse = await this.repositoryCourse.save({
+                  _id: new ObjectId(courseId),
+                  ...course,
+                  studentsId,
+                  version: (result?.version as number) + 1,
+                });
+                this.courseResolver.updateCodeStudentsCourse(courseId + "");
+              }
+              count += 1;
+              const model2 = await this.repositoryEstudiantes.create({
+                ...estudiante,
+                procesado: true,
+              });
+              let result2 = await this.repositoryEstudiantes.save(model2);
+              console.log(count);
             }
+            //} else {
+            // const model = await this.repositoryEstudiantes.create({
+            //   ...estudiante,
+            //   procesado: true,
+            // });
+            //console.log(model);
+            // let result = await this.repositoryEstudiantes.save(model);
+            //}
           }
         }
       }

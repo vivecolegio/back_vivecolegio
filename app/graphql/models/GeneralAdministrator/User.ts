@@ -6,6 +6,7 @@ import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { DocumentType } from './DocumentType';
 import { Gender } from './Gender';
 import { Role } from './Role';
+import { School } from './School';
 
 @Index("index_full", ["username", "genderId", "documentTypeId", "roleId"])
 @ObjectType({ description: 'The User model' })
@@ -111,6 +112,14 @@ export class User {
   @Field({ nullable: true })
   @Column({ nullable: true })
   roleId?: string;
+
+  @Index("index_schoolId")
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  schoolId?: string;
+
+  @Field(() => School, { nullable: true })
+  school?: School;
 }
 
 @ObjectType()
