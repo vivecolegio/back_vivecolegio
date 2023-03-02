@@ -248,7 +248,7 @@ export class StudentResolver {
     let count = 0;
     for (let school of schools) {
       let data = await this.repositoryEstudiantes.findBy({
-        where: { dane: school.daneCode, procesado: null },
+        where: { dane: school.daneCode, procesado: true },
       });
       for (let estudiante of data) {
         if (
@@ -356,10 +356,12 @@ export class StudentResolver {
               });
               let resultUser = null;
               if (user.length > 0) {
-                resultUser = await this.repositoryUser.save({ _id: new ObjectId(user[0]?.id?.toString()), ...modelUser, ...user[0], version: (user[0]?.version as number) + 1, });
+                resultUser = await this.repositoryUser.save({ _id: new ObjectId(user[0]?.id?.toString()), ...user[0], ...modelUser, version: (user[0]?.version as number) + 1, });
               } else {
                 resultUser = await this.repositoryUser.save(modelUser);
               }
+              let student = await this.repository.findBy({ userId: resultUser.id.toString() })
+
               const model = await this.repository.create({
                 schoolId: [school.id.toString()],
                 campusId: [campus[0].id.toString()],
@@ -369,7 +371,12 @@ export class StudentResolver {
                 active: true,
                 version: 0,
               });
-              let result = await this.repository.save(model);
+              let result = null;
+              if (student.length > 0) {
+                result = await this.repository.save({ _id: new ObjectId(student[0]?.id?.toString()), ...student[0], ...model, version: (user[0]?.version as number) + 1, });
+              } else {
+                result = await this.repository.save(model);
+              }
               if (courseId != null && courseId != undefined) {
                 let course = await this.repositoryCourse.findOneBy(courseId);
                 let studentsId = course?.studentsId;
