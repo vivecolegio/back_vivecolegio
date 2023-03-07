@@ -57,23 +57,24 @@ export class PerformanceLevelResolver {
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
-    @Arg('schoolId', () => String) schoolId: String
+    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
   ): Promise<PerformanceLevelConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
         result = await this.repository.findBy({
-          where: { schoolId },
+          where: { schoolId, schoolYearId },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.findBy({ where: { schoolId } });
+        result = await this.repository.findBy({ where: { schoolId, schoolYearId } });
       }
     } else {
       if (orderCreated) {
         result = await this.repository.findBy({
           where: {
-            schoolId,
+            schoolId, schoolYearId,
             active: true,
           },
           order: { createdAt: 'DESC' },
@@ -81,7 +82,7 @@ export class PerformanceLevelResolver {
       } else {
         result = await this.repository.findBy({
           where: {
-            schoolId,
+            schoolId, schoolYearId,
             active: true,
           },
         });

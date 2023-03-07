@@ -1,4 +1,5 @@
 import { Field, InputType } from 'type-graphql';
+
 import { Modality } from '../../models/SchoolAdministrator/Modality';
 
 @InputType()
@@ -11,4 +12,7 @@ export class NewModality implements Partial<Modality> {
 
   @Field({ nullable: true })
   schoolId?: string;
+
+  @Field({ nullable: true })
+  schoolYearId?: string;
 }

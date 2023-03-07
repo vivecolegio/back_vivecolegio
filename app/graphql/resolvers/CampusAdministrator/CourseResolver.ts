@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicDayRepository, AcademicGradeRepository, CampusRepository, CourseRepository, CursosRepository, SchoolRepository, StudentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicDayRepository, AcademicGradeRepository, CampusRepository, CourseRepository, CursosRepository, SchoolRepository, SchoolYearRepository, StudentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewCourse } from '../../inputs/CampusAdministrator/NewCourse';
 import { IContext } from '../../interfaces/IContext';
@@ -15,6 +15,7 @@ import { School } from '../../models/GeneralAdministrator/School';
 import { Student } from '../../models/GeneralAdministrator/Student';
 import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicGrade } from '../../models/SchoolAdministrator/AcademicGrade';
+import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 import { Cursos } from './../../models/Data/Cursos';
 
@@ -43,6 +44,9 @@ export class CourseResolver {
 
   @InjectRepository(School)
   private repositorySchool = SchoolRepository;
+
+  @InjectRepository(SchoolYear)
+  private repositorySchoolYear = SchoolYearRepository;
 
   @InjectRepository(Cursos)
   private repositoryCursos = CursosRepository;
@@ -190,16 +194,22 @@ export class CourseResolver {
   }
 
   @Mutation(() => Boolean)
-  public async updateGradeAcademicDayAllInitialsCourse() {
-    let schools = await this.repositorySchool.findBy({ where: { daneCode: "254172000128" } });
+  public async updateGradeAcademicDayAllInitialsCourse(@Arg('schoolId', () => String) schoolId: String, @Arg('schoolYearId', () => String) schoolYearId: String) {
+    let school = await this.repositorySchool.findOneBy(schoolId);
+    let schoolYear = await this.repositorySchoolYear.findOneBy(schoolYearId);
+    //let schools = await this.repositorySchool.findBy({ where: { daneCode: "254810000696" } });
     let count = 0;
-    for (let school of schools) {
+    //for (let school of schools) {
+    if (school && schoolYear) {
       let campus = await this.repositoryCampus.findBy({
         where: { schoolId: school.id.toString() },
       });
       for (let campu of campus) {
         let courses = await this.repository.findBy({
-          where: { academicDayId: undefined, campusId: campu.id.toString() },
+          where: {
+            academicDayId: undefined, campusId: campu.id.toString(), schoolId: school.id.toString(),
+            schoolYearId: schoolYear?.id?.toString()
+          },
         });
         for (let course of courses) {
           let academicDay = await this.repositoryAcademicDay.findBy({
@@ -207,6 +217,8 @@ export class CourseResolver {
               campusId: campu.id.toString(),
               nameSIMAT: course.jornadaSIMAT,
               active: true,
+              schoolId: school.id.toString(),
+              schoolYearId: schoolYear?.id?.toString()
             },
           });
           if (academicDay.length === 1) {
@@ -226,16 +238,22 @@ export class CourseResolver {
   }
 
   @Mutation(() => Boolean)
-  public async updateGradeAllInitialsCourse() {
-    let schools = await this.repositorySchool.findBy({ where: { daneCode: "254172000128" } });
+  public async updateGradeAllInitialsCourse(@Arg('schoolId', () => String) schoolId: String, @Arg('schoolYearId', () => String) schoolYearId: String) {
+    let school = await this.repositorySchool.findOneBy(schoolId);
+    let schoolYear = await this.repositorySchoolYear.findOneBy(schoolYearId);
+    //let schools = await this.repositorySchool.findBy({ where: { daneCode: "254810000696" } });
     let count = 0;
-    for (let school of schools) {
+    // for (let school of schools) {
+    if (school && schoolYear) {
       let campus = await this.repositoryCampus.findBy({
         where: { schoolId: school.id.toString() },
       });
       for (let campu of campus) {
         let courses = await this.repository.findBy({
-          where: { academicGradeId: undefined, campusId: campu.id.toString(), active: true },
+          where: {
+            academicGradeId: undefined, campusId: campu.id.toString(), active: true, schoolId: school.id.toString(),
+            schoolYearId: schoolYear?.id?.toString()
+          },
         });
         for (let course of courses) {
           let generalAcademicGradeId = '';
@@ -282,6 +300,7 @@ export class CourseResolver {
               schoolId: school.id.toString(),
               generalAcademicGradeId,
               active: true,
+              schoolYearId: schoolYear?.id?.toString()
             },
           });
           if (academicGrade.length === 1) {
@@ -301,10 +320,13 @@ export class CourseResolver {
   }
 
   @Mutation(() => Boolean)
-  public async createAllInitialsCourse() {
-    let schools = await this.repositorySchool.findBy({ where: { daneCode: "254172000128" } });
+  public async createAllInitialsCourse(@Arg('schoolId', () => String) schoolId: String, @Arg('schoolYearId', () => String) schoolYearId: String) {
+    let school = await this.repositorySchool.findOneBy(schoolId);
+    let schoolYear = await this.repositorySchoolYear.findOneBy(schoolYearId);
+    //let schools = await this.repositorySchool.findBy({ where: { daneCode: "254810000696" } });
     let count = 0;
-    for (let school of schools) {
+    //for (let school of schools) {
+    if (school && schoolYear) {
       let data = await this.repositoryCursos.findBy({
         where: { dane: school.daneCode },
       });
@@ -332,6 +354,7 @@ export class CourseResolver {
                   grupoSIMAT: curso.grupo,
                   gradoCodSIMAT: curso.grado_cod,
                   jornadaSIMAT: curso.jornada,
+                  schoolYearId: schoolYear?.id?.toString(),
                 },
               });
               if (course.length === 0) {
@@ -342,13 +365,14 @@ export class CourseResolver {
                   jornadaSIMAT: curso.jornada,
                   campusId: campus[0].id.toString(),
                   schoolId: school.id.toString(),
+                  schoolYearId: schoolYear?.id?.toString(),
                   active: true,
                   version: 0,
                 });
                 let result = await this.repository.save(model);
-                //console.log(model);
+                // console.log(model);
                 count += 1;
-                //console.log(count);
+                // console.log(count);
               } else {
                 let result = await this.repository.save({
                   _id: new ObjectId(course[0].id.toString()),
@@ -357,12 +381,14 @@ export class CourseResolver {
                   active: true,
                   version: (course[0]?.version as number) + 1,
                 });
+                // console.log("aca pasa aglo")
               }
             }
           }
         }
       }
     }
+    //}
     return true;
   }
 

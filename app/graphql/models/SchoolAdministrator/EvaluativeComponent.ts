@@ -1,13 +1,15 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Column, Entity, Index } from 'typeorm';
+
 import { EvaluativeComponentType } from '../../enums/EvaluativeComponentType';
 import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { AcademicArea } from './AcademicArea';
 import { AcademicAsignature } from './AcademicAsignature';
+import { SchoolYear } from './SchoolYear';
 
-@Index("index_full_academicAsignatures", ["academicAsignaturesId", "schoolId"])
-@Index("index_full_academicAreas", ["academicAreasId", "schoolId"])
+@Index("index_full_academicAsignatures", ["academicAsignaturesId", "schoolId", "schoolYearId"])
+@Index("index_full_academicAreas", ["academicAreasId", "schoolId", "schoolYearId"])
 @ObjectType({ description: 'The EvaluativeComponent model', implements: IModelSchoolData })
 @Entity()
 export class EvaluativeComponent extends IModelSchoolData {
@@ -38,6 +40,14 @@ export class EvaluativeComponent extends IModelSchoolData {
 
   @Field(() => [AcademicArea], { nullable: true })
   academicAreas?: AcademicArea[];
+
+  @Index("index_schoolYearId")
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  schoolYearId?: string;
+
+  @Field({ nullable: true })
+  schoolYear?: SchoolYear;
 }
 
 @ObjectType()

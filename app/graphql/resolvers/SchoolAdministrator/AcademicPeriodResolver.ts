@@ -2,21 +2,14 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import {
-  AcademicPeriodRepository,
-  SchoolRepository,
-  SchoolYearRepository,
-  UserRepository,
-} from '../../../servers/DataSource';
+
+import { AcademicPeriodRepository, SchoolRepository, SchoolYearRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicPeriod } from '../../inputs/SchoolAdministrator/NewAcademicPeriod';
 import { IContext } from '../../interfaces/IContext';
 import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
-import {
-  AcademicPeriod,
-  AcademicPeriodConnection,
-} from '../../models/SchoolAdministrator/AcademicPeriod';
+import { AcademicPeriod, AcademicPeriodConnection } from '../../models/SchoolAdministrator/AcademicPeriod';
 import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
@@ -96,21 +89,28 @@ export class AcademicPeriodResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => String) schoolId: String,
-    @Arg('orderCustom', () => Boolean, { nullable: true }) orderCustom: Boolean
+    @Arg('orderCustom', () => Boolean, { nullable: true }) orderCustom: Boolean,
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
   ): Promise<AcademicPeriodConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
         result = await this.repository.findBy({
-          where: { schoolId },
+          where: {
+            schoolId,
+            schoolYearId
+          },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.findBy({ where: { schoolId } });
+        result = await this.repository.findBy({ where: { schoolId, schoolYearId } });
       }
       if (orderCustom) {
         result = await this.repository.findBy({
-          where: { schoolId },
+          where: {
+            schoolId,
+            schoolYearId
+          },
           order: { order: 1 },
         });
       }
@@ -119,6 +119,7 @@ export class AcademicPeriodResolver {
         result = await this.repository.findBy({
           where: {
             schoolId,
+            schoolYearId,
             active: true,
           },
           order: { createdAt: 'DESC' },
@@ -127,6 +128,7 @@ export class AcademicPeriodResolver {
         result = await this.repository.findBy({
           where: {
             schoolId,
+            schoolYearId,
             active: true,
           },
         });
@@ -135,6 +137,7 @@ export class AcademicPeriodResolver {
         result = await this.repository.findBy({
           where: {
             schoolId,
+            schoolYearId,
             active: true,
           },
           order: { order: 1 },

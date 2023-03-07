@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicGradeRepository, CampusRepository, CourseRepository, EstudiantesRepository, SchoolRepository, StudentRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicGradeRepository, CampusRepository, CourseRepository, EstudiantesRepository, SchoolRepository, SchoolYearRepository, StudentRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewStudent } from '../../inputs/GeneralAdministrator/NewStudent';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
@@ -16,6 +16,7 @@ import { School } from '../../models/GeneralAdministrator/School';
 import { Student, StudentConnection } from '../../models/GeneralAdministrator/Student';
 import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicGrade } from '../../models/SchoolAdministrator/AcademicGrade';
+import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 import { CourseResolver } from '../CampusAdministrator/CourseResolver';
 
@@ -43,6 +44,9 @@ export class StudentResolver {
 
   @InjectRepository(Estudiantes2)
   private repositoryEstudiantes = EstudiantesRepository;
+
+  @InjectRepository(SchoolYear)
+  private repositorySchoolYear = SchoolYearRepository;
 
   private courseResolver = new CourseResolver();
 
@@ -243,12 +247,15 @@ export class StudentResolver {
   }
 
   @Mutation(() => Boolean)
-  public async createAllInitialsStudents() {
-    let schools = await this.repositorySchool.findBy({ where: { daneCode: "254172000128" } });
+  public async createAllInitialsStudents(@Arg('schoolId', () => String) schoolId: String, @Arg('schoolYearId', () => String) schoolYearId: String) {
+    let school = await this.repositorySchool.findOneBy(schoolId);
+    let schoolYear = await this.repositorySchoolYear.findOneBy(schoolYearId);
+    //let schools = await this.repositorySchool.findBy({ where: { daneCode: "254810000696" } });
     let count = 0;
-    for (let school of schools) {
+    //for (let school of schools) {
+    if (school && schoolYear) {
       let data = await this.repositoryEstudiantes.findBy({
-        where: { dane: school.daneCode, procesado: true },
+        where: { dane: school.daneCode, procesado: null },
       });
       for (let estudiante of data) {
         if (
@@ -277,6 +284,8 @@ export class StudentResolver {
                 grupoSIMAT: estudiante.grupo,
                 campusId: campus[0].id.toString(),
                 active: true,
+                schoolId: school.id.toString(),
+                schoolYearId: schoolYear?.id?.toString()
               });
               let academicGradeId = undefined;
               let courseId = undefined;
@@ -360,8 +369,10 @@ export class StudentResolver {
               } else {
                 resultUser = await this.repositoryUser.save(modelUser);
               }
-              let student = await this.repository.findBy({ userId: resultUser.id.toString() })
-
+              let student = await this.repository.findBy({
+                userId: resultUser.id.toString(), schoolId: { $in: [school.id.toString()] },
+                schoolYearId: schoolYear?.id?.toString()
+              })
               const model = await this.repository.create({
                 schoolId: [school.id.toString()],
                 campusId: [campus[0].id.toString()],
@@ -370,6 +381,7 @@ export class StudentResolver {
                 userId: resultUser.id.toString(),
                 active: true,
                 version: 0,
+                schoolYearId: schoolYear?.id?.toString()
               });
               let result = null;
               if (student.length > 0) {

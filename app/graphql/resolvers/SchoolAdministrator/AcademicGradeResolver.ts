@@ -55,22 +55,24 @@ export class AcademicGradeResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => String) schoolId: String,
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
   ): Promise<AcademicGradeConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
         result = await this.repository.findBy({
-          where: { schoolId },
+          where: { schoolId, schoolYearId },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.findBy({ where: { schoolId } });
+        result = await this.repository.findBy({ where: { schoolId, schoolYearId } });
       }
     } else {
       if (orderCreated) {
         result = await this.repository.findBy({
           where: {
             schoolId,
+            schoolYearId,
             active: true,
           },
           order: { createdAt: 'DESC' },
@@ -79,6 +81,7 @@ export class AcademicGradeResolver {
         result = await this.repository.findBy({
           where: {
             schoolId,
+            schoolYearId,
             active: true,
           },
         });
@@ -149,6 +152,36 @@ export class AcademicGradeResolver {
     } else {
       return false;
     }
+  }
+
+  @Mutation(() => Boolean)
+  async importAcademicGradeSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String) {
+    let results = await this.repository.findBy({ where: { schoolId, schoolYearId: oldSchoolYearId } });
+    for (let result of results) {
+      let educationLevelNew: any;
+      let educationLevelOld = await this.repositoryEducationLevel.findOneBy(result?.educationLevelId);
+      if (educationLevelOld) {
+        educationLevelNew = await this.repositoryEducationLevel.findBy({ where: { name: educationLevelOld?.name, schoolYearId: newSchoolYearId } });
+      }
+      let specialityNew: any;
+      let specialityOld = await this.repositorySpecialty.findOneBy(result?.specialtyId);
+      if (specialityOld) {
+        specialityNew = await this.repositorySpecialty.findBy({ where: { name: specialityOld?.name, schoolYearId: newSchoolYearId } });
+      }
+      const model = await this.repository.create({
+        generalAcademicCycleId: result.generalAcademicCycleId,
+        generalAcademicGradeId: result.generalAcademicGradeId,
+        name: result.name,
+        schoolId: result.schoolId,
+        educationLevelId: educationLevelNew[0]?.id?.toString(),
+        specialtyId: specialityNew[0]?.id?.toString(),
+        active: true,
+        version: 0,
+        schoolYearId: newSchoolYearId.toString()
+      });
+      let resultSave = await this.repository.save(model);
+    }
+    return true;
   }
 
   @Mutation(() => Boolean)

@@ -33,4 +33,7 @@ export class NewAcademicAsignature implements Partial<AcademicAsignature> {
 
   @Field({ nullable: true })
   order?: number;
+
+  @Field({ nullable: true })
+  schoolYearId?: string;
 }

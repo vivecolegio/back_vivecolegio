@@ -4,7 +4,7 @@ import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from '
 import { ObjectLiteral } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicDayRepository, CampusRepository, JornadasRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicDayRepository, CampusRepository, JornadasRepository, SchoolRepository, SchoolYearRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { Day } from '../../enums/Day';
 import { NewAcademicDay } from '../../inputs/CampusAdministrator/NewAcademicDay';
@@ -14,6 +14,7 @@ import { Jornadas } from '../../models/Data/Jornadas';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
+import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
 @Resolver(AcademicDay)
@@ -30,6 +31,9 @@ export class AcademicDayResolver {
   @InjectRepository(School)
   private repositorySchool = SchoolRepository;
 
+  @InjectRepository(SchoolYear)
+  private repositorySchoolYear = SchoolYearRepository;
+
   @InjectRepository(Jornadas)
   private repositoryJornadas = JornadasRepository;
 
@@ -45,7 +49,8 @@ export class AcademicDayResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('campusId', () => String) campusId: String,
-    @Arg('schoolId', () => String, { nullable: true }) schoolId: String
+    @Arg('schoolId', () => String, { nullable: true }) schoolId: String,
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
   ): Promise<AcademicDayConnection> {
     let result;
     let campusDataIds: any[] = [];
@@ -62,6 +67,7 @@ export class AcademicDayResolver {
         result = await this.repository.findBy({
           where: {
             campusId: { $in: campusDataIds },
+            schoolYearId
           },
           order: { createdAt: 'DESC' },
         });
@@ -69,6 +75,7 @@ export class AcademicDayResolver {
         result = await this.repository.findBy({
           where: {
             campusId: { $in: campusDataIds },
+            schoolYearId
           },
         });
       }
@@ -77,6 +84,7 @@ export class AcademicDayResolver {
         result = await this.repository.findBy({
           where: {
             campusId: { $in: campusDataIds },
+            schoolYearId,
             active: true,
           },
           order: { createdAt: 'DESC' },
@@ -85,6 +93,7 @@ export class AcademicDayResolver {
         result = await this.repository.findBy({
           where: {
             campusId: { $in: campusDataIds },
+            schoolYearId,
             active: true,
           },
         });
@@ -117,11 +126,39 @@ export class AcademicDayResolver {
   }
 
   @Mutation(() => Boolean)
-  public async createAllInitialsAcademicDay() {
-    let schools = await this.repositorySchool.findBy({ where: { daneCode: "254172000128" } });
+  async updateAllAcademicDaySchoolId(@Arg('schoolId', () => String) schoolId: String) {
+    let results;
+    let campusDataIds: any[] = [];
+    if (schoolId) {
+      const campusData = await this.repositoryCampus.findBy({ schoolId, active: true });
+      campusData.forEach((campus: any) => {
+        campusDataIds.push(campus.id.toString());
+      });
+    }
+    results = await this.repository.findBy({
+      where: {
+        campusId: { $in: campusDataIds },
+      },
+      order: { createdAt: 'DESC' },
+    });
+    for (let data of results) {
+      let result = await this.repository.save({
+        _id: new ObjectId(data.id.toString()),
+        ...data,
+        version: (data?.version as number) + 1,
+        schoolId: schoolId.toString(),
+      });
+    }
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  public async createAllInitialsAcademicDay(@Arg('schoolId') schoolId: String, @Arg('schoolYearId') schoolYearId: String,) {
+    let school = await this.repositorySchool.findOneBy(schoolId);
+    let schoolYear = await this.repositorySchoolYear.findOneBy(schoolYearId);
     let count = 0;
     let dataSaveBulk: ObjectLiteral[] = [];
-    for (let school of schools) {
+    if (school && schoolYear) {
       let data = await this.repositoryJornadas.findBy({
         where: { dane: school.daneCode },
       });
@@ -137,7 +174,7 @@ export class AcademicDayResolver {
             });
             if (campus.length === 1) {
               let academicDay = await this.repository.findBy({
-                where: { campusId: campus[0].id.toString(), nameSIMAT: jornada.jornada },
+                where: { campusId: campus[0].id.toString(), nameSIMAT: jornada.jornada, schoolYearId },
               });
               if (academicDay.length === 0) {
                 //const model = await this.repository.create({
@@ -147,6 +184,7 @@ export class AcademicDayResolver {
                   day: [Day.MONDAY, Day.TUESDAY, Day.WEDNESDAY, Day.THURSDAY, Day.FRIDAY],
                   campusId: campus[0].id.toString(),
                   schoolId: school.id.toString(),
+                  schoolYearId: schoolYear.id.toString(),
                   active: true,
                   version: 0,
                 };
@@ -157,7 +195,7 @@ export class AcademicDayResolver {
                 //console.log(count);
               } else {
                 let resultAcademicDay = await this.repository.save({ ...academicDay[0], _id: new ObjectId(academicDay[0].id.toString()), version: (academicDay[0]?.version as number) + 1, schoolId: school.id.toString() });
-                console.log(resultAcademicDay, "guardado")
+                //console.log(resultAcademicDay, "guardado")
               }
             }
           }

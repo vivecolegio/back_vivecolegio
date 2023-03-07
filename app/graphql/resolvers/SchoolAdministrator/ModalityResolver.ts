@@ -2,6 +2,7 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+
 import { ModalityRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewModality } from '../../inputs/SchoolAdministrator/NewModality';
@@ -34,22 +35,24 @@ export class ModalityResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => String) schoolId: String,
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
   ): Promise<ModalityConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
         result = await this.repository.findBy({
-          where: { schoolId },
+          where: { schoolId, schoolYearId },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.findBy({ where: { schoolId } });
+        result = await this.repository.findBy({ where: { schoolId, schoolYearId } });
       }
     } else {
       if (orderCreated) {
         result = await this.repository.findBy({
           where: {
             schoolId,
+            schoolYearId,
             active: true,
           },
           order: { createdAt: 'DESC' },
@@ -58,6 +61,7 @@ export class ModalityResolver {
         result = await this.repository.findBy({
           where: {
             schoolId,
+            schoolYearId,
             active: true,
           },
         });

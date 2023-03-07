@@ -1,12 +1,14 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 
 import { IModelCampusData } from '../../interfaces/IModelCampusData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { AcademicGrade } from '../SchoolAdministrator/AcademicGrade';
+import { SchoolYear } from '../SchoolAdministrator/SchoolYear';
 import { AcademicDay } from './AcademicDay';
 import { Teacher } from './Teacher';
 
+@Index("index_full", ["schoolYearId", "campusId", "schoolId"])
 @ObjectType({ description: 'The Course model', implements: IModelCampusData })
 @Entity()
 export class Course extends IModelCampusData {
@@ -57,6 +59,14 @@ export class Course extends IModelCampusData {
 
   @Field({ nullable: true })
   countStudent?: number;
+
+  @Index("index_schoolYearId")
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  schoolYearId?: string;
+
+  @Field({ nullable: true })
+  schoolYear?: SchoolYear;
 }
 
 @ObjectType()

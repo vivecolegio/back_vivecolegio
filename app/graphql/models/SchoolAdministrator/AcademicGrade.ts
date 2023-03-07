@@ -6,9 +6,10 @@ import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { GeneralAcademicCycle } from '../GeneralAdministrator/GeneralAcademicCycle';
 import { GeneralAcademicGrade } from '../GeneralAdministrator/GeneralAcademicGrade';
 import { EducationLevel } from './EducationLevel';
+import { SchoolYear } from './SchoolYear';
 import { Specialty } from './Specialty';
 
-@Index("index_full", ["educationLevelId", "specialtyId", "generalAcademicCycleId", "generalAcademicGradeId", "schoolId"])
+@Index("index_full", ["educationLevelId", "specialtyId", "generalAcademicCycleId", "generalAcademicGradeId", "schoolId", "schoolYearId"])
 @ObjectType({ description: 'The AcademicGrade model', implements: IModelSchoolData })
 @Entity()
 export class AcademicGrade extends IModelSchoolData {
@@ -50,6 +51,14 @@ export class AcademicGrade extends IModelSchoolData {
 
   @Field({ nullable: true })
   countStudent?: number;
+
+  @Index("index_schoolYearId")
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  schoolYearId?: string;
+
+  @Field({ nullable: true })
+  schoolYear?: SchoolYear;
 }
 
 @ObjectType()

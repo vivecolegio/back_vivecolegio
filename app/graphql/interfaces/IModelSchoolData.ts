@@ -1,5 +1,6 @@
 import { Field, ID, InterfaceType } from 'type-graphql';
 import { Column, CreateDateColumn, Index, ObjectIdColumn, UpdateDateColumn } from 'typeorm';
+
 import { School } from '../models/GeneralAdministrator/School';
 
 @InterfaceType()

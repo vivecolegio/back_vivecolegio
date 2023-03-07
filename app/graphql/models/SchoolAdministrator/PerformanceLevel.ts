@@ -9,9 +9,10 @@ import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { Campus } from '../GeneralAdministrator/Campus';
 import { GeneralPerformanceLevel } from '../GeneralAdministrator/GeneralPerformanceLevel';
 import { AcademicGrade } from './AcademicGrade';
+import { SchoolYear } from './SchoolYear';
 
-@Index("index_full_campusId", ["generalPerformanceLevelId", "campusId", "schoolId"])
-@Index("index_full_academicGradesId", ["generalPerformanceLevelId", "academicGradesId", "schoolId"])
+@Index("index_full_campusId", ["generalPerformanceLevelId", "campusId", "schoolId", "schoolYearId"])
+@Index("index_full_academicGradesId", ["generalPerformanceLevelId", "academicGradesId", "schoolId", "schoolYearId"])
 @ObjectType({ description: 'The PerformanceLevel model', implements: IModelSchoolData })
 @Entity()
 export class PerformanceLevel extends IModelSchoolData {
@@ -83,6 +84,13 @@ export class PerformanceLevel extends IModelSchoolData {
   @Column({ nullable: true })
   order?: number;
 
+  @Index("index_schoolYearId")
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  schoolYearId?: string;
+
+  @Field({ nullable: true })
+  schoolYear?: SchoolYear;
 }
 
 @ObjectType()

@@ -51,4 +51,8 @@ export class NewPerformanceLevel implements Partial<PerformanceLevel> {
 
   @Field({ nullable: true })
   order?: number;
+
+  @Field({ nullable: true })
+  schoolYearId?: string;
+
 }

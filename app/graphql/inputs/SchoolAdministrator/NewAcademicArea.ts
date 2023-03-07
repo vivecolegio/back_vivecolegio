@@ -24,4 +24,8 @@ export class NewAcademicArea implements Partial<AcademicArea> {
 
   @Field({ nullable: true })
   isAverage?: boolean;
+
+  @Field({ nullable: true })
+  schoolYearId?: string;
+
 }

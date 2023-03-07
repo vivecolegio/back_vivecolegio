@@ -1,15 +1,17 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Column, Entity, Index } from 'typeorm';
+
 import { IModelData } from '../../interfaces/IModelData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { Course } from '../CampusAdministrator/Course';
 import { AcademicGrade } from '../SchoolAdministrator/AcademicGrade';
+import { SchoolYear } from '../SchoolAdministrator/SchoolYear';
 import { Campus } from './Campus';
 import { School } from './School';
 import { User } from './User';
 
-@Index("index_full_school", ["schoolId", "academicGradeId", "courseId", "userId"])
-@Index("index_full_campus", ["campusId", "academicGradeId", "courseId", "userId"])
+@Index("index_full_school", ["schoolId", "academicGradeId", "courseId", "userId", "schoolYearId"])
+@Index("index_full_campus", ["campusId", "academicGradeId", "courseId", "userId", "schoolYearId"])
 @ObjectType({ description: 'The Student model', implements: IModelData })
 @Entity()
 export class Student extends IModelData {
@@ -56,6 +58,14 @@ export class Student extends IModelData {
   @Field({ nullable: true })
   @Column({ nullable: true })
   code?: number;
+
+  @Index("index_schoolYearId")
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  schoolYearId?: string;
+
+  @Field({ nullable: true })
+  schoolYear?: SchoolYear;
 }
 
 @ObjectType()

@@ -20,6 +20,8 @@ type AcademicArea implements IModelSchoolData {
   order: Float
   school: School
   schoolId: String
+  schoolYear: SchoolYear
+  schoolYearId: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -145,6 +147,8 @@ type AcademicAsignature implements IModelSchoolData {
   order: Float
   school: School
   schoolId: String
+  schoolYear: SchoolYear
+  schoolYearId: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -345,6 +349,8 @@ type AcademicDay implements IModelCampusData {
   nameSIMAT: String
   school: School
   schoolId: String
+  schoolYear: SchoolYear
+  schoolYearId: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -382,6 +388,8 @@ type AcademicGrade implements IModelSchoolData {
   name: String
   school: School
   schoolId: String
+  schoolYear: SchoolYear
+  schoolYearId: String
   specialty: Specialty
   specialtyId: String
   updatedAt: DateTime
@@ -902,6 +910,8 @@ type Course implements IModelCampusData {
   order: String
   school: School
   schoolId: String
+  schoolYear: SchoolYear
+  schoolYearId: String
   students: [Student!]
   studentsId: [String!]
   teacher: Teacher
@@ -983,6 +993,8 @@ type EducationLevel implements IModelSchoolData {
   name: String
   school: School
   schoolId: String
+  schoolYear: SchoolYear
+  schoolYearId: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -1050,6 +1062,8 @@ type EvaluativeComponent implements IModelSchoolData {
   name: String
   school: School
   schoolId: String
+  schoolYear: SchoolYear
+  schoolYearId: String
   type: EvaluativeComponentType
   updatedAt: DateTime
   updatedByUser: User
@@ -2142,6 +2156,8 @@ type Modality implements IModelSchoolData {
   name: String
   school: School
   schoolId: String
+  schoolYear: SchoolYear
+  schoolYearId: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -2315,12 +2331,12 @@ type Mutation {
   createAcademicPeriod(data: NewAcademicPeriod!): AcademicPeriod!
   createAcademicSchedule(data: NewAcademicSchedule!): AcademicSchedule!
   createAcademicStandard(data: NewAcademicStandard!): AcademicStandard!
-  createAllInitialsAcademicDay: Boolean!
+  createAllInitialsAcademicDay(schoolId: String!, schoolYearId: String!): Boolean!
   createAllInitialsCampusAdministrators: Boolean!
-  createAllInitialsCourse: Boolean!
+  createAllInitialsCourse(schoolId: String!, schoolYearId: String!): Boolean!
   createAllInitialsSchoolAdministratives: Boolean!
   createAllInitialsSchoolAdministrators: Boolean!
-  createAllInitialsStudents: Boolean!
+  createAllInitialsStudents(schoolId: String!, schoolYearId: String!): Boolean!
   createAllInitialsTeachers: Boolean!
   createAuditLogin(data: NewAuditLogin!): AuditLogin!
   createAverageAcademicPeriodStudent(data: NewAverageAcademicPeriodStudent!): AverageAcademicPeriodStudent!
@@ -2480,10 +2496,13 @@ type Mutation {
   generatePerformanceLevelExample(id: String!): Boolean!
   generatePerformanceLevelExample2(id: String!): Boolean!
   generatePerformanceReportCourse(academicPeriodId: String!, format: String!, id: String!, schoolId: String!, schoolYearId: String!, studentId: String): String!
+  importAcademicAreaSchoolYearId(newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!): Boolean!
+  importAcademicGradeSchoolYearId(newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!): Boolean!
   login(password: String!, username: String!): Jwt!
   resetPasswordUser(id: String!): Boolean!
   singleUpload(file: Upload, id: String!): Boolean!
   updateAcademicArea(data: NewAcademicArea!, id: String!): AcademicArea!
+  updateAcademicAreaAcademicAsignatureSchoolYearId(schoolId: String!, schoolYearId: String!): Boolean!
   updateAcademicAreaCoursePeriodValuation(data: NewAcademicAreaCoursePeriodValuation!, id: String!): AcademicAreaCoursePeriodValuation!
   updateAcademicAreaCourseYearValuation(data: NewAcademicAreaCourseYearValuation!, id: String!): AcademicAreaCourseYearValuation!
   updateAcademicAsignature(data: NewAcademicAsignature!, id: String!): AcademicAsignature!
@@ -2498,6 +2517,7 @@ type Mutation {
   updateAcademicPeriod(data: NewAcademicPeriod!, id: String!): AcademicPeriod!
   updateAcademicSchedule(data: NewAcademicSchedule!, id: String!): AcademicSchedule!
   updateAcademicStandard(data: NewAcademicStandard!, id: String!): AcademicStandard!
+  updateAllAcademicDaySchoolId(schoolId: String!): Boolean!
   updateAllAverageStudentCoursePeriod(academicPeriodId: String!, courseId: String!): Boolean!
   updateAllIStudentsName: Boolean!
   updateAllStudentAcademicAsignatureCoursePeriodValuation(academicAsignatureCourseId: String!, academicPeriodId: String!, experienceLearningType: ExperienceLearningType!): Boolean!
@@ -2542,8 +2562,8 @@ type Mutation {
   updateGeneralAcademicStandard(data: NewGeneralAcademicStandard!, id: String!): GeneralAcademicStandard!
   updateGeneralBasicLearningRight(data: NewGeneralBasicLearningRight!, id: String!): GeneralBasicLearningRight!
   updateGeneralPerformanceLevel(data: NewGeneralPerformanceLevel!, id: String!): GeneralPerformanceLevel!
-  updateGradeAcademicDayAllInitialsCourse: Boolean!
-  updateGradeAllInitialsCourse: Boolean!
+  updateGradeAcademicDayAllInitialsCourse(schoolId: String!, schoolYearId: String!): Boolean!
+  updateGradeAllInitialsCourse(schoolId: String!, schoolYearId: String!): Boolean!
   updateGradeAssignment(data: NewGradeAssignment!, id: String!): GradeAssignment!
   updateGuardian(data: NewGuardian!, id: String!): Guardian!
   updateInbox(data: NewInbox!, id: String!): Inbox!
@@ -2591,6 +2611,7 @@ input NewAcademicArea {
   name: String
   order: Float
   schoolId: String
+  schoolYearId: String
 }
 
 input NewAcademicAreaCoursePeriodValuation {
@@ -2622,6 +2643,7 @@ input NewAcademicAsignature {
   name: String
   order: Float
   schoolId: String
+  schoolYearId: String
 }
 
 input NewAcademicAsignatureCourse {
@@ -2665,6 +2687,8 @@ input NewAcademicDay {
   campusId: String
   day: [Day!]
   name: String
+  schoolId: String
+  schoolYearId: String
 }
 
 input NewAcademicGrade {
@@ -2673,6 +2697,7 @@ input NewAcademicGrade {
   generalAcademicGradeId: String
   name: String
   schoolId: String
+  schoolYearId: String
   specialtyId: String
 }
 
@@ -2805,6 +2830,8 @@ input NewCourse {
   campusId: String
   name: String
   order: String
+  schoolId: String
+  schoolYearId: String
   studentsId: [String!]
   teacherId: String
 }
@@ -2819,6 +2846,7 @@ input NewEducationLevel {
   description: String
   name: String
   schoolId: String
+  schoolYearId: String
 }
 
 input NewEmail {
@@ -2835,6 +2863,7 @@ input NewEvaluativeComponent {
   default: Boolean
   name: String
   schoolId: String
+  schoolYearId: String
   type: EvaluativeComponentType
   weight: Float
 }
@@ -3076,6 +3105,7 @@ input NewModality {
   code: String
   name: String
   schoolId: String
+  schoolYearId: String
 }
 
 input NewModule {
@@ -3115,6 +3145,7 @@ input NewPerformanceLevel {
   name: String
   order: Float
   schoolId: String
+  schoolYearId: String
   topScore: Float
   type: PerformanceLevelType
 }
@@ -3198,6 +3229,7 @@ input NewSpecialty {
   modalityId: String
   name: String
   schoolId: String
+  schoolYearId: String
 }
 
 input NewStudent {
@@ -3363,6 +3395,8 @@ type PerformanceLevel implements IModelSchoolData {
   order: Float
   school: School
   schoolId: String
+  schoolYear: SchoolYear
+  schoolYearId: String
   topScore: Float
   type: PerformanceLevelType
   updatedAt: DateTime
@@ -3448,6 +3482,7 @@ type Query {
     last: Float
     orderCreated: Boolean!
     schoolId: String!
+    schoolYearId: String
   ): AcademicAreaConnection!
   getAllAcademicAreaCoursePeriodValuation(
     academicAreaId: String!
@@ -3638,6 +3673,7 @@ type Query {
     last: Float
     orderCreated: Boolean!
     schoolId: String
+    schoolYearId: String
   ): AcademicDayConnection!
   getAllAcademicGrade(
     """Paginate after opaque cursor"""
@@ -3654,6 +3690,7 @@ type Query {
     last: Float
     orderCreated: Boolean!
     schoolId: String!
+    schoolYearId: String
   ): AcademicGradeConnection!
   getAllAcademicHour(
     academicDayId: String
@@ -3689,6 +3726,7 @@ type Query {
     orderCreated: Boolean!
     orderCustom: Boolean
     schoolId: String!
+    schoolYearId: String
   ): AcademicPeriodConnection!
   getAllAcademicSchedule(
     """Paginate after opaque cursor"""
@@ -3920,6 +3958,7 @@ type Query {
     last: Float
     orderCreated: Boolean!
     schoolId: String!
+    schoolYearId: String
   ): EducationLevelConnection!
   getAllEmail(
     """Paginate after opaque cursor"""
@@ -3953,6 +3992,7 @@ type Query {
     last: Float
     orderCreated: Boolean!
     schoolId: String!
+    schoolYearId: String
   ): EvaluativeComponentConnection!
   getAllEvaluativeComponentAcademicAsignatureCourse(
     academicAsignatureCourseId: String!
@@ -4483,6 +4523,7 @@ type Query {
     last: Float
     orderCreated: Boolean!
     schoolId: String!
+    schoolYearId: String
   ): ModalityConnection!
   getAllModule(
     """Paginate after opaque cursor"""
@@ -4561,6 +4602,7 @@ type Query {
     last: Float
     orderCreated: Boolean!
     schoolId: String!
+    schoolYearId: String
   ): PerformanceLevelConnection!
   getAllPerformanceLevelAcademicAsignatureCourse(
     academicAsignatureCourseId: String!
@@ -4791,6 +4833,7 @@ type Query {
     last: Float
     orderCreated: Boolean!
     schoolId: String!
+    schoolYearId: String
   ): SpecialtyConnection!
   getAllStudent(
     """Paginate after opaque cursor"""
@@ -5352,6 +5395,8 @@ type Specialty implements IModelSchoolData {
   name: String
   school: School
   schoolId: String
+  schoolYear: SchoolYear
+  schoolYearId: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -5388,6 +5433,8 @@ type Student implements IModelData {
   id: ID!
   school: [School!]
   schoolId: [String!]
+  schoolYear: SchoolYear
+  schoolYearId: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String

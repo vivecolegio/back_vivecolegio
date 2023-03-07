@@ -1,9 +1,12 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
+
 import { Day } from '../../enums/Day';
 import { IModelCampusData } from '../../interfaces/IModelCampusData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
+import { SchoolYear } from '../SchoolAdministrator/SchoolYear';
 
+@Index("index_full", ["schoolYearId", "campusId", "schoolId"])
 @ObjectType({ description: 'The AcademicDay model', implements: IModelCampusData })
 @Entity()
 export class AcademicDay extends IModelCampusData {
@@ -18,13 +21,21 @@ export class AcademicDay extends IModelCampusData {
   @Field(() => [Day], { nullable: true })
   @Column({ nullable: true })
   day?: [Day];
+
+  @Index("index_schoolYearId")
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  schoolYearId?: string;
+
+  @Field({ nullable: true })
+  schoolYear?: SchoolYear;
 }
 
 @ObjectType()
-export class AcademicDayEdge extends EdgeType('AcademicDay', AcademicDay) {}
+export class AcademicDayEdge extends EdgeType('AcademicDay', AcademicDay) { }
 
 @ObjectType()
 export class AcademicDayConnection extends ConnectionType<AcademicDayEdge>(
   'AcademicDay',
   AcademicDayEdge
-) {}
+) { }

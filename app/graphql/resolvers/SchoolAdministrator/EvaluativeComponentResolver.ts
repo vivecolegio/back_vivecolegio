@@ -2,16 +2,8 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import {
-  AcademicAreaRepository,
-  AcademicAsignatureCourseRepository,
-  AcademicAsignatureRepository,
-  CampusRepository,
-  CourseRepository,
-  EvaluativeComponentRepository,
-  SchoolRepository,
-  UserRepository,
-} from '../../../servers/DataSource';
+
+import { AcademicAreaRepository, AcademicAsignatureCourseRepository, AcademicAsignatureRepository, CampusRepository, CourseRepository, EvaluativeComponentRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewEvaluativeComponent } from '../../inputs/SchoolAdministrator/NewEvaluativeComponent';
 import { IContext } from '../../interfaces/IContext';
@@ -22,10 +14,7 @@ import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicArea } from '../../models/SchoolAdministrator/AcademicArea';
 import { AcademicAsignature } from '../../models/SchoolAdministrator/AcademicAsignature';
-import {
-  EvaluativeComponent,
-  EvaluativeComponentConnection,
-} from '../../models/SchoolAdministrator/EvaluativeComponent';
+import { EvaluativeComponent, EvaluativeComponentConnection } from '../../models/SchoolAdministrator/EvaluativeComponent';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
 @Resolver(EvaluativeComponent)
@@ -66,7 +55,8 @@ export class EvaluativeComponentResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => String) schoolId: String,
-    @Arg('academicAsignatureId', () => String, { nullable: true }) academicAsignatureId: String
+    @Arg('academicAsignatureId', () => String, { nullable: true }) academicAsignatureId: String,
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
   ): Promise<EvaluativeComponentConnection> {
     let result;
     if (allData) {
@@ -75,13 +65,14 @@ export class EvaluativeComponentResolver {
           result = await this.repository.findBy({
             where: {
               schoolId,
+              schoolYearId,
               academicAsignatureId: { $in: [academicAsignatureId] },
             },
             order: { createdAt: 'DESC' },
           });
         } else {
           result = await this.repository.findBy({
-            where: { schoolId },
+            where: { schoolId, schoolYearId },
             order: { createdAt: 'DESC' },
           });
         }
@@ -89,13 +80,13 @@ export class EvaluativeComponentResolver {
         if (academicAsignatureId) {
           result = await this.repository.findBy({
             where: {
-              schoolId,
+              schoolId, schoolYearId,
               academicAsignatureId: { $in: [academicAsignatureId] },
             },
           });
         } else {
           result = await this.repository.findBy({
-            where: { schoolId },
+            where: { schoolId, schoolYearId },
           });
         }
       }
@@ -105,6 +96,7 @@ export class EvaluativeComponentResolver {
           result = await this.repository.findBy({
             where: {
               schoolId,
+              schoolYearId,
               academicAsignatureId: { $in: [academicAsignatureId] },
               default: true,
               active: true,
@@ -115,6 +107,7 @@ export class EvaluativeComponentResolver {
           result = await this.repository.findBy({
             where: {
               schoolId,
+              schoolYearId,
               default: true,
               active: true,
             },
@@ -126,6 +119,7 @@ export class EvaluativeComponentResolver {
           result = await this.repository.findBy({
             where: {
               schoolId,
+              schoolYearId,
               academicAsignatureId: { $in: [academicAsignatureId] },
               default: true,
               active: true,
@@ -135,6 +129,7 @@ export class EvaluativeComponentResolver {
           result = await this.repository.findBy({
             where: {
               schoolId,
+              schoolYearId,
               default: true,
               active: true,
             },
