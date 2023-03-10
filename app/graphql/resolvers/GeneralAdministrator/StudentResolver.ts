@@ -257,6 +257,7 @@ export class StudentResolver {
       let data = await this.repositoryEstudiantes.findBy({
         where: { dane: school.daneCode, procesado: null },
       });
+      console.log("Step: SIMAT - Update Students - Count", data?.length);
       for (let estudiante of data) {
         if (
           estudiante.jornada &&
@@ -339,7 +340,7 @@ export class StudentResolver {
               name += estudiante.nombre2 ? estudiante.nombre2 : '';
               let lastName = (estudiante.apellido1 ? estudiante.apellido1 : '') + " ";
               lastName += estudiante.apellido2 ? estudiante.apellido2 : '';
-              console.log(name, lastName)
+              //console.log(name, lastName)
               const modelUser = await this.repositoryUser.create({
                 name,
                 lastName,
@@ -410,7 +411,7 @@ export class StudentResolver {
                 procesado: true,
               });
               let result2 = await this.repositoryEstudiantes.save(model2);
-              console.log(count);
+              //console.log(count);
             }
             //} else {
             // const model = await this.repositoryEstudiantes.create({

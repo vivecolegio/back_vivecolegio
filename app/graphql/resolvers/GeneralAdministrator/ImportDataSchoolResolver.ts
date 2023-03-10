@@ -91,13 +91,13 @@ export class ImportDataSchoolResolver {
     if (dataSchoolYear.length == 1) {
       let dataCampus = await this.repositoryCampus.findBy({ where: { schoolId: schoolId } });
       for (let schoolYear of dataSchoolYear) {
+        console.log("Step: Initial")
         let dataAcademicPeriods = await this.repositoryAcademicPeriod.findBy({ where: { schoolId: schoolId } });
+        console.log("Academic Periods: ", dataAcademicPeriods?.length)
         for (let academicPeriod of dataAcademicPeriods) {
           let resultAcademicPeriod = await this.repositoryAcademicPeriod.save({
             _id: new ObjectId(academicPeriod.id.toString()),
             ...academicPeriod,
-            //startDate: new Date(),
-            //endDate: new Date(),
             version: (academicPeriod?.version as number) + 1,
             schoolId: schoolId.toString(),
             schoolYearId: schoolYear.id.toString()
@@ -105,6 +105,8 @@ export class ImportDataSchoolResolver {
         }
         for (let campus of dataCampus) {
           let dataAcademicDays = await this.repositoryAcademicDay.findBy({ where: { campusId: campus.id.toString() } });;
+          console.log("Academic Days Campus: ", dataAcademicDays?.length)
+          console.log("Campus: ", campus?.name)
           for (let academicDay of dataAcademicDays) {
             let resultAcademicDay = await this.repositoryAcademicDay.save({
               _id: new ObjectId(academicDay.id.toString()),
@@ -116,6 +118,7 @@ export class ImportDataSchoolResolver {
           }
         }
         let dataEducationLevel = await this.repositoryEducationLevel.findBy({ where: { schoolId: schoolId } });
+        console.log("Education Level: ", dataEducationLevel?.length)
         for (let educationLevel of dataEducationLevel) {
           let resultEducationLevel = await this.repositoryEducationLevel.save({
             _id: new ObjectId(educationLevel.id.toString()),
@@ -126,6 +129,7 @@ export class ImportDataSchoolResolver {
           });
         }
         let dataPerformanceLevel = await this.repositoryPerformanceLevel.findBy({ where: { schoolId: schoolId } });
+        console.log("Performance Level: ", dataPerformanceLevel?.length)
         for (let performanceLevel of dataPerformanceLevel) {
           let resultEducationLevel = await this.repositoryPerformanceLevel.save({
             _id: new ObjectId(performanceLevel.id.toString()),
@@ -136,6 +140,7 @@ export class ImportDataSchoolResolver {
           });
         }
         let dataEvaluativeComponent = await this.repositoryEvaluativeComponent.findBy({ where: { schoolId: schoolId } });
+        console.log("Evaluative Component: ", dataEvaluativeComponent?.length)
         for (let evaluativeComponent of dataEvaluativeComponent) {
           let resultEducationLevel = await this.repositoryEvaluativeComponent.save({
             _id: new ObjectId(evaluativeComponent.id.toString()),
@@ -145,8 +150,30 @@ export class ImportDataSchoolResolver {
             schoolYearId: schoolYear.id.toString()
           });
         }
-        // falta incluir modalidad y especialidad
+        let dataModality = await this.repositoryModality.findBy({ where: { schoolId: schoolId } });
+        console.log("Modality: ", dataEvaluativeComponent?.length)
+        for (let modality of dataModality) {
+          let resultModality = await this.repositoryModality.save({
+            _id: new ObjectId(modality.id.toString()),
+            ...modality,
+            version: (modality?.version as number) + 1,
+            schoolId: schoolId.toString(),
+            schoolYearId: schoolYear.id.toString()
+          });
+          let dataSpeciality = await this.repositorySpecialty.findBy({ where: { modalityId: modality.id.toString() } });
+          console.log("Speciality: ", dataSpeciality?.length)
+          for (let speciality of dataSpeciality) {
+            let resultSpeciality = await this.repositorySpecialty.save({
+              _id: new ObjectId(speciality.id.toString()),
+              ...speciality,
+              version: (speciality?.version as number) + 1,
+              schoolId: schoolId.toString(),
+              schoolYearId: schoolYear.id.toString()
+            });
+          }
+        }
         let dataAcademicArea = await this.repositoryAcademicArea.findBy({ where: { schoolId: schoolId } });
+        console.log("Academic Area: ", dataAcademicArea?.length)
         for (let academicArea of dataAcademicArea) {
           let resultAcademicArea = await this.repositoryAcademicArea.save({
             _id: new ObjectId(academicArea.id.toString()),
@@ -156,6 +183,7 @@ export class ImportDataSchoolResolver {
             schoolYearId: schoolYear.id.toString()
           });
           let dataAcademicAsignature = await this.repositoryAcademicAsignature.findBy({ where: { academicAreaId: academicArea.id.toString() } });
+          console.log("Academic Asignature: ", dataAcademicAsignature?.length)
           for (let academicAsignature of dataAcademicAsignature) {
             let resultAcademicAsignature = await this.repositoryAcademicAsignature.save({
               _id: new ObjectId(academicAsignature.id.toString()),
@@ -167,6 +195,7 @@ export class ImportDataSchoolResolver {
           }
         }
         let dataAcademicGrade = await this.repositoryAcademicGrade.findBy({ where: { schoolId: schoolId } });
+        console.log("Academic Grade: ", dataAcademicGrade?.length)
         for (let academicGrade of dataAcademicGrade) {
           let resultAcademicGrade = await this.repositoryAcademicGrade.save({
             _id: new ObjectId(academicGrade.id.toString()),
@@ -176,6 +205,7 @@ export class ImportDataSchoolResolver {
             schoolYearId: schoolYear.id.toString()
           });
           let dataCourse = await this.repositoryCourse.findBy({ where: { academicGradeId: academicGrade.id.toString() } });
+          console.log("Course: ", dataCourse?.length)
           for (let course of dataCourse) {
             let resultCourse = await this.repositoryCourse.save({
               _id: new ObjectId(course.id.toString()),
@@ -187,31 +217,23 @@ export class ImportDataSchoolResolver {
             });
           }
         }
-
+        console.log("Step: SIMAT ")
         await this.academicDayResolver.createAllInitialsAcademicDay(schoolId, schoolYear.id.toString());
+        console.log("Step: SIMAT - Academic Days")
         await this.courseResolver.createAllInitialsCourse(schoolId, schoolYear.id.toString());
+        console.log("Step: SIMAT - Courses")
         await this.courseResolver.updateGradeAllInitialsCourse(schoolId, schoolYear.id.toString());
+        console.log("Step: SIMAT - Update Grade Courses")
         await this.courseResolver.updateGradeAcademicDayAllInitialsCourse(schoolId, schoolYear.id.toString());
+        console.log("Step: SIMAT - Update Academic Day Courses")
         await this.studentResolver.createAllInitialsStudents(schoolId, schoolYear.id.toString());
+        console.log("Step: SIMAT - Update Students")
       }
     }
-
-
-    //Buscar el ano lectivo unico que debe existir en la base de datos.
-    //luego buscar todos los periodos que existan en la b ase de datos y convertirlos en periodos del ano lectivo 
-    //cambiar el valor del ano lectivo a 2023, con inicio y fin
-    // buscar los niveles educativos y vincularlos al ano
-    // buscar los niveles de desempeno y vincularlos al ano
-    // buscar los componentes evaluativos y vincularlos al ano
-    // buscar las modalidades y vincularlas al ano
-    // buscar las especialidades y vincularlas al ano
-    // buscar las areas y vincularlas al ano
-    // buscar los grados y vincuarlos al ano.
     return true;
   }
 
   //buscar en todos los academic day y actualizar el schoolID segun el campusiD
-
   // falta limpiar la base de datos de los registros de asignaturas que no tengan un area vinculada
 
 
