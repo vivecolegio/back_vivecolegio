@@ -229,7 +229,8 @@ export class GradeAssignmentResolver {
     let result = await this.repository.save(model);
     let courses = await this.repositoryCourse.findBy({
       where: {
-        academicGradeId: result?.academicGradeId
+        academicGradeId: result?.academicGradeId,
+        schoolYearId: result?.schoolYearId
       },
     })
     if (courses) {
@@ -237,7 +238,8 @@ export class GradeAssignmentResolver {
         let repositoryAcademicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findBy({
           where: {
             academicAsignatureId: result?.academicAsignatureId,
-            courseId: course?.id.toString()
+            courseId: course?.id.toString(),
+            schoolYearId: result?.schoolYearId
           },
         })
         if (repositoryAcademicAsignatureCourse.length === 0) {
@@ -246,6 +248,7 @@ export class GradeAssignmentResolver {
             academicAsignatureId: result?.academicAsignatureId,
             courseId: course?.id.toString(),
             gradeAssignmentId: result?.id.toString(),
+            schoolYearId: result?.schoolYearId,
             active: true,
             version: 0,
             createdByUserId,

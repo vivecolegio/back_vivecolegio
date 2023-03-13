@@ -213,12 +213,14 @@ export class AcademicAsignatureCourseResolver {
   @Query(() => AcademicAsignatureCourseConnection)
   async getAllAcademicAsignatureCourseTeacher(
     @Args() args: ConnectionArgs,
-    @Arg('teacherId', () => String) teacherId: String
+    @Arg('teacherId', () => String) teacherId: String,
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
   ): Promise<AcademicAsignatureCourseConnection> {
     let result;
     result = await this.repository.findBy({
       where: {
         teacherId,
+        schoolYearId,
         active: true,
       },
     });

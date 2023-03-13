@@ -17,4 +17,7 @@ export class NewGradeAssignment implements Partial<GradeAssignment> {
 
   @Field({ nullable: true })
   schoolId?: string;
+
+  @Field({ nullable: true })
+  schoolYearId?: string;
 }

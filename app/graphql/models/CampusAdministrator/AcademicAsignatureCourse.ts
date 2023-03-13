@@ -4,6 +4,7 @@ import { IModelCampusData } from '../../interfaces/IModelCampusData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { AcademicAsignature } from '../SchoolAdministrator/AcademicAsignature';
 import { GradeAssignment } from '../SchoolAdministrator/GradeAssignment';
+import { SchoolYear } from '../SchoolAdministrator/SchoolYear';
 import { Course } from './Course';
 import { Teacher } from './Teacher';
 
@@ -50,6 +51,14 @@ export class AcademicAsignatureCourse extends IModelCampusData {
 
   @Field({ nullable: true })
   gradeAssignment?: GradeAssignment;
+
+  @Index("index_schoolYearId")
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  schoolYearId?: string;
+
+  @Field({ nullable: true })
+  schoolYear?: SchoolYear;
 }
 
 @ObjectType()

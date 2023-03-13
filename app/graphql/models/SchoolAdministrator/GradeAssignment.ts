@@ -4,6 +4,7 @@ import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { AcademicAsignature } from './AcademicAsignature';
 import { AcademicGrade } from './AcademicGrade';
+import { SchoolYear } from './SchoolYear';
 
 @Index("index_full", ["academicGradeId", "academicAsignatureId", "schoolId"])
 @ObjectType({ description: 'The GradeAssignment model', implements: IModelSchoolData })
@@ -32,6 +33,14 @@ export class GradeAssignment extends IModelSchoolData {
 
   @Field({ nullable: true })
   academicAsignature?: AcademicAsignature;
+
+  @Index("index_schoolYearId")
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  schoolYearId?: string;
+
+  @Field({ nullable: true })
+  schoolYear?: SchoolYear;
 }
 
 @ObjectType()
