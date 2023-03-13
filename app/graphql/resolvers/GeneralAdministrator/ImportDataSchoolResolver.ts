@@ -2,17 +2,19 @@ import { ObjectId } from 'mongodb';
 import { Arg, Mutation, Resolver } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicAreaRepository, AcademicAsignatureRepository, AcademicDayRepository, AcademicGradeRepository, AcademicPeriodRepository, CampusRepository, CourseRepository, EducationLevelRepository, EvaluativeComponentRepository, JornadasRepository, ModalityRepository, PerformanceLevelRepository, SchoolRepository, SchoolYearRepository, SpecialtyRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAreaRepository, AcademicAsignatureRepository, AcademicDayRepository, AcademicGradeRepository, AcademicPeriodRepository, CampusAdministratorRepository, CampusRepository, CourseRepository, EducationLevelRepository, EvaluativeComponentRepository, ModalityRepository, PerformanceLevelRepository, SchoolAdministratorRepository, SchoolRepository, SchoolYearRepository, SpecialtyRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
 import { AcademicDay } from '../../models/CampusAdministrator/AcademicDay';
 import { Course } from '../../models/CampusAdministrator/Course';
-import { Jornadas } from '../../models/Data/Jornadas';
+import { Teacher } from '../../models/CampusAdministrator/Teacher';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { School } from '../../models/GeneralAdministrator/School';
+import { SchoolAdministrator } from '../../models/GeneralAdministrator/SchoolAdministrator';
 import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicArea } from '../../models/SchoolAdministrator/AcademicArea';
 import { AcademicAsignature } from '../../models/SchoolAdministrator/AcademicAsignature';
 import { AcademicGrade } from '../../models/SchoolAdministrator/AcademicGrade';
 import { AcademicPeriod } from '../../models/SchoolAdministrator/AcademicPeriod';
+import { CampusAdministrator } from '../../models/SchoolAdministrator/CampusAdministrator';
 import { EducationLevel } from '../../models/SchoolAdministrator/EducationLevel';
 import { EvaluativeComponent } from '../../models/SchoolAdministrator/EvaluativeComponent';
 import { Modality } from '../../models/SchoolAdministrator/Modality';
@@ -73,8 +75,14 @@ export class ImportDataSchoolResolver {
   @InjectRepository(Course)
   private repositoryCourse = CourseRepository
 
-  @InjectRepository(Jornadas)
-  private repositoryJornadas = JornadasRepository;
+  @InjectRepository(SchoolAdministrator)
+  private repositorySchoolAdministrator = SchoolAdministratorRepository
+
+  @InjectRepository(CampusAdministrator)
+  private repositoryCampusAdministrator = CampusAdministratorRepository
+
+  @InjectRepository(Teacher)
+  private repositoryTeacher = TeacherRepository;
 
   private academicDayResolver = new AcademicDayResolver();
 
@@ -92,6 +100,13 @@ export class ImportDataSchoolResolver {
       let dataCampus = await this.repositoryCampus.findBy({ where: { schoolId: schoolId } });
       for (let schoolYear of dataSchoolYear) {
         console.log("Step: Initial")
+        console.log("Update Year")
+        let resultSchoolYear = await this.repositorySchoolYear.save({
+          _id: new ObjectId(schoolYear.id.toString()),
+          ...schoolYear,
+          name: "2023",
+          version: (schoolYear?.version as number) + 1,
+        });
         let dataAcademicPeriods = await this.repositoryAcademicPeriod.findBy({ where: { schoolId: schoolId } });
         console.log("Academic Periods: ", dataAcademicPeriods?.length)
         for (let academicPeriod of dataAcademicPeriods) {
@@ -228,6 +243,43 @@ export class ImportDataSchoolResolver {
         console.log("Step: SIMAT - Update Academic Day Courses")
         await this.studentResolver.createAllInitialsStudents(schoolId, schoolYear.id.toString());
         console.log("Step: SIMAT - Update Students")
+        console.log("Step: Final")
+        console.log("Activate Administrator IE")
+        let dataSchoolAdministrator = await this.repositorySchoolAdministrator.findBy({ where: { schoolId: { $in: [schoolId] } } });
+        console.log("School Administrator: ", dataSchoolAdministrator?.length)
+        for (let schoolAdministrator of dataSchoolAdministrator) {
+          let resultUser = await this.repositoryUser.findOneBy(schoolAdministrator?.userId?.toString());
+          resultUser = await this.repositoryUser.save({
+            _id: new ObjectId(resultUser?.id?.toString()),
+            ...resultUser,
+            active: true,
+            version: (resultUser?.version as number) + 1,
+          });
+        }
+        console.log("Activate Administrator Campus")
+        let dataCampusAdministrator = await this.repositoryCampusAdministrator.findBy({ where: { schoolId: { $in: [schoolId] } } });
+        console.log("Campus Administrator: ", dataCampusAdministrator?.length)
+        for (let campusAdministrator of dataSchoolAdministrator) {
+          let resultUser = await this.repositoryUser.findOneBy(campusAdministrator?.userId?.toString());
+          resultUser = await this.repositoryUser.save({
+            _id: new ObjectId(resultUser?.id?.toString()),
+            ...resultUser,
+            active: true,
+            version: (resultUser?.version as number) + 1,
+          });
+        }
+        console.log("Activate Teachers")
+        let dataTeacher = await this.repositoryTeacher.findBy({ where: { schoolId: { $in: [schoolId] } } });
+        console.log("Teacher: ", dataTeacher?.length)
+        for (let teacher of dataTeacher) {
+          let resultUser = await this.repositoryUser.findOneBy(teacher?.userId?.toString());
+          resultUser = await this.repositoryUser.save({
+            _id: new ObjectId(resultUser?.id?.toString()),
+            ...resultUser,
+            active: true,
+            version: (resultUser?.version as number) + 1,
+          });
+        }
       }
     }
     return true;
