@@ -181,6 +181,8 @@ type AcademicAsignatureCourse implements IModelCampusData {
   id: ID!
   school: School
   schoolId: String
+  schoolYear: SchoolYear
+  schoolYearId: String
   teacher: Teacher
   teacherId: String
   updatedAt: DateTime
@@ -1873,6 +1875,8 @@ type GradeAssignment implements IModelSchoolData {
   minHourlyIntensity: Float
   school: School
   schoolId: String
+  schoolYear: SchoolYear
+  schoolYearId: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -2498,7 +2502,12 @@ type Mutation {
   generatePerformanceReportCourse(academicPeriodId: String!, format: String!, id: String!, schoolId: String!, schoolYearId: String!, studentId: String): String!
   importAcademicAreaSchoolYearId(newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!): Boolean!
   importAcademicGradeSchoolYearId(newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!): Boolean!
+  importAcademicPeriodSchoolYearId(newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!): Boolean!
+  importDataSchoolActiveOldYear(schoolId: String!): Boolean!
   importDataSchoolInactive(schoolId: String!): Boolean!
+  importEducationLevelSchoolYearId(newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!): Boolean!
+  importEvaluativeComponentSchoolYearId(newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!): Boolean!
+  importPerformanceLevelSchoolYearId(newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!): Boolean!
   login(password: String!, username: String!): Jwt!
   resetPasswordUser(id: String!): Boolean!
   singleUpload(file: Upload, id: String!): Boolean!
@@ -2653,6 +2662,7 @@ input NewAcademicAsignatureCourse {
   courseId: String
   gradeAssignmentId: String
   hourlyIntensity: Float
+  schoolYearId: String
   teacherId: String
   weight: Float
 }
@@ -3039,6 +3049,7 @@ input NewGradeAssignment {
   maxHourlyIntensity: Float
   minHourlyIntensity: Float
   schoolId: String
+  schoolYearId: String
 }
 
 input NewGuardian {
@@ -3621,6 +3632,7 @@ type Query {
 
     """Paginate last"""
     last: Float
+    schoolYearId: String
     teacherId: String!
   ): AcademicAsignatureCourseConnection!
   getAllAcademicAsignatureCourseYearValuation(

@@ -24,6 +24,7 @@ import { Specialty } from '../../models/SchoolAdministrator/Specialty';
 import { AcademicDayResolver } from '../CampusAdministrator/AcademicDayResolver';
 import { CourseResolver } from '../CampusAdministrator/CourseResolver';
 import { AcademicAreaResolver } from '../SchoolAdministrator/AcademicAreaResolver';
+import { AcademicGradeResolver } from '../SchoolAdministrator/AcademicGradeResolver';
 import { AcademicPeriodResolver } from '../SchoolAdministrator/AcademicPeriodResolver';
 import { EducationLevelResolver } from '../SchoolAdministrator/EducationLevelResolver';
 import { EvaluativeComponentResolver } from '../SchoolAdministrator/EvaluativeComponentResolver';
@@ -104,6 +105,8 @@ export class ImportDataSchoolResolver {
   private evaluativeComponentResolver = new EvaluativeComponentResolver();
 
   private academicAreaResolver = new AcademicAreaResolver();
+
+  private academicGradeResolver = new AcademicGradeResolver();
 
   @Mutation(() => Boolean)
   async importDataSchoolInactive(
@@ -494,6 +497,11 @@ export class ImportDataSchoolResolver {
         console.log("Academic Area New: ", dataAcademicAreaNew?.length)
         if (dataAcademicAreaNew?.length == 0) {
           await this.academicAreaResolver.importAcademicAreaSchoolYearId(schoolId, schoolYear.id.toString(), newSchoolYear.id.toString());
+        }
+        let dataAcademicGradeNew = await this.repositoryAcademicGrade.findBy({ where: { schoolId: schoolId, schoolYearId: newSchoolYear?.id?.toString() } });
+        console.log("Academic Grade New: ", dataAcademicGradeNew?.length)
+        if (dataAcademicAreaNew?.length == 0) {
+          await this.academicGradeResolver.importAcademicGradeSchoolYearId(schoolId, schoolYear.id.toString(), newSchoolYear.id.toString());
         }
         console.log("Step: SIMAT ")
         await this.academicDayResolver.createAllInitialsAcademicDay(schoolId, newSchoolYear.id.toString());
