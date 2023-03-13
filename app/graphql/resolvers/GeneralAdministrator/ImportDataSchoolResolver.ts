@@ -281,6 +281,8 @@ export class ImportDataSchoolResolver {
           });
         }
       }
+    } else {
+      console.log("Step Fail: School Years ", dataSchoolYear?.length)
     }
     return true;
   }
