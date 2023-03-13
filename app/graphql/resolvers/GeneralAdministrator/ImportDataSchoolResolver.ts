@@ -23,6 +23,11 @@ import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { Specialty } from '../../models/SchoolAdministrator/Specialty';
 import { AcademicDayResolver } from '../CampusAdministrator/AcademicDayResolver';
 import { CourseResolver } from '../CampusAdministrator/CourseResolver';
+import { AcademicAreaResolver } from '../SchoolAdministrator/AcademicAreaResolver';
+import { AcademicPeriodResolver } from '../SchoolAdministrator/AcademicPeriodResolver';
+import { EducationLevelResolver } from '../SchoolAdministrator/EducationLevelResolver';
+import { EvaluativeComponentResolver } from '../SchoolAdministrator/EvaluativeComponentResolver';
+import { PerformanceLevelResolver } from '../SchoolAdministrator/PerformanceLevelResolver';
 import { StudentResolver } from './StudentResolver';
 
 @Resolver(School)
@@ -90,6 +95,15 @@ export class ImportDataSchoolResolver {
 
   private studentResolver = new StudentResolver();
 
+  private academicPeriodResolver = new AcademicPeriodResolver();
+
+  private educationLevelResolver = new EducationLevelResolver();
+
+  private performanceLevelResolver = new PerformanceLevelResolver();
+
+  private evaluativeComponentResolver = new EvaluativeComponentResolver();
+
+  private academicAreaResolver = new AcademicAreaResolver();
 
   @Mutation(() => Boolean)
   async importDataSchoolInactive(
@@ -292,11 +306,10 @@ export class ImportDataSchoolResolver {
   async importDataSchoolActiveOldYear(
     @Arg('schoolId', () => String,) schoolId: String
   ) {
-    let dataSchoolYear = await this.repositorySchoolYear.findBy({ where: { schoolId: schoolId } });
-
-    let dataSchoolYear2022 = await this.repositorySchoolYear.findBy({ where: { schoolId: schoolId, name: "2022" } });
-    let dataSchoolYear2023 = await this.repositorySchoolYear.findBy({ where: { schoolId: schoolId, name: "2023" } });
-    if (dataSchoolYear2022.length == 1 && dataSchoolYear2023.length == 1) {
+    //let dataSchoolYear = await this.repositorySchoolYear.findBy({ where: { schoolId: schoolId } });
+    let dataSchoolYear2022 = await this.repositorySchoolYear.findBy({ where: { schoolId: schoolId, schoolYear: 2022 } });
+    let dataSchoolYear2023 = await this.repositorySchoolYear.findBy({ where: { schoolId: schoolId, schoolYear: 2023 } });
+    if (dataSchoolYear2022.length == 1) {
       let schoolYear = dataSchoolYear2022[0];
       let dataCampus = await this.repositoryCampus.findBy({ where: { schoolId: schoolId } });
       console.log("Step: Initial")
@@ -307,7 +320,11 @@ export class ImportDataSchoolResolver {
         name: "2023",
         version: (schoolYear?.version as number) + 1,
       });
-      let dataAcademicPeriods = await this.repositoryAcademicPeriod.findBy({ where: { schoolId: schoolId } });
+      let dataAcademicPeriods = await this.repositoryAcademicPeriod.findBy({
+        where: {
+          schoolId: schoolId, schoolYearId: schoolYear?.id?.toString()
+        }
+      });
       console.log("Academic Periods: ", dataAcademicPeriods?.length)
       for (let academicPeriod of dataAcademicPeriods) {
         let resultAcademicPeriod = await this.repositoryAcademicPeriod.save({
@@ -432,29 +449,65 @@ export class ImportDataSchoolResolver {
           });
         }
       }
-
-
-
-
-      //cambiando año
-      let newSchoolYear = dataSchoolYear2023[0];
-      console.log("Step: SIMAT ")
-      await this.academicDayResolver.createAllInitialsAcademicDay(schoolId, newSchoolYear.id.toString());
-      console.log("Step: SIMAT - Academic Days")
-      await this.courseResolver.createAllInitialsCourse(schoolId, newSchoolYear.id.toString());
-      console.log("Step: SIMAT - Courses")
-      await this.courseResolver.updateGradeAllInitialsCourse(schoolId, newSchoolYear.id.toString());
-      console.log("Step: SIMAT - Update Grade Courses")
-      await this.courseResolver.updateGradeAcademicDayAllInitialsCourse(schoolId, newSchoolYear.id.toString());
-      console.log("Step: SIMAT - Update Academic Day Courses")
-      await this.studentResolver.createAllInitialsStudents(schoolId, newSchoolYear.id.toString());
-      console.log("Step: SIMAT - Update Students")
-      console.log("Step: Final")
-
-
-
-
-
+      if (dataSchoolYear2023.length == 0) {
+        const model = await this.repositorySchoolYear.create({
+          schoolYear: 2023,
+          schoolId: schoolId.toString(),
+          active: true,
+          version: 0,
+        });
+        let resultSchoolYear = await this.repositorySchoolYear.save(model);
+        if (resultSchoolYear) {
+          dataSchoolYear2023 = [resultSchoolYear]
+        }
+      }
+      if (dataSchoolYear2023.length == 1 && dataSchoolYear2023.length == 1) {
+        //cambiando año 
+        let newSchoolYear = dataSchoolYear2023[0];
+        console.log("Step: New year ")
+        let dataAcademicPeriodsNew = await this.repositoryAcademicPeriod.findBy({
+          where: {
+            schoolId: schoolId, schoolYearId: newSchoolYear?.id?.toString()
+          }
+        });
+        console.log("Academic Periods New: ", dataAcademicPeriodsNew?.length)
+        if (dataAcademicPeriodsNew.length == 0) {
+          console.log("Step: Import Academic Periods ")
+          await this.academicPeriodResolver.importAcademicPeriodSchoolYearId(schoolId, schoolYear.id.toString(), newSchoolYear.id.toString());
+        }
+        let dataEducationLevelNew = await this.repositoryEducationLevel.findBy({ where: { schoolId: schoolId, schoolYearId: newSchoolYear?.id?.toString() } });
+        console.log("Education Level New: ", dataEducationLevelNew?.length)
+        if (dataEducationLevelNew.length == 0) {
+          await this.educationLevelResolver.importEducationLevelSchoolYearId(schoolId, schoolYear.id.toString(), newSchoolYear.id.toString());
+        }
+        let dataPerformanceLevelNew = await this.repositoryPerformanceLevel.findBy({ where: { schoolId: schoolId, schoolYearId: newSchoolYear?.id?.toString() } });
+        console.log("Performance Level New: ", dataPerformanceLevelNew?.length)
+        if (dataPerformanceLevelNew?.length == 0) {
+          await this.performanceLevelResolver.importPerformanceLevelSchoolYearId(schoolId, schoolYear.id.toString(), newSchoolYear.id.toString());
+        }
+        let dataEvaluativeComponentNew = await this.repositoryEvaluativeComponent.findBy({ where: { schoolId: schoolId, schoolYearId: newSchoolYear?.id?.toString() } });
+        console.log("Evaluative Component New: ", dataEvaluativeComponentNew?.length)
+        if (dataEvaluativeComponentNew?.length == 0) {
+          await this.evaluativeComponentResolver.importEvaluativeComponentSchoolYearId(schoolId, schoolYear.id.toString(), newSchoolYear.id.toString());
+        }
+        let dataAcademicAreaNew = await this.repositoryAcademicArea.findBy({ where: { schoolId: schoolId, schoolYearId: newSchoolYear?.id?.toString() } });
+        console.log("Academic Area New: ", dataAcademicAreaNew?.length)
+        if (dataAcademicAreaNew?.length == 0) {
+          await this.academicAreaResolver.importAcademicAreaSchoolYearId(schoolId, schoolYear.id.toString(), newSchoolYear.id.toString());
+        }
+        console.log("Step: SIMAT ")
+        await this.academicDayResolver.createAllInitialsAcademicDay(schoolId, newSchoolYear.id.toString());
+        console.log("Step: SIMAT - Academic Days")
+        await this.courseResolver.createAllInitialsCourse(schoolId, newSchoolYear.id.toString());
+        console.log("Step: SIMAT - Courses")
+        await this.courseResolver.updateGradeAllInitialsCourse(schoolId, newSchoolYear.id.toString());
+        console.log("Step: SIMAT - Update Grade Courses")
+        await this.courseResolver.updateGradeAcademicDayAllInitialsCourse(schoolId, newSchoolYear.id.toString());
+        console.log("Step: SIMAT - Update Academic Day Courses")
+        await this.studentResolver.createAllInitialsStudents(schoolId, newSchoolYear.id.toString());
+        console.log("Step: SIMAT - Update Students")
+        console.log("Step: Final")
+      }
       console.log("Activate Administrator IE")
       let dataSchoolAdministrator = await this.repositorySchoolAdministrator.findBy({ where: { schoolId: { $in: [schoolId] } } });
       console.log("School Administrator: ", dataSchoolAdministrator?.length)

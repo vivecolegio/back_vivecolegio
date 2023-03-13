@@ -221,6 +221,24 @@ export class AcademicPeriodResolver {
     return result?.result?.ok === 1 ?? true;
   }
 
+
+  @Mutation(() => Boolean)
+  async importAcademicPeriodSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String) {
+    let results = await this.repository.findBy({ where: { schoolId, schoolYearId: oldSchoolYearId } });
+    for (let result of results) {
+      const model = await this.repository.create({
+        name: result.name,
+        schoolId: result.schoolId,
+        order: result.order,
+        active: true,
+        version: 0,
+        schoolYearId: newSchoolYearId.toString()
+      });
+      let resultSave = await this.repository.save(model);
+    }
+    return true;
+  }
+
   @FieldResolver((_type) => User, { nullable: true })
   async createdByUser(@Root() data: AcademicPeriod) {
     let id = data.createdByUserId;

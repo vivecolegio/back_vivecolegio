@@ -144,6 +144,23 @@ export class EducationLevelResolver {
     return result?.result?.ok === 1 ?? true;
   }
 
+  @Mutation(() => Boolean)
+  async importEducationLevelSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String) {
+    let results = await this.repository.findBy({ where: { schoolId, schoolYearId: oldSchoolYearId } });
+    for (let result of results) {
+      const model = await this.repository.create({
+        name: result.name,
+        schoolId: result.schoolId,
+        description: result.description,
+        active: true,
+        version: 0,
+        schoolYearId: newSchoolYearId.toString()
+      });
+      let resultSave = await this.repository.save(model);
+    }
+    return true;
+  }
+
   @FieldResolver((_type) => User, { nullable: true })
   async createdByUser(@Root() data: EducationLevel) {
     let id = data.createdByUserId;

@@ -452,6 +452,35 @@ export class PerformanceLevelResolver {
     return result?.result?.ok === 1 ?? true;
   }
 
+  @Mutation(() => Boolean)
+  async importPerformanceLevelSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String) {
+    let results = await this.repository.findBy({ where: { schoolId, schoolYearId: oldSchoolYearId } });
+    for (let result of results) {
+      const model = await this.repository.create({
+        name: result.name,
+        minimumScore: result.minimumScore,
+        topScore: result.topScore,
+        abbreviation: result.abbreviation,
+        colorHex: result.colorHex,
+        isFinal: result.isFinal,
+        isRecovery: result.isRecovery,
+        type: result.type,
+        category: result.category,
+        categoryGrade: result.categoryGrade,
+        generalPerformanceLevelId: result.generalPerformanceLevelId,
+        campusId: result.campusId,
+        academicGradesId: result.academicGradesId,
+        schoolId: result.schoolId,
+        order: result.order,
+        active: true,
+        version: 0,
+        schoolYearId: newSchoolYearId.toString()
+      });
+      let resultSave = await this.repository.save(model);
+    }
+    return true;
+  }
+
   @FieldResolver((_type) => User, { nullable: true })
   async createdByUser(@Root() data: PerformanceLevel) {
     let id = data.createdByUserId;
