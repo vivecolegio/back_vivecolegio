@@ -2,14 +2,8 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import {
-  AcademicAreaRepository,
-  AcademicAsignatureRepository,
-  GeneralAcademicAsignatureRepository,
-  GradeAssignmentRepository,
-  SchoolRepository,
-  UserRepository,
-} from '../../../servers/DataSource';
+
+import { AcademicAreaRepository, AcademicAsignatureRepository, GeneralAcademicAsignatureRepository, GradeAssignmentRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicAsignature } from '../../inputs/SchoolAdministrator/NewAcademicAsignature';
 import { IContext } from '../../interfaces/IContext';
@@ -17,10 +11,7 @@ import { GeneralAcademicAsignature } from '../../models/GeneralAdministrator/Gen
 import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicArea } from '../../models/SchoolAdministrator/AcademicArea';
-import {
-  AcademicAsignature,
-  AcademicAsignatureConnection,
-} from '../../models/SchoolAdministrator/AcademicAsignature';
+import { AcademicAsignature, AcademicAsignatureConnection } from '../../models/SchoolAdministrator/AcademicAsignature';
 import { GradeAssignment } from '../../models/SchoolAdministrator/GradeAssignment';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
@@ -131,13 +122,15 @@ export class AcademicAsignatureResolver {
   async getAllAcademicAsignatureNotAssignedInAcademicGrade(
     @Args() args: ConnectionArgs,
     @Arg('schoolId', () => String) schoolId: String,
-    @Arg('academicGradeId', () => String) academicGradeId: string
+    @Arg('academicGradeId', () => String) academicGradeId: string,
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
   ): Promise<AcademicAsignatureConnection> {
     let gradeAssignmentAsignatureIds: any[] = [];
     let gradeAssignmentsAcademicGrade = await this.repositoryGradeAssignment.findBy({
       where: {
         schoolId,
         academicGradeId,
+        schoolYearId,
         active: true,
       },
     });
@@ -151,6 +144,7 @@ export class AcademicAsignatureResolver {
       where: {
         _id: { $nin: gradeAssignmentAsignatureIds },
         schoolId,
+        schoolYearId,
         active: true,
       },
     });
