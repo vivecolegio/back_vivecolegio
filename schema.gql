@@ -2495,6 +2495,7 @@ type Mutation {
   deleteStudentYearBehaviour(id: String!): Boolean!
   deleteTeacher(id: String!): Boolean!
   deleteUser(id: String!): Boolean!
+  fixStudentCourseYearOld(schoolId: String!, schoolYearId: String!): Boolean!
   generateCertificateFinalReportCourse(format: String!, id: String!, schoolId: String!, schoolYearId: String!, studentId: String): String!
   generatePerformanceFinalReportCourse(format: String!, id: String!, schoolId: String!, schoolYearId: String!, studentId: String): String!
   generatePerformanceLevelExample(id: String!): Boolean!
@@ -2507,6 +2508,7 @@ type Mutation {
   importDataSchoolInactive(schoolId: String!): Boolean!
   importEducationLevelSchoolYearId(newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!): Boolean!
   importEvaluativeComponentSchoolYearId(newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!): Boolean!
+  importGradeAssignmentSchoolYear: Boolean!
   importPerformanceLevelSchoolYearId(newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!): Boolean!
   login(password: String!, username: String!): Jwt!
   resetPasswordUser(id: String!): Boolean!
@@ -2548,6 +2550,7 @@ type Mutation {
   updateCodeStudentsAllCourses: Boolean!
   updateCodeStudentsCourse(id: String!): Boolean!
   updateCourse(data: NewCourse!, id: String!): Course!
+  updateDataSimat: Boolean!
   updateDocumentType(data: NewDocumentType!, id: String!): DocumentType!
   updateEducationLevel(data: NewEducationLevel!, id: String!): EducationLevel!
   updateEmail(data: NewEmail!, id: String!): Email!
@@ -2575,6 +2578,7 @@ type Mutation {
   updateGradeAcademicDayAllInitialsCourse(schoolId: String!, schoolYearId: String!): Boolean!
   updateGradeAllInitialsCourse(schoolId: String!, schoolYearId: String!): Boolean!
   updateGradeAssignment(data: NewGradeAssignment!, id: String!): GradeAssignment!
+  updateGradeAssignmentSchoolYear: Boolean!
   updateGuardian(data: NewGuardian!, id: String!): Guardian!
   updateInbox(data: NewInbox!, id: String!): Inbox!
   updateLearning(data: NewLearning!, id: String!): Learning!
@@ -3669,6 +3673,7 @@ type Query {
     """Paginate last"""
     last: Float
     schoolId: String!
+    schoolYearId: String
   ): AcademicAsignatureConnection!
   getAllAcademicDay(
     """Paginate after opaque cursor"""

@@ -2,13 +2,15 @@ import { ObjectId } from 'mongodb';
 import { Arg, Mutation, Resolver } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicAreaRepository, AcademicAsignatureRepository, AcademicDayRepository, AcademicGradeRepository, AcademicPeriodRepository, CampusAdministratorRepository, CampusRepository, CourseRepository, EducationLevelRepository, EvaluativeComponentRepository, ModalityRepository, PerformanceLevelRepository, SchoolAdministratorRepository, SchoolRepository, SchoolYearRepository, SpecialtyRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAreaRepository, AcademicAsignatureCourseRepository, AcademicAsignatureRepository, AcademicDayRepository, AcademicGradeRepository, AcademicPeriodRepository, CampusAdministratorRepository, CampusRepository, CourseRepository, EducationLevelRepository, EvaluativeComponentRepository, GradeAssignmentRepository, ModalityRepository, PerformanceLevelRepository, SchoolAdministratorRepository, SchoolRepository, SchoolYearRepository, SpecialtyRepository, StudentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAsignatureCourse } from '../../models/CampusAdministrator/AcademicAsignatureCourse';
 import { AcademicDay } from '../../models/CampusAdministrator/AcademicDay';
 import { Course } from '../../models/CampusAdministrator/Course';
 import { Teacher } from '../../models/CampusAdministrator/Teacher';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { School } from '../../models/GeneralAdministrator/School';
 import { SchoolAdministrator } from '../../models/GeneralAdministrator/SchoolAdministrator';
+import { Student } from '../../models/GeneralAdministrator/Student';
 import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicArea } from '../../models/SchoolAdministrator/AcademicArea';
 import { AcademicAsignature } from '../../models/SchoolAdministrator/AcademicAsignature';
@@ -17,6 +19,7 @@ import { AcademicPeriod } from '../../models/SchoolAdministrator/AcademicPeriod'
 import { CampusAdministrator } from '../../models/SchoolAdministrator/CampusAdministrator';
 import { EducationLevel } from '../../models/SchoolAdministrator/EducationLevel';
 import { EvaluativeComponent } from '../../models/SchoolAdministrator/EvaluativeComponent';
+import { GradeAssignment } from '../../models/SchoolAdministrator/GradeAssignment';
 import { Modality } from '../../models/SchoolAdministrator/Modality';
 import { PerformanceLevel } from '../../models/SchoolAdministrator/PerformanceLevel';
 import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
@@ -87,8 +90,17 @@ export class ImportDataSchoolResolver {
   @InjectRepository(CampusAdministrator)
   private repositoryCampusAdministrator = CampusAdministratorRepository
 
+  @InjectRepository(GradeAssignment)
+  private repositoryGradeAssignment = GradeAssignmentRepository
+
   @InjectRepository(Teacher)
   private repositoryTeacher = TeacherRepository;
+
+  @InjectRepository(Student)
+  private repositoryStudent = StudentRepository;
+
+  @InjectRepository(AcademicAsignatureCourse)
+  private repositoryAcademicAsignatureCourse = AcademicAsignatureCourseRepository;
 
   private academicDayResolver = new AcademicDayResolver();
 
@@ -320,7 +332,7 @@ export class ImportDataSchoolResolver {
       let resultSchoolYear = await this.repositorySchoolYear.save({
         _id: new ObjectId(schoolYear.id.toString()),
         ...schoolYear,
-        name: "2023",
+        name: 2023,
         version: (schoolYear?.version as number) + 1,
       });
       let dataAcademicPeriods = await this.repositoryAcademicPeriod.findBy({
@@ -559,8 +571,204 @@ export class ImportDataSchoolResolver {
     return true;
   }
 
+
+  @Mutation(() => Boolean)
+  async updateGradeAssignmentSchoolYear() {
+    let dataSchoolDane = [
+      // "254003000046",
+      "154128000680",
+    ];
+    let dataSchool = await this.repositorySchool.findBy({ where: { daneCode: { $in: dataSchoolDane } } })
+    for (let school of dataSchool) {
+      let schoolId = school.id.toString();
+      let dataGradeAssigments = await this.repositoryGradeAssignment.findBy({ where: { schoolId: schoolId } });
+      let schoolYearId = undefined;
+      console.log("Actualizando IE: ", school?.name);
+      console.log("DANE IE: ", school?.daneCode);
+      console.log("Actualizando: ", dataGradeAssigments?.length);
+      for (let gradeAssigment of dataGradeAssigments) {
+        if (gradeAssigment.schoolYearId == undefined) {
+          let academicGrade = await this.repositoryAcademicGrade.findOneBy(gradeAssigment.academicGradeId);
+          if (academicGrade) {
+            let resultGradeAssigment = await this.repositoryGradeAssignment.save({
+              _id: new ObjectId(gradeAssigment?.id?.toString()),
+              ...gradeAssigment,
+              schoolYearId: academicGrade.schoolYearId,
+              active: true,
+              version: (gradeAssigment?.version as number) + 1,
+            });
+            schoolYearId = academicGrade.schoolYearId;
+          }
+        } else {
+          schoolYearId = gradeAssigment.schoolYearId;
+        }
+        let dataAcademicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findBy({ where: { gradeAssignmentId: gradeAssigment.id.toString() } });
+        for (let academicAsignatureCourse of dataAcademicAsignatureCourse) {
+          let resultAcademicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(academicAsignatureCourse?.id?.toString());
+          resultAcademicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.save({
+            _id: new ObjectId(resultAcademicAsignatureCourse?.id?.toString()),
+            ...resultAcademicAsignatureCourse,
+            schoolYearId: schoolYearId,
+            schoolId: schoolId.toString(),
+            active: true,
+            version: (resultAcademicAsignatureCourse?.version as number) + 1,
+          });
+        }
+      }
+    }
+    return true;
+  }
+
+
+
+  //627cfaf0459553d16d932be0
+
+
   //buscar en todos los academic day y actualizar el schoolID segun el campusiD
   // falta limpiar la base de datos de los registros de asignaturas que no tengan un area vinculada
 
+
+
+  @Mutation(() => Boolean)
+  async fixStudentCourseYearOld(@Arg('schoolId', () => String) schoolId: String, @Arg('schoolYearId', () => String) schoolYearId: String) {
+    let dataSchool = await this.repositorySchool.findOneBy(schoolId)
+    let dataSchoolYear = await this.repositorySchoolYear.findOneBy(schoolYearId)
+    if (dataSchool && dataSchoolYear) {
+      let schoolId = dataSchool.id.toString();
+      let schoolYearId = dataSchoolYear.id.toString();
+      let dataCourses = await this.repositoryCourse.findBy({ where: { schoolId: schoolId, schoolYearId, } })
+      for (let course of dataCourses) {
+        let dataStudents = await this.repositoryStudent.findBy({
+          courseId: course.id.toString(),
+          //schoolYearId: schoolYearId
+        })
+        console.log("dataStudents", dataStudents)
+        let studentsId = [];
+        for (let student of dataStudents) {
+          studentsId?.push(student?.id?.toString());
+        }
+        console.log(studentsId)
+        let resultCourse = await this.repositoryCourse.save({
+          _id: new ObjectId(course?.id?.toString()),
+          ...course,
+          studentsId,
+          version: (course?.version as number) + 1,
+        });
+        //this.courseResolver.updateCodeStudentsCourse(course + "");
+      }
+    }
+    return true;
+  }
+
+
+
+
+  @Mutation(() => Boolean)
+  async updateDataSimat() {
+    let dataSchoolDane = [
+      // "254003000046",
+      "154660000698",
+    ];
+    let dataSchool = await this.repositorySchool.findBy({ where: { daneCode: { $in: dataSchoolDane } } })
+    for (let school of dataSchool) {
+      let schoolId = school.id.toString();
+      let dataSchoolYear2023 = await this.repositorySchoolYear.findBy({ where: { schoolId: school.id.toString(), schoolYear: 2023 } });
+      if (dataSchoolYear2023.length > 0) {
+        console.log("Step: SIMAT ")
+        await this.academicDayResolver.createAllInitialsAcademicDay(schoolId, dataSchoolYear2023[0].id.toString());
+        console.log("Step: SIMAT - Academic Days")
+        await this.courseResolver.createAllInitialsCourse(schoolId, dataSchoolYear2023[0].id.toString());
+        console.log("Step: SIMAT - Courses")
+        await this.courseResolver.updateGradeAllInitialsCourse(schoolId, dataSchoolYear2023[0].id.toString());
+        console.log("Step: SIMAT - Update Grade Courses")
+        await this.courseResolver.updateGradeAcademicDayAllInitialsCourse(schoolId, dataSchoolYear2023[0].id.toString());
+        console.log("Step: SIMAT - Update Academic Day Courses")
+        await this.studentResolver.createAllInitialsStudents(schoolId, dataSchoolYear2023[0].id.toString());
+        console.log("Step: SIMAT - Update Students")
+        console.log("Step: Final")
+      }
+    }
+    return true;
+  }
+
+
+  @Mutation(() => Boolean)
+  async importGradeAssignmentSchoolYear() {
+    let dataSchoolDane = [
+      // "254003000046",
+      "154128000680",
+    ];
+    let dataSchool = await this.repositorySchool.findBy({ where: { daneCode: { $in: dataSchoolDane } } })
+    for (let school of dataSchool) {
+      let dataSchoolYear2022 = await this.repositorySchoolYear.findBy({ where: { schoolId: school.id.toString(), schoolYear: 2022 } });
+      let dataSchoolYear2023 = await this.repositorySchoolYear.findBy({ where: { schoolId: school.id.toString(), schoolYear: 2023 } });
+      let schoolId = school.id.toString();
+      console.log("dataSchoolYear2022", dataSchoolYear2022[0].id.toString())
+      console.log("dataSchoolYear2023", dataSchoolYear2023[0].id.toString())
+      if (dataSchoolYear2022?.length > 0 && dataSchoolYear2023.length > 0) {
+        let dataOldGradeAssigments = await this.repositoryGradeAssignment.findBy({ where: { schoolId: schoolId, schoolYearId: dataSchoolYear2022[0].id.toString() } });
+        console.log("Actualizando IE: ", school?.name);
+        console.log("DANE IE: ", school?.daneCode);
+        console.log("Data OLD Grade Assigments: ", dataOldGradeAssigments?.length);
+        for (let oldGradeAssigment of dataOldGradeAssigments) {
+          let oldAcademicGrade = await this.repositoryAcademicGrade.findOneBy(oldGradeAssigment.academicGradeId);
+          let oldAcademicAsignature = await this.repositoryAcademicAsignature.findOneBy(oldGradeAssigment.academicAsignatureId);
+          console.log("oldAcademicGrade", oldAcademicGrade?.id?.toString())
+          console.log("oldAcademicAsignature", oldAcademicAsignature?.id?.toString())
+          if (oldAcademicGrade && oldAcademicAsignature) {
+            let newAcademicGrade = await this.repositoryAcademicGrade.findBy({ where: { schoolId: schoolId, schoolYearId: dataSchoolYear2023[0].id.toString(), generalAcademicGradeId: oldAcademicGrade?.generalAcademicGradeId, name: oldAcademicGrade?.name } });
+            let newAcademicAsignature = await this.repositoryAcademicAsignature.findBy({ where: { schoolId: schoolId, schoolYearId: dataSchoolYear2023[0].id.toString(), name: oldAcademicAsignature?.name } });
+            console.log("newAcademicGrade", newAcademicGrade[0].id.toString())
+            console.log("newAcademicAsignature", newAcademicAsignature[0].id.toString())
+            if (newAcademicGrade?.length > 0 && newAcademicAsignature.length > 0) {
+              const modelNewGradeAssigment = await this.repositoryGradeAssignment.create({
+                academicGradeId: newAcademicGrade[0].id.toString(),
+                academicAsignatureId: newAcademicAsignature[0].id.toString(),
+                minHourlyIntensity: oldGradeAssigment.minHourlyIntensity,
+                maxHourlyIntensity: oldGradeAssigment.maxHourlyIntensity,
+                schoolId: school.id.toString(),
+                schoolYearId: dataSchoolYear2023[0].id.toString(),
+                active: true,
+                version: 0,
+              });
+              let resultNewGradeAssigment = await this.repositoryGradeAssignment.save(modelNewGradeAssigment);
+              let courses = await this.repositoryCourse.findBy({
+                where: {
+                  academicGradeId: resultNewGradeAssigment?.academicGradeId,
+                  schoolYearId: resultNewGradeAssigment?.schoolYearId
+                },
+              })
+              if (courses) {
+                for (let course of courses) {
+                  let repositoryAcademicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findBy({
+                    where: {
+                      academicAsignatureId: resultNewGradeAssigment?.academicAsignatureId,
+                      courseId: course?.id.toString(),
+                      schoolYearId: resultNewGradeAssigment?.schoolYearId
+                    },
+                  })
+                  if (repositoryAcademicAsignatureCourse.length === 0) {
+                    const modelAcademicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.create({
+                      hourlyIntensity: resultNewGradeAssigment?.minHourlyIntensity,
+                      academicAsignatureId: resultNewGradeAssigment?.academicAsignatureId,
+                      courseId: course?.id.toString(),
+                      gradeAssignmentId: resultNewGradeAssigment?.id.toString(),
+                      schoolYearId: resultNewGradeAssigment?.schoolYearId,
+                      active: true,
+                      version: 0,
+                    });
+                    let resultAcademicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.save(modelAcademicAsignatureCourse);
+                  }
+                }
+              }
+            }
+
+          }
+
+        }
+      }
+    }
+    return true;
+  }
 
 }
