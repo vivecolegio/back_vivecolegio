@@ -666,12 +666,35 @@ export class ImportDataSchoolResolver {
   @Mutation(() => Boolean)
   async updateDataSimat() {
     let dataSchoolDane = [
-      // "254003000046",
-      "154660000698",
+      //Error
+      "254003000364",
+      "254003000445",
+      "254003001611",
+      "154109000431",
+      "154128000680",
+      "254128000463",
+
+
+
+
+      "254670000364",
+      "254720000778",
+      "254720000328",
+      "254720000034",
+      "254800001104",
+      "254800000850",
+      "254810000696",
+      "254820000279",
+      "254820000538",
+      "254820000856",
+
+
     ];
     let dataSchool = await this.repositorySchool.findBy({ where: { daneCode: { $in: dataSchoolDane } } })
     for (let school of dataSchool) {
       let schoolId = school.id.toString();
+      console.log("Actualizando IE: ", school?.name);
+      console.log("DANE IE: ", school?.daneCode);
       let dataSchoolYear2023 = await this.repositorySchoolYear.findBy({ where: { schoolId: school.id.toString(), schoolYear: 2023 } });
       if (dataSchoolYear2023.length > 0) {
         console.log("Step: SIMAT ")
