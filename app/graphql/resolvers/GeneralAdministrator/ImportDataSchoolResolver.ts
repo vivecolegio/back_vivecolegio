@@ -120,6 +120,100 @@ export class ImportDataSchoolResolver {
 
   private academicGradeResolver = new AcademicGradeResolver();
 
+
+
+  @Mutation(() => Boolean)
+  async updateWithDaneSchoolBulk() {
+    let dataSchoolDane = [
+      "254003000283",
+      "254003000062",
+      "254003000470",
+      "254003000381",
+      "254003002359",
+
+
+      // "154003000823",
+      // "254003000330",
+      // "254003000526",
+      // "154003001668",
+      // "254051000872",
+
+
+
+      // "254051000821",
+      // "254109000177",
+      // "254109000045",
+      // "154128000019",
+      // "154206000012",
+      // "254206000041",
+      // "254206000157",
+      // "154206000021",
+      // "254206001196",
+      // "254245000041",
+      // "254810000629",
+      // "254670000488",
+      // "254670000445",
+      // "254250000253",
+      // "254261000166",
+      // "254261000476",
+      // "254261000484",
+      // "154313000033",
+      // "254313000054",
+      // "254344000338",
+      // "254344000133",
+      // "254344000290",
+      // "254398000368",
+      // "154398000339",
+      // "254398000724",
+      // "254398000121",
+      // "254398000732",
+      // "154405000986",
+      // "254874000568",
+      // "154418000331",
+      // "154480000118",
+      // "254480000066",
+      // "254480000139",
+      // "154498000085",
+      // "254498000721",
+      // "254498000691",
+      // "254498000110",
+      // "154498001944",
+      // "254498000705",
+      // "154498000051",
+      // "154498001928",
+      // "154498000069",
+      // "154498002223",
+      // "154518000753",
+      // "254670000470",
+      // "154670000025",
+      // "154720001681",
+      // "254720001677",
+      // "254720000930",
+      // "254800000108",
+      // "254800000736",
+      // "154810003020",
+      // "254810000386",
+      // "254810000122",
+      // "254810002265",
+      // "254810000165",
+      // "254810002061",
+      // "254810001013",
+      // "254820000368",
+      // "254820000384",
+      // "254820000848",
+      // "254874000070",
+    ];
+    let dataSchool = await this.repositorySchool.findBy({ where: { daneCode: { $in: dataSchoolDane } } })
+    for (let school of dataSchool) {
+      let schoolId = school.id.toString();
+      console.log("Actualizando IE: ", school?.name);
+      console.log("DANE IE: ", school?.daneCode);
+      await this.importDataSchoolInactive(schoolId);
+    }
+    return true;
+  }
+
+
   @Mutation(() => Boolean)
   async importDataSchoolInactive(
     @Arg('schoolId', () => String) schoolId: String
@@ -133,7 +227,7 @@ export class ImportDataSchoolResolver {
         let resultSchoolYear = await this.repositorySchoolYear.save({
           _id: new ObjectId(schoolYear.id.toString()),
           ...schoolYear,
-          name: "2023",
+          name: 2023,
           version: (schoolYear?.version as number) + 1,
         });
         let dataAcademicPeriods = await this.repositoryAcademicPeriod.findBy({ where: { schoolId: schoolId } });
