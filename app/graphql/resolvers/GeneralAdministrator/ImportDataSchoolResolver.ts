@@ -125,83 +125,7 @@ export class ImportDataSchoolResolver {
   @Mutation(() => Boolean)
   async updateWithDaneSchoolBulk() {
     let dataSchoolDane = [
-      "254003000283",
-      "254003000062",
-      "254003000470",
-      "254003000381",
-      "254003002359",
-
-
-      // "154003000823",
-      // "254003000330",
-      // "254003000526",
-      // "154003001668",
-      // "254051000872",
-
-
-
-      // "254051000821",
-      // "254109000177",
-      // "254109000045",
-      // "154128000019",
-      // "154206000012",
-      // "254206000041",
-      // "254206000157",
-      // "154206000021",
-      // "254206001196",
-      // "254245000041",
-      // "254810000629",
-      // "254670000488",
-      // "254670000445",
-      // "254250000253",
-      // "254261000166",
-      // "254261000476",
-      // "254261000484",
-      // "154313000033",
-      // "254313000054",
-      // "254344000338",
-      // "254344000133",
-      // "254344000290",
-      // "254398000368",
-      // "154398000339",
-      // "254398000724",
-      // "254398000121",
-      // "254398000732",
-      // "154405000986",
-      // "254874000568",
-      // "154418000331",
-      // "154480000118",
-      // "254480000066",
-      // "254480000139",
-      // "154498000085",
-      // "254498000721",
-      // "254498000691",
-      // "254498000110",
-      // "154498001944",
-      // "254498000705",
-      // "154498000051",
-      // "154498001928",
-      // "154498000069",
-      // "154498002223",
-      // "154518000753",
-      // "254670000470",
-      // "154670000025",
-      // "154720001681",
-      // "254720001677",
-      // "254720000930",
-      // "254800000108",
-      // "254800000736",
-      // "154810003020",
-      // "254810000386",
-      // "254810000122",
-      // "254810002265",
-      // "254810000165",
-      // "254810002061",
-      // "254810001013",
-      // "254820000368",
-      // "254820000384",
-      // "254820000848",
-      // "254874000070",
+      ""
     ];
     let dataSchool = await this.repositorySchool.findBy({ where: { daneCode: { $in: dataSchoolDane } } })
     for (let school of dataSchool) {
@@ -219,7 +143,8 @@ export class ImportDataSchoolResolver {
     @Arg('schoolId', () => String) schoolId: String
   ) {
     let dataSchoolYear = await this.repositorySchoolYear.findBy({ where: { schoolId: schoolId } });
-    if (dataSchoolYear.length == 1) {
+    let dataSchoolYear2023 = await this.repositorySchoolYear.findBy({ where: { schoolId: schoolId, schoolYear: 2023 } });
+    if (dataSchoolYear.length == 1 && dataSchoolYear2023.length == 0) {
       let dataCampus = await this.repositoryCampus.findBy({ where: { schoolId: schoolId } });
       for (let schoolYear of dataSchoolYear) {
         console.log("Step: Initial")
@@ -227,7 +152,7 @@ export class ImportDataSchoolResolver {
         let resultSchoolYear = await this.repositorySchoolYear.save({
           _id: new ObjectId(schoolYear.id.toString()),
           ...schoolYear,
-          name: 2023,
+          schoolYear: 2023,
           version: (schoolYear?.version as number) + 1,
         });
         let dataAcademicPeriods = await this.repositoryAcademicPeriod.findBy({ where: { schoolId: schoolId } });
@@ -761,28 +686,28 @@ export class ImportDataSchoolResolver {
   async updateDataSimat() {
     let dataSchoolDane = [
       //Error
-      "254003000364",
-      "254003000445",
-      "254003001611",
-      "154109000431",
-      "154128000680",
-      "254128000463",
+      // "254003000364",
+      // "254003000445",
+      // "254003001611",
+      // "154109000431",
+      // "154128000680",
+      // "254128000463",
 
-
-
-
-      "254670000364",
-      "254720000778",
-      "254720000328",
-      "254720000034",
-      "254800001104",
-      "254800000850",
-      "254810000696",
-      "254820000279",
-      "254820000538",
-      "254820000856",
-
-
+      "254344000133",
+      "254398000368",
+      "254398000724",
+      "254498000721",
+      "154498000051",
+      "154498000069",
+      "254670000470",
+      "154720001681",
+      //"254800000736",
+      "154810003020",
+      "254810000386",
+      "254810000165",
+      "254820000368",
+      "254820000384",
+      "254820000848",
     ];
     let dataSchool = await this.repositorySchool.findBy({ where: { daneCode: { $in: dataSchoolDane } } })
     for (let school of dataSchool) {
@@ -887,5 +812,38 @@ export class ImportDataSchoolResolver {
     }
     return true;
   }
+
+
+  @Mutation(() => Boolean)
+  async fixAcademicAsignatureCourseSchoolYear() {
+    let dataSchoolDane = [
+      // "254003000046",
+      "154128000680",
+    ];
+    let dataSchool = await this.repositorySchool.findBy({ where: { daneCode: { $in: dataSchoolDane } } })
+    for (let school of dataSchool) {
+      let dataSchoolYear2023 = await this.repositorySchoolYear.findBy({ where: { schoolId: school.id.toString(), schoolYear: 2023 } });
+      if (dataSchool && dataSchoolYear2023) {
+        let schoolId = school.id.toString();
+        let schoolYearId = dataSchoolYear2023[0].id.toString();
+        let dataCourses = await this.repositoryCourse.findBy({ where: { schoolId: schoolId, schoolYearId, } })
+        for (let course of dataCourses) {
+          let dataAcademicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findBy({ courseId: course.id.toString() });
+          for (let academicAsignatureCourse of dataAcademicAsignatureCourse) {
+            let resultAcademicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.save({
+              _id: new ObjectId(academicAsignatureCourse?.id?.toString()),
+              ...academicAsignatureCourse,
+              schoolId: course.schoolId,
+              schoolYearId: course.schoolYearId,
+              version: (academicAsignatureCourse?.version as number) + 1,
+            });
+
+          }
+        }
+      }
+    }
+    return true;
+  }
+
 
 }
