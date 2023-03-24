@@ -373,7 +373,7 @@ export class UserResolver {
             if (userRole && userRole.length > 0) {
               schoolId = userRole[0].schoolId;
               campusId = userRole[0].campusId;
-              jwtUtil.teacher = userRole[0];
+              // jwtUtil.teacher = userRole[0];
             }
           }
           if (role.isGuardian) {
@@ -404,20 +404,6 @@ export class UserResolver {
             school = await this.repositorySchool.findBy({
               where: { _id: { $in: schoolIds } },
             });
-            // if (school && school.length === 1) {
-            //   const currentDate = new Date();
-            //   const currentYear = await this.repositorySchoolYear.findBy({
-            //     where: {
-            //       schoolId: school[0].id.toString(),
-            //       active: true,
-            //       startDate: { $lte: currentDate },
-            //       endDate: { $gte: currentDate },
-            //     },
-            //   });
-            //   if (currentYear.length > 0) {
-            //     jwtUtil.schoolYear = currentYear[0];
-            //   }
-            // }
           }
           if (campus && campus !== undefined) {
             jwtUtil.campus = campus;
@@ -465,7 +451,7 @@ export class UserResolver {
   }
 
   @Query(() => Jwt)
-  async me(@Ctx() context: IContext) {
+  async me(@Arg('schoolYearId') schoolYearId: string, @Ctx() context: IContext) {
     let userId = context?.user?.authorization?.id;
     let user = await this.repository.findOneBy(userId);
     let jwtUtil = new Jwt();
@@ -519,9 +505,12 @@ export class UserResolver {
         let userRole = await this.repositoryTeacher.findBy({
           where: { userId: user.id.toString() },
         });
+        console.log("schoolYearId", schoolYearId);
+        console.log("userRole", userRole);
         if (userRole && userRole.length > 0) {
           schoolId = userRole[0].schoolId;
           campusId = userRole[0].campusId;
+          jwtUtil.teacher = userRole[0];
         }
       }
       if (role.isGuardian) {
@@ -552,20 +541,6 @@ export class UserResolver {
         school = await this.repositorySchool.findBy({
           where: { _id: { $in: schoolIds } },
         });
-        if (school && school.length === 1) {
-          const currentDate = new Date();
-          const currentYear = await this.repositorySchoolYear.findBy({
-            where: {
-              schoolId: school[0].id.toString(),
-              active: true,
-              startDate: { $lte: currentDate },
-              endDate: { $gte: currentDate },
-            },
-          });
-          if (currentYear.length > 0) {
-            jwtUtil.schoolYear = currentYear[0];
-          }
-        }
       }
       if (campus && campus !== undefined) {
         jwtUtil.campus = campus;

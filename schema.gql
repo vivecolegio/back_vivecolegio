@@ -2012,7 +2012,6 @@ type Jwt {
   profilePhoto: String
   role: Role
   roleMenus: [Menu!]
-  schoolYear: SchoolYear
   schools: [School!]
   student: Student
   teacher: Teacher
@@ -2495,6 +2494,7 @@ type Mutation {
   deleteStudentYearBehaviour(id: String!): Boolean!
   deleteTeacher(id: String!): Boolean!
   deleteUser(id: String!): Boolean!
+  fixAcademicAsignatureCourseSchoolYear: Boolean!
   fixStudentCourseYearOld(schoolId: String!, schoolYearId: String!): Boolean!
   generateCertificateFinalReportCourse(format: String!, id: String!, schoolId: String!, schoolYearId: String!, studentId: String): String!
   generatePerformanceFinalReportCourse(format: String!, id: String!, schoolId: String!, schoolYearId: String!, studentId: String): String!
@@ -5075,7 +5075,7 @@ type Query {
   getUser(id: String!): User
   getValidationDocumentNumberUser(documentNumber: String!): Boolean!
   getValuationStudents(id: String!): [ExperienceLearningValuation!]
-  me: Jwt!
+  me(schoolYearId: String!): Jwt!
 }
 
 """The QuestionBankTestOnline model"""

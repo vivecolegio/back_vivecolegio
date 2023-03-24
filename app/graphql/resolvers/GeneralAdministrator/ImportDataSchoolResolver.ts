@@ -818,26 +818,29 @@ export class ImportDataSchoolResolver {
   async fixAcademicAsignatureCourseSchoolYear() {
     let dataSchoolDane = [
       // "254003000046",
-      "154128000680",
+      "254385000431",
     ];
     let dataSchool = await this.repositorySchool.findBy({ where: { daneCode: { $in: dataSchoolDane } } })
     for (let school of dataSchool) {
+      console.log("Actualizando IE: ", school?.name);
+      console.log("DANE IE: ", school?.daneCode);
       let dataSchoolYear2023 = await this.repositorySchoolYear.findBy({ where: { schoolId: school.id.toString(), schoolYear: 2023 } });
       if (dataSchool && dataSchoolYear2023) {
         let schoolId = school.id.toString();
         let schoolYearId = dataSchoolYear2023[0].id.toString();
-        let dataCourses = await this.repositoryCourse.findBy({ where: { schoolId: schoolId, schoolYearId, } })
+        let dataCourses = await this.repositoryCourse.findBy({ where: { schoolId: schoolId, schoolYearId: schoolYearId, } })
         for (let course of dataCourses) {
           let dataAcademicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findBy({ courseId: course.id.toString() });
           for (let academicAsignatureCourse of dataAcademicAsignatureCourse) {
-            let resultAcademicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.save({
-              _id: new ObjectId(academicAsignatureCourse?.id?.toString()),
-              ...academicAsignatureCourse,
-              schoolId: course.schoolId,
-              schoolYearId: course.schoolYearId,
-              version: (academicAsignatureCourse?.version as number) + 1,
-            });
-
+            if (academicAsignatureCourse.schoolId == undefined || academicAsignatureCourse.schoolId == null || academicAsignatureCourse.schoolYearId == undefined || academicAsignatureCourse.schoolYearId == null) {
+              let resultAcademicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.save({
+                _id: new ObjectId(academicAsignatureCourse?.id?.toString()),
+                ...academicAsignatureCourse,
+                schoolId: course.schoolId,
+                schoolYearId: course.schoolYearId,
+                version: (academicAsignatureCourse?.version as number) + 1,
+              });
+            }
           }
         }
       }
