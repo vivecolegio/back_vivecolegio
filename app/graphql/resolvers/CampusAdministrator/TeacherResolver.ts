@@ -8,7 +8,7 @@ import {
   PlantaDocenteRepository,
   SchoolRepository,
   TeacherRepository,
-  UserRepository,
+  UserRepository
 } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewTeacher } from '../../inputs/CampusAdministrator/NewTeacher';
@@ -52,29 +52,30 @@ export class TeacherResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => [String]) schoolId: String[],
-    @Arg('campusId', () => [String], { nullable: true }) campusId: String[]
+    @Arg('campusId', () => [String], { nullable: true }) campusId: String[],
+    @Arg('schoolYearId', () => [String], { nullable: true }) schoolYearId: String[]
   ): Promise<TeacherConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
         if (campusId) {
           result = await this.repository.findBy({
-            where: { schoolId: { $in: schoolId }, campusId: { $in: campusId } },
+            where: { schoolId: { $in: schoolId }, campusId: { $in: campusId }, schoolYearId: { $in: schoolYearId } },
             order: { createdAt: 'DESC' },
           });
         } else {
           result = await this.repository.findBy({
-            where: { schoolId: { $in: schoolId } },
+            where: { schoolId: { $in: schoolId }, schoolYearId: { $in: schoolYearId } },
             order: { createdAt: 'DESC' },
           });
         }
       } else {
         if (campusId) {
           result = await this.repository.findBy({
-            where: { schoolId: { $in: schoolId }, campusId: { $in: campusId } },
+            where: { schoolId: { $in: schoolId }, campusId: { $in: campusId }, schoolYearId: { $in: schoolYearId } },
           });
         } else {
-          result = await this.repository.findBy({ where: { schoolId: { $in: schoolId } } });
+          result = await this.repository.findBy({ where: { schoolId: { $in: schoolId }, schoolYearId: { $in: schoolYearId } } });
         }
       }
     } else {
@@ -84,6 +85,7 @@ export class TeacherResolver {
             where: {
               schoolId: { $in: schoolId },
               campusId: { $in: campusId },
+              schoolYearId: { $in: schoolYearId },
               active: true,
             },
             order: { createdAt: 'DESC' },
@@ -92,6 +94,7 @@ export class TeacherResolver {
           result = await this.repository.findBy({
             where: {
               schoolId: { $in: schoolId },
+              schoolYearId: { $in: schoolYearId },
               active: true,
             },
             order: { createdAt: 'DESC' },
@@ -103,6 +106,7 @@ export class TeacherResolver {
             where: {
               schoolId: { $in: schoolId },
               campusId: { $in: campusId },
+              schoolYearId: { $in: schoolYearId },
               active: true,
             },
           });
@@ -110,6 +114,7 @@ export class TeacherResolver {
           result = await this.repository.findBy({
             where: {
               schoolId: { $in: schoolId },
+              schoolYearId: { $in: schoolYearId },
               active: true,
             },
           });
@@ -201,10 +206,10 @@ export class TeacherResolver {
                     docente.sexo == 'F' ? '60cfc51e445f133f9e261ead' : '60ecc36d6c716a21bee51e00',
                   birthdate: fechaNacimiento
                     ? new Date(
-                        Number(fechaNacimiento[2]),
-                        Number(fechaNacimiento[1]) - 1,
-                        Number(fechaNacimiento[0])
-                      )
+                      Number(fechaNacimiento[2]),
+                      Number(fechaNacimiento[1]) - 1,
+                      Number(fechaNacimiento[0])
+                    )
                     : undefined,
                   phone: docente.telefono,
                   email: docente.email,

@@ -692,22 +692,7 @@ export class ImportDataSchoolResolver {
       // "154109000431",
       // "154128000680",
       // "254128000463",
-
-      "254344000133",
-      "254398000368",
-      "254398000724",
-      "254498000721",
-      "154498000051",
-      "154498000069",
-      "254670000470",
-      "154720001681",
-      //"254800000736",
-      "154810003020",
-      "254810000386",
-      "254810000165",
-      "254820000368",
-      "254820000384",
-      "254820000848",
+      "154377000207",
     ];
     let dataSchool = await this.repositorySchool.findBy({ where: { daneCode: { $in: dataSchoolDane } } })
     for (let school of dataSchool) {
@@ -848,5 +833,48 @@ export class ImportDataSchoolResolver {
     return true;
   }
 
+
+
+  @Mutation(() => Boolean)
+  async updateSchoolYearAllTeacher(
+  ) {
+    let schools = await this.repositorySchool.find();
+    for (let school of schools) {
+      console.log("Actualizando IE: ", school?.name);
+      console.log("DANE IE: ", school?.daneCode);
+      //let dataSchoolYear = await this.repositorySchoolYear.findBy({ where: { schoolId: schoolId } });
+      let dataSchoolYears = await this.repositorySchoolYear.find();
+      let schoolYearsId = [];
+      for (let schoolYear of dataSchoolYears) {
+        schoolYearsId?.push(schoolYear?.id?.toString());
+      }
+      console.log("Activate Teachers")
+      let dataTeacher = await this.repositoryTeacher.findBy({ where: { schoolId: { $in: [school?.id?.toString()] } } });
+      console.log("Teacher: ", dataTeacher?.length)
+      for (let teacher of dataTeacher) {
+        if (teacher.schoolYearId?.length == 0 || teacher.schoolYearId == undefined || teacher.schoolYearId == null) {
+          let resultTeacher = await this.repositoryTeacher.save({
+            _id: new ObjectId(teacher?.id?.toString()),
+            ...teacher,
+            active: true,
+            schoolYearId: schoolYearsId,
+            version: (teacher?.version as number) + 1,
+          });
+        }
+        let resultUser = await this.repositoryUser.findOneBy(teacher?.userId?.toString());
+        if (resultUser?.roleId == undefined || resultUser?.roleId == null) {
+          resultUser = await this.repositoryUser.save({
+            _id: new ObjectId(resultUser?.id?.toString()),
+            ...resultUser,
+            roleId: "619551da882a2fb6525a3079",
+            active: true,
+            version: (resultUser?.version as number) + 1,
+          });
+        }
+      }
+
+    }
+    return true;
+  }
 
 }

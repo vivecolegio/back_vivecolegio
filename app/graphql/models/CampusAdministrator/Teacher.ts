@@ -6,9 +6,11 @@ import { Campus } from '../GeneralAdministrator/Campus';
 import { School } from '../GeneralAdministrator/School';
 import { User } from '../GeneralAdministrator/User';
 import { AcademicAsignature } from '../SchoolAdministrator/AcademicAsignature';
+import { SchoolYear } from '../SchoolAdministrator/SchoolYear';
 
 @Index("index_full_school", ["schoolId", "userId", "academicAsignatureId"])
 @Index("index_full_campus", ["campusId", "userId", "academicAsignatureId"])
+@Index("index_full_schoolYear", ["schoolYearId", "userId", "academicAsignatureId"])
 @ObjectType({ description: 'The Teacher model', implements: IModelData })
 @Entity()
 export class Teacher extends IModelData {
@@ -39,7 +41,7 @@ export class Teacher extends IModelData {
   @Index("index_academicAsignatureId")
   @Field(() => [String], { nullable: true })
   @Column({ nullable: true })
-  academicAsignatureId?: [string];
+  academicAsignatureId?: string[];
 
   @Field(() => [AcademicAsignature], { nullable: true })
   academicAsignature?: AcademicAsignature[];
@@ -47,6 +49,14 @@ export class Teacher extends IModelData {
   @Field({ nullable: true })
   @Column({ nullable: true })
   attentionSchedule?: string;
+
+  @Index("index_schoolYearId")
+  @Field(() => [String], { nullable: true })
+  @Column({ nullable: true })
+  schoolYearId?: String[];
+
+  @Field(() => [SchoolYear], { nullable: true })
+  schoolYear?: SchoolYear[];
 }
 
 @ObjectType()

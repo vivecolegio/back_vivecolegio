@@ -20,5 +20,8 @@ export class NewTeacher implements Partial<Teacher> {
   newUser?: NewUser;
 
   @Field(() => [String], { nullable: true })
-  academicAsignatureId?: [string];
+  academicAsignatureId?: string[];
+
+  @Field(() => [String], { nullable: true })
+  schoolYearId?: string[];
 }
