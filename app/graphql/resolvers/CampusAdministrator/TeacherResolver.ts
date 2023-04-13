@@ -131,31 +131,49 @@ export class TeacherResolver {
     let dataUserProcess: NewUser = removeEmptyStringElements(dataProcess.newUser);
     let createdByUserId = context?.user?.authorization?.id;
     delete dataProcess.newUser;
-    if (dataUserProcess.documentNumber != null) {
-      let passwordHash = await bcrypt
-        .hash(dataUserProcess.documentNumber, BCRYPT_SALT_ROUNDS)
-        .then(function (hashedPassword: any) {
-          return hashedPassword;
-        });
-      dataUserProcess.password = passwordHash;
+    console.log(dataUserProcess.documentNumber)
+    let user = await this.repositoryUser.findBy({ documentNumber: dataUserProcess.documentNumber });
+    console.log(user)
+    if (user.length > 0) {
+      const model = await this.repository.create({
+        ...dataProcess,
+        userId: user[0].id.toString(),
+        active: true,
+        version: 0,
+        createdByUserId,
+      });
+      console.log(model)
+      //let result = await this.repository.save(model);
+      return new Teacher();
+    } else {
+      if (dataUserProcess.documentNumber != null) {
+        let passwordHash = await bcrypt
+          .hash(dataUserProcess.documentNumber, BCRYPT_SALT_ROUNDS)
+          .then(function (hashedPassword: any) {
+            return hashedPassword;
+          });
+        dataUserProcess.password = passwordHash;
+      }
+      const modelUser = await this.repositoryUser.create({
+        ...dataUserProcess,
+        username: dataUserProcess.documentNumber,
+        active: true,
+        version: 0,
+        createdByUserId,
+      });
+      console.log(modelUser)
+      let resultUser = await this.repositoryUser.save(modelUser);
+      const model = await this.repository.create({
+        ...dataProcess,
+        userId: resultUser.id.toString(),
+        active: true,
+        version: 0,
+        createdByUserId,
+      });
+      console.log(model)
+      //let result = await this.repository.save(model);
+      return new Teacher();
     }
-    const modelUser = await this.repositoryUser.create({
-      ...dataUserProcess,
-      username: dataUserProcess.documentNumber,
-      active: true,
-      version: 0,
-      createdByUserId,
-    });
-    let resultUser = await this.repositoryUser.save(modelUser);
-    const model = await this.repository.create({
-      ...dataProcess,
-      userId: resultUser.id.toString(),
-      active: true,
-      version: 0,
-      createdByUserId,
-    });
-    let result = await this.repository.save(model);
-    return result;
   }
 
   @Mutation(() => Boolean)
