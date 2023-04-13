@@ -3,13 +3,8 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import {
-  CampusRepository,
-  PlantaDocenteRepository,
-  SchoolRepository,
-  TeacherRepository,
-  UserRepository
-} from '../../../servers/DataSource';
+
+import { CampusRepository, PlantaDocenteRepository, SchoolRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewTeacher } from '../../inputs/CampusAdministrator/NewTeacher';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
@@ -53,29 +48,29 @@ export class TeacherResolver {
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => [String]) schoolId: String[],
     @Arg('campusId', () => [String], { nullable: true }) campusId: String[],
-    @Arg('schoolYearId', () => [String], { nullable: true }) schoolYearId: String[]
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
   ): Promise<TeacherConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
         if (campusId) {
           result = await this.repository.findBy({
-            where: { schoolId: { $in: schoolId }, campusId: { $in: campusId }, schoolYearId: { $in: schoolYearId } },
+            where: { schoolId: { $in: schoolId }, campusId: { $in: campusId }, schoolYearId },
             order: { createdAt: 'DESC' },
           });
         } else {
           result = await this.repository.findBy({
-            where: { schoolId: { $in: schoolId }, schoolYearId: { $in: schoolYearId } },
+            where: { schoolId: { $in: schoolId }, schoolYearId },
             order: { createdAt: 'DESC' },
           });
         }
       } else {
         if (campusId) {
           result = await this.repository.findBy({
-            where: { schoolId: { $in: schoolId }, campusId: { $in: campusId }, schoolYearId: { $in: schoolYearId } },
+            where: { schoolId: { $in: schoolId }, campusId: { $in: campusId }, schoolYearId },
           });
         } else {
-          result = await this.repository.findBy({ where: { schoolId: { $in: schoolId }, schoolYearId: { $in: schoolYearId } } });
+          result = await this.repository.findBy({ where: { schoolId: { $in: schoolId }, schoolYearId } });
         }
       }
     } else {
@@ -85,7 +80,7 @@ export class TeacherResolver {
             where: {
               schoolId: { $in: schoolId },
               campusId: { $in: campusId },
-              schoolYearId: { $in: schoolYearId },
+              schoolYearId,
               active: true,
             },
             order: { createdAt: 'DESC' },
@@ -94,7 +89,7 @@ export class TeacherResolver {
           result = await this.repository.findBy({
             where: {
               schoolId: { $in: schoolId },
-              schoolYearId: { $in: schoolYearId },
+              schoolYearId,
               active: true,
             },
             order: { createdAt: 'DESC' },
@@ -106,7 +101,7 @@ export class TeacherResolver {
             where: {
               schoolId: { $in: schoolId },
               campusId: { $in: campusId },
-              schoolYearId: { $in: schoolYearId },
+              schoolYearId,
               active: true,
             },
           });
@@ -114,7 +109,7 @@ export class TeacherResolver {
           result = await this.repository.findBy({
             where: {
               schoolId: { $in: schoolId },
-              schoolYearId: { $in: schoolYearId },
+              schoolYearId,
               active: true,
             },
           });

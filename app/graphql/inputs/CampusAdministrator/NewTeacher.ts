@@ -1,4 +1,5 @@
 import { Field, InputType } from 'type-graphql';
+
 import { Teacher } from '../../models/CampusAdministrator/Teacher';
 import { NewUser } from '../GeneralAdministrator/NewUser';
 
@@ -22,6 +23,6 @@ export class NewTeacher implements Partial<Teacher> {
   @Field(() => [String], { nullable: true })
   academicAsignatureId?: string[];
 
-  @Field(() => [String], { nullable: true })
-  schoolYearId?: string[];
+  @Field(() => String, { nullable: true })
+  schoolYearId?: string;
 }

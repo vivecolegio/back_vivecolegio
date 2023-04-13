@@ -1,5 +1,6 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Column, Entity, Index } from 'typeorm';
+
 import { IModelData } from '../../interfaces/IModelData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { Campus } from '../GeneralAdministrator/Campus';
@@ -8,9 +9,8 @@ import { User } from '../GeneralAdministrator/User';
 import { AcademicAsignature } from '../SchoolAdministrator/AcademicAsignature';
 import { SchoolYear } from '../SchoolAdministrator/SchoolYear';
 
-@Index("index_full_school", ["schoolId", "userId", "academicAsignatureId"])
-@Index("index_full_campus", ["campusId", "userId", "academicAsignatureId"])
-@Index("index_full_schoolYear", ["schoolYearId", "userId", "academicAsignatureId"])
+@Index("index_full_school", ["schoolId", "userId", "academicAsignatureId", "schoolYearId"])
+@Index("index_full_campus", ["campusId", "userId", "academicAsignatureId", "schoolYearId"])
 @ObjectType({ description: 'The Teacher model', implements: IModelData })
 @Entity()
 export class Teacher extends IModelData {
@@ -51,12 +51,12 @@ export class Teacher extends IModelData {
   attentionSchedule?: string;
 
   @Index("index_schoolYearId")
-  @Field(() => [String], { nullable: true })
+  @Field(() => String, { nullable: true })
   @Column({ nullable: true })
-  schoolYearId?: String[];
+  schoolYearId?: String;
 
-  @Field(() => [SchoolYear], { nullable: true })
-  schoolYear?: SchoolYear[];
+  @Field(() => SchoolYear, { nullable: true })
+  schoolYear?: SchoolYear;
 }
 
 @ObjectType()

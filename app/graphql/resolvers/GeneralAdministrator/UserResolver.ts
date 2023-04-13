@@ -609,15 +609,16 @@ export class UserResolver {
     }
   }
 
-  @Query(() => Boolean)
-  async getValidationDocumentNumberUser(
+  @Query(() => User, { nullable: true })
+  async getUserByDocumentNumber(
     @Arg('documentNumber', () => String) documentNumber: string
   ) {
     const result = await this.repository.findBy({ documentNumber });
-    if (result.length < 1) {
-      return true;
+    console.log(result)
+    if (result.length == 1) {
+      return result[0];
     } else {
-      return false;
+      return null;
     }
   }
 

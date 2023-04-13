@@ -2599,6 +2599,7 @@ type Mutation {
   updateSchoolAdministrator(data: NewSchoolAdministrator!, id: String!): SchoolAdministrator!
   updateSchoolConfiguration(data: NewSchoolConfiguration!, id: String!): SchoolConfiguration!
   updateSchoolYear(data: NewSchoolYear!, id: String!): SchoolYear!
+  updateSchoolYearAllTeacher: Boolean!
   updateSpecialty(data: NewSpecialty!, id: String!): Specialty!
   updateStudent(data: NewStudent!, id: String!): Student!
   updateStudentAttendance(data: NewStudentAttendance!, id: String!): StudentAttendance!
@@ -3299,6 +3300,7 @@ input NewTeacher {
   campusId: [String!]
   newUser: NewUser
   schoolId: [String!]
+  schoolYearId: String
   userId: String
 }
 
@@ -4994,6 +4996,7 @@ type Query {
     last: Float
     orderCreated: Boolean!
     schoolId: [String!]!
+    schoolYearId: String
   ): TeacherConnection!
   getAllUser(
     """Paginate after opaque cursor"""
@@ -5073,7 +5076,7 @@ type Query {
   getStudentYearBehaviour(id: String!): StudentYearBehaviour
   getTeacher(id: String!): Teacher
   getUser(id: String!): User
-  getValidationDocumentNumberUser(documentNumber: String!): Boolean!
+  getUserByDocumentNumber(documentNumber: String!): User
   getValuationStudents(id: String!): [ExperienceLearningValuation!]
   me(schoolYearId: String!): Jwt!
 }
@@ -5651,6 +5654,8 @@ type Teacher implements IModelData {
   id: ID!
   school: [School!]
   schoolId: [String!]
+  schoolYear: SchoolYear
+  schoolYearId: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
