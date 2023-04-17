@@ -337,18 +337,8 @@ export class TeacherResolver {
     @Ctx() context: IContext
   ): Promise<Boolean | null> {
     let data = await this.repository.findOneBy(id);
-    let updatedByUserId = context?.user?.authorization?.id;
-    let result = await this.repository.findOneBy(id);
-    result = await this.repository.save({
-      _id: new ObjectId(id),
-      ...result,
-      active: undefined,
-      version: (result?.version as number) + 1,
-      updatedByUserId,
-    });
-    console.log(result)
-    // result = await this.repository.deleteOne({ _id: new ObjectId(id) });
-    return true;
+    let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
+    return result?.result?.ok === 1 ?? true;
   }
 
   @FieldResolver((_type) => User, { nullable: true })
