@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { CampusRepository, PlantaDocenteRepository, SchoolRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
+import { CampusRepository, PlantaDocenteRepository, SchoolRepository, SchoolYearRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewTeacher } from '../../inputs/CampusAdministrator/NewTeacher';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
@@ -13,6 +13,7 @@ import { Teacher, TeacherConnection } from '../../models/CampusAdministrator/Tea
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
+import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 import { PlantaDocente } from './../../models/Data/PlantaDocente';
 
@@ -28,6 +29,9 @@ export class TeacherResolver {
 
   @InjectRepository(School)
   private repositorySchool = SchoolRepository;
+
+  @InjectRepository(SchoolYear)
+  private repositorySchoolYear = SchoolYearRepository;
 
   @InjectRepository(Campus)
   private repositoryCampus = CampusRepository;
@@ -131,19 +135,20 @@ export class TeacherResolver {
     let dataUserProcess: NewUser = removeEmptyStringElements(dataProcess.newUser);
     let createdByUserId = context?.user?.authorization?.id;
     delete dataProcess.newUser;
-    console.log(dataUserProcess.documentNumber)
     let user = await this.repositoryUser.findBy({ documentNumber: dataUserProcess.documentNumber });
-    console.log(user)
     if (user.length > 0) {
-      const model = await this.repository.create({
-        ...dataProcess,
-        userId: user[0].id.toString(),
-        active: true,
-        version: 0,
-        createdByUserId,
-      });
-      console.log(model)
-      //let result = await this.repository.save(model);
+      let teacher = await this.repository.findBy({ userId: user[0]?.id?.toString(), schoolYearId: dataProcess.schoolYearId })
+      if (teacher.length == 0) {
+        const model = await this.repository.create({
+          ...dataProcess,
+          userId: user[0].id.toString(),
+          active: true,
+          version: 0,
+          createdByUserId,
+        });
+        let result = await this.repository.save(model);
+        return result;
+      }
       return new Teacher();
     } else {
       if (dataUserProcess.documentNumber != null) {
@@ -161,7 +166,6 @@ export class TeacherResolver {
         version: 0,
         createdByUserId,
       });
-      console.log(modelUser)
       let resultUser = await this.repositoryUser.save(modelUser);
       const model = await this.repository.create({
         ...dataProcess,
@@ -170,9 +174,8 @@ export class TeacherResolver {
         version: 0,
         createdByUserId,
       });
-      console.log(model)
-      //let result = await this.repository.save(model);
-      return new Teacher();
+      let result = await this.repository.save(model);
+      return result;
     }
   }
 
@@ -334,8 +337,18 @@ export class TeacherResolver {
     @Ctx() context: IContext
   ): Promise<Boolean | null> {
     let data = await this.repository.findOneBy(id);
-    let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
-    return result?.result?.ok === 1 ?? true;
+    let updatedByUserId = context?.user?.authorization?.id;
+    let result = await this.repository.findOneBy(id);
+    result = await this.repository.save({
+      _id: new ObjectId(id),
+      ...result,
+      active: undefined,
+      version: (result?.version as number) + 1,
+      updatedByUserId,
+    });
+    console.log(result)
+    // result = await this.repository.deleteOne({ _id: new ObjectId(id) });
+    return true;
   }
 
   @FieldResolver((_type) => User, { nullable: true })
@@ -377,6 +390,16 @@ export class TeacherResolver {
         dataIds.push(new ObjectId(id));
       });
       const result = await this.repositorySchool.findBy({ where: { _id: { $in: dataIds } } });
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => SchoolYear, { nullable: true })
+  async schoolYear(@Root() data: Teacher) {
+    let id = data.schoolYearId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositorySchoolYear.findOneBy(id);
       return result;
     }
     return null;
