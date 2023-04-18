@@ -3257,6 +3257,7 @@ input NewStudent {
   courseId: String
   newUser: NewUser
   schoolId: [String!]
+  schoolYearId: String
   userId: String
 }
 
@@ -4872,6 +4873,7 @@ type Query {
     last: Float
     orderCreated: Boolean!
     schoolId: String
+    schoolYearId: String
   ): StudentConnection!
   getAllStudentAcademicGrade(
     academicGradeId: String!

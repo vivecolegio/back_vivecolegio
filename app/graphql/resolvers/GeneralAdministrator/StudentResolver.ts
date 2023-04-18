@@ -62,29 +62,30 @@ export class StudentResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => String, { nullable: true }) schoolId: String,
-    @Arg('campusId', () => String, { nullable: true }) campusId: String
+    @Arg('campusId', () => String, { nullable: true }) campusId: String,
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
   ): Promise<StudentConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
         if (campusId) {
           result = await this.repository.findBy({
-            where: { schoolId, campusId },
+            where: { schoolId, campusId, schoolYearId },
             order: { createdAt: 'DESC' },
           });
         } else {
           result = await this.repository.findBy({
-            where: { schoolId },
+            where: { schoolId, schoolYearId },
             order: { createdAt: 'DESC' },
           });
         }
       } else {
         if (campusId) {
           result = await this.repository.findBy({
-            where: { schoolId, campusId },
+            where: { schoolId, campusId, schoolYearId },
           });
         } else {
-          result = await this.repository.findBy({ where: { schoolId } });
+          result = await this.repository.findBy({ where: { schoolId, schoolYearId } });
         }
       }
     } else {
@@ -94,6 +95,7 @@ export class StudentResolver {
             where: {
               schoolId,
               campusId,
+              schoolYearId,
               active: true,
             },
             order: { createdAt: 'DESC' },
@@ -102,6 +104,7 @@ export class StudentResolver {
           result = await this.repository.findBy({
             where: {
               schoolId,
+              schoolYearId,
               active: true,
             },
             order: { createdAt: 'DESC' },
@@ -113,6 +116,7 @@ export class StudentResolver {
             where: {
               schoolId,
               campusId,
+              schoolYearId,
               active: true,
             },
           });
@@ -120,6 +124,7 @@ export class StudentResolver {
           result = await this.repository.findBy({
             where: {
               schoolId,
+              schoolYearId,
               active: true,
             },
           });
@@ -205,45 +210,48 @@ export class StudentResolver {
     let dataUserProcess: NewUser = removeEmptyStringElements(dataProcess.newUser);
     let createdByUserId = context?.user?.authorization?.id;
     delete dataProcess.newUser;
-    if (dataUserProcess.documentNumber != null) {
-      let passwordHash = await bcrypt
-        .hash(dataUserProcess.documentNumber, BCRYPT_SALT_ROUNDS)
-        .then(function (hashedPassword: any) {
-          return hashedPassword;
+    let user = await this.repositoryUser.findBy({ documentNumber: dataUserProcess.documentNumber });
+    if (user.length > 0) {
+      let teacher = await this.repository.findBy({ userId: user[0]?.id?.toString(), schoolYearId: dataProcess.schoolYearId })
+      if (teacher.length == 0) {
+        const model = await this.repository.create({
+          ...dataProcess,
+          userId: user[0].id.toString(),
+          active: true,
+          version: 0,
+          createdByUserId,
         });
-      dataUserProcess.password = passwordHash;
-    }
-    const modelUser = await this.repositoryUser.create({
-      ...dataUserProcess,
-      username: dataUserProcess.documentNumber,
-      active: true,
-      version: 0,
-      createdByUserId,
-    });
-    let resultUser = await this.repositoryUser.save(modelUser);
-    const model = await this.repository.create({
-      ...dataProcess,
-      userId: resultUser.id.toString(),
-      active: true,
-      version: 0,
-      createdByUserId,
-    });
-    let result = await this.repository.save(model);
-    if (result.courseId) {
-      let course = await this.repositoryCourse.findOneBy(result.courseId);
-      let studentsId = course?.studentsId;
-      if (studentsId == undefined || studentsId == null) {
-        studentsId = [];
+        let result = await this.repository.save(model);
+        return result;
       }
-      studentsId?.push(result.id.toString());
-      let resultCourse = await this.repositoryCourse.save({
-        _id: new ObjectId(result.courseId),
-        ...course,
-        studentsId,
-        version: (result?.version as number) + 1,
+      return new Student();
+    } else {
+      if (dataUserProcess.documentNumber != null) {
+        let passwordHash = await bcrypt
+          .hash(dataUserProcess.documentNumber, BCRYPT_SALT_ROUNDS)
+          .then(function (hashedPassword: any) {
+            return hashedPassword;
+          });
+        dataUserProcess.password = passwordHash;
+      }
+      const modelUser = await this.repositoryUser.create({
+        ...dataUserProcess,
+        username: dataUserProcess.documentNumber,
+        active: true,
+        version: 0,
+        createdByUserId,
       });
+      let resultUser = await this.repositoryUser.save(modelUser);
+      const model = await this.repository.create({
+        ...dataProcess,
+        userId: resultUser.id.toString(),
+        active: true,
+        version: 0,
+        createdByUserId,
+      });
+      let result = await this.repository.save(model);
+      return result;
     }
-    return result;
   }
 
   @Mutation(() => Boolean)

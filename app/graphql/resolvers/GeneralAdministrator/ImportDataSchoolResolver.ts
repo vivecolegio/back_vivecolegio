@@ -842,35 +842,42 @@ export class ImportDataSchoolResolver {
     for (let school of schools) {
       console.log("Actualizando IE: ", school?.name);
       console.log("DANE IE: ", school?.daneCode);
-      //let dataSchoolYear = await this.repositorySchoolYear.findBy({ where: { schoolId: schoolId } });
-      let dataSchoolYears = await this.repositorySchoolYear.find();
-      let schoolYearsId = [];
-      for (let schoolYear of dataSchoolYears) {
-        schoolYearsId?.push(schoolYear?.id?.toString());
-      }
+      let schoolYearId = "";
       console.log("Activate Teachers")
+      let dataSchoolYear2022 = await this.repositorySchoolYear.findBy({ where: { schoolId: school.id.toString(), schoolYear: 2022 } });
+      let dataSchoolYear2023 = await this.repositorySchoolYear.findBy({ where: { schoolId: school.id.toString(), schoolYear: 2023 } });
+      //console.log("dataSchoolYear2022", dataSchoolYear2022[0].id.toString())
+      //console.log("dataSchoolYear2023", dataSchoolYear2023[0].id.toString())
+      if (dataSchoolYear2023?.length > 0) {
+        schoolYearId = dataSchoolYear2023[0].id.toString()
+      } else {
+        if (dataSchoolYear2022?.length > 0) {
+          schoolYearId = dataSchoolYear2022[0].id.toString()
+        }
+      }
+      console.log("SchoolYearId: ", schoolYearId);
       let dataTeacher = await this.repositoryTeacher.findBy({ where: { schoolId: { $in: [school?.id?.toString()] } } });
       console.log("Teacher: ", dataTeacher?.length)
       for (let teacher of dataTeacher) {
-        if (teacher.schoolYearId?.length == 0 || teacher.schoolYearId == undefined || teacher.schoolYearId == null) {
-          let resultTeacher = await this.repositoryTeacher.save({
-            _id: new ObjectId(teacher?.id?.toString()),
-            ...teacher,
-            active: true,
-            schoolYearId: schoolYearsId,
-            version: (teacher?.version as number) + 1,
-          });
-        }
-        let resultUser = await this.repositoryUser.findOneBy(teacher?.userId?.toString());
-        if (resultUser?.roleId == undefined || resultUser?.roleId == null) {
-          resultUser = await this.repositoryUser.save({
-            _id: new ObjectId(resultUser?.id?.toString()),
-            ...resultUser,
-            roleId: "619551da882a2fb6525a3079",
-            active: true,
-            version: (resultUser?.version as number) + 1,
-          });
-        }
+        //if (teacher.schoolYearId?.length == 0 || teacher.schoolYearId == undefined || teacher.schoolYearId == null) {
+        let resultTeacher = await this.repositoryTeacher.save({
+          _id: new ObjectId(teacher?.id?.toString()),
+          ...teacher,
+          //active: true,
+          schoolYearId: schoolYearId,
+          version: (teacher?.version as number) + 1,
+        });
+        //}
+        // let resultUser = await this.repositoryUser.findOneBy(teacher?.userId?.toString());
+        // if (resultUser?.roleId == undefined || resultUser?.roleId == null) {
+        //   resultUser = await this.repositoryUser.save({
+        //     _id: new ObjectId(resultUser?.id?.toString()),
+        //     ...resultUser,
+        //     roleId: "619551da882a2fb6525a3079",
+        //     active: true,
+        //     version: (resultUser?.version as number) + 1,
+        //   });
+        // }
       }
 
     }
