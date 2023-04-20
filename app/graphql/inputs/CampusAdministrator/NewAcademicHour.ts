@@ -1,4 +1,5 @@
 import { Field, InputType } from 'type-graphql';
+
 import { AcademicHour } from '../../models/CampusAdministrator/AcademicHour';
 
 @InputType()
@@ -17,4 +18,10 @@ export class NewAcademicHour implements Partial<AcademicHour> {
 
   @Field({ nullable: true })
   order?: number;
+
+  @Field({ nullable: true })
+  schoolYearId?: string;
+
+  @Field({ nullable: true })
+  schoolId?: string;
 }
