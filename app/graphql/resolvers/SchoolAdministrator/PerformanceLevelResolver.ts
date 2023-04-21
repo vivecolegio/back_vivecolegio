@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicAsignatureCourseRepository, AcademicGradeRepository, CampusRepository, CourseRepository, GeneralPerformanceLevelRepository, PerformanceLevelRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAsignatureCourseRepository, AcademicGradeRepository, CampusRepository, CourseRepository, GeneralPerformanceLevelRepository, PerformanceLevelRepository, SchoolRepository, SchoolYearRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { PerformanceLevelCategory } from '../../enums/PerformanceLevelCategory';
 import { PerformanceLevelCategoryGrade } from '../../enums/PerformanceLevelCategoryGrade';
@@ -17,6 +17,7 @@ import { GeneralPerformanceLevel } from '../../models/GeneralAdministrator/Gener
 import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import { PerformanceLevel, PerformanceLevelConnection } from '../../models/SchoolAdministrator/PerformanceLevel';
+import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 import { AcademicGrade } from './../../models/SchoolAdministrator/AcademicGrade';
 
@@ -33,6 +34,9 @@ export class PerformanceLevelResolver {
 
   @InjectRepository(School)
   private repositorySchool = SchoolRepository;
+
+  @InjectRepository(SchoolYear)
+  private repositorySchoolYear = SchoolYearRepository;
 
   @InjectRepository(Campus)
   private repositoryCampus = CampusRepository;
@@ -516,6 +520,16 @@ export class PerformanceLevelResolver {
     let id = data.schoolId;
     if (id !== null && id !== undefined) {
       const result = await this.repositorySchool.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => SchoolYear, { nullable: true })
+  async schoolYear(@Root() data: PerformanceLevel) {
+    let id = data.schoolYearId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositorySchoolYear.findOneBy(id);
       return result;
     }
     return null;

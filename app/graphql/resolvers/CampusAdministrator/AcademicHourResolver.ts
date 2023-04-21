@@ -6,6 +6,8 @@ import {
   AcademicDayRepository,
   AcademicHourRepository,
   CampusRepository,
+  SchoolRepository,
+  SchoolYearRepository,
   UserRepository,
 } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
@@ -17,7 +19,9 @@ import {
   AcademicHourConnection,
 } from '../../models/CampusAdministrator/AcademicHour';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
+import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
+import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
 @Resolver(AcademicHour)
@@ -33,6 +37,12 @@ export class AcademicHourResolver {
 
   @InjectRepository(AcademicDay)
   private repositoryAcademicDay = AcademicDayRepository;
+
+  @InjectRepository(School)
+  private repositorySchool = SchoolRepository;
+
+  @InjectRepository(SchoolYear)
+  private repositorySchoolYear = SchoolYearRepository;
 
   @Query(() => AcademicHour, { nullable: true })
   async getAcademicHour(@Arg('id', () => String) id: string) {
@@ -256,6 +266,26 @@ export class AcademicHourResolver {
     let id = data.academicDayId;
     if (id !== null && id !== undefined) {
       const result = await this.repositoryAcademicDay.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => School, { nullable: true })
+  async school(@Root() data: AcademicHour) {
+    let id = data.schoolId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositorySchool.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => SchoolYear, { nullable: true })
+  async schoolYear(@Root() data: AcademicHour) {
+    let id = data.schoolYearId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositorySchoolYear.findOneBy(id);
       return result;
     }
     return null;

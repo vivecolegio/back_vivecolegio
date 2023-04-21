@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicAreaRepository, AcademicAsignatureRepository, GeneralAcademicAsignatureRepository, GradeAssignmentRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAreaRepository, AcademicAsignatureRepository, GeneralAcademicAsignatureRepository, GradeAssignmentRepository, SchoolRepository, SchoolYearRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicAsignature } from '../../inputs/SchoolAdministrator/NewAcademicAsignature';
 import { IContext } from '../../interfaces/IContext';
@@ -13,6 +13,7 @@ import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicArea } from '../../models/SchoolAdministrator/AcademicArea';
 import { AcademicAsignature, AcademicAsignatureConnection } from '../../models/SchoolAdministrator/AcademicAsignature';
 import { GradeAssignment } from '../../models/SchoolAdministrator/GradeAssignment';
+import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
 @Resolver(AcademicAsignature)
@@ -28,6 +29,9 @@ export class AcademicAsignatureResolver {
 
   @InjectRepository(School)
   private repositorySchool = SchoolRepository;
+
+  @InjectRepository(SchoolYear)
+  private repositorySchoolYear = SchoolYearRepository;
 
   @InjectRepository(GeneralAcademicAsignature)
   private repositoryGeneralAcademicAsignature = GeneralAcademicAsignatureRepository;
@@ -270,6 +274,16 @@ export class AcademicAsignatureResolver {
     let id = data.schoolId;
     if (id !== null && id !== undefined) {
       const result = await this.repositorySchool.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => SchoolYear, { nullable: true })
+  async schoolYear(@Root() data: AcademicAsignature) {
+    let id = data.schoolYearId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositorySchoolYear.findOneBy(id);
       return result;
     }
     return null;

@@ -3,13 +3,14 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { ModalityRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
+import { ModalityRepository, SchoolRepository, SchoolYearRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewModality } from '../../inputs/SchoolAdministrator/NewModality';
 import { IContext } from '../../interfaces/IContext';
 import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import { Modality, ModalityConnection } from '../../models/SchoolAdministrator/Modality';
+import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
 @Resolver(Modality)
@@ -22,6 +23,9 @@ export class ModalityResolver {
 
   @InjectRepository(School)
   private repositorySchool = SchoolRepository;
+
+  @InjectRepository(SchoolYear)
+  private repositorySchoolYear = SchoolYearRepository;
 
   @Query(() => Modality, { nullable: true })
   async getModality(@Arg('id', () => String) id: string) {
@@ -169,6 +173,16 @@ export class ModalityResolver {
     let id = data.schoolId;
     if (id !== null && id !== undefined) {
       const result = await this.repositorySchool.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => SchoolYear, { nullable: true })
+  async schoolYear(@Root() data: Modality) {
+    let id = data.schoolYearId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositorySchoolYear.findOneBy(id);
       return result;
     }
     return null;

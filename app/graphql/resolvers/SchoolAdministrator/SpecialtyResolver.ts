@@ -3,13 +3,14 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { ModalityRepository, SchoolRepository, SpecialtyRepository, UserRepository } from '../../../servers/DataSource';
+import { ModalityRepository, SchoolRepository, SchoolYearRepository, SpecialtyRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewSpecialty } from '../../inputs/SchoolAdministrator/NewSpecialty';
 import { IContext } from '../../interfaces/IContext';
 import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import { Modality } from '../../models/SchoolAdministrator/Modality';
+import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { Specialty, SpecialtyConnection } from '../../models/SchoolAdministrator/Specialty';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
@@ -26,6 +27,9 @@ export class SpecialtyResolver {
 
   @InjectRepository(School)
   private repositorySchool = SchoolRepository;
+
+  @InjectRepository(SchoolYear)
+  private repositorySchoolYear = SchoolYearRepository;
 
   @Query(() => Specialty, { nullable: true })
   async getSpecialty(@Arg('id', () => String) id: string) {
@@ -181,6 +185,16 @@ export class SpecialtyResolver {
     let id = data.schoolId;
     if (id !== null && id !== undefined) {
       const result = await this.repositorySchool.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => SchoolYear, { nullable: true })
+  async schoolYear(@Root() data: Specialty) {
+    let id = data.schoolYearId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositorySchoolYear.findOneBy(id);
       return result;
     }
     return null;

@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicAreaRepository, AcademicAsignatureRepository, GeneralAcademicAreaRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAreaRepository, AcademicAsignatureRepository, GeneralAcademicAreaRepository, SchoolRepository, SchoolYearRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicArea } from '../../inputs/SchoolAdministrator/NewAcademicArea';
 import { IContext } from '../../interfaces/IContext';
@@ -12,6 +12,7 @@ import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicArea, AcademicAreaConnection } from '../../models/SchoolAdministrator/AcademicArea';
 import { AcademicAsignature } from '../../models/SchoolAdministrator/AcademicAsignature';
+import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
 @Resolver(AcademicArea)
@@ -30,6 +31,9 @@ export class AcademicAreaResolver {
 
   @InjectRepository(School)
   private repositorySchool = SchoolRepository;
+
+  @InjectRepository(SchoolYear)
+  private repositorySchoolYear = SchoolYearRepository;
 
   @Query(() => AcademicArea, { nullable: true })
   async getAcademicArea(@Arg('id', () => String) id: string) {
@@ -244,6 +248,16 @@ export class AcademicAreaResolver {
     let id = data.schoolId;
     if (id !== null && id !== undefined) {
       const result = await this.repositorySchool.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => SchoolYear, { nullable: true })
+  async schoolYear(@Root() data: AcademicArea) {
+    let id = data.schoolYearId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositorySchoolYear.findOneBy(id);
       return result;
     }
     return null;

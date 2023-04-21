@@ -289,4 +289,24 @@ export class AcademicDayResolver {
     }
     return null;
   }
+
+  @FieldResolver((_type) => School, { nullable: true })
+  async school(@Root() data: AcademicDay) {
+    let id = data.schoolId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositorySchool.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => SchoolYear, { nullable: true })
+  async schoolYear(@Root() data: AcademicDay) {
+    let id = data.schoolYearId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositorySchoolYear.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
 }

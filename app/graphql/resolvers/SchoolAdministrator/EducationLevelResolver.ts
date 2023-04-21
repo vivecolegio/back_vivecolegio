@@ -3,13 +3,14 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { EducationLevelRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
+import { EducationLevelRepository, SchoolRepository, SchoolYearRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewEducationLevel } from '../../inputs/SchoolAdministrator/NewEducationLevel';
 import { IContext } from '../../interfaces/IContext';
 import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import { EducationLevel, EducationLevelConnection } from '../../models/SchoolAdministrator/EducationLevel';
+import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
 @Resolver(EducationLevel)
@@ -22,6 +23,9 @@ export class EducationLevelResolver {
 
   @InjectRepository(School)
   private repositorySchool = SchoolRepository;
+
+  @InjectRepository(SchoolYear)
+  private repositorySchoolYear = SchoolYearRepository;
 
   @Query(() => EducationLevel, { nullable: true })
   async getEducationLevel(@Arg('id', () => String) id: string) {
@@ -186,6 +190,16 @@ export class EducationLevelResolver {
     let id = data.schoolId;
     if (id !== null && id !== undefined) {
       const result = await this.repositorySchool.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => SchoolYear, { nullable: true })
+  async schoolYear(@Root() data: EducationLevel) {
+    let id = data.schoolYearId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositorySchoolYear.findOneBy(id);
       return result;
     }
     return null;

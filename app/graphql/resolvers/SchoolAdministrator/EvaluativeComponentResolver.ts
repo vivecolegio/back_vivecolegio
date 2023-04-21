@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicAreaRepository, AcademicAsignatureCourseRepository, AcademicAsignatureRepository, CampusRepository, CourseRepository, EvaluativeComponentRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAreaRepository, AcademicAsignatureCourseRepository, AcademicAsignatureRepository, CampusRepository, CourseRepository, EvaluativeComponentRepository, SchoolRepository, SchoolYearRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewEvaluativeComponent } from '../../inputs/SchoolAdministrator/NewEvaluativeComponent';
 import { IContext } from '../../interfaces/IContext';
@@ -15,6 +15,7 @@ import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicArea } from '../../models/SchoolAdministrator/AcademicArea';
 import { AcademicAsignature } from '../../models/SchoolAdministrator/AcademicAsignature';
 import { EvaluativeComponent, EvaluativeComponentConnection } from '../../models/SchoolAdministrator/EvaluativeComponent';
+import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
 @Resolver(EvaluativeComponent)
@@ -27,6 +28,9 @@ export class EvaluativeComponentResolver {
 
   @InjectRepository(School)
   private repositorySchool = SchoolRepository;
+
+  @InjectRepository(SchoolYear)
+  private repositorySchoolYear = SchoolYearRepository;
 
   @InjectRepository(AcademicAsignature)
   private repositoryAcademicAsignature = AcademicAsignatureRepository;
@@ -319,6 +323,16 @@ export class EvaluativeComponentResolver {
     let id = data.schoolId;
     if (id !== null && id !== undefined) {
       const result = await this.repositorySchool.findOneBy(id);
+      return result;
+    }
+    return null;
+  }
+
+  @FieldResolver((_type) => SchoolYear, { nullable: true })
+  async schoolYear(@Root() data: EvaluativeComponent) {
+    let id = data.schoolYearId;
+    if (id !== null && id !== undefined) {
+      const result = await this.repositorySchoolYear.findOneBy(id);
       return result;
     }
     return null;

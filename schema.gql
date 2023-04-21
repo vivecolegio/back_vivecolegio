@@ -429,6 +429,8 @@ type AcademicHour implements IModelCampusData {
   order: Float
   school: School
   schoolId: String
+  schoolYear: SchoolYear
+  schoolYearId: String
   startTime: String
   updatedAt: DateTime
   updatedByUser: User
@@ -2723,6 +2725,8 @@ input NewAcademicHour {
   campusId: String
   endTime: String
   order: Float
+  schoolId: String
+  schoolYearId: String
   startTime: String
 }
 
