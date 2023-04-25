@@ -165,6 +165,7 @@ export class EvaluativeComponentResolver {
         academicAsignatureCourse.academicAsignatureId
       );
       if (course && academicAsignature) {
+        let schoolYear = await this.repositorySchoolYear.findOneBy(course.schoolYearId);
         let campus = await this.repositoryCampus.findOneBy(course.campusId);
         if (campus) {
           result = await this.repository.findBy({
@@ -172,6 +173,7 @@ export class EvaluativeComponentResolver {
               academicAsignaturesId: { $in: [academicAsignature.id.toString()] },
               academicAreasId: null,
               schoolId: campus.schoolId,
+              schoolYearId: schoolYear?.id?.toString(),
               active: true,
             },
             order: { createdAt: 'DESC' },
@@ -182,6 +184,7 @@ export class EvaluativeComponentResolver {
                 academicAsignaturesId: null,
                 academicAreasId: { $in: [academicAsignature.academicAreaId] },
                 schoolId: campus.schoolId,
+                schoolYearId: schoolYear?.id?.toString(),
                 active: true,
               },
               order: { createdAt: 'DESC' },
@@ -192,6 +195,7 @@ export class EvaluativeComponentResolver {
                   academicAsignaturesId: null,
                   academicAreasId: null,
                   schoolId: campus.schoolId,
+                  schoolYearId: schoolYear?.id?.toString(),
                   active: true,
                 },
                 order: { createdAt: 'DESC' },
