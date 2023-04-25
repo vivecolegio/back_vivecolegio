@@ -2670,6 +2670,7 @@ input NewAcademicAsignatureCourse {
   courseId: String
   gradeAssignmentId: String
   hourlyIntensity: Float
+  schoolId: String
   schoolYearId: String
   teacherId: String
   weight: Float
@@ -3563,6 +3564,7 @@ type Query {
     last: Float
     orderCreated: Boolean!
     schoolId: String!
+    schoolYearId: String
   ): AcademicAsignatureConnection!
   getAllAcademicAsignatureCourse(
     """Paginate after opaque cursor"""

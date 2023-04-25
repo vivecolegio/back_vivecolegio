@@ -51,27 +51,28 @@ export class AcademicAsignatureResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => String) schoolId: String,
-    @Arg('academicAreaId', () => String, { nullable: true }) academicAreaId: string
+    @Arg('academicAreaId', () => String, { nullable: true }) academicAreaId: string,
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
   ): Promise<AcademicAsignatureConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
         if (academicAreaId) {
           result = await this.repository.findBy({
-            where: { schoolId, academicAreaId },
+            where: { schoolId, academicAreaId, schoolYearId },
             order: { createdAt: 'DESC' },
           });
         } else {
           result = await this.repository.findBy({
-            where: { schoolId },
+            where: { schoolId, schoolYearId },
             order: { createdAt: 'DESC' },
           });
         }
       } else {
         if (academicAreaId) {
-          result = await this.repository.findBy({ where: { schoolId, academicAreaId } });
+          result = await this.repository.findBy({ where: { schoolId, academicAreaId, schoolYearId } });
         } else {
-          result = await this.repository.findBy({ where: { schoolId } });
+          result = await this.repository.findBy({ where: { schoolId, schoolYearId } });
         }
       }
     } else {
@@ -81,6 +82,7 @@ export class AcademicAsignatureResolver {
             where: {
               schoolId,
               academicAreaId,
+              schoolYearId,
               active: true,
             },
             order: { createdAt: 'DESC' },
@@ -89,6 +91,7 @@ export class AcademicAsignatureResolver {
           result = await this.repository.findBy({
             where: {
               schoolId,
+              schoolYearId,
               active: true,
             },
             order: { createdAt: 'DESC' },
@@ -99,6 +102,7 @@ export class AcademicAsignatureResolver {
           result = await this.repository.findBy({
             where: {
               schoolId,
+              schoolYearId,
               academicAreaId,
               active: true,
             },
@@ -107,6 +111,7 @@ export class AcademicAsignatureResolver {
           result = await this.repository.findBy({
             where: {
               schoolId,
+              schoolYearId,
               active: true,
             },
           });
