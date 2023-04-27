@@ -102,7 +102,6 @@ export class EvaluativeComponentResolver {
               schoolId,
               schoolYearId,
               academicAsignatureId: { $in: [academicAsignatureId] },
-              default: true,
               active: true,
             },
             order: { createdAt: 'DESC' },
@@ -112,7 +111,6 @@ export class EvaluativeComponentResolver {
             where: {
               schoolId,
               schoolYearId,
-              default: true,
               active: true,
             },
             order: { createdAt: 'DESC' },
@@ -125,7 +123,6 @@ export class EvaluativeComponentResolver {
               schoolId,
               schoolYearId,
               academicAsignatureId: { $in: [academicAsignatureId] },
-              default: true,
               active: true,
             },
           });
@@ -134,7 +131,6 @@ export class EvaluativeComponentResolver {
             where: {
               schoolId,
               schoolYearId,
-              default: true,
               active: true,
             },
           });
