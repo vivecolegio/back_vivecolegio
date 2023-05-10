@@ -240,6 +240,24 @@ export class UserResolver {
         updatedByUserId,
       });
       return true;
+    } else {
+      let password = result?.username;
+      if (password != null) {
+        let passwordHash = await bcrypt
+          .hash(password, BCRYPT_SALT_ROUNDS)
+          .then(function (hashedPassword) {
+            return hashedPassword;
+          });
+        result = await this.repository.save({
+          _id: new ObjectId(id),
+          ...result,
+          documentNumber: password,
+          password: passwordHash,
+          version: (result?.version as number) + 1,
+          updatedByUserId,
+        });
+        return true;
+      }
     }
     return false;
   }
