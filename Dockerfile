@@ -23,5 +23,6 @@ RUN npm prune --production
 
 EXPOSE 4000
 EXPOSE 4001
+EXPOSE 4010
 
 CMD ["yarn", "start"]
