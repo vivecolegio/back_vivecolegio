@@ -501,6 +501,48 @@ export class CourseResolver {
           }
         }
       }
+      else {
+        let students = await this.repositoryStudent.findBy({
+          where: { courseId: id, active: true, schoolYearId: course?.schoolYearId },
+        });
+        let usersId = [];
+        let studentsId = [];
+        for (let student of students) {
+          usersId?.push(new ObjectId(student.userId));
+          studentsId?.push(student.id?.toString());
+        }
+        let users = await this.repositoryUser.findBy({
+          where: { _id: { $in: usersId }, active: true },
+          order: { lastName: 'ASC' },
+        });
+        if (users && users.length > 0) {
+          let code = 1;
+          for (let user of users) {
+            let student = await this.repositoryStudent.findBy({
+              where: {
+                courseId: course.id.toString(),
+                userId: user.id.toString(),
+                active: true,
+              },
+            });
+            if (student && student.length === 1) {
+              await this.repositoryStudent.save({
+                _id: new ObjectId(student[0].id.toString()),
+                ...student[0],
+                code: code as number,
+                version: (student[0]?.version as number) + 1,
+              });
+              code += 1;
+            }
+          }
+          this.repository.save({
+            _id: new ObjectId(id),
+            ...course,
+            studentsId: studentsId,
+            version: (course?.version as number) + 1,
+          })
+        }
+      }
     }
     return true;
   }
