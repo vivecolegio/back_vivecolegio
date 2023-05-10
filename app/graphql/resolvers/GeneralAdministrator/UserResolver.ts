@@ -225,8 +225,17 @@ export class UserResolver {
   ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOneBy(id);
+    if ((result?.username == null || result?.username == undefined || result?.username?.length === 0) && result?.documentNumber && result?.documentNumber?.length > 0) {
+      result = await this.repository.save({
+        _id: new ObjectId(id),
+        ...result,
+        username: result?.documentNumber,
+        version: (result?.version as number) + 1,
+        updatedByUserId,
+      });
+    }
     let password = result?.documentNumber;
-    if (password != null) {
+    if (password != null && password?.length > 0) {
       let passwordHash = await bcrypt
         .hash(password, BCRYPT_SALT_ROUNDS)
         .then(function (hashedPassword) {
@@ -242,7 +251,7 @@ export class UserResolver {
       return true;
     } else {
       let password = result?.username;
-      if (password != null) {
+      if (password != null && password?.length > 0) {
         let passwordHash = await bcrypt
           .hash(password, BCRYPT_SALT_ROUNDS)
           .then(function (hashedPassword) {
