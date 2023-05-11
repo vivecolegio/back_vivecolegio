@@ -6,21 +6,35 @@ import { ApolloServer } from 'apollo-server-express';
 import Cors from 'cors';
 import Express from 'express';
 import { expressjwt } from 'express-jwt';
+import * as fs from 'fs';
 import geoip from 'geoip-lite';
 import { graphqlUploadExpress } from 'graphql-upload';
 import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
+import http from 'http';
+import https from 'https';
 import Morgan from 'morgan';
 import path from 'path';
 import { env } from 'process';
 
-import { port, SERVER_NAME_APP, SERVER_PORT_APP } from './config/index';
+import { GATEWAY_HTTP_PORT_APP, GATEWAY_HTTPS_PORT_APP, SERVER_NAME_APP, SERVER_PORT_APP } from './config/index';
 
 import 'reflect-metadata';
 
 const cluster = require('node:cluster');
 const expressHealthApi = require('express-health-api');
 //const numCPUs = env.NODE_ENV === "development" ? 1 : require('node:os').cpus().length;
-const numCPUs = env.NODE_ENV === "development" ? 1 : 10;
+const numCPUs = env.NODE_ENV === "development" ? 1 : 1;
+
+var httpsOptions = {
+  // this is the private key only
+  key: fs.readFileSync(path.join('ssl', 'vivecolegios', 'private.key')),
+  // this must be the fullchain (cert + intermediates)
+  cert: fs.readFileSync(path.join('ssl', 'vivecolegios', 'certificate.crt')),
+  // this stuff is generally only for peer certificates
+  ca: fs.readFileSync(path.join('ssl', 'vivecolegios', 'ca_bundle.crt')),
+  requestCert: false
+};
+
 async function app() {
   try {
     const gateway = new ApolloGateway({
@@ -138,12 +152,21 @@ async function app() {
     server.start().then(() => {
       server.applyMiddleware({ app });
     });
-    app.listen({ port: port }, () => {
+    var httpServer = http.createServer(app);
+    var httpsServer = https.createServer(httpsOptions, app);
+    httpServer.listen({ port: GATEWAY_HTTP_PORT_APP }, () => {
       console.log(
-        `🚀 Server ready and listening at ==> http://vivecolegios.nortedesantander.gov.co:${port}${server.graphqlPath}`
+        `🚀 Server ready and listening at ==> http://vivecolegios.nortedesantander.gov.co:${GATEWAY_HTTP_PORT_APP}${server.graphqlPath}`
       );
       console.log(`Worker ${process.pid} started`);
-    });
+    });;
+    httpsServer.listen({ port: GATEWAY_HTTPS_PORT_APP }, () => {
+      console.log(
+        `🚀 Server ready and listening at ==> https://vivecolegios.nortedesantander.gov.co:${GATEWAY_HTTPS_PORT_APP}${server.graphqlPath}`
+      );
+      console.log(`Worker ${process.pid} started`);
+    });;;
+
   } catch (err) {
     console.error(err);
   }
