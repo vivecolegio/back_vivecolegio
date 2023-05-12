@@ -192,17 +192,14 @@ export class AcademicDayResolver {
                 //let result = await this.repository.save(model);
                 //console.log(model);
                 count += 1;
-                //console.log(count);
               } else {
                 let resultAcademicDay = await this.repository.save({ ...academicDay[0], _id: new ObjectId(academicDay[0].id.toString()), version: (academicDay[0]?.version as number) + 1, schoolId: school.id.toString() });
-                //console.log(resultAcademicDay, "guardado")
               }
             }
           }
         }
       }
     }
-    //console.log(dataSaveBulk);
     if (dataSaveBulk.length > 0) {
       let result = await this.repository.bulkWrite(dataSaveBulk);
     }

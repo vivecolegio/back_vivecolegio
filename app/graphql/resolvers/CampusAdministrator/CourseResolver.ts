@@ -161,11 +161,13 @@ export class CourseResolver {
   @Query(() => CourseConnection)
   async getAllCourseTeacher(
     @Args() args: ConnectionArgs,
-    @Arg('teacherId', () => String) teacherId: String
+    @Arg('teacherId', () => String) teacherId: String,
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
   ): Promise<CourseConnection> {
     let result = await this.repository.findBy({
       where: {
         teacherId,
+        schoolYearId,
         active: true,
       },
       order: { createdAt: 'DESC' },
