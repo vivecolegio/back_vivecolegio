@@ -19,7 +19,7 @@ COPY . .
 RUN yarn install
 RUN yarn build
 
-RUN npm prune --production
+#RUN npm prune --production
 
 EXPOSE 4000
 EXPOSE 4001
