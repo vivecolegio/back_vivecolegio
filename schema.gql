@@ -3954,6 +3954,7 @@ type Query {
 
     """Paginate last"""
     last: Float
+    schoolYearId: String
     teacherId: String!
   ): CourseConnection!
   getAllDocumentType(
