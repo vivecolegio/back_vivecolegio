@@ -474,9 +474,15 @@ export class CourseResolver {
           where: { _id: { $in: studentsIds } },
         });
         let usersId = [];
+        let studentsId = [];
         for (let student of students) {
-          usersId?.push(new ObjectId(student.userId));
+          if (student?.courseId == course?.id?.toString()) {
+            usersId?.push(new ObjectId(student.userId));
+            studentsId?.push(student?.id?.toString());
+          }
         }
+        // console.log("dataAux", studentsAux?.length);
+        // console.log("data", studentsId?.length);
         let users = await this.repositoryUser.findBy({
           where: { _id: { $in: usersId }, active: true },
           order: { lastName: 'ASC' },
@@ -501,6 +507,12 @@ export class CourseResolver {
               code += 1;
             }
           }
+          await this.repository.save({
+            _id: new ObjectId(id),
+            ...course,
+            studentsId: studentsId,
+            version: (course?.version as number) + 1,
+          })
         }
       }
       else {
