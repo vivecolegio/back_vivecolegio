@@ -1996,7 +1996,7 @@ export class ExperienceLearningResolver {
     for (let asignatureCourse of academicAsignaturesCourses) {
       let academicAsignature = await this.repositoryAcademicAsignature.findOneBy(asignatureCourse?.academicAsignatureId);
       let academicArea = await this.repositoryAcademicArea.findOneBy(academicAsignature?.academicAreaId);
-      if (academicArea !== null && academicArea?.isAverage == true) {
+      if (academicArea !== null) {
         asignaturesAux.push(academicAsignature);
         areasAux.push(academicArea);
       }
