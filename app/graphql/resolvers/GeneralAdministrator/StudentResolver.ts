@@ -509,9 +509,12 @@ export class StudentResolver {
     });
     delete dataProcess?.newUser;
     console.log(data);
+    let courseId = null;
     if (data.courseId) {
       if (data.courseId != result?.courseId) {
+        courseId = data?.courseId;
         let course = await this.repositoryCourse.findOneBy(data.courseId);
+        dataProcess.campusId = [course?.campusId]
         let studentsId = course?.studentsId;
         if (studentsId == undefined || studentsId == null) {
           studentsId = [];
@@ -523,20 +526,12 @@ export class StudentResolver {
           studentsId,
           version: (result?.version as number) + 1,
         });
-        dataProcess.campusId = [course?.campusId]
-        result = await this.repository.save({
-          _id: new ObjectId(id),
-          ...result,
-          ...dataProcess,
-          version: (result?.version as number) + 1,
-          updatedByUserId,
-        });
-        await this.courseResolver.updateCodeStudentsCourse(data?.courseId + "");
       }
     } else {
       if (result?.courseId) {
         let course = await this.repositoryCourse.findOneBy(result?.courseId);
         if (course && course != undefined) {
+          courseId = result?.courseId;
           let studentsId = course?.studentsId;
           if (studentsId == undefined || studentsId == null) {
             studentsId = [];
@@ -550,18 +545,17 @@ export class StudentResolver {
             studentsId,
             version: (result?.version as number) + 1,
           });
-          result = await this.repository.save({
-            _id: new ObjectId(id),
-            ...result,
-            ...dataProcess,
-            version: (result?.version as number) + 1,
-            updatedByUserId,
-          });
-          console.log(result?.courseId)
-          await this.courseResolver.updateCodeStudentsCourse(result?.courseId + "");
         }
       }
     }
+    result = await this.repository.save({
+      _id: new ObjectId(id),
+      ...result,
+      ...dataProcess,
+      version: (result?.version as number) + 1,
+      updatedByUserId,
+    });
+    await this.courseResolver.updateCodeStudentsCourse(courseId + "");
     return result;
   }
 
