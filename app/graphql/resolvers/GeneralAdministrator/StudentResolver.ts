@@ -523,6 +523,7 @@ export class StudentResolver {
           studentsId,
           version: (result?.version as number) + 1,
         });
+        dataProcess.campusId = [course?.campusId]
         result = await this.repository.save({
           _id: new ObjectId(id),
           ...result,
@@ -531,7 +532,6 @@ export class StudentResolver {
           updatedByUserId,
         });
         await this.courseResolver.updateCodeStudentsCourse(data?.courseId + "");
-        dataProcess.campusId = [course?.campusId]
       }
     } else {
       if (result?.courseId) {
