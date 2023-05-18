@@ -523,7 +523,14 @@ export class StudentResolver {
           studentsId,
           version: (result?.version as number) + 1,
         });
-        this.courseResolver.updateCodeStudentsCourse(data?.courseId + "");
+        result = await this.repository.save({
+          _id: new ObjectId(id),
+          ...result,
+          ...dataProcess,
+          version: (result?.version as number) + 1,
+          updatedByUserId,
+        });
+        await this.courseResolver.updateCodeStudentsCourse(data?.courseId + "");
         dataProcess.campusId = [course?.campusId]
       }
     } else {
@@ -543,18 +550,18 @@ export class StudentResolver {
             studentsId,
             version: (result?.version as number) + 1,
           });
+          result = await this.repository.save({
+            _id: new ObjectId(id),
+            ...result,
+            ...dataProcess,
+            version: (result?.version as number) + 1,
+            updatedByUserId,
+          });
           console.log(result?.courseId)
-          this.courseResolver.updateCodeStudentsCourse(result?.courseId + "");
+          await this.courseResolver.updateCodeStudentsCourse(result?.courseId + "");
         }
       }
     }
-    result = await this.repository.save({
-      _id: new ObjectId(id),
-      ...result,
-      ...dataProcess,
-      version: (result?.version as number) + 1,
-      updatedByUserId,
-    });
     return result;
   }
 
