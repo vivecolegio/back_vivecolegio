@@ -2147,6 +2147,7 @@ export class ExperienceLearningResolver {
         {
           courseId,
           academicPeriodId,
+          studentId: { $in: course?.studentsId }
         },
         order: { assessment: -1 },
       });
