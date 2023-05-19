@@ -485,8 +485,18 @@ export class CourseResolver {
         // console.log("data", studentsId?.length);
         let users = await this.repositoryUser.findBy({
           where: { _id: { $in: usersId }, active: true },
-          order: { lastName: 'ASC' },
+          order: { lastName: "ASC" },
         });
+        // for (let use1 of users) {
+        //   console.log(use1?.lastName + " " + use1?.name);
+        // }
+        users = users.sort(function (a, b) {
+          return new Intl.Collator("es").compare("" + a?.lastName + " " + a?.name, "" + b?.lastName + " " + b?.name);
+        });
+        // for (let use2 of users2) {
+        //   console.log(use2?.lastName + " " + use2?.name);
+        // }
+        //console.log(users);
         if (users && users.length > 0) {
           let code = 1;
           for (let user of users) {
