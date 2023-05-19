@@ -495,6 +495,7 @@ export class CourseResolver {
                 courseId: course.id.toString(),
                 userId: user.id.toString(),
                 active: true,
+                schoolYearId: course?.schoolYearId,
               },
             });
             if (student && student.length === 1) {
@@ -505,6 +506,10 @@ export class CourseResolver {
                 version: (student[0]?.version as number) + 1,
               });
               code += 1;
+              //  console.log("code", code);
+              //console.log("student", student);
+            } else {
+              //console.log("student", student);
             }
           }
           await this.repository.save({
@@ -537,6 +542,7 @@ export class CourseResolver {
                 courseId: course.id.toString(),
                 userId: user.id.toString(),
                 active: true,
+                schoolYearId: course?.schoolYearId,
               },
             });
             if (student && student.length === 1) {
