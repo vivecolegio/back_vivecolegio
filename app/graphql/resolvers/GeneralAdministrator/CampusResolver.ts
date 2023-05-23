@@ -2,14 +2,17 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { CampusRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
+
+import { CampusRepository, CourseRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewCampus } from '../../inputs/GeneralAdministrator/NewCampus';
 import { IContext } from '../../interfaces/IContext';
+import { Course } from '../../models/CampusAdministrator/Course';
 import { Campus, CampusConnection } from '../../models/GeneralAdministrator/Campus';
 import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
+import { CourseResolver } from '../CampusAdministrator/CourseResolver';
 
 @Resolver(Campus)
 export class CampusResolver {
@@ -21,6 +24,11 @@ export class CampusResolver {
 
   @InjectRepository(School)
   private repositorySchool = SchoolRepository;
+
+  @InjectRepository(Course)
+  private repositoryCourse = CourseRepository;
+
+  private courseResolver = new CourseResolver();
 
   @Query(() => Campus, { nullable: true })
   async getCampus(@Arg('id', () => String) id: string) {
@@ -120,6 +128,12 @@ export class CampusResolver {
       version: (result?.version as number) + 1,
       updatedByUserId,
     });
+    if (!active) {
+      const courses = await this.repositoryCourse.findBy({ where: { campusId: id } })
+      for (let course of courses) {
+        await this.courseResolver.changeActiveCourse(false, course?.id?.toString(), context);
+      }
+    }
     if (result.id) {
       return true;
     } else {

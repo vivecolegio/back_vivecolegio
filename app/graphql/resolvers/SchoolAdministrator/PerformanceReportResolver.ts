@@ -259,6 +259,22 @@ export class PerformanceReportResolver {
         let studentsId = course?.studentsId;
         if (studentId !== null && studentId?.length > 0) {
           studentsId = [studentId]
+        } else {
+          let studentsAux = studentsId;
+          if (studentsAux) {
+            let studentsIds = [];
+            for (let studentId of studentsAux) {
+              studentsIds?.push(new ObjectId(studentId.toString()));
+            }
+            let students = await this.repositoryStudent.findBy({
+              where: { _id: { $in: studentsIds } }, order: { code: 1 },
+            });
+            //console.log(students);
+            studentsId = [];
+            for (let student of students) {
+              studentsId.push(student?.id?.toString());
+            }
+          }
         }
         areasAux = filtered.sort(this.compareOrderAcademicArea);
         let areas: any[] = [];
@@ -486,6 +502,7 @@ export class PerformanceReportResolver {
           for (let studentId of studentsId) {
             let dataPDF = { ...data };
             let student = await this.repositoryStudent.findOneBy(studentId + "");
+            //console.log("codigo", student?.code);
             let studentUser = await this.repositoryUser.findOneBy(student?.userId);
             dataPDF = { ...dataPDF, "studentName": studentUser?.name + " " + studentUser?.lastName };
             dataPDF = { ...dataPDF, "studentDocumentNumber": studentUser?.documentNumber };
@@ -756,7 +773,20 @@ export class PerformanceReportResolver {
           }
           let urlsReturn = await Promise.all(promisesGeneratePDF).then(() => {
             if (urls?.length > 1) {
-              urls = urls.sort();
+              //urls = urls.sort();
+              //console.log(studentsId);
+              //console.log(urls);
+              let urlsAux = [];
+              if (studentsId) {
+                for (let student of studentsId) {
+                  let urlsStudents = urls.filter((url: any) => url.includes(student));
+                  urlsStudents = urlsStudents.sort();
+                  for (let urlStudent of urlsStudents) {
+                    urlsAux.push(urlStudent);
+                  }
+                }
+              }
+              //console.log(urlsAux);
               const merge = require('easy-pdf-merge');
               const opts = {
                 maxBuffer: 1024 * 5096, // 500kb
