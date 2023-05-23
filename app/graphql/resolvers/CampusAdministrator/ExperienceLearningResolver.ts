@@ -1330,6 +1330,7 @@ export class ExperienceLearningResolver {
               academicAsignaturesId: { $in: [academicAsignature.id.toString()] },
               academicAreasId: null,
               schoolId: campus.schoolId,
+              schoolYearId: course?.schoolYearId,
               active: true,
             },
             order: { createdAt: 'DESC' },
@@ -1340,6 +1341,7 @@ export class ExperienceLearningResolver {
                 academicAsignaturesId: null,
                 academicAreasId: { $in: [academicAsignature.academicAreaId] },
                 schoolId: campus.schoolId,
+                schoolYearId: course?.schoolYearId,
                 active: true,
               },
               order: { createdAt: 'DESC' },
@@ -1350,6 +1352,7 @@ export class ExperienceLearningResolver {
                   academicAsignaturesId: null,
                   academicAreasId: null,
                   schoolId: campus.schoolId,
+                  schoolYearId: course?.schoolYearId,
                   active: true,
                 },
                 order: { createdAt: 'DESC' },
@@ -1359,6 +1362,8 @@ export class ExperienceLearningResolver {
         }
       }
     }
+    //console.log("evaluativeComponent", evaluativeComponents)
+    //console.log("countevaluativeComponent", evaluativeComponents?.length)
     if (academicAsignatureCourse) {
       const course = await this.repositoryCourse.findOneBy(academicAsignatureCourse.courseId);
       if (course) {
@@ -1465,6 +1470,7 @@ export class ExperienceLearningResolver {
                   experienceLearningType
                 },
               });
+            //console.log("CountexperienceLearningAverageValuation", experienceLearningAverageValuation?.length)
             if (experienceLearningAverageValuation.length > 0) {
               let averageComponent = 0;
               let weightComponent = 0;
@@ -1483,6 +1489,9 @@ export class ExperienceLearningResolver {
                   average += averageComponent * (weightComponent / 100);
                   break;
               }
+              //console.log("averageComponent", averageComponent)
+              //console.log("weightComponent", weightComponent)
+              //console.log("****************************************average", average)
             }
           }
           switch (performanceLevelType) {
@@ -1507,6 +1516,7 @@ export class ExperienceLearningResolver {
               studentPeriodValuation.performanceLevelId = performanceLevelId;
               break;
           }
+          //console.log(studentPeriodValuation)
           if (studentPeriodValuation.id) {
             studentPeriodValuation =
               await this.repositoryAcademicAsignatureCoursePeriodValuation.save({
@@ -1551,6 +1561,7 @@ export class ExperienceLearningResolver {
               academicAsignaturesId: { $in: [academicAsignature.id.toString()] },
               academicAreasId: null,
               schoolId: campus.schoolId,
+              schoolYearId: course?.schoolYearId,
               active: true,
             },
             order: { createdAt: 'DESC' },
@@ -1561,6 +1572,7 @@ export class ExperienceLearningResolver {
                 academicAsignaturesId: null,
                 academicAreasId: { $in: [academicAsignature.academicAreaId] },
                 schoolId: campus.schoolId,
+                schoolYearId: course?.schoolYearId,
                 active: true,
               },
               order: { createdAt: 'DESC' },
@@ -1571,6 +1583,7 @@ export class ExperienceLearningResolver {
                   academicAsignaturesId: null,
                   academicAreasId: null,
                   schoolId: campus.schoolId,
+                  schoolYearId: course?.schoolYearId,
                   active: true,
                 },
                 order: { createdAt: 'DESC' },

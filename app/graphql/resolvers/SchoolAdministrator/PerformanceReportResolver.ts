@@ -568,6 +568,11 @@ export class PerformanceReportResolver {
                     notesAsignatures.push({ assessment: "-", academicPeriodId: period?.id?.toString(), performanceLevel: "-", "asignatureId": academicAsignature?.id?.toString(), "areaId": academicArea?.id?.toString(), "teacher": teacherUserAsignatureCourse?.name + " " + teacherUserAsignatureCourse?.lastName })
                   }
                 }
+                //else {
+                // console.log("dime que aca es el problema y listo")
+                // console.log("academicPeriod", academicPeriod);
+                // console.log("period", period);
+                //}
               }
               // Nota Final de Año
               let notesAsignature = await this.repositoryAcademicAsignatureCourseYearValuation.findBy({
@@ -726,6 +731,7 @@ export class PerformanceReportResolver {
             //console.log(notesAreas)
             dataPDF = { ...dataPDF, "notesAsignatures": notesAsignatures };
             dataPDF = { ...dataPDF, "notesAreas": notesAreas };
+            //console.log("dataPDF", dataPDF)
             switch (reportPerformanceType) {
               case "DETAILS":
                 promisesGeneratePDF.push(
@@ -815,6 +821,7 @@ export class PerformanceReportResolver {
         return opts.inverse(this);
       });
       const browser = await puppeteer.launch({
+        headless: "new",
         args: ['--no-sandbox']
       });
       const page = await browser.newPage();
@@ -882,6 +889,7 @@ export class PerformanceReportResolver {
         return opts.inverse(this);
       });
       const browser = await puppeteer.launch({
+        headless: "new",
         args: ['--no-sandbox']
       });
       const page = await browser.newPage();
@@ -929,6 +937,7 @@ export class PerformanceReportResolver {
     const data = require('../../../reports/performanceReport/data.json');
     try {
       const browser = await puppeteer.launch({
+        headless: "new",
         args: ['--no-sandbox']
       });
       const page = await browser.newPage();
