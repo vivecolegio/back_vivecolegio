@@ -904,6 +904,7 @@ export class ExperienceLearningResolver {
     @Arg('studentId', () => String) studentId: string,
     @Arg('experienceLearningType', () => ExperienceLearningType) experienceLearningType: ExperienceLearningType,
   ) {
+    //console.log("createExperienceLearningAverageValuationStudent")
     const experienceLearnings = await this.repository.findBy({
       where: {
         evaluativeComponentsId: { $in: [evaluativeComponentId] },
@@ -1068,6 +1069,9 @@ export class ExperienceLearningResolver {
           }
           performanceLevels = await this.performanceLevelResolver.getAllPerformanceLevelAcademicAsignatureCourseFinal({}, academicAsignatureCourseId + "");
           average = average / countExperienceLearningAssessment;
+          //console.log("performanceLevelType", performanceLevelType)
+          //console.log("average", average)
+          //console.log("countExperienceLearningAssessment", countExperienceLearningAssessment)
           switch (performanceLevelType) {
             case PerformanceLevelType.QUALITATIVE:
               if (average != null && average > 0 && countExperienceLearningAssessment > 0) {
@@ -1095,12 +1099,15 @@ export class ExperienceLearningResolver {
                   });
                 }
                 if (perf && perf?.node?.id) {
-                  performanceLevelId = perf.node.id
+                  performanceLevelId = perf.node.id.toString()
                 }
+                //console.log("perf", perf)
                 studentAverage.performanceLevelId = performanceLevelId;
+                //console.log("performanceLevelId", performanceLevelId)
               }
               break;
           }
+          //console.log(studentAverage);
           if (studentAverage.id) {
             studentAverage = await this.repositoryExperienceLearningAverageValuation.save({
               _id: new ObjectId(studentAverage.id.toString()),
@@ -1471,6 +1478,8 @@ export class ExperienceLearningResolver {
                 },
               });
             //console.log("CountexperienceLearningAverageValuation", experienceLearningAverageValuation?.length)
+            //console.log("performanceLevelType", performanceLevelType)
+            //console.log(experienceLearningAverageValuation);
             if (experienceLearningAverageValuation.length > 0) {
               let averageComponent = 0;
               let weightComponent = 0;

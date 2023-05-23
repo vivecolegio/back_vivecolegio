@@ -182,6 +182,7 @@ export class PerformanceLevelResolver {
     if (academicAsignatureCourse) {
       let course = await this.repositoryCourse.findOneBy(academicAsignatureCourse.courseId);
       if (course) {
+        let schoolYear = await this.repositorySchoolYear.findOneBy(course.schoolYearId);
         let campus = await this.repositoryCampus.findOneBy(course.campusId);
         if (campus) {
           result = await this.repository.findBy({
@@ -189,6 +190,7 @@ export class PerformanceLevelResolver {
               campusId: { $in: [course.campusId] },
               academicGradesId: { $in: [course.academicGradeId] },
               schoolId: campus.schoolId,
+              schoolYearId: schoolYear?.id?.toString(),
               isFinal: true,
               active: true,
             },
@@ -199,6 +201,7 @@ export class PerformanceLevelResolver {
               where: {
                 campusId: { $in: [course.campusId] },
                 schoolId: campus.schoolId,
+                schoolYearId: schoolYear?.id?.toString(),
                 isFinal: true,
                 active: true,
               },
@@ -209,6 +212,7 @@ export class PerformanceLevelResolver {
                 where: {
                   academicGradesId: { $in: [course.academicGradeId] },
                   schoolId: campus.schoolId,
+                  schoolYearId: schoolYear?.id?.toString(),
                   isFinal: true,
                   active: true,
                 },
@@ -218,6 +222,7 @@ export class PerformanceLevelResolver {
                 result = await this.repository.findBy({
                   where: {
                     schoolId: campus.schoolId,
+                    schoolYearId: schoolYear?.id?.toString(),
                     isFinal: true,
                     active: true,
                   },
@@ -247,6 +252,7 @@ export class PerformanceLevelResolver {
     if (courseId) {
       let course = await this.repositoryCourse.findOneBy(courseId);
       if (course) {
+        let schoolYear = await this.repositorySchoolYear.findOneBy(course.schoolYearId);
         let campus = await this.repositoryCampus.findOneBy(course.campusId);
         if (campus) {
           result = await this.repository.findBy({
@@ -254,6 +260,7 @@ export class PerformanceLevelResolver {
               campusId: { $in: [course.campusId] },
               academicGradesId: { $in: [course.academicGradeId] },
               schoolId: campus.schoolId,
+              schoolYearId: schoolYear?.id?.toString(),
               active: true,
             },
             order: { createdAt: 'DESC' },
@@ -263,6 +270,7 @@ export class PerformanceLevelResolver {
               where: {
                 campusId: { $in: [course.campusId] },
                 schoolId: campus.schoolId,
+                schoolYearId: schoolYear?.id?.toString(),
                 active: true,
               },
               order: { createdAt: 'DESC' },
@@ -272,6 +280,7 @@ export class PerformanceLevelResolver {
                 where: {
                   academicGradesId: { $in: [course.academicGradeId] },
                   schoolId: campus.schoolId,
+                  schoolYearId: schoolYear?.id?.toString(),
                   active: true,
                 },
                 order: { createdAt: 'DESC' },
@@ -280,6 +289,7 @@ export class PerformanceLevelResolver {
                 result = await this.repository.findBy({
                   where: {
                     schoolId: campus.schoolId,
+                    schoolYearId: schoolYear?.id?.toString(),
                     active: true,
                   },
                   order: { createdAt: 'DESC' },
@@ -309,6 +319,7 @@ export class PerformanceLevelResolver {
     if (courseId) {
       let course = await this.repositoryCourse.findOneBy(courseId);
       if (course) {
+        let schoolYear = await this.repositorySchoolYear.findOneBy(course.schoolYearId);
         let campus = await this.repositoryCampus.findOneBy(course.campusId);
         if (campus) {
           result = await this.repository.findBy({
@@ -316,6 +327,7 @@ export class PerformanceLevelResolver {
               campusId: { $in: [course.campusId] },
               academicGradesId: { $in: [course.academicGradeId] },
               schoolId: campus.schoolId,
+              schoolYearId: schoolYear?.id?.toString(),
               isFinal: true,
               active: true,
             },
@@ -326,6 +338,7 @@ export class PerformanceLevelResolver {
               where: {
                 campusId: { $in: [course.campusId] },
                 schoolId: campus.schoolId,
+                schoolYearId: schoolYear?.id?.toString(),
                 isFinal: true,
                 active: true,
               },
@@ -336,6 +349,7 @@ export class PerformanceLevelResolver {
                 where: {
                   academicGradesId: { $in: [course.academicGradeId] },
                   schoolId: campus.schoolId,
+                  schoolYearId: schoolYear?.id?.toString(),
                   isFinal: true,
                   active: true,
                 },
@@ -345,6 +359,7 @@ export class PerformanceLevelResolver {
                 result = await this.repository.findBy({
                   where: {
                     schoolId: campus.schoolId,
+                    schoolYearId: schoolYear?.id?.toString(),
                     isFinal: true,
                     active: true,
                   },
