@@ -3,10 +3,11 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicDayRepository, AcademicGradeRepository, CampusRepository, CourseRepository, CursosRepository, SchoolRepository, SchoolYearRepository, StudentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAsignatureCourseRepository, AcademicDayRepository, AcademicGradeRepository, CampusRepository, CourseRepository, CursosRepository, SchoolRepository, SchoolYearRepository, StudentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewCourse } from '../../inputs/CampusAdministrator/NewCourse';
 import { IContext } from '../../interfaces/IContext';
+import { AcademicAsignatureCourse } from '../../models/CampusAdministrator/AcademicAsignatureCourse';
 import { AcademicDay } from '../../models/CampusAdministrator/AcademicDay';
 import { Course, CourseConnection } from '../../models/CampusAdministrator/Course';
 import { Teacher } from '../../models/CampusAdministrator/Teacher';
@@ -18,6 +19,7 @@ import { AcademicGrade } from '../../models/SchoolAdministrator/AcademicGrade';
 import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 import { Cursos } from './../../models/Data/Cursos';
+import { AcademicAsignatureCourseResolver } from './AcademicAsignatureCourseResolver';
 
 @Resolver(Course)
 export class CourseResolver {
@@ -51,6 +53,11 @@ export class CourseResolver {
   @InjectRepository(Cursos)
   private repositoryCursos = CursosRepository;
 
+  @InjectRepository(AcademicAsignatureCourse)
+  private repositoryAcademicAsignatureCourse = AcademicAsignatureCourseRepository;
+
+  private academicAsignatureCourseResolver = new AcademicAsignatureCourseResolver();
+
   @Query(() => Course, { nullable: true })
   async getCourse(@Arg('id', () => String) id: string) {
     const result = await this.repository.findOneBy(id);
@@ -69,7 +76,12 @@ export class CourseResolver {
     let result;
     let campusDataIds: any[] = [];
     if (schoolId) {
-      const campusData = await this.repositoryCampus.findBy({ schoolId, active: true });
+      let campusData = [];
+      if (allData) {
+        campusData = await this.repositoryCampus.findBy({ schoolId });
+      } else {
+        campusData = await this.repositoryCampus.findBy({ schoolId, active: true });
+      }
       campusData.forEach((campus: any) => {
         campusDataIds.push(campus.id.toString());
       });
@@ -611,6 +623,12 @@ export class CourseResolver {
       version: (result?.version as number) + 1,
       updatedByUserId,
     });
+    if (!active) {
+      const academicAsignatureCourses = await this.repositoryAcademicAsignatureCourse.findBy({ where: { courseId: id } })
+      for (let academicAsignatureCourse of academicAsignatureCourses) {
+        await this.academicAsignatureCourseResolver.changeActiveAcademicAsignatureCourse(false, academicAsignatureCourse?.id?.toString(), context);
+      }
+    }
     if (result.id) {
       return true;
     } else {
