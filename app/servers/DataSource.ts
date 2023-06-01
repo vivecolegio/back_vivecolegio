@@ -44,6 +44,7 @@ import { AuditLogin } from '../graphql/models/GeneralAdministrator/AuditLogin';
 import { Campus } from '../graphql/models/GeneralAdministrator/Campus';
 import { DocumentType } from '../graphql/models/GeneralAdministrator/DocumentType';
 import { Email } from '../graphql/models/GeneralAdministrator/Email';
+import { FrecuentQuestion } from '../graphql/models/GeneralAdministrator/FrecuentQuestion';
 import { Gender } from '../graphql/models/GeneralAdministrator/Gender';
 import { GeneralAcademicArea } from '../graphql/models/GeneralAdministrator/GeneralAcademicArea';
 import { GeneralAcademicAsignature } from '../graphql/models/GeneralAdministrator/GeneralAcademicAsignature';
@@ -64,6 +65,7 @@ import { SchoolAdministrative } from '../graphql/models/GeneralAdministrator/Sch
 import { SchoolAdministrator } from '../graphql/models/GeneralAdministrator/SchoolAdministrator';
 import { Student } from '../graphql/models/GeneralAdministrator/Student';
 import { User } from '../graphql/models/GeneralAdministrator/User';
+import { VideoTutorial } from '../graphql/models/GeneralAdministrator/VideoTutorial';
 import { AcademicArea } from '../graphql/models/SchoolAdministrator/AcademicArea';
 import { AcademicAsignature } from '../graphql/models/SchoolAdministrator/AcademicAsignature';
 import { AcademicGrade } from '../graphql/models/SchoolAdministrator/AcademicGrade';
@@ -176,7 +178,9 @@ export const dataSource = new DataSource({
     AcademicAreaCourseYearValuation,
     AverageAcademicYearStudent,
     AverageAcademicYearCourse,
-    StudentYearBehaviour
+    StudentYearBehaviour,
+    VideoTutorial,
+    FrecuentQuestion
   ],
   synchronize: true,
   logger: 'advanced-console',
@@ -296,4 +300,5 @@ export const AcademicAreaCourseYearValuationRepository = dataSource.getMongoRepo
 export const AverageAcademicYearStudentRepository = dataSource.getMongoRepository(AverageAcademicYearStudent);
 export const AverageAcademicYearCourseRepository = dataSource.getMongoRepository(AverageAcademicYearCourse);
 export const StudentYearBehaviourRepository = dataSource.getMongoRepository(StudentYearBehaviour);
-
+export const VideoTutorialRepository = dataSource.getMongoRepository(VideoTutorial);
+export const FrecuentQuestionRepository = dataSource.getMongoRepository(FrecuentQuestion);

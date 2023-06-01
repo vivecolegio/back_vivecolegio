@@ -4,7 +4,16 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicGradeRepository, CampusRepository, CourseRepository, EstudiantesRepository, SchoolRepository, SchoolYearRepository, StudentRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  AcademicGradeRepository,
+  CampusRepository,
+  CourseRepository,
+  EstudiantesRepository,
+  SchoolRepository,
+  SchoolYearRepository,
+  StudentRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewStudent } from '../../inputs/GeneralAdministrator/NewStudent';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
@@ -212,7 +221,10 @@ export class StudentResolver {
     delete dataProcess.newUser;
     let user = await this.repositoryUser.findBy({ documentNumber: dataUserProcess.documentNumber });
     if (user.length > 0) {
-      let teacher = await this.repository.findBy({ userId: user[0]?.id?.toString(), schoolYearId: dataProcess.schoolYearId })
+      let teacher = await this.repository.findBy({
+        userId: user[0]?.id?.toString(),
+        schoolYearId: dataProcess.schoolYearId,
+      });
       if (teacher.length == 0) {
         const model = await this.repository.create({
           ...dataProcess,
@@ -255,7 +267,10 @@ export class StudentResolver {
   }
 
   @Mutation(() => Boolean)
-  public async createAllInitialsStudents(@Arg('schoolId', () => String) schoolId: String, @Arg('schoolYearId', () => String) schoolYearId: String) {
+  public async createAllInitialsStudents(
+    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('schoolYearId', () => String) schoolYearId: String
+  ) {
     let school = await this.repositorySchool.findOneBy(schoolId);
     let schoolYear = await this.repositorySchoolYear.findOneBy(schoolYearId);
     //let schools = await this.repositorySchool.findBy({ where: { daneCode: "254810000696" } });
@@ -263,9 +278,9 @@ export class StudentResolver {
     //for (let school of schools) {
     if (school && schoolYear) {
       let data = await this.repositoryEstudiantes.findBy({
-        where: { dane: school.daneCode, procesado: null },
+        where: { dane: school.daneCode },
       });
-      console.log("Step: SIMAT - Update Students - Count", data?.length);
+      console.log('Step: SIMAT - Update Students - Count', data?.length);
       for (let estudiante of data) {
         if (
           estudiante.jornada &&
@@ -294,7 +309,7 @@ export class StudentResolver {
                 campusId: campus[0].id.toString(),
                 active: true,
                 schoolId: school.id.toString(),
-                schoolYearId: schoolYear?.id?.toString()
+                schoolYearId: schoolYear?.id?.toString(),
               });
               let academicGradeId = undefined;
               let courseId = undefined;
@@ -344,9 +359,9 @@ export class StudentResolver {
                   return hashedPassword;
                 });
               let fechaNacimiento = estudiante.fecha_nacimiento?.split('/');
-              let name = (estudiante.nombre1 ? estudiante.nombre1 : '') + " ";
+              let name = (estudiante.nombre1 ? estudiante.nombre1 : '') + ' ';
               name += estudiante.nombre2 ? estudiante.nombre2 : '';
-              let lastName = (estudiante.apellido1 ? estudiante.apellido1 : '') + " ";
+              let lastName = (estudiante.apellido1 ? estudiante.apellido1 : '') + ' ';
               lastName += estudiante.apellido2 ? estudiante.apellido2 : '';
               //console.log(name, lastName)
               const modelUser = await this.repositoryUser.create({
@@ -362,10 +377,10 @@ export class StudentResolver {
                     : '60ecc36d6c716a21bee51e00',
                 birthdate: fechaNacimiento
                   ? new Date(
-                    Number(fechaNacimiento[2]),
-                    Number(fechaNacimiento[1]) - 1,
-                    Number(fechaNacimiento[0])
-                  )
+                      Number(fechaNacimiento[2]),
+                      Number(fechaNacimiento[1]) - 1,
+                      Number(fechaNacimiento[0])
+                    )
                   : undefined,
                 roleId: '619551d1882a2fb6525a3078',
                 schoolId: school.id.toString(),
@@ -374,14 +389,20 @@ export class StudentResolver {
               });
               let resultUser = null;
               if (user.length > 0) {
-                resultUser = await this.repositoryUser.save({ _id: new ObjectId(user[0]?.id?.toString()), ...user[0], ...modelUser, version: (user[0]?.version as number) + 1, });
+                resultUser = await this.repositoryUser.save({
+                  _id: new ObjectId(user[0]?.id?.toString()),
+                  ...user[0],
+                  ...modelUser,
+                  version: (user[0]?.version as number) + 1,
+                });
               } else {
                 resultUser = await this.repositoryUser.save(modelUser);
               }
               let student = await this.repository.findBy({
-                userId: resultUser.id.toString(), schoolId: { $in: [school.id.toString()] },
-                schoolYearId: schoolYear?.id?.toString()
-              })
+                userId: resultUser.id.toString(),
+                schoolId: { $in: [school.id.toString()] },
+                schoolYearId: schoolYear?.id?.toString(),
+              });
               const model = await this.repository.create({
                 schoolId: [school.id.toString()],
                 campusId: [campus[0].id.toString()],
@@ -390,11 +411,16 @@ export class StudentResolver {
                 userId: resultUser.id.toString(),
                 active: true,
                 version: 0,
-                schoolYearId: schoolYear?.id?.toString()
+                schoolYearId: schoolYear?.id?.toString(),
               });
               let result = null;
               if (student.length > 0) {
-                result = await this.repository.save({ _id: new ObjectId(student[0]?.id?.toString()), ...student[0], ...model, version: (user[0]?.version as number) + 1, });
+                result = await this.repository.save({
+                  _id: new ObjectId(student[0]?.id?.toString()),
+                  ...student[0],
+                  ...model,
+                  version: (user[0]?.version as number) + 1,
+                });
               } else {
                 result = await this.repository.save(model);
               }
@@ -411,7 +437,7 @@ export class StudentResolver {
                   studentsId,
                   version: (result?.version as number) + 1,
                 });
-                this.courseResolver.updateCodeStudentsCourse(courseId + "");
+                this.courseResolver.updateCodeStudentsCourse(courseId + '');
               }
               count += 1;
               const model2 = await this.repositoryEstudiantes.create({
@@ -441,7 +467,7 @@ export class StudentResolver {
     let schools = await this.repositorySchool.find();
     let count = 0;
     for (let school of schools) {
-      if (school?.daneCode == "154680000015") {
+      if (school?.daneCode == '154680000015') {
         let data = await this.repositoryEstudiantes.findBy({
           where: { dane: school.daneCode, procesado: null },
         });
@@ -462,11 +488,11 @@ export class StudentResolver {
             ) {
               let user = await this.repositoryUser.findBy({ username: estudiante.doc });
               if (user.length == 1) {
-                let name = (estudiante.nombre1 ? estudiante.nombre1 : '') + " ";
+                let name = (estudiante.nombre1 ? estudiante.nombre1 : '') + ' ';
                 name += estudiante.nombre2 ? estudiante.nombre2 : '';
-                let lastName = (estudiante.apellido1 ? estudiante.apellido1 : '') + " ";
+                let lastName = (estudiante.apellido1 ? estudiante.apellido1 : '') + ' ';
                 lastName += estudiante.apellido2 ? estudiante.apellido2 : '';
-                console.log(name, lastName)
+                console.log(name, lastName);
                 let resultUser = await this.repositoryUser.save({
                   _id: new ObjectId(user[0]?.id?.toString()),
                   ...user[0],
@@ -514,7 +540,7 @@ export class StudentResolver {
       if (data.courseId != result?.courseId) {
         courseId = data?.courseId;
         let course = await this.repositoryCourse.findOneBy(data.courseId);
-        dataProcess.campusId = [course?.campusId]
+        dataProcess.campusId = [course?.campusId];
         let studentsId = course?.studentsId;
         if (studentsId == undefined || studentsId == null) {
           studentsId = [];
@@ -555,7 +581,7 @@ export class StudentResolver {
       version: (result?.version as number) + 1,
       updatedByUserId,
     });
-    await this.courseResolver.updateCodeStudentsCourse(courseId + "");
+    await this.courseResolver.updateCodeStudentsCourse(courseId + '');
     return result;
   }
 

@@ -2496,6 +2496,7 @@ type Mutation {
   deleteStudentYearBehaviour(id: String!): Boolean!
   deleteTeacher(id: String!): Boolean!
   deleteUser(id: String!): Boolean!
+  fixAcademicAsignatureCourseSchoolSchoolYear2023: Boolean!
   fixAcademicAsignatureCourseSchoolYear: Boolean!
   fixStudentCourseYearOld(schoolId: String!, schoolYearId: String!): Boolean!
   generateCertificateFinalReportCourse(format: String!, id: String!, schoolId: String!, schoolYearId: String!, studentId: String): String!
