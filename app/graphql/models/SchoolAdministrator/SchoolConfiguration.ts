@@ -1,8 +1,9 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 
 import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
+import { SchoolYear } from './SchoolYear';
 
 @ObjectType({ description: 'The SchoolConfiguration model', implements: IModelSchoolData })
 @Entity()
@@ -18,6 +19,14 @@ export class SchoolConfiguration extends IModelSchoolData {
   @Field({ nullable: true })
   @Column({ nullable: true })
   valueString?: string;
+
+  @Index("index_schoolYearId")
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  schoolYearId?: string;
+
+  @Field({ nullable: true })
+  schoolYear?: SchoolYear;
 }
 
 @ObjectType()

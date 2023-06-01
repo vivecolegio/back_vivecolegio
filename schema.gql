@@ -5344,6 +5344,8 @@ type SchoolConfiguration implements IModelSchoolData {
   id: ID!
   school: School
   schoolId: String
+  schoolYear: SchoolYear
+  schoolYearId: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
