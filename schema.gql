@@ -2515,6 +2515,8 @@ type Mutation {
   importPerformanceLevelSchoolYearId(newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!): Boolean!
   login(password: String!, username: String!): Jwt!
   resetPasswordUser(id: String!): Boolean!
+  schoolImgPrincipalSignatureUploadImage(file: Upload, id: String!): Boolean!
+  schoolLogoUploadImage(file: Upload, id: String!): Boolean!
   singleUpload(file: Upload, id: String!): Boolean!
   updateAcademicArea(data: NewAcademicArea!, id: String!): AcademicArea!
   updateAcademicAreaAcademicAsignatureSchoolYearId(schoolId: String!, schoolYearId: String!): Boolean!
@@ -3236,6 +3238,8 @@ input NewSchoolAdministrator {
 
 input NewSchoolConfiguration {
   code: String
+  schoolId: String
+  schoolYearId: String
   valueNumber: Float
   valueString: String
 }
