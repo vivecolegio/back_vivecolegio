@@ -1553,6 +1553,7 @@ export class ExperienceLearningResolver {
     @Arg('studentId', () => String) studentId: string,
     @Arg('experienceLearningType', () => ExperienceLearningType) experienceLearningType: ExperienceLearningType,
   ) {
+    let countDigitsPerformanceLevel = 2;
     let academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(
       academicAsignatureCourseId
     );
@@ -1565,6 +1566,12 @@ export class ExperienceLearningResolver {
       if (course && academicAsignature) {
         let campus = await this.repositoryCampus.findOneBy(course.campusId);
         if (campus) {
+          let schoolConfigurationCountDigitsPerformanceLevel = await this.repositorySchoolConfiguration.findBy({
+            where: { schoolId: campus?.schoolId, code: "COUNT_DIGITS_PERFORMANCE_LEVEL", active: true },
+          });
+          if (schoolConfigurationCountDigitsPerformanceLevel?.length > 0) {
+            countDigitsPerformanceLevel = schoolConfigurationCountDigitsPerformanceLevel[0]?.valueNumber ? schoolConfigurationCountDigitsPerformanceLevel[0]?.valueNumber : 2;
+          }
           evaluativeComponents = await this.repositoryEvaluativeComponent.findBy({
             where: {
               academicAsignaturesId: { $in: [academicAsignature.id.toString()] },
@@ -1728,6 +1735,7 @@ export class ExperienceLearningResolver {
               //studentPeriodValuation.performanceLevelId = performanceLevels?.edges[Math.trunc(average) - 1]?.node?.id.toString();
               break;
             case PerformanceLevelType.QUANTITATIVE:
+              average = Number(average.toFixed(countDigitsPerformanceLevel));
               studentPeriodValuation.assessment = average;
               perf = performanceLevels?.edges?.find((c: any) => {
                 return average < c.node.topScore && average >= c.node.minimumScore;
@@ -1770,6 +1778,7 @@ export class ExperienceLearningResolver {
     @Arg('academicPeriodId', () => String) academicPeriodId: string,
     @Arg('studentId', () => String) studentId: string
   ) {
+    let countDigitsPerformanceLevel = 2;
     let schoolConfigurationAverageArea;
     let configurationAverageArea = "IHS";
     let academicPeriod = await this.repositoryAcademicPeriod.findOneBy(academicPeriodId);
@@ -1777,6 +1786,12 @@ export class ExperienceLearningResolver {
       schoolConfigurationAverageArea = await this.repositorySchoolConfiguration.findBy({
         where: { schoolId: academicPeriod?.schoolId?.toString(), code: "AVERAGE_AREA", active: true },
       });
+      let schoolConfigurationCountDigitsPerformanceLevel = await this.repositorySchoolConfiguration.findBy({
+        where: { schoolId: academicPeriod?.schoolId, code: "COUNT_DIGITS_PERFORMANCE_LEVEL", active: true },
+      });
+      if (schoolConfigurationCountDigitsPerformanceLevel?.length > 0) {
+        countDigitsPerformanceLevel = schoolConfigurationCountDigitsPerformanceLevel[0]?.valueNumber ? schoolConfigurationCountDigitsPerformanceLevel[0]?.valueNumber : 2;
+      }
       if (schoolConfigurationAverageArea?.length > 0) {
         configurationAverageArea = schoolConfigurationAverageArea[0]?.valueString ? schoolConfigurationAverageArea[0]?.valueString : "IHS";
       }
@@ -1952,6 +1967,7 @@ export class ExperienceLearningResolver {
           //studentAreaPeriodValuation.performanceLevelId = performanceLevels?.edges[Math.trunc(average) - 1]?.node?.id.toString();
           break;
         case PerformanceLevelType.QUANTITATIVE:
+          average = Number(average.toFixed(countDigitsPerformanceLevel));
           studentAreaPeriodValuation.assessment = average;
           perf = performanceLevels?.edges?.find((c: any) => {
             return average < c.node.topScore && average >= c.node.minimumScore;
