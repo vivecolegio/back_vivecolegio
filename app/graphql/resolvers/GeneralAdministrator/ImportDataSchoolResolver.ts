@@ -1060,7 +1060,7 @@ export class ImportDataSchoolResolver {
   async fixAcademicAsignatureCourseSchoolSchoolYear2023() {
     let dataSchoolDane = [
       // "254003000046",
-      '254174000095',
+      '154680000015',
     ];
     let dataSchool = await this.repositorySchool.findBy({
       where: { daneCode: { $in: dataSchoolDane } },
@@ -1203,6 +1203,57 @@ export class ImportDataSchoolResolver {
               //}
             }
             //}
+          }
+        }
+      }
+    }
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  async fixAcademicAsignatureWithDeleteAcademicArea() {
+    let dataSchoolDane = [
+      // "254003000046",
+      '154680000015',
+    ];
+    let dataSchool = await this.repositorySchool.findBy({
+      where: { daneCode: { $in: dataSchoolDane } },
+    });
+    for (let school of dataSchool) {
+      console.log('Actualizando IE: ', school?.name);
+      console.log('DANE IE: ', school?.daneCode);
+      let dataSchoolYear2023 = await this.repositorySchoolYear.findBy({
+        where: { schoolId: school.id.toString(), schoolYear: 2023 },
+      });
+      if (dataSchool && dataSchoolYear2023) {
+        let schoolId = school.id.toString();
+        let schoolYearId = dataSchoolYear2023[0].id.toString();
+        if (schoolYearId) {
+          let dataAcademicAsignatures = await this.repositoryAcademicAsignature.findBy({
+            where: {
+              schoolId: school.id.toString(),
+              schoolYearId: schoolYearId,
+            },
+          });
+          for (let academicAsignature of dataAcademicAsignatures) {
+            let dataAcademicArea = await this.repositoryAcademicArea.findOneBy(
+              academicAsignature.academicAreaId
+            );
+            if (!dataAcademicArea) {
+              let modelAcademicAsignature = await this.repositoryAcademicAsignature.create({
+                ...academicAsignature,
+                active: false,
+                version: (academicAsignature?.version as number) + 1,
+              });
+              await this.repositoryAcademicAsignature.save(modelAcademicAsignature);
+            } else {
+              let modelAcademicAsignature = await this.repositoryAcademicAsignature.create({
+                ...academicAsignature,
+                schoolYearId: dataAcademicArea?.schoolYearId,
+                version: (academicAsignature?.version as number) + 1,
+              });
+              await this.repositoryAcademicAsignature.save(modelAcademicAsignature);
+            }
           }
         }
       }
