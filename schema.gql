@@ -3709,6 +3709,24 @@ type Query {
     schoolId: String
     schoolYearId: String
   ): AcademicDayConnection!
+  getAllAcademicDayCampus(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+    campusId: String!
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+    schoolId: String
+    schoolYearId: String
+  ): AcademicDayConnection!
   getAllAcademicGrade(
     """Paginate after opaque cursor"""
     after: String

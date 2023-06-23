@@ -108,6 +108,64 @@ export class AcademicDayResolver {
     return resultConn;
   }
 
+  @Query(() => AcademicDayConnection)
+  async getAllAcademicDayCampus(
+    @Args() args: ConnectionArgs,
+    @Arg('allData', () => Boolean) allData: Boolean,
+    @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
+    @Arg('campusId', () => String) campusId: String,
+    @Arg('schoolId', () => String, { nullable: true }) schoolId: String,
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
+  ): Promise<AcademicDayConnection> {
+    let result;
+    let campusDataIds: any[] = [];
+    campusDataIds.push(campusId);
+    if (allData) {
+      if (orderCreated) {
+        result = await this.repository.findBy({
+          where: {
+            campusId: { $in: campusDataIds },
+            schoolYearId
+          },
+          order: { createdAt: 'DESC' },
+        });
+      } else {
+        result = await this.repository.findBy({
+          where: {
+            campusId: { $in: campusDataIds },
+            schoolYearId
+          },
+        });
+      }
+    } else {
+      if (orderCreated) {
+        result = await this.repository.findBy({
+          where: {
+            campusId: { $in: campusDataIds },
+            schoolYearId,
+            active: true,
+          },
+          order: { createdAt: 'DESC' },
+        });
+      } else {
+        result = await this.repository.findBy({
+          where: {
+            campusId: { $in: campusDataIds },
+            schoolYearId,
+            active: true,
+          },
+        });
+      }
+    }
+    let resultConn = new AcademicDayConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
+  }
+
   @Mutation(() => AcademicDay)
   async createAcademicDay(
     @Arg('data') data: NewAcademicDay,
