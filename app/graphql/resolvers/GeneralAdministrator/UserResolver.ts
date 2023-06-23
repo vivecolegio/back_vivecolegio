@@ -366,6 +366,7 @@ export class UserResolver {
               where: { userId: user.id.toString(), active: true },
             });
             if (userRole && userRole.length > 0) {
+
               schoolId = userRole[0].schoolId;
             }
           }
@@ -389,7 +390,7 @@ export class UserResolver {
           }
           if (role.isStudent) {
             let userRole = await this.repositoryStudent.findBy({
-              where: { userId: user.id.toString(), active: true },
+              where: { userId: user.id.toString(), active: true }, order: { createdAt: 'DESC' },
             });
             if (userRole && userRole.length > 0) {
               schoolId = userRole[0].schoolId;
@@ -399,7 +400,7 @@ export class UserResolver {
           }
           if (role.isTeacher) {
             let userRole = await this.repositoryTeacher.findBy({
-              where: { userId: user.id.toString(), active: true },
+              where: { userId: user.id.toString(), active: true }, order: { createdAt: 'DESC' },
             });
             if (userRole && userRole.length > 0) {
               schoolId = userRole[0].schoolId;
@@ -409,7 +410,7 @@ export class UserResolver {
           }
           if (role.isGuardian) {
             let userRole = await this.repositoryGuardian.findBy({
-              where: { userId: user.id.toString(), active: true },
+              where: { userId: user.id.toString(), active: true }, order: { createdAt: 'DESC' },
             });
             if (userRole && userRole.length > 0) {
               schoolId = userRole[0].schoolId;
