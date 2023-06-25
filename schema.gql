@@ -2016,6 +2016,7 @@ type Jwt {
   roleMenus: [Menu!]
   schools: [School!]
   student: Student
+  students: [Student!]
   teacher: Teacher
   userId: String
   username: String

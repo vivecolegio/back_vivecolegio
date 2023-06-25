@@ -415,6 +415,20 @@ export class UserResolver {
             if (userRole && userRole.length > 0) {
               schoolId = userRole[0].schoolId;
               campusId = userRole[0].campusId;
+              let students;
+              if (userRole[0].studentsId !== undefined) {
+                let studentsId: any[] = [];
+                userRole[0].studentsId.forEach((id: any) => {
+                  studentsId.push(new ObjectId(id));
+                });
+                students = await this.repositoryStudent.findBy({
+                  where: { _id: { $in: studentsId } },
+                });
+                if (students && students !== undefined) {
+                  jwtUtil.students = students;
+                  jwtUtil.student = students[0];
+                }
+              }
             }
           }
           let campus;

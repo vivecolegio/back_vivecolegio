@@ -43,4 +43,7 @@ export class Jwt {
 
   @Field({ nullable: true })
   teacher?: Teacher;
+
+  @Field((_type) => [Student], { nullable: true })
+  students?: Student[];
 }
