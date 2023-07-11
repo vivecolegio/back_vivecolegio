@@ -385,6 +385,7 @@ export class PerformanceReportResolver {
                             let experienceLearnings = await this.repositoryExperienceLearning.findBy({
                               where:
                               {
+                                academicPeriodId: academicPeriod?.id?.toString(),
                                 academicAsignatureCourseId: asignatureCourse?.id?.toString(),
                                 active: true
                               }
@@ -432,6 +433,7 @@ export class PerformanceReportResolver {
                             let experienceLearnings = await this.repositoryExperienceLearning.findBy({
                               where:
                               {
+                                academicPeriodId: academicPeriod?.id?.toString(),
                                 academicAsignatureCourseId: asignatureCourse?.id?.toString(),
                                 active: true
                               }
