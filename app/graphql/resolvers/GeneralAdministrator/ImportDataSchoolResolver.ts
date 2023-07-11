@@ -2,29 +2,7 @@ import { ObjectId } from 'mongodb';
 import { Arg, Mutation, Resolver } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import {
-  AcademicAreaRepository,
-  AcademicAsignatureCourseRepository,
-  AcademicAsignatureRepository,
-  AcademicDayRepository,
-  AcademicGradeRepository,
-  AcademicPeriodRepository,
-  CampusAdministratorRepository,
-  CampusRepository,
-  CourseRepository,
-  EducationLevelRepository,
-  EvaluativeComponentRepository,
-  GradeAssignmentRepository,
-  ModalityRepository,
-  PerformanceLevelRepository,
-  SchoolAdministratorRepository,
-  SchoolRepository,
-  SchoolYearRepository,
-  SpecialtyRepository,
-  StudentRepository,
-  TeacherRepository,
-  UserRepository,
-} from '../../../servers/DataSource';
+import { AcademicAreaRepository, AcademicAsignatureCourseRepository, AcademicAsignatureRepository, AcademicDayRepository, AcademicGradeRepository, AcademicPeriodRepository, CampusAdministratorRepository, CampusRepository, CourseRepository, EducationLevelRepository, EvaluativeComponentRepository, GradeAssignmentRepository, ModalityRepository, PerformanceLevelRepository, SchoolAdministratorRepository, SchoolRepository, SchoolYearRepository, SpecialtyRepository, StudentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
 import { AcademicAsignatureCourse } from '../../models/CampusAdministrator/AcademicAsignatureCourse';
 import { AcademicDay } from '../../models/CampusAdministrator/AcademicDay';
 import { Course } from '../../models/CampusAdministrator/Course';
@@ -790,52 +768,38 @@ export class ImportDataSchoolResolver {
   }
 
   @Mutation(() => Boolean)
-  async updateDataSimat() {
-    let dataSchoolDane = [
-      //Error
-      // "254003000364",
-      // "254003000445",
-      // "254003001611",
-      // "154109000431",
-      // "154128000680",
-      // "254128000463",
-      '154377000207',
-    ];
-    let dataSchool = await this.repositorySchool.findBy({
-      where: { daneCode: { $in: dataSchoolDane } },
-    });
-    for (let school of dataSchool) {
-      let schoolId = school.id.toString();
-      console.log('Actualizando IE: ', school?.name);
-      console.log('DANE IE: ', school?.daneCode);
-      let dataSchoolYear2023 = await this.repositorySchoolYear.findBy({
-        where: { schoolId: school.id.toString(), schoolYear: 2023 },
-      });
-      if (dataSchoolYear2023.length > 0) {
+  async updateDataSimat(@Arg('schoolId', () => String) schoolId: String, @Arg('schoolYearId', () => String) schoolYearId: String) {
+    let dataSchool = await this.repositorySchool.findOneBy(schoolId);
+    if (dataSchool) {
+      let schoolId = dataSchool.id.toString();
+      console.log('Actualizando IE: ', dataSchool?.name);
+      console.log('DANE IE: ', dataSchool?.daneCode);
+      let dataSchoolYear = await this.repositorySchoolYear.findOneBy(schoolYearId);
+      if (dataSchoolYear) {
         console.log('Step: SIMAT ');
         await this.academicDayResolver.createAllInitialsAcademicDay(
           schoolId,
-          dataSchoolYear2023[0].id.toString()
+          schoolYearId
         );
         console.log('Step: SIMAT - Academic Days');
         await this.courseResolver.createAllInitialsCourse(
           schoolId,
-          dataSchoolYear2023[0].id.toString()
+          schoolYearId
         );
         console.log('Step: SIMAT - Courses');
         await this.courseResolver.updateGradeAllInitialsCourse(
           schoolId,
-          dataSchoolYear2023[0].id.toString()
+          schoolYearId
         );
         console.log('Step: SIMAT - Update Grade Courses');
         await this.courseResolver.updateGradeAcademicDayAllInitialsCourse(
           schoolId,
-          dataSchoolYear2023[0].id.toString()
+          schoolYearId
         );
         console.log('Step: SIMAT - Update Academic Day Courses');
         await this.studentResolver.createAllInitialsStudents(
           schoolId,
-          dataSchoolYear2023[0].id.toString()
+          schoolYearId
         );
         console.log('Step: SIMAT - Update Students');
         console.log('Step: Final');

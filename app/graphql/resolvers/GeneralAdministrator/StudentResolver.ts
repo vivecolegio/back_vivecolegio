@@ -19,7 +19,7 @@ import { NewStudent } from '../../inputs/GeneralAdministrator/NewStudent';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
 import { IContext } from '../../interfaces/IContext';
 import { Course } from '../../models/CampusAdministrator/Course';
-import { Estudiantes2 } from '../../models/Data/Estudiantes2';
+import { Estudiantes } from '../../models/Data/Estudiantes';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { School } from '../../models/GeneralAdministrator/School';
 import { Student, StudentConnection } from '../../models/GeneralAdministrator/Student';
@@ -51,7 +51,7 @@ export class StudentResolver {
   @InjectRepository(Course)
   private repositoryCourse = CourseRepository;
 
-  @InjectRepository(Estudiantes2)
+  @InjectRepository(Estudiantes)
   private repositoryEstudiantes = EstudiantesRepository;
 
   @InjectRepository(SchoolYear)
@@ -377,10 +377,10 @@ export class StudentResolver {
                     : '60ecc36d6c716a21bee51e00',
                 birthdate: fechaNacimiento
                   ? new Date(
-                      Number(fechaNacimiento[2]),
-                      Number(fechaNacimiento[1]) - 1,
-                      Number(fechaNacimiento[0])
-                    )
+                    Number(fechaNacimiento[2]),
+                    Number(fechaNacimiento[1]) - 1,
+                    Number(fechaNacimiento[0])
+                  )
                   : undefined,
                 roleId: '619551d1882a2fb6525a3078',
                 schoolId: school.id.toString(),

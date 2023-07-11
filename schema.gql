@@ -2557,7 +2557,7 @@ type Mutation {
   updateCodeStudentsAllCourses: Boolean!
   updateCodeStudentsCourse(id: String!): Boolean!
   updateCourse(data: NewCourse!, id: String!): Course!
-  updateDataSimat: Boolean!
+  updateDataSimat(schoolId: String!, schoolYearId: String!): Boolean!
   updateDocumentType(data: NewDocumentType!, id: String!): DocumentType!
   updateEducationLevel(data: NewEducationLevel!, id: String!): EducationLevel!
   updateEmail(data: NewEmail!, id: String!): Email!
