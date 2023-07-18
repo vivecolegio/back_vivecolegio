@@ -4,7 +4,7 @@ import report from "puppeteer-report";
 import { Arg, Ctx, Mutation, Resolver } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicAreaCoursePeriodValuationRepository, AcademicAreaCourseYearValuationRepository, AcademicAreaRepository, AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicAsignatureCourseYearValuationRepository, AcademicAsignatureRepository, AcademicDayRepository, AcademicGradeRepository, AcademicPeriodRepository, AverageAcademicPeriodCourseRepository, AverageAcademicPeriodStudentRepository, CampusRepository, CourseRepository, EvidenceLearningRepository, ExperienceLearningRepository, LearningRepository, PerformanceLevelRepository, SchoolConfigurationRepository, SchoolRepository, StudentBehaviourRepository, StudentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAreaCoursePeriodValuationRepository, AcademicAreaCourseYearValuationRepository, AcademicAreaRepository, AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicAsignatureCourseYearValuationRepository, AcademicAsignatureRepository, AcademicDayRepository, AcademicGradeRepository, AcademicPeriodRepository, AverageAcademicPeriodCourseRepository, AverageAcademicPeriodStudentRepository, CampusRepository, CourseRepository, EvidenceLearningRepository, ExperienceLearningRepository, LearningRepository, PerformanceLevelRepository, SchoolConfigurationRepository, SchoolRepository, SchoolYearRepository, StudentBehaviourRepository, StudentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
 import { PerformanceLevelType } from '../../enums/PerformanceLevelType';
 import { ValuationType } from '../../enums/ValuationType';
 import { IContext } from '../../interfaces/IContext';
@@ -32,6 +32,7 @@ import { EvidenceLearning } from '../../models/SchoolAdministrator/EvidenceLearn
 import { Learning } from '../../models/SchoolAdministrator/Learning';
 import { PerformanceLevel } from '../../models/SchoolAdministrator/PerformanceLevel';
 import { SchoolConfiguration } from '../../models/SchoolAdministrator/SchoolConfiguration';
+import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { PerformanceLevelResolver } from './PerformanceLevelResolver';
 
 @Resolver(SchoolConfiguration)
@@ -72,6 +73,9 @@ export class PerformanceReportResolver {
 
   @InjectRepository(AcademicArea)
   private repositoryAcademicArea = AcademicAreaRepository;
+
+  @InjectRepository(SchoolYear)
+  private repositorySchoolYear = SchoolYearRepository;
 
   @InjectRepository(AcademicAsignatureCoursePeriodValuation)
   private repositoryAcademicAsignatureCoursePeriodValuation = AcademicAsignatureCoursePeriodValuationRepository;
@@ -195,6 +199,7 @@ export class PerformanceReportResolver {
       let titular = await this.repositoryTeacher.findOneBy(course?.teacherId);
       let titularUser = await this.repositoryUser.findOneBy(titular?.userId);
       let academicDay = await this.repositoryAcademicDay.findOneBy(course?.academicDayId);
+      let schoolYear = await this.repositorySchoolYear.findOneBy(course?.schoolYearId);
       let academicPeriods = await this.repositoryAcademicPeriod.findBy({
         where: {
           schoolYearId: schoolYearId,
@@ -219,6 +224,7 @@ export class PerformanceReportResolver {
         data = { ...data, "titular": titularUser?.name + " " + titularUser?.lastName };
         data = { ...data, "studentAcademicDayName": academicDay?.name };
         data = { ...data, "academicPeriodName": academicPeriod?.name };
+        data = { ...data, "schoolYear": schoolYear?.schoolYear };
         data = { ...data, "academicPeriodId": academicPeriod?.id?.toString() };
         let areasAux: any[] = []
         let asignaturesAux: any[] = []
@@ -750,6 +756,8 @@ export class PerformanceReportResolver {
             //console.log(notesAreas)
             dataPDF = { ...dataPDF, "notesAsignatures": notesAsignatures };
             dataPDF = { ...dataPDF, "notesAreas": notesAreas };
+            dataPDF = { ...dataPDF, "generatedDate": new Date().toLocaleString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit', }) };
+            dataPDF = { ...dataPDF, "generatedHour": new Date().toLocaleString("en-US", { hour: '2-digit', hour12: true, minute: '2-digit', second: '2-digit' }) };
             //console.log("dataPDF", dataPDF)
             switch (reportPerformanceType) {
               case "DETAILS":

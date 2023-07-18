@@ -41,9 +41,9 @@
     .app-student-notes {
       display: grid;
       background-color: #e6e7e9;
-      grid-template-columns: 28% 44% 28%;
+      grid-template-columns: 25% 50% 25%;
       width: 100%;
-      height: 113px;
+      height: 120px;
       background-image: url("http://vivecolegios.nortedesantander.gov.co:4000/public/uploads/users/profile/61faa0716770295e7c3775ab/VCpmSvM0jrd93e.svg");
       background-size: 100%;
       background-repeat: no-repeat;
@@ -110,7 +110,7 @@
 
     .data-student {
       display: grid;
-      grid-template-columns: 8fr repeat(5, 3.2fr);
+      grid-template-columns: 8fr repeat(3, 3.2fr);
       grid-template-rows: repeat(2, 1fr);
       grid-column-gap: 0.5rem;
       grid-row-gap: 0.5rem;
@@ -129,6 +129,15 @@
     .data-student3 {
       display: grid;
       grid-template-columns: repeat(4, auto);
+      grid-template-rows: 1fr;
+      grid-column-gap: 0.5rem;
+      grid-row-gap: 0px;
+      margin-bottom: 0.5rem;
+    }
+
+    .data-student4 {
+      display: grid;
+      grid-template-columns: repeat(6, auto);
       grid-template-rows: 1fr;
       grid-column-gap: 0.5rem;
       grid-row-gap: 0px;
@@ -240,7 +249,7 @@
     .container-firma-nombre {
       display: flex;
       justify-content: space-between;
-      margin-top: 8rem;
+      margin-top: 6rem;
       align-items: center;
     }
 
@@ -279,7 +288,7 @@
 
 <body>
   <div class="page">
-    <div id="header" style="padding-bottom: 2%;">
+    <div id="header">
       <div class="app-student-notes">
         <div>
           <img class="header-img-school" src="http://vivecolegios.nortedesantander.gov.co:4000/{{schoolLogo}}" alt="" />
@@ -301,6 +310,9 @@
         </div>
       </div>
     </div>
+    <div style="padding-bottom: 2%; text-align: end; padding-right: 1%;">
+      <span>Generado el {{generatedDate}} {{generatedHour}}</span>
+    </div>
     <div class="titulo">
       <h1>
         Informe de Desempeño Detallado<br />
@@ -312,14 +324,18 @@
         <div class="item-data">Documento</div>
         <div class="item-data">Grado</div>
         <div class="item-data">Curso</div>
-        <div class="item-data">Jornada</div>
-        <div class="item-data">Periodo</div>
         <div class="item-data item-data-white">{{studentName}}</div>
         <div class="item-data item-data-white">{{studentDocumentNumber}}</div>
         <div class="item-data item-data-white">{{studentAcademicGradeName}}</div>
         <div class="item-data item-data-white">{{studentAcademicCourseName}}</div>
-        <div class="item-data item-data-white">{{studentAcademicDayName}}</div>
+      </div>
+      <div class="data-student4">
+        <div class="item-data">Año Escolar</div>
+        <div class="item-data item-data-white">{{schoolYear}}</div>
+        <div class="item-data">Periodo Académico</div>
         <div class="item-data item-data-white">{{academicPeriodName}}</div>
+        <div class="item-data">Jornada</div>
+        <div class="item-data item-data-white">{{studentAcademicDayName}}</div>
       </div>
       <div class="data-student2">
         <div class="item-data">Promedio</div>
