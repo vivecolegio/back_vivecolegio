@@ -1332,6 +1332,7 @@ export class ExperienceLearningResolver {
     @Arg('studentId', () => String) studentId: string,
     @Arg('experienceLearningType', () => ExperienceLearningType) experienceLearningType: ExperienceLearningType,
   ) {
+    let countDigitsPerformanceLevel = 2;
     let academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(
       academicAsignatureCourseId
     );
@@ -1344,6 +1345,12 @@ export class ExperienceLearningResolver {
       if (course && academicAsignature) {
         let campus = await this.repositoryCampus.findOneBy(course.campusId);
         if (campus) {
+          let schoolConfigurationCountDigitsPerformanceLevel = await this.repositorySchoolConfiguration.findBy({
+            where: { schoolId: campus?.schoolId, code: "COUNT_DIGITS_PERFORMANCE_LEVEL", active: true },
+          });
+          if (schoolConfigurationCountDigitsPerformanceLevel?.length > 0) {
+            countDigitsPerformanceLevel = schoolConfigurationCountDigitsPerformanceLevel[0]?.valueNumber ? schoolConfigurationCountDigitsPerformanceLevel[0]?.valueNumber : 2;
+          }
           evaluativeComponents = await this.repositoryEvaluativeComponent.findBy({
             where: {
               academicAsignaturesId: { $in: [academicAsignature.id.toString()] },
@@ -1522,6 +1529,7 @@ export class ExperienceLearningResolver {
               //studentPeriodValuation.performanceLevelId = performanceLevels?.edges[Math.trunc(average) - 1]?.node?.id.toString();
               break;
             case PerformanceLevelType.QUANTITATIVE:
+              average = Number(average.toFixed(countDigitsPerformanceLevel));
               studentPeriodValuation.assessment = average;
               perf = performanceLevels?.edges?.find((c: any) => {
                 return average < c.node.topScore && average >= c.node.minimumScore;
@@ -1537,7 +1545,6 @@ export class ExperienceLearningResolver {
               studentPeriodValuation.performanceLevelId = performanceLevelId;
               break;
           }
-          //console.log(studentPeriodValuation)
           if (studentPeriodValuation.id) {
             studentPeriodValuation =
               await this.repositoryAcademicAsignatureCoursePeriodValuation.save({
