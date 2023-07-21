@@ -104,6 +104,10 @@ export class User {
   @Column({ nullable: true })
   profilePhoto?: string;
 
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  signaturePhoto?: string;
+
   @ManyToOne(() => Role, (data) => data.id, { lazy: true })
   @Field(() => Role, { nullable: true })
   role?: Lazy<Role>;

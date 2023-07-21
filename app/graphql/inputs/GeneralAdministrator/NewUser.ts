@@ -36,5 +36,8 @@ export class NewUser implements Partial<User> {
   profilePhoto?: string;
 
   @Field({ nullable: true })
+  signaturePhoto?: string;
+
+  @Field({ nullable: true })
   roleId?: string;
 }

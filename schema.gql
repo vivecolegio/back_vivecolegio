@@ -2618,6 +2618,7 @@ type Mutation {
   updateUser(data: NewUser!, id: String!): User!
   updateWithDaneSchoolBulk: Boolean!
   userProfileUploadImage(file: Upload, id: String!): Boolean!
+  userSignatureUploadImage(file: Upload, id: String!): Boolean!
 }
 
 """The NavigationMethodTestOnline Register"""
@@ -3329,6 +3330,7 @@ input NewUser {
   phone: String
   profilePhoto: String
   roleId: String
+  signaturePhoto: String
   username: String
 }
 
@@ -5740,6 +5742,7 @@ type User {
   roleId: String
   school: School
   schoolId: String
+  signaturePhoto: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String

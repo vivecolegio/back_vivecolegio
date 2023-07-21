@@ -655,6 +655,45 @@ export class UserResolver {
     }
   }
 
+  @Mutation(() => Boolean)
+  async userSignatureUploadImage(
+    @Arg('id', () => String) id: string,
+    @Arg('file', () => GraphQLUpload, { nullable: true }) file: FileUpload,
+    @Ctx() context: IContext
+  ) {
+    //console.log(context);
+    let updatedByUserId = context?.user?.authorization?.id;
+    if (file?.filename) {
+      var fs = require('fs');
+      var dir = './public/uploads/users/signature/' + id;
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      const stream = file?.createReadStream();
+      const uid = new ShortUniqueId({ length: 14 });
+      const out = fs.createWriteStream(
+        dir +
+        '/' +
+        uid() +
+        '.' +
+        file?.filename.slice(((file?.filename.lastIndexOf('.') - 1) >>> 0) + 2)
+      );
+      stream.pipe(out);
+      await finished(out);
+      let result = await this.repository.findOneBy(id);
+      result = await this.repository.save({
+        _id: new ObjectId(id),
+        ...result,
+        signaturePhoto: out.path,
+        updatedByUserId,
+        version: (result?.version as number) + 1,
+      });
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   @Query(() => User, { nullable: true })
   async getUserByDocumentNumber(
     @Arg('documentNumber', () => String) documentNumber: string
@@ -690,4 +729,6 @@ export class UserResolver {
       return false;
     }
   }
+
+
 }
