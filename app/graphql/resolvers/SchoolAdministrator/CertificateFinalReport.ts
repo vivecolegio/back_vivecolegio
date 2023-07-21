@@ -636,6 +636,8 @@ export class CertificateFinalReportResolver {
             } else {
               dataPDF = { ...dataPDF, "promocion": reportPerformanceFinalNotPromoted };
             }
+            dataPDF = { ...dataPDF, "generatedDate": new Date().toLocaleString(undefined, { timeZone: 'America/Bogota', year: 'numeric', month: '2-digit', day: '2-digit', }) };
+            dataPDF = { ...dataPDF, "generatedHour": new Date().toLocaleString("en-US", { timeZone: 'America/Bogota', hour: '2-digit', hour12: true, minute: '2-digit', second: '2-digit' }) };
             switch (reportPerformanceType) {
               case "DETAILS":
                 // promisesGeneratePDF.push(
@@ -660,7 +662,17 @@ export class CertificateFinalReportResolver {
           }
           let urlsReturn = await Promise.all(promisesGeneratePDF).then(() => {
             if (urls?.length > 1) {
-              urls = urls.sort();
+              //urls = urls.sort();
+              let urlsAux = [];
+              if (studentsId) {
+                for (let student of studentsId) {
+                  let urlsStudents = urls.filter((url: any) => url.includes(student));
+                  urlsStudents = urlsStudents.sort();
+                  for (let urlStudent of urlsStudents) {
+                    urlsAux.push(urlStudent);
+                  }
+                }
+              }
               const merge = require('easy-pdf-merge');
               const opts = {
                 maxBuffer: 1024 * 5096, // 500kb
@@ -672,7 +684,7 @@ export class CertificateFinalReportResolver {
               if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir, { recursive: true });
               }
-              merge(urls, dir + '/' + id + '.pdf', opts, function (err: any) {
+              merge(urlsAux, dir + '/' + id + '.pdf', opts, function (err: any) {
                 if (err) {
                   return console.log(err)
                 }

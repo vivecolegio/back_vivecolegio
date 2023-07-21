@@ -756,8 +756,8 @@ export class PerformanceReportResolver {
             //console.log(notesAreas)
             dataPDF = { ...dataPDF, "notesAsignatures": notesAsignatures };
             dataPDF = { ...dataPDF, "notesAreas": notesAreas };
-            dataPDF = { ...dataPDF, "generatedDate": new Date().toLocaleString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit', }) };
-            dataPDF = { ...dataPDF, "generatedHour": new Date().toLocaleString("en-US", { hour: '2-digit', hour12: true, minute: '2-digit', second: '2-digit' }) };
+            dataPDF = { ...dataPDF, "generatedDate": new Date().toLocaleString(undefined, { timeZone: 'America/Bogota', year: 'numeric', month: '2-digit', day: '2-digit', }) };
+            dataPDF = { ...dataPDF, "generatedHour": new Date().toLocaleString("en-US", { timeZone: 'America/Bogota', hour: '2-digit', hour12: true, minute: '2-digit', second: '2-digit' }) };
             //console.log("dataPDF", dataPDF)
             switch (reportPerformanceType) {
               case "DETAILS":
@@ -808,7 +808,7 @@ export class PerformanceReportResolver {
               if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir, { recursive: true });
               }
-              merge(urls, dir + '/' + id + '.pdf', opts, function (err: any) {
+              merge(urlsAux, dir + '/' + id + '.pdf', opts, function (err: any) {
                 if (err) {
                   return console.log(err)
                 }

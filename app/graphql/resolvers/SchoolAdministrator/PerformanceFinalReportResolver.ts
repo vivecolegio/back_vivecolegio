@@ -3,7 +3,7 @@ import report from "puppeteer-report";
 import { Arg, Ctx, Mutation, Resolver } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicAreaCoursePeriodValuationRepository, AcademicAreaCourseYearValuationRepository, AcademicAreaRepository, AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicAsignatureCourseYearValuationRepository, AcademicAsignatureRepository, AcademicDayRepository, AcademicGradeRepository, AcademicPeriodRepository, AverageAcademicYearCourseRepository, AverageAcademicYearStudentRepository, CampusRepository, CourseRepository, EvidenceLearningRepository, ExperienceLearningRepository, LearningRepository, PerformanceLevelRepository, SchoolConfigurationRepository, SchoolRepository, StudentRepository, StudentYearBehaviourRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAreaCoursePeriodValuationRepository, AcademicAreaCourseYearValuationRepository, AcademicAreaRepository, AcademicAsignatureCoursePeriodValuationRepository, AcademicAsignatureCourseRepository, AcademicAsignatureCourseYearValuationRepository, AcademicAsignatureRepository, AcademicDayRepository, AcademicGradeRepository, AcademicPeriodRepository, AverageAcademicYearCourseRepository, AverageAcademicYearStudentRepository, CampusRepository, CourseRepository, EvidenceLearningRepository, ExperienceLearningRepository, LearningRepository, PerformanceLevelRepository, SchoolConfigurationRepository, SchoolRepository, SchoolYearRepository, StudentRepository, StudentYearBehaviourRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
 import { PerformanceLevelType } from '../../enums/PerformanceLevelType';
 import { ValuationType } from '../../enums/ValuationType';
 import { IContext } from '../../interfaces/IContext';
@@ -31,6 +31,7 @@ import { EvidenceLearning } from '../../models/SchoolAdministrator/EvidenceLearn
 import { Learning } from '../../models/SchoolAdministrator/Learning';
 import { PerformanceLevel } from '../../models/SchoolAdministrator/PerformanceLevel';
 import { SchoolConfiguration } from '../../models/SchoolAdministrator/SchoolConfiguration';
+import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { PerformanceLevelResolver } from './PerformanceLevelResolver';
 
 @Resolver(SchoolConfiguration)
@@ -108,6 +109,9 @@ export class PerformanceFinalReportResolver {
   @InjectRepository(StudentYearBehaviour)
   private repositoryStudentYearBehaviour = StudentYearBehaviourRepository;
 
+  @InjectRepository(SchoolYear)
+  private repositorySchoolYear = SchoolYearRepository;
+
   private performanceLevelResolver = new PerformanceLevelResolver();
 
   @Mutation(() => String)
@@ -183,6 +187,7 @@ export class PerformanceFinalReportResolver {
         },
         order: { order: 1 },
       });
+      let schoolYear = await this.repositorySchoolYear.findOneBy(course?.schoolYearId);
       //let academicPeriod = await this.repositoryAcademicPeriod.findOneBy(academicPeriodId);
       let academicAsignaturesCourse = await this.repositoryAcademicAsignatureCourse.findBy({ where: { courseId: course?.id?.toString() } });
       if (academicAsignaturesCourse?.length > 0) {
@@ -199,6 +204,7 @@ export class PerformanceFinalReportResolver {
         data = { ...data, "titular": titularUser?.name + " " + titularUser?.lastName };
         data = { ...data, "studentAcademicDayName": academicDay?.name };
         data = { ...data, "academicPeriodName": "Final" };
+        data = { ...data, "schoolYear": schoolYear?.schoolYear };
         let areasAux: any[] = []
         let asignaturesAux: any[] = []
         let performanceLevelType: any = null;
@@ -601,6 +607,8 @@ export class PerformanceFinalReportResolver {
             } else {
               dataPDF = { ...dataPDF, "promocion": reportPerformanceFinalNotPromoted };
             }
+            dataPDF = { ...dataPDF, "generatedDate": new Date().toLocaleString(undefined, { timeZone: 'America/Bogota', year: 'numeric', month: '2-digit', day: '2-digit', }) };
+            dataPDF = { ...dataPDF, "generatedHour": new Date().toLocaleString("en-US", { timeZone: 'America/Bogota', hour: '2-digit', hour12: true, minute: '2-digit', second: '2-digit' }) };
             switch (reportPerformanceType) {
               case "DETAILS":
                 // promisesGeneratePDF.push(
@@ -625,7 +633,17 @@ export class PerformanceFinalReportResolver {
           }
           let urlsReturn = await Promise.all(promisesGeneratePDF).then(() => {
             if (urls?.length > 1) {
-              urls = urls.sort();
+              //urls = urls.sort();
+              let urlsAux = [];
+              if (studentsId) {
+                for (let student of studentsId) {
+                  let urlsStudents = urls.filter((url: any) => url.includes(student));
+                  urlsStudents = urlsStudents.sort();
+                  for (let urlStudent of urlsStudents) {
+                    urlsAux.push(urlStudent);
+                  }
+                }
+              }
               const merge = require('easy-pdf-merge');
               const opts = {
                 maxBuffer: 1024 * 5096, // 500kb
@@ -637,7 +655,7 @@ export class PerformanceFinalReportResolver {
               if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir, { recursive: true });
               }
-              merge(urls, dir + '/' + id + '.pdf', opts, function (err: any) {
+              merge(urlsAux, dir + '/' + id + '.pdf', opts, function (err: any) {
                 if (err) {
                   return console.log(err)
                 }
