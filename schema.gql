@@ -2318,6 +2318,7 @@ type Mutation {
   changeActiveStudentYearBehaviour(active: Boolean!, id: String!): Boolean!
   changeActiveTeacher(active: Boolean!, id: String!): Boolean!
   changeActiveUser(active: Boolean!, id: String!): Boolean!
+  changeActiveVideoTutorial(active: Boolean!, id: String!): Boolean!
   changePasswordUser(id: String!, password: String!): Boolean!
   createAcademicArea(data: NewAcademicArea!): AcademicArea!
   createAcademicAreaCoursePeriodValuation(data: NewAcademicAreaCoursePeriodValuation!): AcademicAreaCoursePeriodValuation!
@@ -2422,6 +2423,7 @@ type Mutation {
   createStudentYearBehaviour(data: NewStudentYearBehaviour!): StudentYearBehaviour!
   createTeacher(data: NewTeacher!): Teacher!
   createUser(data: NewUser!): User!
+  createVideoTutorial(data: NewVideoTutorial!): VideoTutorial!
   deleteAcademicArea(id: String!): Boolean!
   deleteAcademicAreaCoursePeriodValuation(id: String!): Boolean!
   deleteAcademicAreaCourseYearValuation(id: String!): Boolean!
@@ -2497,6 +2499,7 @@ type Mutation {
   deleteStudentYearBehaviour(id: String!): Boolean!
   deleteTeacher(id: String!): Boolean!
   deleteUser(id: String!): Boolean!
+  deleteVideoTutorial(id: String!): Boolean!
   fixAcademicAsignatureCourseSchoolSchoolYear2023: Boolean!
   fixAcademicAsignatureCourseSchoolYear: Boolean!
   fixAcademicAsignatureWithDeleteAcademicArea: Boolean!
@@ -2616,6 +2619,7 @@ type Mutation {
   updateStudentsAllInitialsCourse: Boolean!
   updateTeacher(data: NewTeacher!, id: String!): Teacher!
   updateUser(data: NewUser!, id: String!): User!
+  updateVideoTutorial(data: NewVideoTutorial!, id: String!): VideoTutorial!
   updateWithDaneSchoolBulk: Boolean!
   userProfileUploadImage(file: Upload, id: String!): Boolean!
   userSignatureUploadImage(file: Upload, id: String!): Boolean!
@@ -3332,6 +3336,17 @@ input NewUser {
   roleId: String
   signaturePhoto: String
   username: String
+}
+
+input NewVideoTutorial {
+  description: String
+  image: String
+  maxResolutionFileUrl: String
+  mediumResolutionFileUrl: String
+  miniumResolutionFileUrl: String
+  name: String
+  order: Float
+  rolesId: [String!]
 }
 
 """The Notification model"""
@@ -5049,6 +5064,35 @@ type Query {
     last: Float
     orderCreated: Boolean!
   ): UserConnection!
+  getAllVideoTutorial(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+  ): VideoTutorialConnection!
+  getAllVideoTutorialByRol(
+    """Paginate after opaque cursor"""
+    after: String
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    roleId: String!
+  ): VideoTutorialConnection!
   getAuditLogin(id: String!): AuditLogin
   getAverageAcademicPeriodStudent(id: String!): AverageAcademicPeriodStudent
   getAverageAcademicYearCourse(id: String!): AverageAcademicYearCourse
@@ -5114,6 +5158,7 @@ type Query {
   getUser(id: String!): User
   getUserByDocumentNumber(documentNumber: String!): User
   getValuationStudents(id: String!): [ExperienceLearningValuation!]
+  getVideoTutorial(id: String!): VideoTutorial
   me(schoolYearId: String!): Jwt!
 }
 
@@ -5769,4 +5814,40 @@ enum ValuationType {
   CALCULATE
   DEFINITIVE
   RECOVERY
+}
+
+"""The VideoTutorial model"""
+type VideoTutorial implements IModelData {
+  active: Boolean
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  description: String
+  id: ID!
+  image: String
+  maxResolutionFileUrl: String
+  mediumResolutionFileUrl: String
+  miniumResolutionFileUrl: String
+  name: String
+  order: Float
+  roles: [Role!]
+  rolesId: [String!]
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type VideoTutorialConnection {
+  edges: [VideoTutorialEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type VideoTutorialEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: VideoTutorial!
 }

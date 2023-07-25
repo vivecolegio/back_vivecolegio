@@ -34,63 +34,57 @@ export class VideoTutorialResolver {
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
-    @Arg('menuId', () => String, { nullable: true }) menuId: String,
   ): Promise<VideoTutorialConnection> {
     let result;
     if (allData) {
       if (orderCreated) {
-        if (menuId) {
-          result = await this.repository.findBy({
-            where: { menuId },
-            order: { createdAt: 'DESC' },
-          });
-        } else {
-          result = await this.repository.findBy({
-            order: { createdAt: 'DESC' },
-          });
-        }
+        result = await this.repository.findBy({
+          order: { createdAt: 'DESC' },
+        });
       } else {
-        if (menuId) {
-          result = await this.repository.findBy({ where: { menuId } });
-        } else {
-          result = await this.repository.find();
-        }
+        result = await this.repository.find();
       }
     } else {
       if (orderCreated) {
-        if (menuId) {
-          result = await this.repository.findBy({
-            where: {
-              menuId,
-              active: true,
-            },
-            order: { createdAt: 'DESC' },
-          });
-        } else {
-          result = await this.repository.findBy({
-            where: {
-              active: true,
-            },
-            order: { createdAt: 'DESC' },
-          });
-        }
+        result = await this.repository.findBy({
+          where: {
+            active: true,
+          },
+          order: { createdAt: 'DESC' },
+        });
       } else {
-        if (menuId) {
-          result = await this.repository.findBy({
-            where: {
-              menuId,
-              active: true,
-            },
-          });
-        } else {
-          result = await this.repository.findBy({
-            where: {
-              active: true,
-            },
-          });
-        }
+        result = await this.repository.findBy({
+          where: {
+            active: true,
+          },
+        });
+
       }
     }
+    let resultConn = new VideoTutorialConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
+  }
+
+  @Query(() => VideoTutorialConnection)
+  async getAllVideoTutorialByRol(
+    @Args() args: ConnectionArgs,
+    @Arg('roleId', () => String) roleId: String,
+  ): Promise<VideoTutorialConnection> {
+    let result;
+    let rolesIds: any[] = [];
+    rolesIds.push(roleId)
+    result = await this.repository.findBy({
+      where: {
+        rolesId: { $in: rolesIds },
+        active: true,
+      },
+      order: { createdAt: 'DESC' },
+    });
     let resultConn = new VideoTutorialConnection();
     let resultConnection = connectionFromArraySlice(result, args, {
       sliceStart: 0,

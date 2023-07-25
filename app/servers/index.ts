@@ -50,6 +50,7 @@ import { GeneralAcademicAsignatureResolver } from '../graphql/resolvers/GeneralA
 import { GeneralBasicLearningRightResolver } from '../graphql/resolvers/GeneralAdministrator/GeneralBasicLearningRightResolver';
 import { ImportDataSchoolResolver } from '../graphql/resolvers/GeneralAdministrator/ImportDataSchoolResolver';
 import { SchoolAdministrativeResolver } from '../graphql/resolvers/GeneralAdministrator/SchoolAdministrativeResolver';
+import { VideoTutorialResolver } from '../graphql/resolvers/GeneralAdministrator/VideoTutorialResolver';
 import { CertificateFinalReportResolver } from '../graphql/resolvers/SchoolAdministrator/CertificateFinalReport';
 import { EvidenceLearningResolver } from '../graphql/resolvers/SchoolAdministrator/EvidenceLearningResolver';
 import { ForumInteractionResolver } from '../graphql/resolvers/SchoolAdministrator/ForumInteractionResolver';
@@ -196,7 +197,8 @@ async function app() {
         CertificateFinalReportResolver,
         PerformanceFinalReportResolver,
         StudentYearBehaviourResolver,
-        ImportDataSchoolResolver
+        ImportDataSchoolResolver,
+        VideoTutorialResolver
       ],
       emitSchemaFile: true,
       validate: false,
