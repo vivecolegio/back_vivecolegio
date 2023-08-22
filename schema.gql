@@ -3240,6 +3240,7 @@ input NewSchoolAdministrative {
 input NewSchoolAdministrator {
   newUser: NewUser
   schoolId: [String!]
+  support: Boolean
   userId: String
 }
 
@@ -3487,6 +3488,7 @@ enum PerformanceLevelType {
 }
 
 type Query {
+  fixAcademicAsignatureCourseTeacher(schoolYearId: String!): Boolean!
   getAcademicArea(id: String!): AcademicArea
   getAcademicAreaCoursePeriodValuation(id: String!): AcademicAreaCoursePeriodValuation
   getAcademicAreaCourseYearValuation(id: String!): AcademicAreaCourseYearValuation
@@ -4940,6 +4942,7 @@ type Query {
     """Paginate last"""
     last: Float
     schoolId: String!
+    schoolYearId: String
   ): StudentConnection!
   getAllStudentAcademicGradeIdWithoutCourse(
     academicGradeId: String!
@@ -5384,6 +5387,7 @@ type SchoolAdministrator implements IModelData {
   id: ID!
   school: [School!]
   schoolId: [String!]
+  support: Boolean
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
