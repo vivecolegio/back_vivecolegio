@@ -72,7 +72,7 @@ export class StudentResolver {
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => String, { nullable: true }) schoolId: String,
     @Arg('campusId', () => String, { nullable: true }) campusId: String,
-    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String,
   ): Promise<StudentConnection> {
     let result;
     if (allData) {
@@ -154,7 +154,7 @@ export class StudentResolver {
     @Args() args: ConnectionArgs,
     @Arg('schoolId', () => String) schoolId: String,
     @Arg('campusId', () => String) campusId: String,
-    @Arg('academicGradeId', () => String) academicGradeId: String
+    @Arg('academicGradeId', () => String) academicGradeId: String,
   ): Promise<StudentConnection> {
     let result;
     result = await this.repository.findBy({
@@ -181,7 +181,8 @@ export class StudentResolver {
     @Args() args: ConnectionArgs,
     @Arg('schoolId', () => String) schoolId: String,
     @Arg('campusId', () => String, { nullable: true }) campusId: String,
-    @Arg('academicGradeId', () => String) academicGradeId: String
+    @Arg('academicGradeId', () => String) academicGradeId: String,
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String,
   ): Promise<StudentConnection> {
     let result;
     if (campusId) {
@@ -190,6 +191,7 @@ export class StudentResolver {
           schoolId,
           campusId,
           academicGradeId,
+          schoolYearId,
           active: true,
         },
         order: { createdAt: 'DESC' },
@@ -199,6 +201,7 @@ export class StudentResolver {
         where: {
           schoolId,
           academicGradeId,
+          schoolYearId,
           active: true,
         },
         order: { createdAt: 'DESC' },
@@ -269,7 +272,7 @@ export class StudentResolver {
   @Mutation(() => Boolean)
   public async createAllInitialsStudents(
     @Arg('schoolId', () => String) schoolId: String,
-    @Arg('schoolYearId', () => String) schoolYearId: String
+    @Arg('schoolYearId', () => String) schoolYearId: String,
   ) {
     let school = await this.repositorySchool.findOneBy(schoolId);
     let schoolYear = await this.repositorySchoolYear.findOneBy(schoolYearId);
@@ -377,10 +380,10 @@ export class StudentResolver {
                     : '60ecc36d6c716a21bee51e00',
                 birthdate: fechaNacimiento
                   ? new Date(
-                    Number(fechaNacimiento[2]),
-                    Number(fechaNacimiento[1]) - 1,
-                    Number(fechaNacimiento[0])
-                  )
+                      Number(fechaNacimiento[2]),
+                      Number(fechaNacimiento[1]) - 1,
+                      Number(fechaNacimiento[0]),
+                    )
                   : undefined,
                 roleId: '619551d1882a2fb6525a3078',
                 schoolId: school.id.toString(),
@@ -519,7 +522,7 @@ export class StudentResolver {
   async updateStudent(
     @Arg('data') data: NewStudent,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Student | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
@@ -589,7 +592,7 @@ export class StudentResolver {
   async changeActiveStudent(
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOneBy(id);
@@ -618,7 +621,7 @@ export class StudentResolver {
   @Mutation(() => Boolean)
   async deleteStudent(
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
