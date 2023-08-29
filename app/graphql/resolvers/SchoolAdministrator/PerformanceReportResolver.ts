@@ -228,7 +228,7 @@ export class PerformanceReportResolver {
         data = { ...data, "studentAcademicCourseName": course?.name };
         data = { ...data, "campusName": campus?.name };
         data = { ...data, "titular": titularUser?.name + " " + titularUser?.lastName };
-        data = { ...data, "imgTitularSignature": titularUser?.signaturePhoto };
+        data = { ...data, "imgTitularSignature": titularUser?.signaturePhoto ? titularUser?.signaturePhoto : "*" };
         data = { ...data, "studentAcademicDayName": academicDay?.name };
         data = { ...data, "academicPeriodName": academicPeriod?.name };
         data = { ...data, "schoolYear": schoolYear?.schoolYear };
@@ -959,6 +959,9 @@ export class PerformanceReportResolver {
         a?.toString();
         b?.toString();
         switch (operator) {
+          case `!=`:
+            bool = a != b;
+            break;
           case `===`:
             bool = a === b;
             break;
