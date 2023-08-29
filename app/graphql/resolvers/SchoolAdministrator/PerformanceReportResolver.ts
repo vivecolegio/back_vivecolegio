@@ -603,7 +603,12 @@ export class PerformanceReportResolver {
                         }
                         if (valuationAsignatureRecovery) {
                           let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(valuationAsignatureRecovery?.performanceLevelId);
-                          notesAsignatures.push({ assessment: valuationAsignatureRecovery?.assessment?.toFixed(countDigitsPerformanceLevel), academicPeriodId: valuationAsignatureRecovery?.academicPeriodId, performanceLevel: performanceLevel?.name, "asignatureId": academicAsignature?.id?.toString(), "areaId": academicArea?.id?.toString(), "teacher": teacherUserAsignatureCourse?.name + " " + teacherUserAsignatureCourse?.lastName })
+                          ///configuration recovery
+                          if (reportPerformanceShowRecoverylValuation == "YES") {
+                            notesAsignatures.push({ assessment: valuationAsignatureCalculate?.assessment?.toFixed(countDigitsPerformanceLevel) + " - " + valuationAsignatureRecovery?.assessment?.toFixed(countDigitsPerformanceLevel) + " (N)", academicPeriodId: valuationAsignatureRecovery?.academicPeriodId, performanceLevel: performanceLevel?.name, "asignatureId": academicAsignature?.id?.toString(), "areaId": academicArea?.id?.toString(), "teacher": teacherUserAsignatureCourse?.name + " " + teacherUserAsignatureCourse?.lastName })
+                          } else {
+                            notesAsignatures.push({ assessment: valuationAsignatureRecovery?.assessment?.toFixed(countDigitsPerformanceLevel), academicPeriodId: valuationAsignatureRecovery?.academicPeriodId, performanceLevel: performanceLevel?.name, "asignatureId": academicAsignature?.id?.toString(), "areaId": academicArea?.id?.toString(), "teacher": teacherUserAsignatureCourse?.name + " " + teacherUserAsignatureCourse?.lastName })
+                          }
                         } else {
                           if (valuationAsignatureDefinitive) {
                             let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(valuationAsignatureDefinitive?.performanceLevelId);
@@ -658,15 +663,9 @@ export class PerformanceReportResolver {
                             break;
                         }
                       }
-
                       if (valuationAsignatureRecovery) {
                         let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(valuationAsignatureRecovery?.performanceLevelId);
-                        ///configuration recovery
-                        if (reportPerformanceShowRecoverylValuation == "YES") {
-                          notesAsignatures.push({ assessment: valuationAsignatureCalculate?.assessment?.toFixed(countDigitsPerformanceLevel) + " / " + valuationAsignatureRecovery?.assessment?.toFixed(countDigitsPerformanceLevel) + " (N)", academicPeriodId: "FINAL", performanceLevel: performanceLevel?.name, "asignatureId": academicAsignature?.id?.toString(), "areaId": academicArea?.id?.toString(), "teacher": teacherUserAsignatureCourse?.name + " " + teacherUserAsignatureCourse?.lastName })
-                        } else {
-                          notesAsignatures.push({ assessment: valuationAsignatureRecovery?.assessment?.toFixed(countDigitsPerformanceLevel), academicPeriodId: "FINAL", performanceLevel: performanceLevel?.name, "asignatureId": academicAsignature?.id?.toString(), "areaId": academicArea?.id?.toString(), "teacher": teacherUserAsignatureCourse?.name + " " + teacherUserAsignatureCourse?.lastName })
-                        }
+                        notesAsignatures.push({ assessment: valuationAsignatureRecovery?.assessment?.toFixed(countDigitsPerformanceLevel), academicPeriodId: "FINAL", performanceLevel: performanceLevel?.name, "asignatureId": academicAsignature?.id?.toString(), "areaId": academicArea?.id?.toString(), "teacher": teacherUserAsignatureCourse?.name + " " + teacherUserAsignatureCourse?.lastName })
                       } else {
                         if (valuationAsignatureDefinitive) {
                           let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(valuationAsignatureDefinitive?.performanceLevelId);
