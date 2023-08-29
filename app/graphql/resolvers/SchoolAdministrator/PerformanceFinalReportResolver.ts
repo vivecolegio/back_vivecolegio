@@ -202,6 +202,7 @@ export class PerformanceFinalReportResolver {
         data = { ...data, "studentAcademicCourseName": course?.name };
         data = { ...data, "campusName": campus?.name };
         data = { ...data, "titular": titularUser?.name + " " + titularUser?.lastName };
+        data = { ...data, "imgTitularSignature": titularUser?.signaturePhoto };
         data = { ...data, "studentAcademicDayName": academicDay?.name };
         data = { ...data, "academicPeriodName": "Final" };
         data = { ...data, "schoolYear": schoolYear?.schoolYear };

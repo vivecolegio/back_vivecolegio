@@ -249,7 +249,7 @@
     .container-firma-nombre {
       display: flex;
       justify-content: space-between;
-      margin-top: 3rem;
+      margin-top: 1rem;
       align-items: center;
     }
 
@@ -438,7 +438,8 @@
         {{/iff }}
         {{#iff reportPerformanceSignatureType '==' 'TEACHER_COURSE'}}
         <div class="container-firma">
-          <div style="width:200px; height:100px;padding-bottom: 5px"></div>
+          <img src="http://vivecolegios.nortedesantander.gov.co:4000/{{../imgTitularSignature}}" alt="" width="200"
+            height="100" style="padding-bottom: 5px" />
           <div class="firma"></div>
           <p style="margin:0; padding:0">{{../titular}}</p>
           <p style="margin:0; padding:0">{{../reportPerformanceTitleSignatureTeacherCourse}}</p>
@@ -446,7 +447,8 @@
         {{/iff }}
         {{#iff reportPerformanceSignatureType '==' 'TEACHER_COURSE_AND_PRINCIPAL'}}
         <div class="container-firma">
-          <div style="width:200px; height:100px;padding-bottom: 5px"></div>
+          <img src="http://vivecolegios.nortedesantander.gov.co:4000/{{../imgTitularSignature}}" alt="" width="200"
+            height="100" style="padding-bottom: 5px" />
           <div class="firma"></div>
           <p style="margin:0; padding:0">{{../titular}}</p>
           <p style="margin:0; padding:0">{{../reportPerformanceTitleSignatureTeacherCourse}}</p>
