@@ -2031,7 +2031,9 @@ export class ExperienceLearningResolver {
       let students = course.studentsId;
       if (students) {
         for (let student of students) {
+          //if (student == "641b68268a65b9d508e3d5b7") {
           await this.createAveragePeriodValuationStudent(course?.id?.toString(), academicPeriodId, student + "")
+          //}
         }
         return true;
       }
@@ -2046,9 +2048,27 @@ export class ExperienceLearningResolver {
     @Arg('studentId', () => String) studentId: string
   ) {
     //console.log("llamando ", courseId, academicPeriodId, studentId)
+    let countDigitsPerformanceLevel = 2;
+    let schoolConfigurationAverageArea;
+    let configurationAverageArea = "IHS";
+    let hourlyIntensityAreaAux = new Array();
+    let academicPeriod = await this.repositoryAcademicPeriod.findOneBy(academicPeriodId);
+    if (academicPeriod) {
+      schoolConfigurationAverageArea = await this.repositorySchoolConfiguration.findBy({
+        where: { schoolId: academicPeriod?.schoolId?.toString(), code: "AVERAGE_AREA", active: true },
+      });
+      if (schoolConfigurationAverageArea?.length > 0) {
+        configurationAverageArea = schoolConfigurationAverageArea[0]?.valueString ? schoolConfigurationAverageArea[0]?.valueString : "IHS";
+      }
+      let schoolConfigurationCountDigitsPerformanceLevel = await this.repositorySchoolConfiguration.findBy({
+        where: { schoolId: academicPeriod?.schoolId, code: "COUNT_DIGITS_PERFORMANCE_LEVEL", active: true },
+      });
+      if (schoolConfigurationCountDigitsPerformanceLevel?.length > 0) {
+        countDigitsPerformanceLevel = schoolConfigurationCountDigitsPerformanceLevel[0]?.valueNumber ? schoolConfigurationCountDigitsPerformanceLevel[0]?.valueNumber : 2;
+      }
+    }
     let academicAsignaturesCourses = await this.repositoryAcademicAsignatureCourse.findBy({ where: { courseId: courseId } });
     let areasAux: any[] = []
-    let hourlyIntensityAreaAux = new Array();
     let asignaturesAux: any[] = [];
     for (let asignatureCourse of academicAsignaturesCourses) {
       let academicAsignature = await this.repositoryAcademicAsignature.findOneBy(asignatureCourse?.academicAsignatureId);
@@ -2092,19 +2112,70 @@ export class ExperienceLearningResolver {
           studentId,
         }
       });
+      let countDefinitive = 0;
+      let countCalculate = 0;
+      let countRecovery = 0;
+      for (let studentAreaPeriodValuation of studentAreaPeriodValuationList) {
+        switch (studentAreaPeriodValuation?.valuationType) {
+          case ValuationType?.DEFINITIVE:
+            countDefinitive++;
+            break;
+          case ValuationType?.CALCULATE:
+            countCalculate++;
+            break;
+          case ValuationType?.RECOVERY:
+            countRecovery++;
+            break;
+        }
+      }
+      let studentAreaPeriodValuationAux: AcademicAsignatureCoursePeriodValuation | null = null;
+      if (countCalculate > 0) {
+        for (let studentAreaPeriodValuation of studentAreaPeriodValuationList) {
+          if (studentAreaPeriodValuation?.valuationType == ValuationType?.CALCULATE) {
+            studentAreaPeriodValuationAux = studentAreaPeriodValuation;
+          }
+        }
+      }
+      if (countRecovery > 0) {
+        for (let studentAreaPeriodValuation of studentAreaPeriodValuationList) {
+          if (studentAreaPeriodValuation?.valuationType == ValuationType?.RECOVERY) {
+            studentAreaPeriodValuationAux = studentAreaPeriodValuation;
+          }
+        }
+      }
+      if (countDefinitive > 0) {
+        for (let studentAreaPeriodValuation of studentAreaPeriodValuationList) {
+          if (studentAreaPeriodValuation?.valuationType == ValuationType?.DEFINITIVE) {
+            studentAreaPeriodValuationAux = studentAreaPeriodValuation;
+          }
+        }
+      }
+      //console.log(studentAreaPeriodValuationAux)
       let averageArea = 0;
-      switch (performanceLevelType) {
-        case PerformanceLevelType.QUALITATIVE:
-          let performanceLevelIndex = performanceLevels?.edges?.findIndex((i: any) => i.node.id.toString() === studentAreaPeriodValuationList[0]?.performanceLevelId) + 1;
-          averageArea = performanceLevelIndex;
-          average += averageArea * hourlyIntensityArea;
-          break;
-        case PerformanceLevelType.QUANTITATIVE:
-          averageArea = studentAreaPeriodValuationList[0]?.assessment
-            ? studentAreaPeriodValuationList[0]?.assessment
-            : 0;
-          average += averageArea * hourlyIntensityArea;
-          break;
+      if (studentAreaPeriodValuationAux != null) {
+        let averageAsignatureCourse = 0;
+        let horlyIntensityAsignature = 0;
+        switch (performanceLevelType) {
+          case PerformanceLevelType.QUALITATIVE:
+            let performanceLevelIndex = performanceLevels?.edges?.findIndex((i: any) => i.node.id.toString() === studentAreaPeriodValuationAux?.performanceLevelId) + 1;
+            averageArea = performanceLevelIndex;
+            if (configurationAverageArea == "IHS") {
+              average += averageArea * hourlyIntensityArea;
+            } else {
+              average += averageArea
+            }
+            break;
+          case PerformanceLevelType.QUANTITATIVE:
+            averageArea = studentAreaPeriodValuationAux?.assessment
+              ? studentAreaPeriodValuationAux?.assessment
+              : 0;
+            if (configurationAverageArea == "IHS") {
+              average += averageArea * hourlyIntensityArea;
+            } else {
+              average += averageArea;
+            }
+            break;
+        }
       }
       //console.log("Area: ", area?.name);
       //console.log("IH:", hourlyIntensityArea);
@@ -2154,6 +2225,7 @@ export class ExperienceLearningResolver {
           averageAcademicPeriodStudent.assessment = average;
           break;
         case PerformanceLevelType.QUANTITATIVE:
+          average = Number(average.toFixed(countDigitsPerformanceLevel));
           averageAcademicPeriodStudent.assessment = average;
           perf = performanceLevels?.edges?.find((c: any) => {
             return average < c.node.topScore && average >= c.node.minimumScore;
