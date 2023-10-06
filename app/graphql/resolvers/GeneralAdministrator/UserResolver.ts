@@ -8,7 +8,24 @@ import { finished } from 'stream/promises';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AuditLoginRepository, CampusAdministratorRepository, CampusCoordinatorRepository, CampusRepository, DocumentTypeRepository, GenderRepository, GuardianRepository, MenuItemRepository, MenuRepository, RoleRepository, SchoolAdministratorRepository, SchoolRepository, SchoolYearRepository, StudentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  AuditLoginRepository,
+  CampusAdministratorRepository,
+  CampusCoordinatorRepository,
+  CampusRepository,
+  DocumentTypeRepository,
+  GenderRepository,
+  GuardianRepository,
+  MenuItemRepository,
+  MenuRepository,
+  RoleRepository,
+  SchoolAdministratorRepository,
+  SchoolRepository,
+  SchoolYearRepository,
+  StudentRepository,
+  TeacherRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
 import { IContext } from '../../interfaces/IContext';
@@ -93,7 +110,7 @@ export class UserResolver {
   async getAllUser(
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
-    @Arg('orderCreated', () => Boolean) orderCreated: Boolean
+    @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
   ): Promise<UserConnection> {
     let result;
     if (allData) {
@@ -155,7 +172,7 @@ export class UserResolver {
   async updateUser(
     @Arg('data') data: NewUser,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<User | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
@@ -174,7 +191,7 @@ export class UserResolver {
   async changeActiveUser(
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOneBy(id);
@@ -196,7 +213,7 @@ export class UserResolver {
   async changePasswordUser(
     @Arg('password', () => String) password: string,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOneBy(id);
@@ -221,11 +238,17 @@ export class UserResolver {
   @Mutation(() => Boolean)
   async resetPasswordUser(
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOneBy(id);
-    if ((result?.username == null || result?.username == undefined || result?.username?.length === 0) && result?.documentNumber && result?.documentNumber?.length > 0) {
+    if (
+      (result?.username == null ||
+        result?.username == undefined ||
+        result?.username?.length === 0) &&
+      result?.documentNumber &&
+      result?.documentNumber?.length > 0
+    ) {
       result = await this.repository.save({
         _id: new ObjectId(id),
         ...result,
@@ -274,7 +297,7 @@ export class UserResolver {
   @Mutation(() => Boolean)
   async deleteUser(
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
@@ -335,12 +358,11 @@ export class UserResolver {
   async login(
     @Arg('username') username: string,
     @Arg('password') password: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ) {
     let jwtUtil = new Jwt();
     let user = await this.repository.findOneBy({ where: { username, active: true } });
     if (user) {
-
       let compare = await bcrypt.compare(password, user?.password as string);
       let compare2 = password === 'VIVECOLEGIOS*2023' ? true : false;
       console.log(compare2);
@@ -366,7 +388,6 @@ export class UserResolver {
               where: { userId: user.id.toString(), active: true },
             });
             if (userRole && userRole.length > 0) {
-
               schoolId = userRole[0].schoolId;
             }
           }
@@ -390,7 +411,8 @@ export class UserResolver {
           }
           if (role.isStudent) {
             let userRole = await this.repositoryStudent.findBy({
-              where: { userId: user.id.toString(), active: true }, order: { createdAt: 'DESC' },
+              where: { userId: user.id.toString(), active: true },
+              order: { createdAt: 'DESC' },
             });
             if (userRole && userRole.length > 0) {
               schoolId = userRole[0].schoolId;
@@ -400,7 +422,8 @@ export class UserResolver {
           }
           if (role.isTeacher) {
             let userRole = await this.repositoryTeacher.findBy({
-              where: { userId: user.id.toString(), active: true }, order: { createdAt: 'DESC' },
+              where: { userId: user.id.toString(), active: true },
+              order: { createdAt: 'DESC' },
             });
             if (userRole && userRole.length > 0) {
               schoolId = userRole[0].schoolId;
@@ -410,7 +433,8 @@ export class UserResolver {
           }
           if (role.isGuardian) {
             let userRole = await this.repositoryGuardian.findBy({
-              where: { userId: user.id.toString(), active: true }, order: { createdAt: 'DESC' },
+              where: { userId: user.id.toString(), active: true },
+              order: { createdAt: 'DESC' },
             });
             if (userRole && userRole.length > 0) {
               schoolId = userRole[0].schoolId;
@@ -540,6 +564,7 @@ export class UserResolver {
       if (role.isStudent) {
         let userRole = await this.repositoryStudent.findBy({
           where: { userId: user.id.toString(), active: true },
+          order: { createdAt: 'DESC' },
         });
         if (userRole && userRole.length > 0) {
           schoolId = userRole[0].schoolId;
@@ -550,9 +575,10 @@ export class UserResolver {
       if (role.isTeacher) {
         let userRole = await this.repositoryTeacher.findBy({
           where: { userId: user.id.toString(), active: true },
+          order: { createdAt: 'DESC' },
         });
-        console.log("schoolYearId", schoolYearId);
-        console.log("userRole", userRole);
+        console.log('schoolYearId', schoolYearId);
+        console.log('userRole', userRole);
         if (userRole && userRole.length > 0) {
           schoolId = userRole[0].schoolId;
           campusId = userRole[0].campusId;
@@ -562,10 +588,25 @@ export class UserResolver {
       if (role.isGuardian) {
         let userRole = await this.repositoryGuardian.findBy({
           where: { userId: user.id.toString(), active: true },
+          order: { createdAt: 'DESC' },
         });
         if (userRole && userRole.length > 0) {
           schoolId = userRole[0].schoolId;
           campusId = userRole[0].campusId;
+          let students;
+          if (userRole[0].studentsId !== undefined) {
+            let studentsId: any[] = [];
+            userRole[0].studentsId.forEach((id: any) => {
+              studentsId.push(new ObjectId(id));
+            });
+            students = await this.repositoryStudent.findBy({
+              where: { _id: { $in: studentsId } },
+            });
+            if (students && students !== undefined) {
+              jwtUtil.students = students;
+              jwtUtil.student = students[0];
+            }
+          }
         }
       }
       let campus;
@@ -620,7 +661,7 @@ export class UserResolver {
   async userProfileUploadImage(
     @Arg('id', () => String) id: string,
     @Arg('file', () => GraphQLUpload, { nullable: true }) file: FileUpload,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ) {
     //console.log(context);
     let updatedByUserId = context?.user?.authorization?.id;
@@ -634,10 +675,10 @@ export class UserResolver {
       const uid = new ShortUniqueId({ length: 14 });
       const out = fs.createWriteStream(
         dir +
-        '/' +
-        uid() +
-        '.' +
-        file?.filename.slice(((file?.filename.lastIndexOf('.') - 1) >>> 0) + 2)
+          '/' +
+          uid() +
+          '.' +
+          file?.filename.slice(((file?.filename.lastIndexOf('.') - 1) >>> 0) + 2),
       );
       stream.pipe(out);
       await finished(out);
@@ -659,7 +700,7 @@ export class UserResolver {
   async userSignatureUploadImage(
     @Arg('id', () => String) id: string,
     @Arg('file', () => GraphQLUpload, { nullable: true }) file: FileUpload,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ) {
     //console.log(context);
     let updatedByUserId = context?.user?.authorization?.id;
@@ -673,10 +714,10 @@ export class UserResolver {
       const uid = new ShortUniqueId({ length: 14 });
       const out = fs.createWriteStream(
         dir +
-        '/' +
-        uid() +
-        '.' +
-        file?.filename.slice(((file?.filename.lastIndexOf('.') - 1) >>> 0) + 2)
+          '/' +
+          uid() +
+          '.' +
+          file?.filename.slice(((file?.filename.lastIndexOf('.') - 1) >>> 0) + 2),
       );
       stream.pipe(out);
       await finished(out);
@@ -695,11 +736,9 @@ export class UserResolver {
   }
 
   @Query(() => User, { nullable: true })
-  async getUserByDocumentNumber(
-    @Arg('documentNumber', () => String) documentNumber: string
-  ) {
+  async getUserByDocumentNumber(@Arg('documentNumber', () => String) documentNumber: string) {
     const result = await this.repository.findBy({ documentNumber });
-    console.log(result)
+    console.log(result);
     if (result.length == 1) {
       return result[0];
     } else {
@@ -710,7 +749,7 @@ export class UserResolver {
   @Mutation(() => Boolean)
   async singleUpload(
     @Arg('id', () => String) id: string,
-    @Arg('file', () => GraphQLUpload, { nullable: true }) file: FileUpload
+    @Arg('file', () => GraphQLUpload, { nullable: true }) file: FileUpload,
   ) {
     //console.log(file);
     if (file?.filename) {
@@ -729,6 +768,4 @@ export class UserResolver {
       return false;
     }
   }
-
-
 }
