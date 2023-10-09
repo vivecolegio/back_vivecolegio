@@ -445,4 +445,33 @@ export class AcademicAsignatureCourseResolver {
     }
     return null;
   }
+
+  @Mutation(() => Boolean)
+  async fixAcademicAsignatureCourseTeacherV2(
+    @Arg('teacherId', () => String) teacherId: String,
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
+  ): Promise<Boolean | null> {
+    let result;
+    result = await this.repository.findBy({
+      where: {
+        teacherId,
+        schoolYearId,
+        active: true,
+      },
+    });
+    for (let dataAcademic of result) {
+      let course = await this.repositoryCourse.findOneBy(dataAcademic?.courseId?.toString());
+      if (course == null) {
+        console.log("inactivando");
+        let resultUpdate = await this.repository.save({
+          _id: new ObjectId(dataAcademic?.id?.toString()),
+          ...dataAcademic,
+          version: (dataAcademic?.version as number) + 1,
+          active: false,
+        });
+      }
+    }
+    return true;
+  }
+
 }
