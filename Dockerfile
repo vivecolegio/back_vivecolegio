@@ -10,7 +10,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && apt-get install -y curl 
-RUN apt-get update && apt-get install -y default-jre default-jdk
+RUN apt-get update && apt-get install -y openjdk-17-jre default-jdk 
 
 WORKDIR /usr/src/app
 
