@@ -10,7 +10,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && apt-get install -y curl 
-RUN apt-get install software-properties-common 
+RUN apt-get install -y software-properties-common 
 RUN apt-get update
 RUN add-apt-repository ppa:openjdk-r/ppa
 RUN apt-get update
