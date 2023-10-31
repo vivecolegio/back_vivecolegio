@@ -10,8 +10,10 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && apt-get install -y curl 
+RUN apt-get install software-properties-common 
+RUN apt-get update
 RUN add-apt-repository ppa:openjdk-r/ppa
-RUN apt update
+RUN apt-get update
 RUN apt-get update && apt-get install -y openjdk-17-jre default-jdk 
 
 WORKDIR /usr/src/app
