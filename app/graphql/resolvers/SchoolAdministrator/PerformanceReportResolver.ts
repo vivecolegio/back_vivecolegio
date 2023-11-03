@@ -678,6 +678,8 @@ export class PerformanceReportResolver {
                         }
                       }
                     }
+                  } else {
+                    notesAsignatures.push({ assessment: "-", academicPeriodId: "FINAL", performanceLevel: "-", "asignatureId": academicAsignature?.id?.toString(), "areaId": academicArea?.id?.toString(), "teacher": teacherUserAsignatureCourse?.name + " " + teacherUserAsignatureCourse?.lastName })
                   }
                 } else {
                   notesAsignatures.push({ assessment: "-", academicPeriodId: "FINAL", performanceLevel: "-", "asignatureId": academicAsignature?.id?.toString(), "areaId": academicArea?.id?.toString(), "teacher": teacherUserAsignatureCourse?.name + " " + teacherUserAsignatureCourse?.lastName })
@@ -781,6 +783,8 @@ export class PerformanceReportResolver {
                         }
                       }
                     }
+                  } else {
+                    notesAreas.push({ assessment: "-", academicPeriodId: "FINAL", performanceLevel: "-", "areaId": area?.id?.toString() })
                   }
                 } else {
                   notesAreas.push({ assessment: "-", academicPeriodId: "FINAL", performanceLevel: "-", "areaId": area?.id?.toString() })
@@ -810,7 +814,6 @@ export class PerformanceReportResolver {
             dataPDF = { ...dataPDF, "notesAreas": notesAreas };
             dataPDF = { ...dataPDF, "generatedDate": new Date().toLocaleString(undefined, { timeZone: 'America/Bogota', year: 'numeric', month: '2-digit', day: '2-digit', }) };
             dataPDF = { ...dataPDF, "generatedHour": new Date().toLocaleString("en-US", { timeZone: 'America/Bogota', hour: '2-digit', hour12: true, minute: '2-digit', second: '2-digit' }) };
-            //console.log("dataPDF", dataPDF)
             switch (reportPerformanceType) {
               case "DETAILS":
                 promisesGeneratePDF.push(
