@@ -218,7 +218,8 @@ export class PerformanceReportResolver {
       let academicAsignaturesCourse = await this.repositoryAcademicAsignatureCourse.findBy({ where: { courseId: course?.id?.toString() } });
       if (academicAsignaturesCourse?.length > 0) {
         data = { ...data, "schoolPrincipalSignature": school?.textPrincipalSignature };
-        data = { ...data, "imgPrincipalSignature": school?.imgPrincipalSignature };
+        data = { ...data, "imgPrincipalSignature": school?.imgPrincipalSignature ? school?.imgPrincipalSignature : "*" };
+        data = { ...data, "imgSecretarySignature": school?.imgSecretarySignature ? school?.imgSecretarySignature : "*" };
         data = { ...data, "schoolName": school?.name };
         data = { ...data, "schoolResolution": school?.textResolution };
         data = { ...data, "schoolAddress": school?.textAddress };

@@ -199,7 +199,8 @@ export class CertificateFinalReportResolver {
       if (academicAsignaturesCourse?.length > 0) {
         data = { ...data, "schoolPrincipalSignature": school?.textPrincipalSignature };
         data = { ...data, "schoolSecretarySignature": school?.textSecretarySignature };
-        data = { ...data, "imgPrincipalSignature": school?.imgPrincipalSignature };
+        data = { ...data, "imgPrincipalSignature": school?.imgPrincipalSignature ? school?.imgPrincipalSignature : "*" };
+        data = { ...data, "imgSecretarySignature": school?.imgSecretarySignature ? school?.imgSecretarySignature : "*" };
         data = { ...data, "schoolName": school?.name };
         data = { ...data, "schoolResolution": school?.textResolution };
         data = { ...data, "schoolAddress": school?.textAddress };
@@ -210,7 +211,7 @@ export class CertificateFinalReportResolver {
         data = { ...data, "studentAcademicCourseName": course?.name };
         data = { ...data, "campusName": campus?.name };
         data = { ...data, "titular": titularUser?.name + " " + titularUser?.lastName };
-        data = { ...data, "imgTitularSignature": titularUser?.signaturePhoto };
+        data = { ...data, "imgTitularSignature": titularUser?.signaturePhoto ? titularUser?.signaturePhoto : "*" };
         data = { ...data, "studentAcademicDayName": academicDay?.name };
         data = { ...data, "academicPeriodName": "Final" };
         data = { ...data, "schoolYear": schoolYear?.schoolYear };
@@ -639,6 +640,7 @@ export class CertificateFinalReportResolver {
             }
             dataPDF = { ...dataPDF, "generatedDate": new Date().toLocaleString(undefined, { timeZone: 'America/Bogota', year: 'numeric', month: '2-digit', day: '2-digit', }) };
             dataPDF = { ...dataPDF, "generatedHour": new Date().toLocaleString("en-US", { timeZone: 'America/Bogota', hour: '2-digit', hour12: true, minute: '2-digit', second: '2-digit' }) };
+            console.log("data", dataPDF)
             switch (reportPerformanceType) {
               case "DETAILS":
                 // promisesGeneratePDF.push(

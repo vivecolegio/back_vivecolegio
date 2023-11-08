@@ -454,8 +454,13 @@
       <div class="container-firma-nombre">
         {{#iff reportPerformanceSignatureType '==' 'PRINCIPAL'}}
         <div class="container-firma">
+          {{#iff ../imgPrincipalSignature '==' '*'}}
+          <div style="width:200px; height:100px;padding-bottom: 5px"></div>
+          {{/iff }}
+          {{#iff ../imgPrincipalSignature '!=' '*'}}
           <img src="http://vivecolegios.nortedesantander.gov.co:4000/{{../imgPrincipalSignature}}" alt="" width="200"
             height="100" style="padding-bottom: 5px" />
+          {{/iff }}
           <div class="firma"></div>
           <p style="margin:0; padding:0">{{../schoolPrincipalSignature}}</p>
           <p style="margin:0; padding:0">{{../reportPerformanceTitleSignaturePrincipal}}</p>
@@ -489,8 +494,13 @@
           <p style="margin:0; padding:0">{{../reportPerformanceTitleSignatureTeacherCourse}}</p>
         </div>
         <div class="container-firma">
+          {{#iff ../imgPrincipalSignature '==' '*'}}
+          <div style="width:200px; height:100px;padding-bottom: 5px"></div>
+          {{/iff }}
+          {{#iff ../imgPrincipalSignature '!=' '*'}}
           <img src="http://vivecolegios.nortedesantander.gov.co:4000/{{../imgPrincipalSignature}}" alt="" width="200"
             height="100" style="padding-bottom: 5px" />
+          {{/iff }}
           <div class="firma"></div>
           <p style="margin:0; padding:0">{{../schoolPrincipalSignature}}</p>
           <p style="margin:0; padding:0">{{../reportPerformanceTitleSignaturePrincipal}}</p>
@@ -498,14 +508,26 @@
         {{/iff }}
         {{#iff reportPerformanceSignatureType '==' 'PRINCIPAL_SECRETARY'}}
         <div class="container-firma">
+          {{#iff ../imgPrincipalSignature '==' '*'}}
+          <div style="width:200px; height:100px;padding-bottom: 5px"></div>
+          {{/iff }}
+          {{#iff ../imgPrincipalSignature '!=' '*'}}
           <img src="http://vivecolegios.nortedesantander.gov.co:4000/{{../imgPrincipalSignature}}" alt="" width="200"
             height="100" style="padding-bottom: 5px" />
+          {{/iff }}
           <div class="firma"></div>
           <p style="margin:0; padding:0">{{../schoolPrincipalSignature}}</p>
           <p style="margin:0; padding:0">{{../reportPerformanceTitleSignaturePrincipal}}</p>
         </div>
         <div class="container-firma">
           <div style="width:200px; height:100px;padding-bottom: 5px"></div>
+          {{#iff ../imgSecretarySignature '==' '*'}}
+          <div style="width:200px; height:100px;padding-bottom: 5px"></div>
+          {{/iff }}
+          {{#iff ../imgSecretarySignature '!=' '*'}}
+          <img src="http://vivecolegios.nortedesantander.gov.co:4000/{{../imgSecretarySignature}}" alt="" width="200"
+            height="100" style="padding-bottom: 5px" />
+          {{/iff }}
           <div class="firma"></div>
           <p style="margin:0; padding:0">{{../schoolSecretarySignature}}</p>
           <p style="margin:0; padding:0">{{../reportCertificateFinalSignatureSecretary}}</p>

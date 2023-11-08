@@ -192,7 +192,8 @@ export class PerformanceFinalReportResolver {
       let academicAsignaturesCourse = await this.repositoryAcademicAsignatureCourse.findBy({ where: { courseId: course?.id?.toString() } });
       if (academicAsignaturesCourse?.length > 0) {
         data = { ...data, "schoolPrincipalSignature": school?.textPrincipalSignature };
-        data = { ...data, "imgPrincipalSignature": school?.imgPrincipalSignature };
+        data = { ...data, "imgPrincipalSignature": school?.imgPrincipalSignature ? school?.imgPrincipalSignature : "*" };
+        data = { ...data, "imgSecretarySignature": school?.imgSecretarySignature ? school?.imgSecretarySignature : "*" };
         data = { ...data, "schoolName": school?.name };
         data = { ...data, "schoolResolution": school?.textResolution };
         data = { ...data, "schoolAddress": school?.textAddress };
@@ -202,7 +203,7 @@ export class PerformanceFinalReportResolver {
         data = { ...data, "studentAcademicCourseName": course?.name };
         data = { ...data, "campusName": campus?.name };
         data = { ...data, "titular": titularUser?.name + " " + titularUser?.lastName };
-        data = { ...data, "imgTitularSignature": titularUser?.signaturePhoto };
+        data = { ...data, "imgTitularSignature": titularUser?.signaturePhoto ? titularUser?.signaturePhoto : "*" };
         data = { ...data, "studentAcademicDayName": academicDay?.name };
         data = { ...data, "academicPeriodName": "Final" };
         data = { ...data, "schoolYear": schoolYear?.schoolYear };

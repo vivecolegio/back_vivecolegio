@@ -216,6 +216,44 @@ export class SchoolResolver {
     }
   }
 
+  @Mutation(() => Boolean)
+  async schoolImgSecretarySignatureUploadImage(
+    @Arg('id', () => String) id: string,
+    @Arg('file', () => GraphQLUpload, { nullable: true }) file: FileUpload,
+    @Ctx() context: IContext
+  ) {
+    //console.log(context);
+    let updatedByUserId = context?.user?.authorization?.id;
+    if (file?.filename) {
+      var fs = require('fs');
+      var dir = './public/uploads/school/secretarySignature/' + id;
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      const stream = file?.createReadStream();
+      const uid = new ShortUniqueId({ length: 14 });
+      const out = fs.createWriteStream(
+        dir +
+        '/' +
+        uid() +
+        '.' +
+        file?.filename.slice(((file?.filename.lastIndexOf('.') - 1) >>> 0) + 2)
+      );
+      stream.pipe(out);
+      await finished(out);
+      let result = await this.repository.findOneBy(id);
+      result = await this.repository.save({
+        _id: new ObjectId(id),
+        ...result,
+        imgSecretarySignature: out.path,
+        updatedByUserId,
+        version: (result?.version as number) + 1,
+      });
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   @FieldResolver((_type) => User, { nullable: true })
   async createdByUser(@Root() data: School) {
