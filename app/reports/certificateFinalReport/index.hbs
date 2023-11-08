@@ -394,7 +394,7 @@
       {{#each areas as | area areaId|}}
       {{#iff ../reportPerformanceAreaAsignatureType '==' 'AREA_ASIGNATURE'}}
       <div class="item-data">{{area.name}}</div>
-      <div class="item-data"></div>
+      <div class="item-data">{{area.ihs}}</div>
       {{#each area.academicPeriods as | academicPeriod2 academicPeriodId2|}}
       {{#each ../../../notesAreas as | notesArea notesAreaId|}}
       {{#iff notesArea.areaId '===' area.id}}
@@ -554,7 +554,6 @@
         <p style="margin:0; padding:0">{{../reportPerformanceTitleSignaturePrincipal}}</p>
       </div>
       <div class="container-firma">
-        <div style="width:200px; height:100px;padding-bottom: 5px"></div>
         {{#iff ../imgSecretarySignature '==' '*'}}
         <div style="width:200px; height:100px;padding-bottom: 5px"></div>
         {{/iff }}
