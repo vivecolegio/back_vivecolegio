@@ -31,6 +31,14 @@ export class AcademicPeriod extends IModelSchoolData {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
+  startDateRecovery?: Date;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  endDateRecovery?: Date;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   weight?: number;
 
   @Field({ nullable: true })
