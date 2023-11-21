@@ -2061,13 +2061,13 @@ export class ExperienceLearningResolver {
         configurationAverageArea = schoolConfigurationAverageArea[0]?.valueString ? schoolConfigurationAverageArea[0]?.valueString : "IHS";
       }
       let schoolConfigurationCountDigitsPerformanceLevel = await this.repositorySchoolConfiguration.findBy({
-        where: { schoolId: academicPeriod?.schoolId, code: "COUNT_DIGITS_PERFORMANCE_LEVEL", active: true },
+        where: { schoolId: academicPeriod?.schoolId, code: "COUNT_DIGITS_AVERAGE_STUDENT", active: true },
       });
       if (schoolConfigurationCountDigitsPerformanceLevel?.length > 0) {
         countDigitsPerformanceLevel = schoolConfigurationCountDigitsPerformanceLevel[0]?.valueNumber ? schoolConfigurationCountDigitsPerformanceLevel[0]?.valueNumber : 2;
       }
     }
-    let academicAsignaturesCourses = await this.repositoryAcademicAsignatureCourse.findBy({ where: { courseId: courseId } });
+    let academicAsignaturesCourses = await this.repositoryAcademicAsignatureCourse.findBy({ where: { courseId: courseId, active: true } });
     let areasAux: any[] = []
     let asignaturesAux: any[] = [];
     for (let asignatureCourse of academicAsignaturesCourses) {
@@ -2828,17 +2828,23 @@ export class ExperienceLearningResolver {
     }
     let countNoPromotedArea = 0;
     let countNoPromotedAsignature = 0;
-
+    let countDigitsPerformanceLevel = 2;
+    let schoolConfigurationCountDigitsPerformanceLevel = await this.repositorySchoolConfiguration.findBy({
+      where: { schoolId: schoolId, code: "COUNT_DIGITS_AVERAGE_STUDENT", active: true },
+    });
+    if (schoolConfigurationCountDigitsPerformanceLevel?.length > 0) {
+      countDigitsPerformanceLevel = schoolConfigurationCountDigitsPerformanceLevel[0]?.valueNumber ? schoolConfigurationCountDigitsPerformanceLevel[0]?.valueNumber : 2;
+    }
 
     //console.log("llamando ", courseId, academicPeriodId, studentId)
-    let academicAsignaturesCourses = await this.repositoryAcademicAsignatureCourse.findBy({ where: { courseId: courseId } });
+    let academicAsignaturesCourses = await this.repositoryAcademicAsignatureCourse.findBy({ where: { courseId: courseId, active: true } });
     let areasAux: any[] = []
     let hourlyIntensityAreaAux = new Array();
     let asignaturesAux: any[] = [];
     for (let asignatureCourse of academicAsignaturesCourses) {
       let academicAsignature = await this.repositoryAcademicAsignature.findOneBy(asignatureCourse?.academicAsignatureId);
       let academicArea = await this.repositoryAcademicArea.findOneBy(academicAsignature?.academicAreaId);
-      if (academicArea !== null && academicArea?.isAverage == true) {
+      if (academicArea !== null) {
         asignaturesAux.push(academicAsignature);
         areasAux.push(academicArea);
       }
@@ -2993,6 +2999,7 @@ export class ExperienceLearningResolver {
           averageAcademicYearStudent.assessment = average;
           break;
         case PerformanceLevelType.QUANTITATIVE:
+          average = Number(average.toFixed(countDigitsPerformanceLevel));
           averageAcademicYearStudent.assessment = average;
           perf = performanceLevels?.edges?.find((c: any) => {
             return average < c.node.topScore && average >= c.node.minimumScore;
@@ -3007,7 +3014,6 @@ export class ExperienceLearningResolver {
           }
           // console.log(averageAcademicPeriodStudent?.studentId)
           // console.log(average)
-          // console.log(perf?.node?.name);
           averageAcademicYearStudent.performanceLevelId = performanceLevelId;
           break;
       }
@@ -3044,6 +3050,7 @@ export class ExperienceLearningResolver {
         {
           courseId,
           schoolYearId,
+          studentId: { $in: course?.studentsId }
         },
         order: { assessment: -1 },
       });
