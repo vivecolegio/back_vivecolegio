@@ -1709,7 +1709,7 @@ export class ExperienceLearningResolver {
               studentPeriodValuation.valuationType = ValuationType?.RECOVERY;
             }
           }
-          console.log(studentPeriodValuation);
+          //console.log(studentPeriodValuation);
           let performanceLevelType: any = null;
           let performanceLevels = await this.performanceLevelResolver.getAllPerformanceLevelAcademicAsignatureCourseFinal({}, academicAsignatureCourseId + "");
           if (performanceLevels) {
@@ -2775,9 +2775,9 @@ export class ExperienceLearningResolver {
         }
         let promisesListStudents: any[] = [];
         for (let student of students) {
-          promisesListStudents.push(
-            this.createAverageYearValuationStudent(course?.id?.toString(), schoolYearId, schoolId, student + "")
-          );
+          //promisesListStudents.push(
+          await this.createAverageYearValuationStudent(course?.id?.toString(), schoolYearId, schoolId, student + "")
+          //);
         }
         await Promise.all(promisesListStudents).then(async () => {
           return true;
@@ -2812,6 +2812,11 @@ export class ExperienceLearningResolver {
     @Arg('schoolId', () => String) schoolId: string,
     @Arg('studentId', () => String) studentId: string
   ) {
+    console.log("courseId", courseId);
+    console.log("schoolYearId", schoolYearId);
+    console.log("schoolId", schoolId);
+    console.log("studentId", studentId);
+
     let schoolConfigurationPromotedIndicate = await this.repositorySchoolConfiguration.findBy({
       where: { schoolId, code: "PROMOTED_INDICATE", active: true },
     });
@@ -2887,7 +2892,7 @@ export class ExperienceLearningResolver {
       let countDefinitive = 0;
       let countCalculate = 0;
       let countRecovery = 0;
-      console.log("studentAreaYearValuationList", studentAreaYearValuationList)
+      //console.log("studentAreaYearValuationList", studentAreaYearValuationList)
       for (let studentAsignatureYearValuation of studentAreaYearValuationList) {
         switch (studentAsignatureYearValuation?.valuationType) {
           case ValuationType?.DEFINITIVE:
@@ -2924,9 +2929,9 @@ export class ExperienceLearningResolver {
           }
         }
       }
-      console.log("studentAsignatureYearValuationAux", studentAsignatureYearValuationAux)
+      //console.log("studentAsignatureYearValuationAux", studentAsignatureYearValuationAux)
       let performanceLevel = performanceLevels?.edges?.find((i: any) => i.node.id.toString() === studentAsignatureYearValuationAux?.performanceLevelId?.toString());
-      console.log("performanceLevel, performanceLevel", performanceLevel)
+      //console.log("performanceLevel, performanceLevel", performanceLevel)
       if (performanceLevel?.node?.isRecovery) {
         countNoPromotedArea += 1;
       }
@@ -2961,14 +2966,19 @@ export class ExperienceLearningResolver {
         studentId,
       }
     });
+
+    console.log("averageAcademicYearStudentList", averageAcademicYearStudentList?.length)
     if (averageAcademicYearStudentList.length > 1) {
-      //console.log("elminando repetidos")
+      console.log("elminando repetidos");
       for (let averageAcademicYearStudents of averageAcademicYearStudentList) {
-        let result = await this.repositoryAverageAcademicPeriodStudent.deleteOne({ _id: new ObjectId(averageAcademicYearStudents?.id?.toString()) });
+        console.log("elminando repetidos", averageAcademicYearStudents?.id?.toString());
+        let result = await this.repositoryAverageAcademicYearStudent.deleteOne({ _id: new ObjectId(averageAcademicYearStudents?.id?.toString()) });
+        console.log("result", result);
       }
       averageAcademicYearStudentList = [];
     }
     //console.log(averageAcademicPeriodStudentList)
+    console.log("averageAcademicYearStudentList", averageAcademicYearStudentList?.length)
     if (averageAcademicYearStudentList.length > 0) {
       averageAcademicYearStudent = averageAcademicYearStudentList[0];
     } else {
@@ -3063,6 +3073,8 @@ export class ExperienceLearningResolver {
       }
       let auxCount = 1;
       for (let averageAcademicYearStudents of averageAcademicYearStudentList) {
+        //console.log("averageAcademicYearStudents", averageAcademicYearStudents)
+        //console.log("auxCount", auxCount)
         await this.repositoryAverageAcademicYearStudent.save({
           _id: new ObjectId(averageAcademicYearStudents.id.toString()),
           ...averageAcademicYearStudents,
@@ -3164,21 +3176,28 @@ export class ExperienceLearningResolver {
     @Arg('courseId', () => String) courseId: string,
     @Arg('schoolYearId', () => String) schoolYearId: string,
   ) {
-    //console.log("llamando ", courseId, academicPeriodId, studentId
+    console.log("llamando ", courseId, schoolYearId);
     const course = await this.repositoryCourse.findOneBy(courseId);
     if (course) {
       let students = course.studentsId;
       if (students) {
+        let academicAsignaturesCourses = await this.repositoryAcademicAsignatureCourse.findBy({ where: { courseId: courseId, active: true } });
+
+        let performanceLevelType: any = null;
+        let performanceLevels = await this.performanceLevelResolver.getAllPerformanceLevelAcademicAsignatureCourseFinal({}, academicAsignaturesCourses[0]?.id?.toString() + "");
+        if (performanceLevels) {
+          performanceLevelType = performanceLevels?.edges[0]?.node?.type;
+        }
+
+        console.log("performanceLevels", performanceLevels)
+        console.log("performanceLevels", performanceLevelType)
         for (let student of students) {
           let studentId = student;
-          let studentBehaviours = await this.repositoryStudentBehaviour.findBy({ where: { studentId: studentId } });
-          let academicAsignaturesCourses = await this.repositoryAcademicAsignatureCourse.findBy({ where: { courseId: courseId } });
+          let studentBehaviours = await this.repositoryStudentBehaviour.findBy({ where: { studentId: studentId, courseId: courseId, } });
           let average = 0;
-          let performanceLevelType: any = null;
-          let performanceLevels = await this.performanceLevelResolver.getAllPerformanceLevelAcademicAsignatureCourseFinal({}, academicAsignaturesCourses[0]?.id?.toString() + "");
-          if (performanceLevels) {
-            performanceLevelType = performanceLevels?.edges[0]?.node?.type;
-          }
+          console.log("studentId", studentId)
+          console.log("studentBehaviours", studentBehaviours?.length)
+          console.log("studentBehaviours", studentBehaviours)
           for (let studentBehaviour of studentBehaviours) {
             let averageArea = 0;
             switch (performanceLevelType) {
@@ -3195,6 +3214,7 @@ export class ExperienceLearningResolver {
                 break;
             }
           }
+          console.log("average", average)
           average = average / studentBehaviours?.length;
           let perf = null;
           let performanceLevelId = undefined;
@@ -3207,8 +3227,9 @@ export class ExperienceLearningResolver {
               studentId,
             }
           });
+          console.log("averageAcademicYearStudentList", averageAcademicYearStudentList?.length)
           if (averageAcademicYearStudentList.length > 1) {
-            //console.log("elminando repetidos")
+            console.log("elminando repetidos")
             for (let averageAcademicYearStudents of averageAcademicYearStudentList) {
               let result = await this.repositoryStudentYearBehaviour.deleteOne({ _id: new ObjectId(averageAcademicYearStudents?.id?.toString()) });
             }
