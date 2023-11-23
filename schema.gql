@@ -459,6 +459,7 @@ type AcademicPeriod implements IModelSchoolData {
   createdByUser: User
   createdByUserId: String
   endDate: DateTime
+  endDateRecovery: DateTime
   id: ID!
   name: String
   order: Float
@@ -467,6 +468,7 @@ type AcademicPeriod implements IModelSchoolData {
   schoolYear: SchoolYear
   schoolYearId: String
   startDate: DateTime
+  startDateRecovery: DateTime
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -2354,6 +2356,7 @@ type Mutation {
   createAveragePeriodValuationStudent(academicPeriodId: String!, courseId: String!, studentId: String!): Boolean!
   createAverageYearValuationCourse(courseId: String!, schoolYearId: String!): Boolean!
   createAverageYearValuationStudent(courseId: String!, schoolId: String!, schoolYearId: String!, studentId: String!): Boolean!
+  createBackup: Boolean!
   createCampus(data: NewCampus!): Campus!
   createCampusAdministrator(data: NewCampusAdministrator!): CampusAdministrator!
   createCampusCoordinator(data: NewCampusCoordinator!): CampusCoordinator!
@@ -2502,6 +2505,7 @@ type Mutation {
   deleteVideoTutorial(id: String!): Boolean!
   fixAcademicAsignatureCourseSchoolSchoolYear2023: Boolean!
   fixAcademicAsignatureCourseSchoolYear: Boolean!
+  fixAcademicAsignatureCourseTeacherV2(schoolYearId: String, teacherId: String!): Boolean!
   fixAcademicAsignatureWithDeleteAcademicArea: Boolean!
   fixStudentCourseYearOld(schoolId: String!, schoolYearId: String!): Boolean!
   generateCertificateFinalReportCourse(format: String!, id: String!, schoolId: String!, schoolYearId: String!, studentId: String): String!
@@ -2521,6 +2525,7 @@ type Mutation {
   login(password: String!, username: String!): Jwt!
   resetPasswordUser(id: String!): Boolean!
   schoolImgPrincipalSignatureUploadImage(file: Upload, id: String!): Boolean!
+  schoolImgSecretarySignatureUploadImage(file: Upload, id: String!): Boolean!
   schoolLogoUploadImage(file: Upload, id: String!): Boolean!
   singleUpload(file: Upload, id: String!): Boolean!
   updateAcademicArea(data: NewAcademicArea!, id: String!): AcademicArea!
@@ -2743,11 +2748,13 @@ input NewAcademicHour {
 
 input NewAcademicPeriod {
   endDate: DateTime
+  endDateRecovery: DateTime
   name: String
   order: Float
   schoolId: String
   schoolYearId: String
   startDate: DateTime
+  startDateRecovery: DateTime
   weight: Float
 }
 
@@ -3221,6 +3228,7 @@ input NewSchool {
   daneCode: String
   educationalModel: String
   imgPrincipalSignature: String
+  imgSecretarySignature: String
   logo: String
   name: String
   pedagogicalModel: String
@@ -3488,7 +3496,6 @@ enum PerformanceLevelType {
 }
 
 type Query {
-  fixAcademicAsignatureCourseTeacher(schoolYearId: String!): Boolean!
   getAcademicArea(id: String!): AcademicArea
   getAcademicAreaCoursePeriodValuation(id: String!): AcademicAreaCoursePeriodValuation
   getAcademicAreaCourseYearValuation(id: String!): AcademicAreaCourseYearValuation
@@ -5328,6 +5335,7 @@ type School implements IModelData {
   educationalModel: String
   id: ID!
   imgPrincipalSignature: String
+  imgSecretarySignature: String
   logo: String
   name: String
   pedagogicalModel: String

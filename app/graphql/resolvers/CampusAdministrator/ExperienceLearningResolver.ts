@@ -3176,9 +3176,22 @@ export class ExperienceLearningResolver {
     @Arg('courseId', () => String) courseId: string,
     @Arg('schoolYearId', () => String) schoolYearId: string,
   ) {
-    console.log("llamando ", courseId, schoolYearId);
     const course = await this.repositoryCourse.findOneBy(courseId);
-    if (course) {
+    let countDigitsPerformanceLevel = 2;
+    let academicPeriods = await this.repositoryAcademicPeriod.findBy({
+      where: {
+        schoolYearId: schoolYearId,
+        active: true,
+      },
+      order: { order: 1 },
+    });
+    if (course && academicPeriods) {
+      let schoolConfigurationCountDigitsPerformanceLevel = await this.repositorySchoolConfiguration.findBy({
+        where: { schoolId: course?.schoolId, code: "COUNT_DIGITS_PERFORMANCE_LEVEL", active: true },
+      });
+      if (schoolConfigurationCountDigitsPerformanceLevel?.length > 0) {
+        countDigitsPerformanceLevel = schoolConfigurationCountDigitsPerformanceLevel[0]?.valueNumber ? schoolConfigurationCountDigitsPerformanceLevel[0]?.valueNumber : 2;
+      }
       let students = course.studentsId;
       if (students) {
         let academicAsignaturesCourses = await this.repositoryAcademicAsignatureCourse.findBy({ where: { courseId: courseId, active: true } });
@@ -3189,15 +3202,10 @@ export class ExperienceLearningResolver {
           performanceLevelType = performanceLevels?.edges[0]?.node?.type;
         }
 
-        console.log("performanceLevels", performanceLevels)
-        console.log("performanceLevels", performanceLevelType)
         for (let student of students) {
           let studentId = student;
           let studentBehaviours = await this.repositoryStudentBehaviour.findBy({ where: { studentId: studentId, courseId: courseId, } });
           let average = 0;
-          console.log("studentId", studentId)
-          console.log("studentBehaviours", studentBehaviours?.length)
-          console.log("studentBehaviours", studentBehaviours)
           for (let studentBehaviour of studentBehaviours) {
             let averageArea = 0;
             switch (performanceLevelType) {
@@ -3214,8 +3222,7 @@ export class ExperienceLearningResolver {
                 break;
             }
           }
-          console.log("average", average)
-          average = average / studentBehaviours?.length;
+          average = average / academicPeriods?.length;
           let perf = null;
           let performanceLevelId = undefined;
           let averageYearStudent: StudentYearBehaviour;
@@ -3227,9 +3234,7 @@ export class ExperienceLearningResolver {
               studentId,
             }
           });
-          console.log("averageAcademicYearStudentList", averageAcademicYearStudentList?.length)
           if (averageAcademicYearStudentList.length > 1) {
-            console.log("elminando repetidos")
             for (let averageAcademicYearStudents of averageAcademicYearStudentList) {
               let result = await this.repositoryStudentYearBehaviour.deleteOne({ _id: new ObjectId(averageAcademicYearStudents?.id?.toString()) });
             }
@@ -3258,6 +3263,7 @@ export class ExperienceLearningResolver {
                 averageYearStudent.assessment = average;
                 break;
               case PerformanceLevelType.QUANTITATIVE:
+                average = Number(average.toFixed(countDigitsPerformanceLevel));
                 averageYearStudent.assessment = average;
                 perf = performanceLevels?.edges?.find((c: any) => {
                   return average < c.node.topScore && average >= c.node.minimumScore;
@@ -3277,7 +3283,6 @@ export class ExperienceLearningResolver {
                 break;
             }
           }
-          //console.log(averageAcademicYearStudent);
           if (averageYearStudent.id) {
             //console.log("problema aca ", averageAcademicYearStudent);
             averageYearStudent =
