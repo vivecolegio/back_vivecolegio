@@ -2269,8 +2269,15 @@ export class ExperienceLearningResolver {
     @Arg('courseId', () => String) courseId: string,
     @Arg('academicPeriodId', () => String) academicPeriodId: string
   ) {
+    let countDigitsPerformanceLevel = 2;
     const course = await this.repositoryCourse.findOneBy(courseId);
     if (course) {
+      let schoolConfigurationCountDigitsPerformanceLevel = await this.repositorySchoolConfiguration.findBy({
+        where: { schoolId: course?.schoolId, code: "COUNT_DIGITS_AVERAGE_COURSE", active: true },
+      });
+      if (schoolConfigurationCountDigitsPerformanceLevel?.length > 0) {
+        countDigitsPerformanceLevel = schoolConfigurationCountDigitsPerformanceLevel[0]?.valueNumber ? schoolConfigurationCountDigitsPerformanceLevel[0]?.valueNumber : 2;
+      }
       let averageAcademicPeriodStudentList = await this.repositoryAverageAcademicPeriodStudent.findBy({
         where:
         {
@@ -2351,6 +2358,7 @@ export class ExperienceLearningResolver {
           averageAcademicPeriodCourse.assessment = average;
           break;
         case PerformanceLevelType.QUANTITATIVE:
+          average = Number(average.toFixed(countDigitsPerformanceLevel));
           averageAcademicPeriodCourse.assessment = average;
           perf = performanceLevels?.edges?.find((c: any) => {
             return average < c.node.topScore && average >= c.node.minimumScore;
@@ -2443,6 +2451,7 @@ export class ExperienceLearningResolver {
     @Arg('schoolId', () => String) schoolId: string,
     @Arg('schoolYearId', () => String) schoolYearId: string
   ) {
+    let countDigitsPerformanceLevel = 2;
     const course = await this.repositoryCourse.findOneBy(courseId);
     let academicPeriods = await this.repositoryAcademicPeriod.findBy({
       where: {
@@ -2452,6 +2461,12 @@ export class ExperienceLearningResolver {
       },
       order: { order: 1 },
     });
+    let schoolConfigurationCountDigitsPerformanceLevel = await this.repositorySchoolConfiguration.findBy({
+      where: { schoolId: course?.schoolId, code: "COUNT_DIGITS_PERFORMANCE_LEVEL", active: true },
+    });
+    if (schoolConfigurationCountDigitsPerformanceLevel?.length > 0) {
+      countDigitsPerformanceLevel = schoolConfigurationCountDigitsPerformanceLevel[0]?.valueNumber ? schoolConfigurationCountDigitsPerformanceLevel[0]?.valueNumber : 2;
+    }
     if (course && academicPeriods) {
       let students = course.studentsId;
       if (students) {
@@ -2565,6 +2580,7 @@ export class ExperienceLearningResolver {
                   break;
                 case PerformanceLevelType.QUANTITATIVE:
                   let perf = null;
+                  assessmentYear = Number(assessmentYear.toFixed(countDigitsPerformanceLevel));
                   studentYearValuation.assessment = assessmentYear;
                   perf = performanceLevelsFinal?.edges?.find((c: any) => {
                     return assessmentYear < c.node.topScore && assessmentYear >= c.node.minimumScore;
@@ -2741,6 +2757,7 @@ export class ExperienceLearningResolver {
                     break;
                   case PerformanceLevelType.QUANTITATIVE:
                     let perf = null;
+                    assessmentYear = Number(assessmentYear.toFixed(countDigitsPerformanceLevel));
                     studentYearValuation.assessment = assessmentYear;
                     perf = performanceLevelsFinal?.edges?.find((c: any) => {
                       return assessmentYear < c.node.topScore && assessmentYear >= c.node.minimumScore;
@@ -3053,6 +3070,7 @@ export class ExperienceLearningResolver {
     @Arg('courseId', () => String) courseId: string,
     @Arg('schoolYearId', () => String) schoolYearId: string
   ) {
+    let countDigitsPerformanceLevel = 2;
     const course = await this.repositoryCourse.findOneBy(courseId);
     if (course) {
       let averageAcademicYearStudentList = await this.repositoryAverageAcademicYearStudent.findBy({
@@ -3064,6 +3082,12 @@ export class ExperienceLearningResolver {
         },
         order: { assessment: -1 },
       });
+      let schoolConfigurationCountDigitsPerformanceLevel = await this.repositorySchoolConfiguration.findBy({
+        where: { schoolId: course?.schoolId, code: "COUNT_DIGITS_AVERAGE_COURSE", active: true },
+      });
+      if (schoolConfigurationCountDigitsPerformanceLevel?.length > 0) {
+        countDigitsPerformanceLevel = schoolConfigurationCountDigitsPerformanceLevel[0]?.valueNumber ? schoolConfigurationCountDigitsPerformanceLevel[0]?.valueNumber : 2;
+      }
       let average = 0;
       let performanceLevelType: any = null;
       let academicAsignaturesCourses = await this.repositoryAcademicAsignatureCourse.findBy({ where: { courseId: courseId } });
@@ -3137,6 +3161,7 @@ export class ExperienceLearningResolver {
           averageAcademicYearCourse.assessment = average;
           break;
         case PerformanceLevelType.QUANTITATIVE:
+          average = Number(average.toFixed(countDigitsPerformanceLevel));
           averageAcademicYearCourse.assessment = average;
           perf = performanceLevels?.edges?.find((c: any) => {
             return average < c.node.topScore && average >= c.node.minimumScore;
