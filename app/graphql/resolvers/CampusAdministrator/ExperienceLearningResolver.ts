@@ -2469,6 +2469,7 @@ export class ExperienceLearningResolver {
     }
     if (course && academicPeriods) {
       let students = course.studentsId;
+      //students = ["640ee89db455c6be2e15593e"]
       if (students) {
         const academicAsignatureCourses = await this.repositoryAcademicAsignatureCourse.findBy({ where: { courseId: courseId, active: true } })
         for (let student of students) {
@@ -2595,6 +2596,10 @@ export class ExperienceLearningResolver {
                   }
                   break;
               }
+              // if (academicAsignatureCourse?.academicAsignatureId == "63dcee42051c95ccea993518") {
+              //   console.log(studentYearValuation?.assessment)
+              // }
+
               if (studentYearValuation.id) {
                 studentYearValuation =
                   await this.repositoryAcademicAsignatureCourseYearValuation.save({
@@ -2623,7 +2628,9 @@ export class ExperienceLearningResolver {
               performanceLevelType = performanceLevelsFinal?.edges[0]?.node?.type;
             }
             let assessmentYear = 0;
+            let countPeriod = 0;
             for (let academicPeriod of academicPeriods) {
+              countPeriod++;
               let academicPeriodPercentage = 0;
               if (academicPeriod?.weight) {
                 academicPeriodPercentage = academicPeriod?.weight / 100;
@@ -2757,8 +2764,11 @@ export class ExperienceLearningResolver {
                     break;
                   case PerformanceLevelType.QUANTITATIVE:
                     let perf = null;
-                    assessmentYear = Number(assessmentYear.toFixed(countDigitsPerformanceLevel));
-                    studentYearValuation.assessment = assessmentYear;
+                    if (countPeriod == academicPeriods?.length) {
+                      assessmentYear = Number(assessmentYear.toFixed(countDigitsPerformanceLevel));
+                    }
+
+                    studentYearValuation.assessment = Number(assessmentYear.toFixed(countDigitsPerformanceLevel));
                     perf = performanceLevelsFinal?.edges?.find((c: any) => {
                       return assessmentYear < c.node.topScore && assessmentYear >= c.node.minimumScore;
                     });
@@ -2772,6 +2782,12 @@ export class ExperienceLearningResolver {
                     }
                     break;
                 }
+                // if (studentYearValuation?.academicAreaId == "627e093d2ea93bb02290904c") {
+                //   console.log(studentYearValuation?.assessment)
+                //   console.log("academicArea", academicAsignature?.name)
+                //   console.log("academicArea", academicArea?.name)
+                // }
+
                 if (studentYearValuation.id) {
                   studentYearValuation =
                     await this.repositoryAcademicAreaCourseYearValuation.save({
