@@ -471,11 +471,38 @@ export class CourseResolver {
   }
 
   @Mutation(() => Boolean)
+  public async updateCodeStudentsCoursesAcademicGrade(@Arg('id', () => String) id: string) {
+    let count = 0;
+    let academicGrade = await this.repositoryAcademicGrade.findOneBy(id);
+    if (academicGrade && academicGrade?.schoolId) {
+      console.log(academicGrade)
+      let campus = await this.repositoryCampus.findBy({
+        where: { schoolId: academicGrade?.schoolId.toString() },
+      });
+      for (let campu of campus) {
+        let courses = await this.repository.findBy({
+          where: {
+            academicGradeId: academicGrade?.id?.toString(),
+            campusId: campu.id.toString(),
+          },
+        });
+        for (let course of courses) {
+          console.log(count);
+          this.updateCodeStudentsCourse(course.id.toString())
+          count += 1;
+        }
+      }
+      return true;
+    }
+  }
+
+  @Mutation(() => Boolean)
   async updateCodeStudentsCourse(
     @Arg('id', () => String) id: string
   ): Promise<Boolean | null> {
     let course = await this.repository.findOneBy(id);
     if (course) {
+      console.log(course)
       if (course.studentsId && course.studentsId.length > 0) {
         let studentsAux = course.studentsId;
         let studentsIds = [];

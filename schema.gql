@@ -2564,6 +2564,7 @@ type Mutation {
   updateClassroomPlan(data: NewClassroomPlan!, id: String!): ClassroomPlan!
   updateCodeStudentsAllCourses: Boolean!
   updateCodeStudentsCourse(id: String!): Boolean!
+  updateCodeStudentsCoursesAcademicGrade(id: String!): Boolean!
   updateCourse(data: NewCourse!, id: String!): Course!
   updateDataSimat(schoolId: String!, schoolYearId: String!): Boolean!
   updateDocumentType(data: NewDocumentType!, id: String!): DocumentType!
