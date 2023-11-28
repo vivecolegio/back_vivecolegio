@@ -76,6 +76,7 @@
     "html-pdf": "3.0.1",
     "html-pdf-node": "1.0.8",
     "jsonwebtoken": "9.0.2",
+    "moment": "^2.29.4",
     "mongodb": "4.10.0",
     "mongodb-snapshot": "^1.4.1",
     "morgan": "1.10.0",

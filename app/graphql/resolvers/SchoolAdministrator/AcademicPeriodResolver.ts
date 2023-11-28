@@ -1,4 +1,5 @@
 import { connectionFromArraySlice } from 'graphql-relay';
+import moment from 'moment';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
@@ -235,6 +236,25 @@ export class AcademicPeriodResolver {
         schoolYearId: newSchoolYearId.toString()
       });
       let resultSave = await this.repository.save(model);
+    }
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  async updateEndPeriod() {
+    let results = await this.repository.find();
+    for (let result of results) {
+      let endDateAux = new Date(result?.endDate as Date);
+      endDateAux = moment(endDateAux).hour(23).minute(59).second(59).toDate();
+      let endDateRecoveryAux = new Date(result?.endDateRecovery as Date);
+      endDateRecoveryAux = moment(endDateRecoveryAux).hour(23).minute(59).second(59).toDate();
+      await this.repository.save({
+        _id: new ObjectId(result?.id?.toString()),
+        ...result,
+        endDate: endDateAux,
+        endDateRecovery: endDateRecoveryAux,
+        version: (result?.version as number) + 1,
+      });
     }
     return true;
   }
