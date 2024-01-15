@@ -1,4 +1,4 @@
-import PDFMerger from 'pdf-merger-js/browser';
+import PDFMerger from 'pdf-merger-js';
 import report from "puppeteer-report";
 import { Arg, Ctx, Mutation, Resolver } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';

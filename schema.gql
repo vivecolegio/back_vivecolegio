@@ -2356,7 +2356,6 @@ type Mutation {
   createAveragePeriodValuationStudent(academicPeriodId: String!, courseId: String!, studentId: String!): Boolean!
   createAverageYearValuationCourse(courseId: String!, schoolYearId: String!): Boolean!
   createAverageYearValuationStudent(courseId: String!, schoolId: String!, schoolYearId: String!, studentId: String!): Boolean!
-  createBackup: Boolean!
   createCampus(data: NewCampus!): Campus!
   createCampusAdministrator(data: NewCampusAdministrator!): CampusAdministrator!
   createCampusCoordinator(data: NewCampusCoordinator!): CampusCoordinator!
@@ -2528,6 +2527,7 @@ type Mutation {
   schoolImgSecretarySignatureUploadImage(file: Upload, id: String!): Boolean!
   schoolLogoUploadImage(file: Upload, id: String!): Boolean!
   singleUpload(file: Upload, id: String!): Boolean!
+  syncDataOnlineOffline: Boolean!
   updateAcademicArea(data: NewAcademicArea!, id: String!): AcademicArea!
   updateAcademicAreaAcademicAsignatureSchoolYearId(schoolId: String!, schoolYearId: String!): Boolean!
   updateAcademicAreaCoursePeriodValuation(data: NewAcademicAreaCoursePeriodValuation!, id: String!): AcademicAreaCoursePeriodValuation!
@@ -2570,6 +2570,7 @@ type Mutation {
   updateDocumentType(data: NewDocumentType!, id: String!): DocumentType!
   updateEducationLevel(data: NewEducationLevel!, id: String!): EducationLevel!
   updateEmail(data: NewEmail!, id: String!): Email!
+  updateEndPeriod: Boolean!
   updateEvaluativeComponent(data: NewEvaluativeComponent!, id: String!): EvaluativeComponent!
   updateEvidenceLearning(data: NewEvidenceLearning!, id: String!): EvidenceLearning!
   updateExperienceLearning(data: NewExperienceLearning!, id: String!): ExperienceLearning!
@@ -3249,7 +3250,6 @@ input NewSchoolAdministrative {
 input NewSchoolAdministrator {
   newUser: NewUser
   schoolId: [String!]
-  support: Boolean
   userId: String
 }
 
@@ -5396,7 +5396,6 @@ type SchoolAdministrator implements IModelData {
   id: ID!
   school: [School!]
   schoolId: [String!]
-  support: Boolean
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
