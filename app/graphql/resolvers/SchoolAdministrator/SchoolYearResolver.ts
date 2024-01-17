@@ -172,7 +172,7 @@ export class SchoolYearResolver {
     });
     let result = await this.repository.save(model);
     if (result?.schoolYearImportId) {
-      await this.importDataSchoolActiveOldYear(result?.schoolId + "", result?.schoolYearImportId, result?.id?.toString());
+      this.importDataSchoolActiveOldYear(result?.schoolId + "", result?.schoolYearImportId, result?.id?.toString());
     }
     return result;
   }
