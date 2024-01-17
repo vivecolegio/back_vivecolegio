@@ -37,6 +37,10 @@ export class AcademicHour extends IModelCampusData {
 
   @Field({ nullable: true })
   schoolYear?: SchoolYear;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  entityBaseId?: string;
 }
 
 @ObjectType()

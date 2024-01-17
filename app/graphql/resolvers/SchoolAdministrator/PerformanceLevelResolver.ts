@@ -479,7 +479,21 @@ export class PerformanceLevelResolver {
   @Mutation(() => Boolean)
   async importPerformanceLevelSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String) {
     let results = await this.repository.findBy({ where: { schoolId, schoolYearId: oldSchoolYearId } });
+    console.log("IMPORT", results?.length);
     for (let result of results) {
+      let academicGradesId = [];
+      if (result?.academicGradesId) {
+        for (let academicGradeId of result?.academicGradesId) {
+          let academicGradeNew: any;
+          let academicGradeOld = await this.repositoryAcademicGrade.findOneBy(academicGradeId);
+          if (academicGradeOld) {
+            academicGradeNew = await this.repositoryAcademicGrade.findBy({ where: { entityBaseId: academicGradeId, schoolYearId: newSchoolYearId } });
+            if (academicGradeNew?.length > 0) {
+              academicGradesId.push(academicGradeNew[0]?.id?.toString());
+            }
+          }
+        }
+      }
       const model = await this.repository.create({
         name: result.name,
         minimumScore: result.minimumScore,
@@ -493,12 +507,15 @@ export class PerformanceLevelResolver {
         categoryGrade: result.categoryGrade,
         generalPerformanceLevelId: result.generalPerformanceLevelId,
         campusId: result.campusId,
-        academicGradesId: result.academicGradesId,
+        academicGradesId: academicGradesId,
         schoolId: result.schoolId,
         order: result.order,
-        active: true,
+        createdByUserId: result.createdByUserId,
+        updatedByUserId: result.updatedByUserId,
+        active: result?.active,
         version: 0,
-        schoolYearId: newSchoolYearId.toString()
+        schoolYearId: newSchoolYearId.toString(),
+        entityBaseId: result?.id?.toString()
       });
       let resultSave = await this.repository.save(model);
     }

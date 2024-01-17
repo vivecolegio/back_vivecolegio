@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicAreaRepository, AcademicAsignatureRepository, GeneralAcademicAsignatureRepository, GradeAssignmentRepository, SchoolRepository, SchoolYearRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAreaRepository, AcademicAsignatureRepository, AcademicGradeRepository, GeneralAcademicAsignatureRepository, GradeAssignmentRepository, SchoolRepository, SchoolYearRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicAsignature } from '../../inputs/SchoolAdministrator/NewAcademicAsignature';
 import { IContext } from '../../interfaces/IContext';
@@ -12,6 +12,7 @@ import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicArea } from '../../models/SchoolAdministrator/AcademicArea';
 import { AcademicAsignature, AcademicAsignatureConnection } from '../../models/SchoolAdministrator/AcademicAsignature';
+import { AcademicGrade } from '../../models/SchoolAdministrator/AcademicGrade';
 import { GradeAssignment } from '../../models/SchoolAdministrator/GradeAssignment';
 import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
@@ -38,6 +39,9 @@ export class AcademicAsignatureResolver {
 
   @InjectRepository(GradeAssignment)
   private repositoryGradeAssignment = GradeAssignmentRepository;
+
+  @InjectRepository(AcademicGrade)
+  private repositoryAcademicGrade = AcademicGradeRepository;
 
   @Query(() => AcademicAsignature, { nullable: true })
   async getAcademicAsignature(@Arg('id', () => String) id: string) {
@@ -232,6 +236,47 @@ export class AcademicAsignatureResolver {
     let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
     return result?.result?.ok === 1 ?? true;
+  }
+
+  @Mutation(() => Boolean)
+  async importAcademicAsignatureSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldAcademicAreaId', () => String) oldAcademicAreaId: String, @Arg('newAcademicAreaId', () => String) newAcademicAreaId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String) {
+    let results = await this.repository.findBy({ where: { schoolId, academicAreaId: oldAcademicAreaId } });
+    console.log("IMPORT", results?.length);
+    for (let result of results) {
+      let academicGradesId = [];
+      if (result?.academicGradeId) {
+        for (let academicGradeId of result?.academicGradeId) {
+          let academicGradeNew: any;
+          let academicGradeOld = await this.repositoryAcademicGrade.findOneBy(academicGradeId);
+          if (academicGradeOld) {
+            academicGradeNew = await this.repositoryAcademicGrade.findBy({ where: { entityBaseId: academicGradeId, schoolYearId: newSchoolYearId } });
+            if (academicGradeNew?.length > 0) {
+              academicGradesId.push(academicGradeNew[0]?.id?.toString());
+            }
+          }
+        }
+      }
+      const model = await this.repository.create({
+        name: result.name,
+        abbreviation: result.abbreviation,
+        code: result.code,
+        minWeight: result.minWeight,
+        maxWeight: result.maxWeight,
+        academicAreaId: newAcademicAreaId.toString(),
+        academicGradeId: academicGradesId,
+        schoolId: result.schoolId,
+        generalAcademicAsignatureId: result.generalAcademicAsignatureId,
+        order: result.order,
+        createdByUserId: result.createdByUserId,
+        updatedByUserId: result.updatedByUserId,
+        active: result?.active,
+        version: 0,
+        schoolYearId: newSchoolYearId.toString(),
+        entityBaseId: result?.id?.toString()
+      });
+      let resultSave = await this.repository.save(model);
+    }
+    return true;
   }
 
   @FieldResolver((_type) => User, { nullable: true })

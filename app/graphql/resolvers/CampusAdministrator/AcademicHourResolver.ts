@@ -231,6 +231,30 @@ export class AcademicHourResolver {
     return result?.result?.ok === 1 ?? true;
   }
 
+  @Mutation(() => Boolean)
+  async importAcademicHourSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldAcademicDayId', () => String) oldAcademicDayId: String, @Arg('newAcademicDayId', () => String) newAcademicDayId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String) {
+    let results = await this.repository.findBy({ where: { schoolId, academicDayId: oldAcademicDayId } });
+    console.log("IMPORT", results?.length);
+    for (let result of results) {
+      const model = await this.repository.create({
+        academicDayId: newAcademicDayId + "",
+        startTime: result.startTime,
+        endTime: result.endTime,
+        order: result.order,
+        campusId: result.campusId,
+        schoolId: result.schoolId,
+        createdByUserId: result.createdByUserId,
+        updatedByUserId: result.updatedByUserId,
+        active: result?.active,
+        version: 0,
+        schoolYearId: newSchoolYearId.toString(),
+        entityBaseId: result?.id?.toString()
+      });
+      let resultSave = await this.repository.save(model);
+    }
+    return true;
+  }
+
   @FieldResolver((_type) => User, { nullable: true })
   async createdByUser(@Root() data: AcademicHour) {
     let id = data.createdByUserId;

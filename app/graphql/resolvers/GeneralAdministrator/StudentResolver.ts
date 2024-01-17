@@ -6,9 +6,11 @@ import { InjectRepository } from 'typeorm-typedi-extensions';
 
 import {
   AcademicGradeRepository,
+  AverageAcademicYearStudentRepository,
   CampusRepository,
   CourseRepository,
   EstudiantesRepository,
+  GeneralAcademicGradeRepository,
   SchoolRepository,
   SchoolYearRepository,
   StudentRepository,
@@ -18,9 +20,11 @@ import { removeEmptyStringElements } from '../../../types';
 import { NewStudent } from '../../inputs/GeneralAdministrator/NewStudent';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
 import { IContext } from '../../interfaces/IContext';
+import { AverageAcademicYearStudent } from '../../models/CampusAdministrator/AverageAcademicYearStudent';
 import { Course } from '../../models/CampusAdministrator/Course';
 import { Estudiantes } from '../../models/Data/Estudiantes';
 import { Campus } from '../../models/GeneralAdministrator/Campus';
+import { GeneralAcademicGrade } from '../../models/GeneralAdministrator/GeneralAcademicGrade';
 import { School } from '../../models/GeneralAdministrator/School';
 import { Student, StudentConnection } from '../../models/GeneralAdministrator/Student';
 import { User } from '../../models/GeneralAdministrator/User';
@@ -56,6 +60,12 @@ export class StudentResolver {
 
   @InjectRepository(SchoolYear)
   private repositorySchoolYear = SchoolYearRepository;
+
+  @InjectRepository(AverageAcademicYearStudent)
+  private repositoryAverageAcademicYearStudent = AverageAcademicYearStudentRepository;
+
+  @InjectRepository(GeneralAcademicGrade)
+  private repositoryGeneralAcademicGrade = GeneralAcademicGradeRepository;
 
   private courseResolver = new CourseResolver();
 
@@ -380,10 +390,10 @@ export class StudentResolver {
                     : '60ecc36d6c716a21bee51e00',
                 birthdate: fechaNacimiento
                   ? new Date(
-                      Number(fechaNacimiento[2]),
-                      Number(fechaNacimiento[1]) - 1,
-                      Number(fechaNacimiento[0]),
-                    )
+                    Number(fechaNacimiento[2]),
+                    Number(fechaNacimiento[1]) - 1,
+                    Number(fechaNacimiento[0]),
+                  )
                   : undefined,
                 roleId: '619551d1882a2fb6525a3078',
                 schoolId: school.id.toString(),
@@ -616,6 +626,73 @@ export class StudentResolver {
     } else {
       return false;
     }
+  }
+
+  @Mutation(() => Boolean)
+  async importStudentSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String, @Arg('studentPromoted', () => Boolean) studentPromoted: boolean, @Arg('studentNoPromoted', () => Boolean) studentNoPromoted: boolean) {
+    let dataAcademicGradeGeneral = await this.repositoryGeneralAcademicGrade.findBy({
+      where: { active: true },
+    });
+    for (let academicGradeGeneral of dataAcademicGradeGeneral) {
+      let academicGradeNext: any[] = [];
+      let academicGradePrevious: any[] = [];
+      let academicGradeCurrent: any[] = [];
+      if (academicGradeGeneral?.nextGeneralAcademicGradeId) {
+        academicGradeNext = await this.repositoryAcademicGrade.findBy({
+          where: { generalAcademicGradeId: academicGradeGeneral?.nextGeneralAcademicGradeId, schoolYearId: newSchoolYearId },
+        });
+      }
+      if (academicGradeGeneral?.previousGeneralAcademicGradeId) {
+        academicGradePrevious = await this.repositoryAcademicGrade.findBy({
+          where: { generalAcademicGradeId: academicGradeGeneral?.id?.toString(), schoolYearId: oldSchoolYearId },
+        });
+      }
+      if (academicGradeGeneral?.previousGeneralAcademicGradeId) {
+        academicGradeCurrent = await this.repositoryAcademicGrade.findBy({
+          where: { generalAcademicGradeId: academicGradeGeneral?.id?.toString(), schoolYearId: newSchoolYearId },
+        });
+      }
+      if (academicGradeNext?.length > 0 && academicGradePrevious?.length > 0 && academicGradeCurrent?.length > 0) {
+        let results = await this.repository.findBy({ where: { schoolId, schoolYearId: oldSchoolYearId, academicGradeId: academicGradePrevious[0]?.id?.toString } });
+        console.log("IMPORT", results?.length);
+        for (let result of results) {
+          let averageAcademicYearStudent = await this.repositoryAverageAcademicYearStudent.findBy({ where: { studentId: result?.id?.toString(), schoolYearId: oldSchoolYearId } });
+          if (averageAcademicYearStudent?.length > 0) {
+            if (studentPromoted && averageAcademicYearStudent[0]?.promoted == true) {
+              const model = await this.repository.create({
+                userId: result.userId,
+                campusId: result.campusId,
+                schoolId: result.schoolId,
+                academicGradeId: academicGradeNext[0]?.id?.toString(),
+                createdByUserId: result.createdByUserId,
+                updatedByUserId: result.updatedByUserId,
+                active: result?.active,
+                version: 0,
+                schoolYearId: newSchoolYearId.toString(),
+                entityBaseId: result?.id?.toString()
+              });
+              let resultSave = await this.repository.save(model);
+            }
+            if (studentNoPromoted && averageAcademicYearStudent[0]?.promoted == false) {
+              const model = await this.repository.create({
+                userId: result.userId,
+                campusId: result.campusId,
+                schoolId: result.schoolId,
+                academicGradeId: academicGradeCurrent[0]?.id?.toString(),
+                createdByUserId: result.createdByUserId,
+                updatedByUserId: result.updatedByUserId,
+                active: result?.active,
+                version: 0,
+                schoolYearId: newSchoolYearId.toString(),
+                entityBaseId: result?.id?.toString()
+              });
+              let resultSave = await this.repository.save(model);
+            }
+          }
+        }
+      }
+    }
+    return true;
   }
 
   @Mutation(() => Boolean)

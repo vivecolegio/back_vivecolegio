@@ -57,6 +57,10 @@ export class Teacher extends IModelData {
 
   @Field(() => SchoolYear, { nullable: true })
   schoolYear?: SchoolYear;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  entityBaseId?: string;
 }
 
 @ObjectType()

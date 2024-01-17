@@ -25,6 +25,7 @@ import {
   GradeAssignmentConnection
 } from '../../models/SchoolAdministrator/GradeAssignment';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
+import { AcademicAsignatureCourseResolver } from '../CampusAdministrator/AcademicAsignatureCourseResolver';
 
 @Resolver(GradeAssignment)
 export class GradeAssignmentResolver {
@@ -48,6 +49,8 @@ export class GradeAssignmentResolver {
 
   @InjectRepository(Course)
   private repositoryCourse = CourseRepository;
+
+  private academicAsignatureCourseResolver = new AcademicAsignatureCourseResolver();
 
   @Query(() => GradeAssignment, { nullable: true })
   async getGradeAssignment(@Arg('id', () => String) id: string) {
@@ -299,6 +302,48 @@ export class GradeAssignmentResolver {
     } else {
       return false;
     }
+  }
+
+  @Mutation(() => Boolean)
+  async importGradeAssignmentSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String, @Arg('academicAsignatureCourse', () => Boolean) academicAsignatureCourse: boolean) {
+    let results = await this.repository.findBy({ where: { schoolId, schoolYearId: oldSchoolYearId } });
+    console.log("IMPORT", results?.length);
+    for (let result of results) {
+      let academicGradeNew: any;
+      let academicGradeOld = await this.repositoryAcademicGrade.findOneBy(result?.academicGradeId);
+      if (academicGradeOld) {
+        academicGradeNew = await this.repositoryAcademicGrade.findBy({ where: { entityBaseId: result?.academicGradeId, schoolYearId: newSchoolYearId } });
+      }
+      let academicAsignatureNew: any;
+      let academicAsignatureOld = await this.repositoryAcademicAsignature.findOneBy(result?.academicAsignatureId);
+      if (academicAsignatureOld) {
+        academicAsignatureNew = await this.repositoryAcademicAsignature.findBy({ where: { entityBaseId: result?.academicAsignatureId, schoolYearId: newSchoolYearId } });
+      }
+      const model = await this.repository.create({
+        minHourlyIntensity: result.minHourlyIntensity,
+        maxHourlyIntensity: result.maxHourlyIntensity,
+        academicGradeId: academicGradeNew?.length > 0 ? academicGradeNew[0]?.id?.toString() : null,
+        academicAsignatureId: academicAsignatureNew?.length > 0 ? academicAsignatureNew[0]?.id?.toString() : null,
+        schoolId: result.schoolId,
+        createdByUserId: result.createdByUserId,
+        updatedByUserId: result.updatedByUserId,
+        active: result?.active,
+        version: 0,
+        schoolYearId: newSchoolYearId.toString(),
+        entityBaseId: result?.id?.toString()
+      });
+      let resultSave = await this.repository.save(model);
+      console.log("academicAsignatureCourseResolver");
+      if (academicAsignatureCourse) {
+        await this.academicAsignatureCourseResolver.importAcademicAsignatureSchoolYearId(
+          schoolId,
+          result.id.toString(),
+          resultSave.id.toString(),
+          newSchoolYearId.toString()
+        );
+      }
+    }
+    return true;
   }
 
   @Mutation(() => Boolean)

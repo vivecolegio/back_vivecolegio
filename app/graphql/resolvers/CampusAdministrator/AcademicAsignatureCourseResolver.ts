@@ -292,6 +292,40 @@ export class AcademicAsignatureCourseResolver {
   }
 
   @Mutation(() => Boolean)
+  async importAcademicAsignatureSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldGradeAssignmentId', () => String) oldGradeAssignmentId: String, @Arg('newGradeAssignmentId', () => String) newGradeAssignmentId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String) {
+    let results = await this.repository.findBy({ where: { schoolId, gradeAssignmentId: oldGradeAssignmentId } });
+    console.log("IMPORT", results?.length);
+    for (let result of results) {
+      let courseNew: any;
+      let courseOld = await this.repositoryCourse.findOneBy(result?.courseId);
+      if (courseOld) {
+        courseNew = await this.repositoryCourse.findBy({ where: { entityBaseId: result?.courseId, schoolYearId: newSchoolYearId } });
+      }
+      let academicAsignatureNew: any;
+      let academicAsignatureOld = await this.repositoryAcademicAsignature.findOneBy(result?.academicAsignatureId);
+      if (academicAsignatureOld) {
+        academicAsignatureNew = await this.repositoryAcademicAsignature.findBy({ where: { entityBaseId: result?.academicAsignatureId, schoolYearId: newSchoolYearId } });
+      }
+      const model = await this.repository.create({
+        hourlyIntensity: result.hourlyIntensity,
+        academicAsignatureId: academicAsignatureNew?.length > 0 ? academicAsignatureNew[0]?.id?.toString() : null,
+        courseId: courseNew?.length > 0 ? courseNew[0]?.id?.toString() : null,
+        weight: result.weight,
+        gradeAssignmentId: newGradeAssignmentId.toString(),
+        schoolId: result.schoolId,
+        createdByUserId: result.createdByUserId,
+        updatedByUserId: result.updatedByUserId,
+        active: result?.active,
+        version: 0,
+        schoolYearId: newSchoolYearId.toString(),
+        entityBaseId: result?.id?.toString()
+      });
+      let resultSave = await this.repository.save(model);
+    }
+    return true;
+  }
+
+  @Mutation(() => Boolean)
   async deleteAcademicAsignatureCourse(
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext

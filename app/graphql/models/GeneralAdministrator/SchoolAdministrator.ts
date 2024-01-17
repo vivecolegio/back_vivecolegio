@@ -1,5 +1,6 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Column, Entity, Index } from 'typeorm';
+
 import { IModelData } from '../../interfaces/IModelData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { Campus } from './Campus';
@@ -35,6 +36,10 @@ export class SchoolAdministrator extends IModelData {
   @Field({ nullable: true })
   @Column({ nullable: true })
   user?: User;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  support?: boolean;
 }
 
 @ObjectType()

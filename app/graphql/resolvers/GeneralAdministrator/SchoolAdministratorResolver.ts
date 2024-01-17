@@ -3,20 +3,14 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import {
-  SchoolAdministratorRepository,
-  SchoolRepository,
-  UserRepository,
-} from '../../../servers/DataSource';
+
+import { SchoolAdministratorRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewSchoolAdministrator } from '../../inputs/GeneralAdministrator/NewSchoolAdministrator';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
 import { IContext } from '../../interfaces/IContext';
 import { School } from '../../models/GeneralAdministrator/School';
-import {
-  SchoolAdministrator,
-  SchoolAdministratorConnection,
-} from '../../models/GeneralAdministrator/SchoolAdministrator';
+import { SchoolAdministrator, SchoolAdministratorConnection } from '../../models/GeneralAdministrator/SchoolAdministrator';
 import { User } from '../../models/GeneralAdministrator/User';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
@@ -50,17 +44,17 @@ export class SchoolAdministratorResolver {
     if (allData) {
       if (orderCreated) {
         result = await this.repository.findBy({
-          where: { schoolId },
+          where: { schoolId, support: false },
           order: { createdAt: 'DESC' },
         });
       } else {
-        result = await this.repository.findBy({ where: { schoolId } });
+        result = await this.repository.findBy({ where: { schoolId, support: false } });
       }
     } else {
       if (orderCreated) {
         result = await this.repository.findBy({
           where: {
-            schoolId,
+            schoolId, support: false,
             active: true,
           },
           order: { createdAt: 'DESC' },
@@ -68,7 +62,7 @@ export class SchoolAdministratorResolver {
       } else {
         result = await this.repository.findBy({
           where: {
-            schoolId,
+            schoolId, support: false,
             active: true,
           },
         });

@@ -17,6 +17,7 @@ import { EducationLevel } from '../../models/SchoolAdministrator/EducationLevel'
 import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { Specialty } from '../../models/SchoolAdministrator/Specialty';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
+import { CourseResolver } from '../CampusAdministrator/CourseResolver';
 
 @Resolver(AcademicGrade)
 export class AcademicGradeResolver {
@@ -46,6 +47,8 @@ export class AcademicGradeResolver {
 
   @InjectRepository(Student)
   private repositoryStudent = StudentRepository;
+
+  private courseResolver = new CourseResolver();
 
   @Query(() => AcademicGrade, { nullable: true })
   async getAcademicGrade(@Arg('id', () => String) id: string) {
@@ -159,31 +162,44 @@ export class AcademicGradeResolver {
   }
 
   @Mutation(() => Boolean)
-  async importAcademicGradeSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String) {
+  async importAcademicGradeSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String, @Arg('course', () => Boolean) course: boolean) {
     let results = await this.repository.findBy({ where: { schoolId, schoolYearId: oldSchoolYearId } });
+    console.log("IMPORT", results?.length);
     for (let result of results) {
       let educationLevelNew: any;
       let educationLevelOld = await this.repositoryEducationLevel.findOneBy(result?.educationLevelId);
       if (educationLevelOld) {
-        educationLevelNew = await this.repositoryEducationLevel.findBy({ where: { name: educationLevelOld?.name, schoolYearId: newSchoolYearId } });
+        educationLevelNew = await this.repositoryEducationLevel.findBy({ where: { entityBaseId: result?.educationLevelId, schoolYearId: newSchoolYearId } });
       }
-      let specialityNew: any;
-      let specialityOld = await this.repositorySpecialty.findOneBy(result?.specialtyId);
-      if (specialityOld) {
-        specialityNew = await this.repositorySpecialty.findBy({ where: { name: specialityOld?.name, schoolYearId: newSchoolYearId } });
-      }
+      // let specialityNew: any;
+      // let specialityOld = await this.repositorySpecialty.findOneBy(result?.specialtyId);
+      // if (specialityOld) {
+      //   specialityNew = await this.repositorySpecialty.findBy({ where: { name: specialityOld?.name, schoolYearId: newSchoolYearId } });
+      // }
       const model = await this.repository.create({
+        name: result.name,
+        educationLevelId: educationLevelNew?.length > 0 ? educationLevelNew[0]?.id?.toString() : null,
+        specialtyId: result.specialtyId,
         generalAcademicCycleId: result.generalAcademicCycleId,
         generalAcademicGradeId: result.generalAcademicGradeId,
-        name: result.name,
         schoolId: result.schoolId,
-        educationLevelId: educationLevelNew[0]?.id?.toString(),
-        specialtyId: specialityNew[0]?.id?.toString(),
-        active: true,
+        createdByUserId: result.createdByUserId,
+        updatedByUserId: result.updatedByUserId,
+        active: result?.active,
         version: 0,
-        schoolYearId: newSchoolYearId.toString()
+        schoolYearId: newSchoolYearId.toString(),
+        entityBaseId: result?.id?.toString()
       });
       let resultSave = await this.repository.save(model);
+      console.log("courseResolver");
+      if (course) {
+        await this.courseResolver.importCourseSchoolYearId(
+          schoolId,
+          result.id.toString(),
+          resultSave.id.toString(),
+          newSchoolYearId.toString()
+        );
+      }
     }
     return true;
   }

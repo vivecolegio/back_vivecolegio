@@ -16,6 +16,7 @@ import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
+import { AcademicHourResolver } from './AcademicHourResolver';
 
 @Resolver(AcademicDay)
 export class AcademicDayResolver {
@@ -36,6 +37,8 @@ export class AcademicDayResolver {
 
   @InjectRepository(Jornadas)
   private repositoryJornadas = JornadasRepository;
+
+  private academicHourResolver = new AcademicHourResolver();
 
   @Query(() => AcademicDay, { nullable: true })
   async getAcademicDay(@Arg('id', () => String) id: string) {
@@ -313,6 +316,38 @@ export class AcademicDayResolver {
     let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
     return result?.result?.ok === 1 ?? true;
+  }
+
+  @Mutation(() => Boolean)
+  async importAcademicDaySchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String, @Arg('academicHour', () => Boolean) academicHour: boolean) {
+    let results = await this.repository.findBy({ where: { schoolId, schoolYearId: oldSchoolYearId } });
+    console.log("IMPORT", results?.length);
+    for (let result of results) {
+      const model = await this.repository.create({
+        name: result.name,
+        nameSIMAT: result.nameSIMAT,
+        day: result.day,
+        schoolId: result.schoolId,
+        campusId: result.campusId,
+        createdByUserId: result.createdByUserId,
+        updatedByUserId: result.updatedByUserId,
+        active: result?.active,
+        version: 0,
+        schoolYearId: newSchoolYearId.toString(),
+        entityBaseId: result?.id?.toString()
+      });
+      let resultSave = await this.repository.save(model);
+      console.log("academicHourResolver");
+      if (academicHour) {
+        await this.academicHourResolver.importAcademicHourSchoolYearId(
+          schoolId,
+          result.id.toString(),
+          resultSave.id.toString(),
+          newSchoolYearId.toString()
+        );
+      }
+    }
+    return true;
   }
 
   @FieldResolver((_type) => User, { nullable: true })

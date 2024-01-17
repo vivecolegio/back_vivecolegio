@@ -332,6 +332,28 @@ export class TeacherResolver {
   }
 
   @Mutation(() => Boolean)
+  async importTeacherSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String) {
+    let results = await this.repository.findBy({ where: { schoolId, schoolYearId: oldSchoolYearId } });
+    console.log("IMPORT", results?.length);
+    for (let result of results) {
+      const model = await this.repository.create({
+        attentionSchedule: result.attentionSchedule,
+        userId: result.userId,
+        campusId: result.campusId,
+        schoolId: result.schoolId,
+        createdByUserId: result.createdByUserId,
+        updatedByUserId: result.updatedByUserId,
+        active: result?.active,
+        version: 0,
+        schoolYearId: newSchoolYearId.toString(),
+        entityBaseId: result?.id?.toString()
+      });
+      let resultSave = await this.repository.save(model);
+    }
+    return true;
+  }
+
+  @Mutation(() => Boolean)
   async deleteTeacher(
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext

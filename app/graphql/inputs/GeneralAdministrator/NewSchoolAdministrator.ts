@@ -1,4 +1,5 @@
 import { Field, InputType } from 'type-graphql';
+
 import { SchoolAdministrator } from '../../models/GeneralAdministrator/SchoolAdministrator';
 import { NewUser } from './NewUser';
 
@@ -12,4 +13,7 @@ export class NewSchoolAdministrator implements Partial<SchoolAdministrator> {
 
   @Field({ nullable: true })
   newUser?: NewUser;
+
+  @Field({ nullable: true })
+  support?: boolean;
 }

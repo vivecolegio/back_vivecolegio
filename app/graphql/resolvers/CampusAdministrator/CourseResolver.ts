@@ -664,6 +664,33 @@ export class CourseResolver {
   }
 
   @Mutation(() => Boolean)
+  async importCourseSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldAcademicGradeId', () => String) oldAcademicGradeId: String, @Arg('newAcademicGradeId', () => String) newAcademicGradeId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String) {
+    let results = await this.repository.findBy({ where: { schoolId, academicGradeId: oldAcademicGradeId } });
+    console.log("IMPORT", results?.length);
+    for (let result of results) {
+      let academicDayNew: any;
+      let academicDayOld = await this.repositoryAcademicDay.findOneBy(result?.academicDayId);
+      if (academicDayOld) {
+        academicDayNew = await this.repositoryAcademicDay.findBy({ where: { entityBaseId: result?.academicDayId, schoolYearId: newSchoolYearId } });
+      }
+      const model = await this.repository.create({
+        academicGradeId: newAcademicGradeId?.toString(),
+        academicDayId: academicDayNew?.length > 0 ? academicDayNew[0]?.id?.toString() : null,
+        name: result.name,
+        order: result.order,
+        createdByUserId: result.createdByUserId,
+        updatedByUserId: result.updatedByUserId,
+        active: result?.active,
+        version: 0,
+        schoolYearId: newSchoolYearId.toString(),
+        entityBaseId: result?.id?.toString()
+      });
+      let resultSave = await this.repository.save(model);
+    }
+    return true;
+  }
+
+  @Mutation(() => Boolean)
   async deleteCourse(
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext

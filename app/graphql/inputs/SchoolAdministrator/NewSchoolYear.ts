@@ -1,5 +1,7 @@
 import { Field, InputType } from 'type-graphql';
+
 import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
+import { NewSchoolYearImportOptions } from './NewSchoolYearImportOptions';
 
 @InputType()
 export class NewSchoolYear implements Partial<SchoolYear> {
@@ -17,4 +19,10 @@ export class NewSchoolYear implements Partial<SchoolYear> {
 
   @Field({ nullable: true })
   schoolId?: string;
+
+  @Field({ nullable: true })
+  schoolYearImportId?: string;
+
+  @Field({ nullable: true })
+  schoolYearImportOptions?: NewSchoolYearImportOptions;
 }

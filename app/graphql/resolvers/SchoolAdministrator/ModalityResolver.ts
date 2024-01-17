@@ -12,6 +12,7 @@ import { User } from '../../models/GeneralAdministrator/User';
 import { Modality, ModalityConnection } from '../../models/SchoolAdministrator/Modality';
 import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
+import { SpecialtyResolver } from './SpecialtyResolver';
 
 @Resolver(Modality)
 export class ModalityResolver {
@@ -26,6 +27,8 @@ export class ModalityResolver {
 
   @InjectRepository(SchoolYear)
   private repositorySchoolYear = SchoolYearRepository;
+
+  private specialityResolver = new SpecialtyResolver();
 
   @Query(() => Modality, { nullable: true })
   async getModality(@Arg('id', () => String) id: string) {
@@ -146,6 +149,36 @@ export class ModalityResolver {
     let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
     return result?.result?.ok === 1 ?? true;
+  }
+
+  @Mutation(() => Boolean)
+  async importModalitySchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String, @Arg('speciality', () => Boolean) speciality: boolean) {
+    let results = await this.repository.findBy({ where: { schoolId, schoolYearId: oldSchoolYearId } });
+    console.log("IMPORT", results?.length);
+    for (let result of results) {
+      const model = await this.repository.create({
+        code: result.code,
+        name: result.name,
+        schoolId: result.schoolId,
+        createdByUserId: result.createdByUserId,
+        updatedByUserId: result.updatedByUserId,
+        active: result?.active,
+        version: 0,
+        schoolYearId: newSchoolYearId.toString(),
+        entityBaseId: result?.id?.toString()
+      });
+      let resultSave = await this.repository.save(model);
+      console.log("specialityResolver");
+      if (speciality) {
+        await this.specialityResolver.importSpecialitySchoolYearId(
+          schoolId,
+          result.id.toString(),
+          resultSave.id.toString(),
+          newSchoolYearId.toString()
+        );
+      }
+    }
+    return true;
   }
 
   @FieldResolver((_type) => User, { nullable: true })

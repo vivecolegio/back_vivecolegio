@@ -150,6 +150,28 @@ export class SpecialtyResolver {
     return result?.result?.ok === 1 ?? true;
   }
 
+  @Mutation(() => Boolean)
+  async importSpecialitySchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldModalityId', () => String) oldModalityId: String, @Arg('newModalityId', () => String) newModalityId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String) {
+    let results = await this.repository.findBy({ where: { schoolId, modalityId: oldModalityId } });
+    console.log("IMPORT", results?.length);
+    for (let result of results) {
+      const model = await this.repository.create({
+        modalityId: newModalityId + "",
+        code: result.code,
+        name: result.name,
+        schoolId: result.schoolId,
+        createdByUserId: result.createdByUserId,
+        updatedByUserId: result.updatedByUserId,
+        active: result?.active,
+        version: 0,
+        schoolYearId: newSchoolYearId.toString(),
+        entityBaseId: result?.id?.toString()
+      });
+      let resultSave = await this.repository.save(model);
+    }
+    return true;
+  }
+
   @FieldResolver((_type) => User, { nullable: true })
   async createdByUser(@Root() data: Specialty) {
     let id = data.createdByUserId;

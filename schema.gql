@@ -12,6 +12,7 @@ type AcademicArea implements IModelSchoolData {
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  entityBaseId: String
   generalAcademicArea: GeneralAcademicArea
   generalAcademicAreaId: String
   id: ID!
@@ -138,6 +139,7 @@ type AcademicAsignature implements IModelSchoolData {
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  entityBaseId: String
   generalAcademicAsignature: GeneralAcademicAsignature
   generalAcademicAsignatureId: String
   id: ID!
@@ -175,6 +177,7 @@ type AcademicAsignatureCourse implements IModelCampusData {
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  entityBaseId: String
   gradeAssignment: GradeAssignment
   gradeAssignmentId: String
   hourlyIntensity: Float
@@ -346,6 +349,7 @@ type AcademicDay implements IModelCampusData {
   createdByUser: User
   createdByUserId: String
   day: [Day!]
+  entityBaseId: String
   id: ID!
   name: String
   nameSIMAT: String
@@ -382,6 +386,7 @@ type AcademicGrade implements IModelSchoolData {
   createdByUserId: String
   educationLevel: EducationLevel
   educationLevelId: String
+  entityBaseId: String
   generalAcademicCycle: GeneralAcademicCycle
   generalAcademicCycleId: String
   generalAcademicGrade: GeneralAcademicGrade
@@ -425,6 +430,7 @@ type AcademicHour implements IModelCampusData {
   createdByUser: User
   createdByUserId: String
   endTime: String
+  entityBaseId: String
   id: ID!
   order: Float
   school: School
@@ -460,6 +466,7 @@ type AcademicPeriod implements IModelSchoolData {
   createdByUserId: String
   endDate: DateTime
   endDateRecovery: DateTime
+  entityBaseId: String
   id: ID!
   name: String
   order: Float
@@ -908,6 +915,7 @@ type Course implements IModelCampusData {
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  entityBaseId: String
   gradoCodSIMAT: String
   grupoSIMAT: String
   id: ID!
@@ -995,6 +1003,7 @@ type EducationLevel implements IModelSchoolData {
   createdByUser: User
   createdByUserId: String
   description: String
+  entityBaseId: String
   id: ID!
   name: String
   school: School
@@ -1064,6 +1073,7 @@ type EvaluativeComponent implements IModelSchoolData {
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  entityBaseId: String
   id: ID!
   name: String
   school: School
@@ -1749,6 +1759,8 @@ type GeneralAcademicGrade implements IModelData {
   generalAcademicCycleId: String
   id: ID!
   name: String
+  nextGeneralAcademicGradeId: String
+  previousGeneralAcademicGradeId: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -1874,6 +1886,7 @@ type GradeAssignment implements IModelSchoolData {
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  entityBaseId: String
   id: ID!
   maxHourlyIntensity: Float
   minHourlyIntensity: Float
@@ -2160,6 +2173,7 @@ type Modality implements IModelSchoolData {
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  entityBaseId: String
   id: ID!
   name: String
   school: School
@@ -2356,6 +2370,7 @@ type Mutation {
   createAveragePeriodValuationStudent(academicPeriodId: String!, courseId: String!, studentId: String!): Boolean!
   createAverageYearValuationCourse(courseId: String!, schoolYearId: String!): Boolean!
   createAverageYearValuationStudent(courseId: String!, schoolId: String!, schoolYearId: String!, studentId: String!): Boolean!
+  createBackup: Boolean!
   createCampus(data: NewCampus!): Campus!
   createCampusAdministrator(data: NewCampusAdministrator!): CampusAdministrator!
   createCampusCoordinator(data: NewCampusCoordinator!): CampusCoordinator!
@@ -2512,22 +2527,30 @@ type Mutation {
   generatePerformanceLevelExample(id: String!): Boolean!
   generatePerformanceLevelExample2(id: String!): Boolean!
   generatePerformanceReportCourse(academicPeriodId: String!, format: String!, id: String!, schoolId: String!, schoolYearId: String!, studentId: String): String!
-  importAcademicAreaSchoolYearId(newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!): Boolean!
-  importAcademicGradeSchoolYearId(newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!): Boolean!
+  importAcademicAreaSchoolYearId(asignature: Boolean!, newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!): Boolean!
+  importAcademicAsignatureSchoolYearId(newAcademicAreaId: String!, newSchoolYearId: String!, oldAcademicAreaId: String!, schoolId: String!): Boolean!
+  importAcademicDaySchoolYearId(academicHour: Boolean!, newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!): Boolean!
+  importAcademicGradeSchoolYearId(course: Boolean!, newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!): Boolean!
+  importAcademicHourSchoolYearId(newAcademicDayId: String!, newSchoolYearId: String!, oldAcademicDayId: String!, schoolId: String!): Boolean!
   importAcademicPeriodSchoolYearId(newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!): Boolean!
-  importDataSchoolActiveOldYear(schoolId: String!): Boolean!
+  importCourseSchoolYearId(newAcademicGradeId: String!, newSchoolYearId: String!, oldAcademicGradeId: String!, schoolId: String!): Boolean!
   importDataSchoolInactive(schoolId: String!): Boolean!
   importEducationLevelSchoolYearId(newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!): Boolean!
   importEvaluativeComponentSchoolYearId(newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!): Boolean!
   importGradeAssignmentSchoolYear: Boolean!
+  importGradeAssignmentSchoolYearId(academicAsignatureCourse: Boolean!, newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!): Boolean!
+  importModalitySchoolYearId(newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!, speciality: Boolean!): Boolean!
   importPerformanceLevelSchoolYearId(newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!): Boolean!
+  importSchoolConfigurationSchoolYearId(newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!): Boolean!
+  importSpecialitySchoolYearId(newModalityId: String!, newSchoolYearId: String!, oldModalityId: String!, schoolId: String!): Boolean!
+  importStudentSchoolYearId(newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!, studentNoPromoted: Boolean!, studentPromoted: Boolean!): Boolean!
+  importTeacherSchoolYearId(newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!): Boolean!
   login(password: String!, username: String!): Jwt!
   resetPasswordUser(id: String!): Boolean!
   schoolImgPrincipalSignatureUploadImage(file: Upload, id: String!): Boolean!
   schoolImgSecretarySignatureUploadImage(file: Upload, id: String!): Boolean!
   schoolLogoUploadImage(file: Upload, id: String!): Boolean!
   singleUpload(file: Upload, id: String!): Boolean!
-  syncDataOnlineOffline: Boolean!
   updateAcademicArea(data: NewAcademicArea!, id: String!): AcademicArea!
   updateAcademicAreaAcademicAsignatureSchoolYearId(schoolId: String!, schoolYearId: String!): Boolean!
   updateAcademicAreaCoursePeriodValuation(data: NewAcademicAreaCoursePeriodValuation!, id: String!): AcademicAreaCoursePeriodValuation!
@@ -3250,6 +3273,7 @@ input NewSchoolAdministrative {
 input NewSchoolAdministrator {
   newUser: NewUser
   schoolId: [String!]
+  support: Boolean
   userId: String
 }
 
@@ -3266,7 +3290,29 @@ input NewSchoolYear {
   folioNumber: Float
   schoolId: String
   schoolYear: Float
+  schoolYearImportId: String
+  schoolYearImportOptions: NewSchoolYearImportOptions
   startDate: DateTime
+}
+
+input NewSchoolYearImportOptions {
+  academicAsignatureCourse: Boolean
+  academicDay: Boolean
+  academicHour: Boolean
+  academicPeriod: Boolean
+  area: Boolean
+  asignature: Boolean
+  course: Boolean
+  educationLevel: Boolean
+  evaluativeComponent: Boolean
+  grade: Boolean
+  gradeAssignment: Boolean
+  modality: Boolean
+  performanceLevel: Boolean
+  speciality: Boolean
+  studentNoPromoted: Boolean
+  studentPromoted: Boolean
+  teacher: Boolean
 }
 
 input NewSpecialty {
@@ -3444,6 +3490,7 @@ type PerformanceLevel implements IModelSchoolData {
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  entityBaseId: String
   generalPerformanceLevel: GeneralPerformanceLevel
   generalPerformanceLevelId: String
   id: ID!
@@ -5396,6 +5443,7 @@ type SchoolAdministrator implements IModelData {
   id: ID!
   school: [School!]
   schoolId: [String!]
+  support: Boolean
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -5425,6 +5473,7 @@ type SchoolConfiguration implements IModelSchoolData {
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  entityBaseId: String
   id: ID!
   school: School
   schoolId: String
@@ -5478,6 +5527,9 @@ type SchoolYear implements IModelSchoolData {
   school: School
   schoolId: String
   schoolYear: Float
+  schoolYearImport: SchoolYear
+  schoolYearImportId: String
+  schoolYearImportOptions: SchoolYearImportOptions
   startDate: DateTime
   updatedAt: DateTime
   updatedByUser: User
@@ -5499,6 +5551,27 @@ type SchoolYearEdge {
   node: SchoolYear!
 }
 
+"""The SchoolYearImportOptions model"""
+type SchoolYearImportOptions {
+  academicAsignatureCourse: Boolean
+  academicDay: Boolean
+  academicHour: Boolean
+  academicPeriod: Boolean
+  area: Boolean
+  asignature: Boolean
+  course: Boolean
+  educationLevel: Boolean
+  evaluativeComponent: Boolean
+  grade: Boolean
+  gradeAssignment: Boolean
+  modality: Boolean
+  performanceLevel: Boolean
+  speciality: Boolean
+  studentNoPromoted: Boolean
+  studentPromoted: Boolean
+  teacher: Boolean
+}
+
 """The Specialty model"""
 type Specialty implements IModelSchoolData {
   active: Boolean
@@ -5506,6 +5579,7 @@ type Specialty implements IModelSchoolData {
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  entityBaseId: String
   id: ID!
   modality: Modality
   modalityId: String
@@ -5547,6 +5621,7 @@ type Student implements IModelData {
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  entityBaseId: String
   id: ID!
   school: [School!]
   schoolId: [String!]
@@ -5746,6 +5821,7 @@ type Teacher implements IModelData {
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
+  entityBaseId: String
   id: ID!
   school: [School!]
   schoolId: [String!]

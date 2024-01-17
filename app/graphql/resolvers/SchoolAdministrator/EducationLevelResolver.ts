@@ -151,14 +151,18 @@ export class EducationLevelResolver {
   @Mutation(() => Boolean)
   async importEducationLevelSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String) {
     let results = await this.repository.findBy({ where: { schoolId, schoolYearId: oldSchoolYearId } });
+    console.log("IMPORT", results?.length);
     for (let result of results) {
       const model = await this.repository.create({
         name: result.name,
         schoolId: result.schoolId,
         description: result.description,
-        active: true,
+        createdByUserId: result.createdByUserId,
+        updatedByUserId: result.updatedByUserId,
+        active: result?.active,
         version: 0,
-        schoolYearId: newSchoolYearId.toString()
+        schoolYearId: newSchoolYearId.toString(),
+        entityBaseId: result?.id?.toString()
       });
       let resultSave = await this.repository.save(model);
     }

@@ -281,17 +281,47 @@ export class EvaluativeComponentResolver {
   @Mutation(() => Boolean)
   async importEvaluativeComponentSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String) {
     let results = await this.repository.findBy({ where: { schoolId, schoolYearId: oldSchoolYearId } });
+    console.log("IMPORT", results?.length);
     for (let result of results) {
+      let academicAreasId = [];
+      if (result?.academicAreasId) {
+        for (let academicAreaId of result?.academicAreasId) {
+          let academicAreaNew: any;
+          let academicAreaOld = await this.repositoryAcademicArea.findOneBy(academicAreaId);
+          if (academicAreaOld) {
+            academicAreaNew = await this.repositoryAcademicArea.findBy({ where: { entityBaseId: academicAreaId, schoolYearId: newSchoolYearId } });
+            if (academicAreaNew?.length > 0) {
+              academicAreasId.push(academicAreaNew[0]?.id?.toString());
+            }
+          }
+        }
+      }
+      let academicAsignaturesId = [];
+      if (result?.academicAsignaturesId) {
+        for (let academicAsignatureId of result?.academicAsignaturesId) {
+          let academicAsignatureNew: any;
+          let academicAsignatureOld = await this.repositoryAcademicArea.findOneBy(academicAsignatureId);
+          if (academicAsignatureOld) {
+            academicAsignatureNew = await this.repositoryAcademicArea.findBy({ where: { entityBaseId: academicAsignatureId, schoolYearId: newSchoolYearId } });
+            if (academicAsignatureNew?.length > 0) {
+              academicAsignaturesId.push(academicAsignatureNew[0]?.id?.toString());
+            }
+          }
+        }
+      }
       const model = await this.repository.create({
         name: result.name,
         weight: result.weight,
         type: result.type,
-        academicAreasId: result.academicAreasId,
-        academicAsignaturesId: result.academicAsignaturesId,
+        academicAreasId: academicAreasId,
+        academicAsignaturesId: academicAsignaturesId,
         schoolId: result.schoolId,
-        active: true,
+        createdByUserId: result.createdByUserId,
+        updatedByUserId: result.updatedByUserId,
+        active: result?.active,
         version: 0,
-        schoolYearId: newSchoolYearId.toString()
+        schoolYearId: newSchoolYearId.toString(),
+        entityBaseId: result?.id?.toString()
       });
       let resultSave = await this.repository.save(model);
     }

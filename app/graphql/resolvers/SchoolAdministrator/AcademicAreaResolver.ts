@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicAreaRepository, AcademicAsignatureRepository, GeneralAcademicAreaRepository, SchoolRepository, SchoolYearRepository, UserRepository } from '../../../servers/DataSource';
+import { AcademicAreaRepository, AcademicAsignatureRepository, AcademicGradeRepository, GeneralAcademicAreaRepository, SchoolRepository, SchoolYearRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicArea } from '../../inputs/SchoolAdministrator/NewAcademicArea';
 import { IContext } from '../../interfaces/IContext';
@@ -12,8 +12,10 @@ import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicArea, AcademicAreaConnection } from '../../models/SchoolAdministrator/AcademicArea';
 import { AcademicAsignature } from '../../models/SchoolAdministrator/AcademicAsignature';
+import { AcademicGrade } from '../../models/SchoolAdministrator/AcademicGrade';
 import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
+import { AcademicAsignatureResolver } from './AcademicAsignatureResolver';
 
 @Resolver(AcademicArea)
 export class AcademicAreaResolver {
@@ -34,6 +36,11 @@ export class AcademicAreaResolver {
 
   @InjectRepository(SchoolYear)
   private repositorySchoolYear = SchoolYearRepository;
+
+  @InjectRepository(AcademicGrade)
+  private repositoryAcademicGrade = AcademicGradeRepository;
+
+  private academicAsignatureResolver = new AcademicAsignatureResolver();
 
   @Query(() => AcademicArea, { nullable: true })
   async getAcademicArea(@Arg('id', () => String) id: string) {
@@ -177,37 +184,47 @@ export class AcademicAreaResolver {
   }
 
   @Mutation(() => Boolean)
-  async importAcademicAreaSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String) {
+  async importAcademicAreaSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String, @Arg('asignature', () => Boolean) asignature: boolean) {
     let results = await this.repository.findBy({ where: { schoolId, schoolYearId: oldSchoolYearId } });
+    console.log("IMPORT", results?.length);
     for (let result of results) {
-      let datas = await this.repositoryAcademicAsignature.findBy({ where: { academicAreaId: result?.id?.toString() } });
+      let academicGradesId = [];
+      if (result?.academicGradeId) {
+        for (let academicGradeId of result?.academicGradeId) {
+          let academicGradeNew: any;
+          let academicGradeOld = await this.repositoryAcademicGrade.findOneBy(academicGradeId);
+          if (academicGradeOld) {
+            academicGradeNew = await this.repositoryAcademicGrade.findBy({ where: { entityBaseId: academicGradeId, schoolYearId: newSchoolYearId } });
+            if (academicGradeNew?.length > 0) {
+              academicGradesId.push(academicGradeNew[0]?.id?.toString());
+            }
+          }
+        }
+      }
       const model = await this.repository.create({
         generalAcademicAreaId: result.generalAcademicAreaId,
         name: result.name,
-        schoolId: result.schoolId,
         abbreviation: result.abbreviation,
+        academicGradeId: academicGradesId,
+        schoolId: result.schoolId,
         isAverage: result.isAverage,
         order: result.order,
-        active: true,
+        createdByUserId: result.createdByUserId,
+        updatedByUserId: result.updatedByUserId,
+        active: result?.active,
         version: 0,
-        schoolYearId: newSchoolYearId.toString()
+        schoolYearId: newSchoolYearId.toString(),
+        entityBaseId: result?.id?.toString()
       });
       let resultSave = await this.repository.save(model);
-      if (resultSave) {
-        for (let data of datas) {
-          let model2 = await this.repositoryAcademicAsignature.create({
-            name: data.name,
-            abbreviation: data.abbreviation,
-            schoolId: resultSave.schoolId,
-            generalAcademicAsignatureId: data.generalAcademicAsignatureId,
-            order: data.order,
-            active: true,
-            version: 0,
-            academicAreaId: resultSave.id.toString(),
-            schoolYearId: newSchoolYearId.toString()
-          });
-          let resultSave2 = await this.repositoryAcademicAsignature.save(model2);
-        }
+      console.log("asignatureResolver");
+      if (asignature) {
+        await this.academicAsignatureResolver.importAcademicAsignatureSchoolYearId(
+          schoolId,
+          result.id.toString(),
+          resultSave.id.toString(),
+          newSchoolYearId.toString()
+        );
       }
     }
     return true;

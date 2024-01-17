@@ -226,14 +226,33 @@ export class AcademicPeriodResolver {
   @Mutation(() => Boolean)
   async importAcademicPeriodSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String) {
     let results = await this.repository.findBy({ where: { schoolId, schoolYearId: oldSchoolYearId } });
+    let schoolYear = await this.repositorySchoolYear.findOneBy(newSchoolYearId);
+
+    console.log("IMPORT", results?.length);
     for (let result of results) {
+      let startDate = result.startDate;
+      let endDate = result.endDate;
+      let endDateRecovery = result.endDateRecovery;
+      let startDateRecovery = result.startDateRecovery;
+      startDate?.setFullYear(schoolYear?.startDate?.getFullYear() ? schoolYear?.startDate?.getFullYear() : 0);
+      endDate?.setFullYear(schoolYear?.startDate?.getFullYear() ? schoolYear?.startDate?.getFullYear() : 0);
+      endDateRecovery?.setFullYear(schoolYear?.startDate?.getFullYear() ? schoolYear?.startDate?.getFullYear() : 0);
+      startDateRecovery?.setFullYear(schoolYear?.startDate?.getFullYear() ? schoolYear?.startDate?.getFullYear() : 0);
       const model = await this.repository.create({
         name: result.name,
         schoolId: result.schoolId,
+        weight: result.weight,
         order: result.order,
-        active: true,
+        startDate: startDate,
+        endDate: endDate,
+        endDateRecovery: endDateRecovery,
+        startDateRecovery: startDateRecovery,
+        createdByUserId: result.createdByUserId,
+        updatedByUserId: result.updatedByUserId,
+        active: result?.active,
         version: 0,
-        schoolYearId: newSchoolYearId.toString()
+        schoolYearId: newSchoolYearId.toString(),
+        entityBaseId: result?.id?.toString()
       });
       let resultSave = await this.repository.save(model);
     }

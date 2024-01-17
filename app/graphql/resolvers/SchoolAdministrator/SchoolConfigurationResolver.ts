@@ -167,6 +167,28 @@ export class SchoolConfigurationResolver {
   }
 
   @Mutation(() => Boolean)
+  async importSchoolConfigurationSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String) {
+    let results = await this.repository.findBy({ where: { schoolId, schoolYearId: oldSchoolYearId } });
+    console.log("IMPORT", results?.length);
+    for (let result of results) {
+      const model = await this.repository.create({
+        code: result.code,
+        valueNumber: result.valueNumber,
+        valueString: result.valueString,
+        schoolId: result.schoolId,
+        createdByUserId: result.createdByUserId,
+        updatedByUserId: result.updatedByUserId,
+        active: result?.active,
+        version: 0,
+        schoolYearId: newSchoolYearId.toString(),
+        entityBaseId: result?.id?.toString()
+      });
+      let resultSave = await this.repository.save(model);
+    }
+    return true;
+  }
+
+  @Mutation(() => Boolean)
   async deleteSchoolConfiguration(
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext

@@ -59,6 +59,10 @@ export class AcademicGrade extends IModelSchoolData {
 
   @Field({ nullable: true })
   schoolYear?: SchoolYear;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  entityBaseId?: string;
 }
 
 @ObjectType()

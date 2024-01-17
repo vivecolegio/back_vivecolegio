@@ -44,6 +44,10 @@ export class AcademicPeriod extends IModelSchoolData {
   @Field({ nullable: true })
   @Column({ nullable: true })
   order?: number;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  entityBaseId?: string;
 }
 
 @ObjectType()

@@ -18,6 +18,14 @@ export class GeneralAcademicGrade extends IModelData {
 
   @Field({ nullable: true })
   generalAcademicCycle?: GeneralAcademicCycle;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  nextGeneralAcademicGradeId?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  previousGeneralAcademicGradeId?: string;
 }
 
 @ObjectType()
