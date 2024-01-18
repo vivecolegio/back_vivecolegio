@@ -6,7 +6,11 @@ import { finished } from 'stream/promises';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { SchoolRepository, SchoolYearRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  SchoolRepository,
+  SchoolYearRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewSchool } from '../../inputs/GeneralAdministrator/NewSchool';
 import { IContext } from '../../interfaces/IContext';
@@ -36,7 +40,7 @@ export class SchoolResolver {
   async getAllSchool(
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
-    @Arg('orderCreated', () => Boolean) orderCreated: Boolean
+    @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
   ): Promise<SchoolConnection> {
     let result;
     if (allData) {
@@ -90,7 +94,7 @@ export class SchoolResolver {
   async updateSchool(
     @Arg('data') data: NewSchool,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<School | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
@@ -109,7 +113,7 @@ export class SchoolResolver {
   async changeActiveSchool(
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOneBy(id);
@@ -130,19 +134,18 @@ export class SchoolResolver {
   @Mutation(() => Boolean)
   async deleteSchool(
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
     return result?.result?.ok === 1 ?? true;
   }
 
-
   @Mutation(() => Boolean)
   async schoolLogoUploadImage(
     @Arg('id', () => String) id: string,
     @Arg('file', () => GraphQLUpload, { nullable: true }) file: FileUpload,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ) {
     //console.log(context);
     let updatedByUserId = context?.user?.authorization?.id;
@@ -156,10 +159,10 @@ export class SchoolResolver {
       const uid = new ShortUniqueId({ length: 14 });
       const out = fs.createWriteStream(
         dir +
-        '/' +
-        uid() +
-        '.' +
-        file?.filename.slice(((file?.filename.lastIndexOf('.') - 1) >>> 0) + 2)
+          '/' +
+          uid() +
+          '.' +
+          file?.filename.slice(((file?.filename.lastIndexOf('.') - 1) >>> 0) + 2),
       );
       stream.pipe(out);
       await finished(out);
@@ -181,7 +184,7 @@ export class SchoolResolver {
   async schoolImgPrincipalSignatureUploadImage(
     @Arg('id', () => String) id: string,
     @Arg('file', () => GraphQLUpload, { nullable: true }) file: FileUpload,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ) {
     //console.log(context);
     let updatedByUserId = context?.user?.authorization?.id;
@@ -195,10 +198,10 @@ export class SchoolResolver {
       const uid = new ShortUniqueId({ length: 14 });
       const out = fs.createWriteStream(
         dir +
-        '/' +
-        uid() +
-        '.' +
-        file?.filename.slice(((file?.filename.lastIndexOf('.') - 1) >>> 0) + 2)
+          '/' +
+          uid() +
+          '.' +
+          file?.filename.slice(((file?.filename.lastIndexOf('.') - 1) >>> 0) + 2),
       );
       stream.pipe(out);
       await finished(out);
@@ -220,7 +223,7 @@ export class SchoolResolver {
   async schoolImgSecretarySignatureUploadImage(
     @Arg('id', () => String) id: string,
     @Arg('file', () => GraphQLUpload, { nullable: true }) file: FileUpload,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ) {
     //console.log(context);
     let updatedByUserId = context?.user?.authorization?.id;
@@ -234,10 +237,10 @@ export class SchoolResolver {
       const uid = new ShortUniqueId({ length: 14 });
       const out = fs.createWriteStream(
         dir +
-        '/' +
-        uid() +
-        '.' +
-        file?.filename.slice(((file?.filename.lastIndexOf('.') - 1) >>> 0) + 2)
+          '/' +
+          uid() +
+          '.' +
+          file?.filename.slice(((file?.filename.lastIndexOf('.') - 1) >>> 0) + 2),
       );
       stream.pipe(out);
       await finished(out);
@@ -279,7 +282,10 @@ export class SchoolResolver {
   async schoolYear(@Root() data: School) {
     let id = data.id.toString();
     if (id !== null && id !== undefined) {
-      const result = await this.repositorySchoolYear.findBy({ where: { schoolId: id, active: true } });
+      const result = await this.repositorySchoolYear.findBy({
+        where: { schoolId: id, active: true },
+        order: { createdAt: 'DESC' },
+      });
       return result;
     }
     return null;

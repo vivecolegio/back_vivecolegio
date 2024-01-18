@@ -3,7 +3,19 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicAsignatureCourseRepository, AcademicDayRepository, AcademicGradeRepository, CampusRepository, CourseRepository, CursosRepository, SchoolRepository, SchoolYearRepository, StudentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  AcademicAsignatureCourseRepository,
+  AcademicDayRepository,
+  AcademicGradeRepository,
+  CampusRepository,
+  CourseRepository,
+  CursosRepository,
+  SchoolRepository,
+  SchoolYearRepository,
+  StudentRepository,
+  TeacherRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewCourse } from '../../inputs/CampusAdministrator/NewCourse';
 import { IContext } from '../../interfaces/IContext';
@@ -71,7 +83,7 @@ export class CourseResolver {
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('campusId', () => String) campusId: String,
     @Arg('schoolId', () => String, { nullable: true }) schoolId: String,
-    @Arg('academicGradeId', () => String, { nullable: true }) academicGradeId: String
+    @Arg('academicGradeId', () => String, { nullable: true }) academicGradeId: String,
   ): Promise<CourseConnection> {
     let result;
     let campusDataIds: any[] = [];
@@ -174,7 +186,7 @@ export class CourseResolver {
   async getAllCourseTeacher(
     @Args() args: ConnectionArgs,
     @Arg('teacherId', () => String) teacherId: String,
-    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String,
   ): Promise<CourseConnection> {
     let result = await this.repository.findBy({
       where: {
@@ -208,7 +220,10 @@ export class CourseResolver {
   }
 
   @Mutation(() => Boolean)
-  public async updateGradeAcademicDayAllInitialsCourse(@Arg('schoolId', () => String) schoolId: String, @Arg('schoolYearId', () => String) schoolYearId: String) {
+  public async updateGradeAcademicDayAllInitialsCourse(
+    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('schoolYearId', () => String) schoolYearId: String,
+  ) {
     let school = await this.repositorySchool.findOneBy(schoolId);
     let schoolYear = await this.repositorySchoolYear.findOneBy(schoolYearId);
     //let schools = await this.repositorySchool.findBy({ where: { daneCode: "254810000696" } });
@@ -221,8 +236,10 @@ export class CourseResolver {
       for (let campu of campus) {
         let courses = await this.repository.findBy({
           where: {
-            academicDayId: undefined, campusId: campu.id.toString(), schoolId: school.id.toString(),
-            schoolYearId: schoolYear?.id?.toString()
+            academicDayId: undefined,
+            campusId: campu.id.toString(),
+            schoolId: school.id.toString(),
+            schoolYearId: schoolYear?.id?.toString(),
           },
         });
         for (let course of courses) {
@@ -232,7 +249,7 @@ export class CourseResolver {
               nameSIMAT: course.jornadaSIMAT,
               active: true,
               schoolId: school.id.toString(),
-              schoolYearId: schoolYear?.id?.toString()
+              schoolYearId: schoolYear?.id?.toString(),
             },
           });
           if (academicDay.length === 1) {
@@ -252,7 +269,10 @@ export class CourseResolver {
   }
 
   @Mutation(() => Boolean)
-  public async updateGradeAllInitialsCourse(@Arg('schoolId', () => String) schoolId: String, @Arg('schoolYearId', () => String) schoolYearId: String) {
+  public async updateGradeAllInitialsCourse(
+    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('schoolYearId', () => String) schoolYearId: String,
+  ) {
     let school = await this.repositorySchool.findOneBy(schoolId);
     let schoolYear = await this.repositorySchoolYear.findOneBy(schoolYearId);
     //let schools = await this.repositorySchool.findBy({ where: { daneCode: "254810000696" } });
@@ -265,8 +285,11 @@ export class CourseResolver {
       for (let campu of campus) {
         let courses = await this.repository.findBy({
           where: {
-            academicGradeId: undefined, campusId: campu.id.toString(), active: true, schoolId: school.id.toString(),
-            schoolYearId: schoolYear?.id?.toString()
+            academicGradeId: undefined,
+            campusId: campu.id.toString(),
+            active: true,
+            schoolId: school.id.toString(),
+            schoolYearId: schoolYear?.id?.toString(),
           },
         });
         for (let course of courses) {
@@ -314,7 +337,7 @@ export class CourseResolver {
               schoolId: school.id.toString(),
               generalAcademicGradeId,
               active: true,
-              schoolYearId: schoolYear?.id?.toString()
+              schoolYearId: schoolYear?.id?.toString(),
             },
           });
           if (academicGrade.length === 1) {
@@ -334,7 +357,10 @@ export class CourseResolver {
   }
 
   @Mutation(() => Boolean)
-  public async createAllInitialsCourse(@Arg('schoolId', () => String) schoolId: String, @Arg('schoolYearId', () => String) schoolYearId: String) {
+  public async createAllInitialsCourse(
+    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('schoolYearId', () => String) schoolYearId: String,
+  ) {
     let school = await this.repositorySchool.findOneBy(schoolId);
     let schoolYear = await this.repositorySchoolYear.findOneBy(schoolYearId);
     //let schools = await this.repositorySchool.findBy({ where: { daneCode: "254810000696" } });
@@ -461,7 +487,7 @@ export class CourseResolver {
           },
         });
         for (let course of courses) {
-          this.updateCodeStudentsCourse(course.id.toString())
+          this.updateCodeStudentsCourse(course.id.toString());
           count += 1;
           //console.log(count);
         }
@@ -475,7 +501,7 @@ export class CourseResolver {
     let count = 0;
     let academicGrade = await this.repositoryAcademicGrade.findOneBy(id);
     if (academicGrade && academicGrade?.schoolId) {
-      console.log(academicGrade)
+      console.log(academicGrade);
       let campus = await this.repositoryCampus.findBy({
         where: { schoolId: academicGrade?.schoolId.toString() },
       });
@@ -488,7 +514,7 @@ export class CourseResolver {
         });
         for (let course of courses) {
           console.log(count);
-          this.updateCodeStudentsCourse(course.id.toString())
+          this.updateCodeStudentsCourse(course.id.toString());
           count += 1;
         }
       }
@@ -497,12 +523,10 @@ export class CourseResolver {
   }
 
   @Mutation(() => Boolean)
-  async updateCodeStudentsCourse(
-    @Arg('id', () => String) id: string
-  ): Promise<Boolean | null> {
+  async updateCodeStudentsCourse(@Arg('id', () => String) id: string): Promise<Boolean | null> {
     let course = await this.repository.findOneBy(id);
     if (course) {
-      console.log(course)
+      console.log(course);
       if (course.studentsId && course.studentsId.length > 0) {
         let studentsAux = course.studentsId;
         let studentsIds = [];
@@ -524,13 +548,16 @@ export class CourseResolver {
         // console.log("data", studentsId?.length);
         let users = await this.repositoryUser.findBy({
           where: { _id: { $in: usersId }, active: true },
-          order: { lastName: "ASC" },
+          order: { lastName: 'ASC' },
         });
         // for (let use1 of users) {
         //   console.log(use1?.lastName + " " + use1?.name);
         // }
         users = users.sort(function (a, b) {
-          return new Intl.Collator("es").compare("" + a?.lastName + " " + a?.name, "" + b?.lastName + " " + b?.name);
+          return new Intl.Collator('es').compare(
+            '' + a?.lastName + ' ' + a?.name,
+            '' + b?.lastName + ' ' + b?.name,
+          );
         });
         // for (let use2 of users2) {
         //   console.log(use2?.lastName + " " + use2?.name);
@@ -566,10 +593,9 @@ export class CourseResolver {
             ...course,
             studentsId: studentsId,
             version: (course?.version as number) + 1,
-          })
+          });
         }
-      }
-      else {
+      } else {
         let students = await this.repositoryStudent.findBy({
           where: { courseId: id, active: true, schoolYearId: course?.schoolYearId },
         });
@@ -609,7 +635,7 @@ export class CourseResolver {
             ...course,
             studentsId: studentsId,
             version: (course?.version as number) + 1,
-          })
+          });
         }
       }
     }
@@ -620,7 +646,7 @@ export class CourseResolver {
   async updateCourse(
     @Arg('data') data: NewCourse,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Course | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
@@ -639,7 +665,7 @@ export class CourseResolver {
   async changeActiveCourse(
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOneBy(id);
@@ -651,9 +677,15 @@ export class CourseResolver {
       updatedByUserId,
     });
     if (!active) {
-      const academicAsignatureCourses = await this.repositoryAcademicAsignatureCourse.findBy({ where: { courseId: id } })
+      const academicAsignatureCourses = await this.repositoryAcademicAsignatureCourse.findBy({
+        where: { courseId: id },
+      });
       for (let academicAsignatureCourse of academicAsignatureCourses) {
-        await this.academicAsignatureCourseResolver.changeActiveAcademicAsignatureCourse(false, academicAsignatureCourse?.id?.toString(), context);
+        await this.academicAsignatureCourseResolver.changeActiveAcademicAsignatureCourse(
+          false,
+          academicAsignatureCourse?.id?.toString(),
+          context,
+        );
       }
     }
     if (result.id) {
@@ -664,26 +696,37 @@ export class CourseResolver {
   }
 
   @Mutation(() => Boolean)
-  async importCourseSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldAcademicGradeId', () => String) oldAcademicGradeId: String, @Arg('newAcademicGradeId', () => String) newAcademicGradeId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String) {
-    let results = await this.repository.findBy({ where: { schoolId, academicGradeId: oldAcademicGradeId } });
-    console.log("IMPORT", results?.length);
+  async importCourseSchoolYearId(
+    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('oldAcademicGradeId', () => String) oldAcademicGradeId: String,
+    @Arg('newAcademicGradeId', () => String) newAcademicGradeId: String,
+    @Arg('newSchoolYearId', () => String) newSchoolYearId: String,
+  ) {
+    let results = await this.repository.findBy({
+      where: { schoolId, academicGradeId: oldAcademicGradeId },
+    });
+    console.log('IMPORT', results?.length);
     for (let result of results) {
       let academicDayNew: any;
       let academicDayOld = await this.repositoryAcademicDay.findOneBy(result?.academicDayId);
       if (academicDayOld) {
-        academicDayNew = await this.repositoryAcademicDay.findBy({ where: { entityBaseId: result?.academicDayId, schoolYearId: newSchoolYearId } });
+        academicDayNew = await this.repositoryAcademicDay.findBy({
+          where: { entityBaseId: result?.academicDayId, schoolYearId: newSchoolYearId },
+        });
       }
       const model = await this.repository.create({
         academicGradeId: newAcademicGradeId?.toString(),
         academicDayId: academicDayNew?.length > 0 ? academicDayNew[0]?.id?.toString() : null,
         name: result.name,
         order: result.order,
+        campusId: result.campusId,
+        schoolId: result.schoolId,
         createdByUserId: result.createdByUserId,
         updatedByUserId: result.updatedByUserId,
         active: result?.active,
         version: 0,
         schoolYearId: newSchoolYearId.toString(),
-        entityBaseId: result?.id?.toString()
+        entityBaseId: result?.id?.toString(),
       });
       let resultSave = await this.repository.save(model);
     }
@@ -691,9 +734,29 @@ export class CourseResolver {
   }
 
   @Mutation(() => Boolean)
+  async fixImportCourseSchoolYearId(@Arg('schoolYearId', () => String) schoolYearId: String) {
+    let results = await this.repository.findBy({
+      where: { schoolYearId },
+    });
+    console.log('IMPORT', results?.length);
+    for (let result of results) {
+      let oldCourse = await this.repository.findOneBy(result?.entityBaseId);
+      if (oldCourse) {
+        let result2 = await this.repository.save({
+          _id: new ObjectId(result?.id?.toString()),
+          ...result,
+          campusId: oldCourse.campusId,
+          schoolId: oldCourse.schoolId,
+        });
+      }
+    }
+    return true;
+  }
+
+  @Mutation(() => Boolean)
   async deleteCourse(
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
@@ -800,9 +863,9 @@ export class CourseResolver {
     if (id !== null && id !== undefined) {
       const result = await this.repositoryStudent.findBy({
         where: {
-          courseId: data?.id?.toString()
-        }
-      })
+          courseId: data?.id?.toString(),
+        },
+      });
       return result?.length;
     }
     return 0;
