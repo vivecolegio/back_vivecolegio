@@ -4,18 +4,7 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import {
-  AcademicGradeRepository,
-  AverageAcademicYearStudentRepository,
-  CampusRepository,
-  CourseRepository,
-  EstudiantesRepository,
-  GeneralAcademicGradeRepository,
-  SchoolRepository,
-  SchoolYearRepository,
-  StudentRepository,
-  UserRepository,
-} from '../../../servers/DataSource';
+import { AcademicGradeRepository, AverageAcademicYearStudentRepository, CampusRepository, CourseRepository, EstudiantesRepository, GeneralAcademicGradeRepository, SchoolRepository, SchoolYearRepository, StudentRepository, UserRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewStudent } from '../../inputs/GeneralAdministrator/NewStudent';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
@@ -629,36 +618,73 @@ export class StudentResolver {
   }
 
   @Mutation(() => Boolean)
-  async importStudentSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String, @Arg('studentPromoted', () => Boolean) studentPromoted: boolean, @Arg('studentNoPromoted', () => Boolean) studentNoPromoted: boolean) {
+  async importStudentSchoolYearId(
+    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String,
+    @Arg('newSchoolYearId', () => String) newSchoolYearId: String,
+    @Arg('studentPromoted', () => Boolean) studentPromoted: boolean,
+    @Arg('studentNoPromoted', () => Boolean) studentNoPromoted: boolean,
+  ) {
     let dataAcademicGradeGeneral = await this.repositoryGeneralAcademicGrade.findBy({
       where: { active: true },
     });
     for (let academicGradeGeneral of dataAcademicGradeGeneral) {
+      //console.log('academicGradeGeneral', academicGradeGeneral);
       let academicGradeNext: any[] = [];
       let academicGradePrevious: any[] = [];
       let academicGradeCurrent: any[] = [];
       if (academicGradeGeneral?.nextGeneralAcademicGradeId) {
         academicGradeNext = await this.repositoryAcademicGrade.findBy({
-          where: { generalAcademicGradeId: academicGradeGeneral?.nextGeneralAcademicGradeId, schoolYearId: newSchoolYearId },
+          where: {
+            generalAcademicGradeId: academicGradeGeneral?.nextGeneralAcademicGradeId,
+            schoolYearId: newSchoolYearId,
+          },
         });
       }
       if (academicGradeGeneral?.previousGeneralAcademicGradeId) {
         academicGradePrevious = await this.repositoryAcademicGrade.findBy({
-          where: { generalAcademicGradeId: academicGradeGeneral?.id?.toString(), schoolYearId: oldSchoolYearId },
+          where: {
+            generalAcademicGradeId: academicGradeGeneral?.id?.toString(),
+            schoolYearId: oldSchoolYearId,
+          },
         });
       }
       if (academicGradeGeneral?.previousGeneralAcademicGradeId) {
         academicGradeCurrent = await this.repositoryAcademicGrade.findBy({
-          where: { generalAcademicGradeId: academicGradeGeneral?.id?.toString(), schoolYearId: newSchoolYearId },
+          where: {
+            generalAcademicGradeId: academicGradeGeneral?.id?.toString(),
+            schoolYearId: newSchoolYearId,
+          },
         });
       }
-      if (academicGradeNext?.length > 0 && academicGradePrevious?.length > 0 && academicGradeCurrent?.length > 0) {
-        let results = await this.repository.findBy({ where: { schoolId, schoolYearId: oldSchoolYearId, academicGradeId: academicGradePrevious[0]?.id?.toString } });
-        console.log("IMPORT", results?.length);
+      //console.log('academicGradeNext', academicGradeNext);
+      //console.log('academicGradePrevious', academicGradePrevious);
+      //console.log('academicGradeCurrent', academicGradeCurrent);
+      if (
+        academicGradeNext?.length > 0 &&
+        academicGradePrevious?.length > 0 &&
+        academicGradeCurrent?.length > 0
+      ) {
+        let results = await this.repository.findBy({
+          where: {
+            schoolId,
+            schoolYearId: oldSchoolYearId,
+            academicGradeId: academicGradePrevious[0]?.id?.toString(),
+          },
+        });
+        //console.log('schoolId', schoolId);
+        //console.log('schoolYearId', oldSchoolYearId);
+        //console.log('academicGradeId', academicGradePrevious[0]?.id?.toString());
+        //console.log('IMPORT', results?.length);
+        //results = [results[0]];
+        //console.log('results', results);
         for (let result of results) {
-          let averageAcademicYearStudent = await this.repositoryAverageAcademicYearStudent.findBy({ where: { studentId: result?.id?.toString(), schoolYearId: oldSchoolYearId } });
+          let averageAcademicYearStudent = await this.repositoryAverageAcademicYearStudent.findBy({
+            where: { studentId: result?.id?.toString(), schoolYearId: oldSchoolYearId },
+          });
+          //console.log('averageAcademicYearStudent', averageAcademicYearStudent);
           if (averageAcademicYearStudent?.length > 0) {
-            if (studentPromoted && averageAcademicYearStudent[0]?.promoted == true) {
+            if (studentPromoted && (averageAcademicYearStudent[0]?.promoted == true)) {
               const model = await this.repository.create({
                 userId: result.userId,
                 campusId: result.campusId,
@@ -669,11 +695,12 @@ export class StudentResolver {
                 active: result?.active,
                 version: 0,
                 schoolYearId: newSchoolYearId.toString(),
-                entityBaseId: result?.id?.toString()
+                entityBaseId: result?.id?.toString(),
               });
+              //console.log('PROMOTED', model);
               let resultSave = await this.repository.save(model);
             }
-            if (studentNoPromoted && averageAcademicYearStudent[0]?.promoted == false) {
+            if (studentNoPromoted && (averageAcademicYearStudent[0]?.promoted == false)) {
               const model = await this.repository.create({
                 userId: result.userId,
                 campusId: result.campusId,
@@ -684,8 +711,9 @@ export class StudentResolver {
                 active: result?.active,
                 version: 0,
                 schoolYearId: newSchoolYearId.toString(),
-                entityBaseId: result?.id?.toString()
+                entityBaseId: result?.id?.toString(),
               });
+              //console.log('NO PROMOTED', model);
               let resultSave = await this.repository.save(model);
             }
           }
