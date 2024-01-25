@@ -716,6 +716,21 @@ export class StudentResolver {
               //console.log('NO PROMOTED', model);
               let resultSave = await this.repository.save(model);
             }
+          } else {
+            const model = await this.repository.create({
+              userId: result.userId,
+              campusId: result.campusId,
+              schoolId: result.schoolId,
+              academicGradeId: academicGradeNext[0]?.id?.toString(),
+              createdByUserId: result.createdByUserId,
+              updatedByUserId: result.updatedByUserId,
+              active: result?.active,
+              version: 0,
+              schoolYearId: newSchoolYearId.toString(),
+              entityBaseId: result?.id?.toString(),
+            });
+            //console.log('PROMOTED', model);
+            let resultSave = await this.repository.save(model);
           }
         }
       }
