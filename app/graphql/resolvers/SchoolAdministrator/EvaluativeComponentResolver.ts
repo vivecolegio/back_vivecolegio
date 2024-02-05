@@ -167,7 +167,6 @@ export class EvaluativeComponentResolver {
           result = await this.repository.findBy({
             where: {
               academicAsignaturesId: { $in: [academicAsignature.id.toString()] },
-              academicAreasId: null,
               schoolId: campus.schoolId,
               schoolYearId: schoolYear?.id?.toString(),
               active: true,
@@ -177,7 +176,6 @@ export class EvaluativeComponentResolver {
           if (result.length === 0) {
             result = await this.repository.findBy({
               where: {
-                academicAsignaturesId: null,
                 academicAreasId: { $in: [academicAsignature.academicAreaId] },
                 schoolId: campus.schoolId,
                 schoolYearId: schoolYear?.id?.toString(),
@@ -188,8 +186,6 @@ export class EvaluativeComponentResolver {
             if (result.length === 0) {
               result = await this.repository.findBy({
                 where: {
-                  academicAsignaturesId: null,
-                  academicAreasId: null,
                   schoolId: campus.schoolId,
                   schoolYearId: schoolYear?.id?.toString(),
                   active: true,
