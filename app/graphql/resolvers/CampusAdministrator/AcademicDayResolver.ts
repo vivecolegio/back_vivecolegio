@@ -4,7 +4,14 @@ import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from '
 import { ObjectLiteral } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicDayRepository, CampusRepository, JornadasRepository, SchoolRepository, SchoolYearRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  AcademicDayRepository,
+  CampusRepository,
+  JornadasRepository,
+  SchoolRepository,
+  SchoolYearRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { Day } from '../../enums/Day';
 import { NewAcademicDay } from '../../inputs/CampusAdministrator/NewAcademicDay';
@@ -53,7 +60,7 @@ export class AcademicDayResolver {
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('campusId', () => String) campusId: String,
     @Arg('schoolId', () => String, { nullable: true }) schoolId: String,
-    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String,
   ): Promise<AcademicDayConnection> {
     let result;
     let campusDataIds: any[] = [];
@@ -70,7 +77,7 @@ export class AcademicDayResolver {
         result = await this.repository.findBy({
           where: {
             campusId: { $in: campusDataIds },
-            schoolYearId
+            schoolYearId,
           },
           order: { createdAt: 'DESC' },
         });
@@ -78,7 +85,7 @@ export class AcademicDayResolver {
         result = await this.repository.findBy({
           where: {
             campusId: { $in: campusDataIds },
-            schoolYearId
+            schoolYearId,
           },
         });
       }
@@ -118,7 +125,7 @@ export class AcademicDayResolver {
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('campusId', () => String) campusId: String,
     @Arg('schoolId', () => String, { nullable: true }) schoolId: String,
-    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String,
   ): Promise<AcademicDayConnection> {
     let result;
     let campusDataIds: any[] = [];
@@ -128,7 +135,7 @@ export class AcademicDayResolver {
         result = await this.repository.findBy({
           where: {
             campusId: { $in: campusDataIds },
-            schoolYearId
+            schoolYearId,
           },
           order: { createdAt: 'DESC' },
         });
@@ -136,7 +143,7 @@ export class AcademicDayResolver {
         result = await this.repository.findBy({
           where: {
             campusId: { $in: campusDataIds },
-            schoolYearId
+            schoolYearId,
           },
         });
       }
@@ -172,7 +179,7 @@ export class AcademicDayResolver {
   @Mutation(() => AcademicDay)
   async createAcademicDay(
     @Arg('data') data: NewAcademicDay,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<AcademicDay> {
     let dataProcess: NewAcademicDay = removeEmptyStringElements(data);
     let createdByUserId = context?.user?.authorization?.id;
@@ -214,7 +221,10 @@ export class AcademicDayResolver {
   }
 
   @Mutation(() => Boolean)
-  public async createAllInitialsAcademicDay(@Arg('schoolId') schoolId: String, @Arg('schoolYearId') schoolYearId: String,) {
+  public async createAllInitialsAcademicDay(
+    @Arg('schoolId') schoolId: String,
+    @Arg('schoolYearId') schoolYearId: String,
+  ) {
     let school = await this.repositorySchool.findOneBy(schoolId);
     let schoolYear = await this.repositorySchoolYear.findOneBy(schoolYearId);
     let count = 0;
@@ -235,7 +245,11 @@ export class AcademicDayResolver {
             });
             if (campus.length === 1) {
               let academicDay = await this.repository.findBy({
-                where: { campusId: campus[0].id.toString(), nameSIMAT: jornada.jornada, schoolYearId },
+                where: {
+                  campusId: campus[0].id.toString(),
+                  nameSIMAT: jornada.jornada,
+                  schoolYearId,
+                },
               });
               if (academicDay.length === 0) {
                 //const model = await this.repository.create({
@@ -254,7 +268,12 @@ export class AcademicDayResolver {
                 //console.log(model);
                 count += 1;
               } else {
-                let resultAcademicDay = await this.repository.save({ ...academicDay[0], _id: new ObjectId(academicDay[0].id.toString()), version: (academicDay[0]?.version as number) + 1, schoolId: school.id.toString() });
+                let resultAcademicDay = await this.repository.save({
+                  ...academicDay[0],
+                  _id: new ObjectId(academicDay[0].id.toString()),
+                  version: (academicDay[0]?.version as number) + 1,
+                  schoolId: school.id.toString(),
+                });
               }
             }
           }
@@ -271,7 +290,7 @@ export class AcademicDayResolver {
   async updateAcademicDay(
     @Arg('data') data: NewAcademicDay,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<AcademicDay | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
@@ -290,7 +309,7 @@ export class AcademicDayResolver {
   async changeActiveAcademicDay(
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOneBy(id);
@@ -311,7 +330,7 @@ export class AcademicDayResolver {
   @Mutation(() => Boolean)
   async deleteAcademicDay(
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
@@ -319,31 +338,46 @@ export class AcademicDayResolver {
   }
 
   @Mutation(() => Boolean)
-  async importAcademicDaySchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String, @Arg('academicHour', () => Boolean) academicHour: boolean) {
-    let results = await this.repository.findBy({ where: { schoolId, schoolYearId: oldSchoolYearId } });
-    console.log("IMPORT", results?.length);
+  async importAcademicDaySchoolYearId(
+    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String,
+    @Arg('newSchoolYearId', () => String) newSchoolYearId: String,
+    @Arg('academicHour', () => Boolean) academicHour: boolean,
+  ) {
+    let results = await this.repository.findBy({
+      where: { schoolId, schoolYearId: oldSchoolYearId },
+    });
+    console.log('IMPORT', results?.length);
     for (let result of results) {
-      const model = await this.repository.create({
-        name: result.name,
-        nameSIMAT: result.nameSIMAT,
-        day: result.day,
-        schoolId: result.schoolId,
-        campusId: result.campusId,
-        createdByUserId: result.createdByUserId,
-        updatedByUserId: result.updatedByUserId,
-        active: result?.active,
-        version: 0,
-        schoolYearId: newSchoolYearId.toString(),
-        entityBaseId: result?.id?.toString()
+      let modelEntityBase = await this.repository.findBy({
+        where: { entityBaseId: result?.id?.toString(), schoolYearId: newSchoolYearId.toString() },
       });
-      let resultSave = await this.repository.save(model);
-      console.log("academicHourResolver");
+      let resultSave;
+      if (modelEntityBase?.length < 1) {
+        const model = await this.repository.create({
+          name: result.name,
+          nameSIMAT: result.nameSIMAT,
+          day: result.day,
+          schoolId: result.schoolId,
+          campusId: result.campusId,
+          createdByUserId: result.createdByUserId,
+          updatedByUserId: result.updatedByUserId,
+          active: result?.active,
+          version: 0,
+          schoolYearId: newSchoolYearId.toString(),
+          entityBaseId: result?.id?.toString(),
+        });
+        resultSave = await this.repository.save(model);
+      } else {
+        resultSave = modelEntityBase[0];
+      }
+      console.log('academicHourResolver');
       if (academicHour) {
         await this.academicHourResolver.importAcademicHourSchoolYearId(
           schoolId,
           result.id.toString(),
           resultSave.id.toString(),
-          newSchoolYearId.toString()
+          newSchoolYearId.toString(),
         );
       }
     }

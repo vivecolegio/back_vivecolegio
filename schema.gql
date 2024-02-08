@@ -1566,8 +1566,12 @@ enum ExperienceType {
 }
 
 """The Forum model"""
-type Forum implements IModelSchoolData {
+type Forum implements IModelCampusData {
+  academicAsignatureCourse: AcademicAsignatureCourse
+  academicAsignatureCourseId: String
   active: Boolean
+  campus: Campus
+  campusId: String
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
@@ -1577,6 +1581,8 @@ type Forum implements IModelSchoolData {
   name: String
   school: School
   schoolId: String
+  schoolYear: SchoolYear
+  schoolYearId: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -1598,17 +1604,21 @@ type ForumEdge {
 }
 
 """The ForumInteraction model"""
-type ForumInteraction implements IModelSchoolData {
+type ForumInteraction implements IModelCampusData {
   active: Boolean
+  campus: Campus
+  campusId: String
   comment: String
   createdAt: DateTime
   createdByUser: User
   createdByUserId: String
-  forum: Forum
-  forumId: String
+  forumQuestion: ForumQuestion
+  forumQuestionId: String
   id: ID!
   school: School
   schoolId: String
+  schoolYear: SchoolYear
+  schoolYearId: String
   updatedAt: DateTime
   updatedByUser: User
   updatedByUserId: String
@@ -1627,6 +1637,44 @@ type ForumInteractionEdge {
   """Used in `before` and `after` args"""
   cursor: String!
   node: ForumInteraction!
+}
+
+"""The ForumQuestionQuestion model"""
+type ForumQuestion implements IModelCampusData {
+  active: Boolean
+  campus: Campus
+  campusId: String
+  createdAt: DateTime
+  createdByUser: User
+  createdByUserId: String
+  description: String
+  details: String
+  forum: Forum
+  forumId: String
+  id: ID!
+  name: String
+  school: School
+  schoolId: String
+  schoolYear: SchoolYear
+  schoolYearId: String
+  updatedAt: DateTime
+  updatedByUser: User
+  updatedByUserId: String
+  version: Float
+}
+
+type ForumQuestionConnection {
+  edges: [ForumQuestionEdge!]!
+  pageInfo: PageInfo!
+
+  """Total Count"""
+  totalCount: Float
+}
+
+type ForumQuestionEdge {
+  """Used in `before` and `after` args"""
+  cursor: String!
+  node: ForumQuestion!
 }
 
 """The Gender model"""
@@ -2297,6 +2345,7 @@ type Mutation {
   changeActiveExperienceLearningTraditionalValuation(active: Boolean!, id: String!): Boolean!
   changeActiveForum(active: Boolean!, id: String!): Boolean!
   changeActiveForumInteraction(active: Boolean!, id: String!): Boolean!
+  changeActiveForumQuestion(active: Boolean!, id: String!): Boolean!
   changeActiveGender(active: Boolean!, id: String!): Boolean!
   changeActiveGeneralAcademicArea(active: Boolean!, id: String!): Boolean!
   changeActiveGeneralAcademicAsignature(active: Boolean!, id: String!): Boolean!
@@ -2400,6 +2449,7 @@ type Mutation {
   createExperienceLearningTraditionalValuationStudents(id: String!): Boolean!
   createForum(data: NewForum!): Forum!
   createForumInteraction(data: NewForumInteraction!): ForumInteraction!
+  createForumQuestion(data: NewForumQuestion!): ForumQuestion!
   createGender(data: NewGender!): Gender!
   createGeneralAcademicArea(data: NewGeneralAcademicArea!): GeneralAcademicArea!
   createGeneralAcademicAsignature(data: NewGeneralAcademicAsignature!): GeneralAcademicAsignature!
@@ -2479,6 +2529,7 @@ type Mutation {
   deleteExperienceLearningTraditionalValuation(id: String!): Boolean!
   deleteForum(id: String!): Boolean!
   deleteForumInteraction(id: String!): Boolean!
+  deleteForumQuestion(id: String!): Boolean!
   deleteGender(id: String!): Boolean!
   deleteGeneralAcademicArea(id: String!): Boolean!
   deleteGeneralAcademicAsignature(id: String!): Boolean!
@@ -2521,6 +2572,7 @@ type Mutation {
   fixAcademicAsignatureCourseSchoolYear: Boolean!
   fixAcademicAsignatureCourseTeacherV2(schoolYearId: String, teacherId: String!): Boolean!
   fixAcademicAsignatureWithDeleteAcademicArea: Boolean!
+  fixImportCourseSchoolYearId(schoolYearId: String!): Boolean!
   fixStudentCourseYearOld(schoolId: String!, schoolYearId: String!): Boolean!
   generateCertificateFinalReportCourse(format: String!, id: String!, schoolId: String!, schoolYearId: String!, studentId: String): String!
   generatePerformanceFinalReportCourse(format: String!, id: String!, schoolId: String!, schoolYearId: String!, studentId: String): String!
@@ -2607,6 +2659,7 @@ type Mutation {
   updateExperienceLearningTraditionalValuation(data: NewExperienceLearningTraditionalValuation!, id: String!): ExperienceLearningTraditionalValuation!
   updateForum(data: NewForum!, id: String!): Forum!
   updateForumInteraction(data: NewForumInteraction!, id: String!): ForumInteraction!
+  updateForumQuestion(data: NewForumQuestion!, id: String!): ForumQuestion!
   updateGender(data: NewGender!, id: String!): Gender!
   updateGeneralAcademicArea(data: NewGeneralAcademicArea!, id: String!): GeneralAcademicArea!
   updateGeneralAcademicAsignature(data: NewGeneralAcademicAsignature!, id: String!): GeneralAcademicAsignature!
@@ -3038,15 +3091,31 @@ input NewExperienceLearningTraditionalValuation {
 }
 
 input NewForum {
+  academicAsignatureCourseId: String
+  campusId: String
   description: String
   details: String
   name: String
   schoolId: String
+  schoolYearId: String
 }
 
 input NewForumInteraction {
+  campusId: String
   comment: String
+  forumQuestionId: String
+  schoolId: String
+  schoolYearId: String
+}
+
+input NewForumQuestion {
+  campusId: String
+  description: String
+  details: String
   forumId: String
+  name: String
+  schoolId: String
+  schoolYearId: String
 }
 
 input NewGender {
@@ -4394,6 +4463,22 @@ type Query {
     """Paginate last"""
     last: Float
   ): ForumInteractionConnection!
+  getAllForumQuestion(
+    """Paginate after opaque cursor"""
+    after: String
+    allData: Boolean!
+
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderCreated: Boolean!
+    schoolId: String!
+  ): ForumQuestionConnection!
   getAllGender(
     """Paginate after opaque cursor"""
     after: String
@@ -5177,6 +5262,7 @@ type Query {
   getExperienceLearningTraditionalValuation(id: String!): ExperienceLearningTraditionalValuation
   getForum(id: String!): Forum
   getForumInteraction(id: String!): ForumInteraction
+  getForumQuestion(id: String!): ForumQuestion
   getGender(id: String!): Gender
   getGeneralAcademicArea(id: String!): GeneralAcademicArea
   getGeneralAcademicAsignature(id: String!): GeneralAcademicAsignature

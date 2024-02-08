@@ -1493,7 +1493,8 @@ export class ExperienceLearningResolver {
                   academicPeriodId,
                   studentId,
                   evaluativeComponentId: evaluativeComponent.id.toString(),
-                  experienceLearningType
+                  experienceLearningType,
+                  active: true,
                 },
               });
             //console.log("CountexperienceLearningAverageValuation", experienceLearningAverageValuation?.length)
@@ -2965,9 +2966,15 @@ export class ExperienceLearningResolver {
       //console.log("studentAsignatureYearValuationAux", studentAsignatureYearValuationAux)
       let performanceLevel = performanceLevels?.edges?.find((i: any) => i.node.id.toString() === studentAsignatureYearValuationAux?.performanceLevelId?.toString());
       //console.log("performanceLevel, performanceLevel", performanceLevel)
+
       if (performanceLevel?.node?.isRecovery) {
         countNoPromotedArea += 1;
+        console.log("area", area);
+        console.log("studentAsignatureYearValuationAux", studentAsignatureYearValuationAux);
+        console.log("performanceLevel", performanceLevel);
       }
+      console.log("countNoPromotedArea", countNoPromotedArea);
+
       switch (performanceLevelType) {
         case PerformanceLevelType.QUALITATIVE:
           let performanceLevelIndex = performanceLevels?.edges?.findIndex((i: any) => i.node.id.toString() === studentAsignatureYearValuationAux?.performanceLevelId?.toString()) + 1;

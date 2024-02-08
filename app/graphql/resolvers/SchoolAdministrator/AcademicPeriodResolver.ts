@@ -4,13 +4,21 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicPeriodRepository, SchoolRepository, SchoolYearRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  AcademicPeriodRepository,
+  SchoolRepository,
+  SchoolYearRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicPeriod } from '../../inputs/SchoolAdministrator/NewAcademicPeriod';
 import { IContext } from '../../interfaces/IContext';
 import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
-import { AcademicPeriod, AcademicPeriodConnection } from '../../models/SchoolAdministrator/AcademicPeriod';
+import {
+  AcademicPeriod,
+  AcademicPeriodConnection,
+} from '../../models/SchoolAdministrator/AcademicPeriod';
 import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
@@ -65,7 +73,7 @@ export class AcademicPeriodResolver {
   async getAcademicPeriodSchoolYear(
     @Args() args: ConnectionArgs,
     @Arg('schoolId', () => String) schoolId: string,
-    @Arg('schoolYearId', () => String) schoolYearId: string
+    @Arg('schoolYearId', () => String) schoolYearId: string,
   ) {
     let result = await this.repository.findBy({
       where: {
@@ -91,7 +99,7 @@ export class AcademicPeriodResolver {
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => String) schoolId: String,
     @Arg('orderCustom', () => Boolean, { nullable: true }) orderCustom: Boolean,
-    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String,
   ): Promise<AcademicPeriodConnection> {
     let result;
     if (allData) {
@@ -99,7 +107,7 @@ export class AcademicPeriodResolver {
         result = await this.repository.findBy({
           where: {
             schoolId,
-            schoolYearId
+            schoolYearId,
           },
           order: { createdAt: 'DESC' },
         });
@@ -110,7 +118,7 @@ export class AcademicPeriodResolver {
         result = await this.repository.findBy({
           where: {
             schoolId,
-            schoolYearId
+            schoolYearId,
           },
           order: { order: 1 },
         });
@@ -157,7 +165,7 @@ export class AcademicPeriodResolver {
   @Mutation(() => AcademicPeriod)
   async createAcademicPeriod(
     @Arg('data') data: NewAcademicPeriod,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<AcademicPeriod> {
     let dataProcess: NewAcademicPeriod = removeEmptyStringElements(data);
     let createdByUserId = context?.user?.authorization?.id;
@@ -175,7 +183,7 @@ export class AcademicPeriodResolver {
   async updateAcademicPeriod(
     @Arg('data') data: NewAcademicPeriod,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<AcademicPeriod | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
@@ -194,7 +202,7 @@ export class AcademicPeriodResolver {
   async changeActiveAcademicPeriod(
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOneBy(id);
@@ -215,46 +223,63 @@ export class AcademicPeriodResolver {
   @Mutation(() => Boolean)
   async deleteAcademicPeriod(
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
     return result?.result?.ok === 1 ?? true;
   }
 
-
   @Mutation(() => Boolean)
-  async importAcademicPeriodSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String) {
-    let results = await this.repository.findBy({ where: { schoolId, schoolYearId: oldSchoolYearId } });
+  async importAcademicPeriodSchoolYearId(
+    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String,
+    @Arg('newSchoolYearId', () => String) newSchoolYearId: String,
+  ) {
+    let results = await this.repository.findBy({
+      where: { schoolId, schoolYearId: oldSchoolYearId },
+    });
     let schoolYear = await this.repositorySchoolYear.findOneBy(newSchoolYearId);
-
-    console.log("IMPORT", results?.length);
+    console.log('IMPORT', results?.length);
     for (let result of results) {
-      let startDate = result.startDate;
-      let endDate = result.endDate;
-      let endDateRecovery = result.endDateRecovery;
-      let startDateRecovery = result.startDateRecovery;
-      startDate?.setFullYear(schoolYear?.startDate?.getFullYear() ? schoolYear?.startDate?.getFullYear() : 0);
-      endDate?.setFullYear(schoolYear?.startDate?.getFullYear() ? schoolYear?.startDate?.getFullYear() : 0);
-      endDateRecovery?.setFullYear(schoolYear?.startDate?.getFullYear() ? schoolYear?.startDate?.getFullYear() : 0);
-      startDateRecovery?.setFullYear(schoolYear?.startDate?.getFullYear() ? schoolYear?.startDate?.getFullYear() : 0);
-      const model = await this.repository.create({
-        name: result.name,
-        schoolId: result.schoolId,
-        weight: result.weight,
-        order: result.order,
-        startDate: startDate,
-        endDate: endDate,
-        endDateRecovery: endDateRecovery,
-        startDateRecovery: startDateRecovery,
-        createdByUserId: result.createdByUserId,
-        updatedByUserId: result.updatedByUserId,
-        active: result?.active,
-        version: 0,
-        schoolYearId: newSchoolYearId.toString(),
-        entityBaseId: result?.id?.toString()
+      let modelEntityBase = await this.repository.findBy({
+        where: { entityBaseId: result?.id?.toString(), schoolYearId: newSchoolYearId.toString() },
       });
-      let resultSave = await this.repository.save(model);
+      if (modelEntityBase?.length < 1) {
+        let startDate = result.startDate;
+        let endDate = result.endDate;
+        let endDateRecovery = result.endDateRecovery;
+        let startDateRecovery = result.startDateRecovery;
+        startDate?.setFullYear(
+          schoolYear?.startDate?.getFullYear() ? schoolYear?.startDate?.getFullYear() : 0,
+        );
+        endDate?.setFullYear(
+          schoolYear?.startDate?.getFullYear() ? schoolYear?.startDate?.getFullYear() : 0,
+        );
+        endDateRecovery?.setFullYear(
+          schoolYear?.startDate?.getFullYear() ? schoolYear?.startDate?.getFullYear() : 0,
+        );
+        startDateRecovery?.setFullYear(
+          schoolYear?.startDate?.getFullYear() ? schoolYear?.startDate?.getFullYear() : 0,
+        );
+        const model = await this.repository.create({
+          name: result.name,
+          schoolId: result.schoolId,
+          weight: result.weight,
+          order: result.order,
+          startDate: startDate,
+          endDate: endDate,
+          endDateRecovery: endDateRecovery,
+          startDateRecovery: startDateRecovery,
+          createdByUserId: result.createdByUserId,
+          updatedByUserId: result.updatedByUserId,
+          active: result?.active,
+          version: 0,
+          schoolYearId: newSchoolYearId.toString(),
+          entityBaseId: result?.id?.toString(),
+        });
+        let resultSave = await this.repository.save(model);
+      }
     }
     return true;
   }

@@ -3,7 +3,23 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicAreaRepository, AcademicDayRepository, AcademicGradeRepository, AcademicPeriodRepository, EducationLevelRepository, EvaluativeComponentRepository, GradeAssignmentRepository, ModalityRepository, PerformanceLevelRepository, SchoolConfigurationRepository, SchoolRepository, SchoolYearRepository, StudentRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  AcademicAreaRepository,
+  AcademicDayRepository,
+  AcademicGradeRepository,
+  AcademicPeriodRepository,
+  EducationLevelRepository,
+  EvaluativeComponentRepository,
+  GradeAssignmentRepository,
+  ModalityRepository,
+  PerformanceLevelRepository,
+  SchoolConfigurationRepository,
+  SchoolRepository,
+  SchoolYearRepository,
+  StudentRepository,
+  TeacherRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewSchoolYear } from '../../inputs/SchoolAdministrator/NewSchoolYear';
 import { IContext } from '../../interfaces/IContext';
@@ -160,7 +176,7 @@ export class SchoolYearResolver {
   @Mutation(() => SchoolYear)
   async createSchoolYear(
     @Arg('data') data: NewSchoolYear,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<SchoolYear> {
     let dataProcess: NewSchoolYear = removeEmptyStringElements(data);
     let createdByUserId = context?.user?.authorization?.id;
@@ -172,7 +188,11 @@ export class SchoolYearResolver {
     });
     let result = await this.repository.save(model);
     if (result?.schoolYearImportId) {
-      this.importDataSchoolActiveOldYear(result?.schoolId + "", result?.schoolYearImportId, result?.id?.toString());
+      this.importDataSchoolActiveOldYear(
+        result?.schoolId + '',
+        result?.schoolYearImportId,
+        result?.id?.toString(),
+      );
     }
     return result;
   }
@@ -181,7 +201,7 @@ export class SchoolYearResolver {
   async updateSchoolYear(
     @Arg('data') data: NewSchoolYear,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<SchoolYear | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
@@ -200,7 +220,7 @@ export class SchoolYearResolver {
   async changeActiveSchoolYear(
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOneBy(id);
@@ -221,7 +241,7 @@ export class SchoolYearResolver {
   @Mutation(() => Boolean)
   async deleteSchoolYear(
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
@@ -268,7 +288,11 @@ export class SchoolYearResolver {
     return null;
   }
 
-  async importDataSchoolActiveOldYear(schoolId: String, schoolYearOldId: String, schoolYearNewId: String) {
+  async importDataSchoolActiveOldYear(
+    schoolId: String,
+    schoolYearOldId: String,
+    schoolYearNewId: String,
+  ) {
     let dataSchoolYearOld = await this.repository.findOneBy(schoolYearOldId);
     let dataSchoolYearNew = await this.repository.findOneBy(schoolYearNewId);
     if (dataSchoolYearOld) {
@@ -284,7 +308,7 @@ export class SchoolYearResolver {
           await this.schoolConfigurationResolver.importSchoolConfigurationSchoolYearId(
             schoolId,
             schoolYear.id.toString(),
-            newSchoolYear.id.toString()
+            newSchoolYear.id.toString(),
           );
         }
         if (newSchoolYear?.schoolYearImportOptions?.academicPeriod) {
@@ -299,7 +323,7 @@ export class SchoolYearResolver {
             await this.academicPeriodResolver.importAcademicPeriodSchoolYearId(
               schoolId,
               schoolYear.id.toString(),
-              newSchoolYear.id.toString()
+              newSchoolYear.id.toString(),
             );
           }
         }
@@ -312,7 +336,7 @@ export class SchoolYearResolver {
             await this.educationLevelResolver.importEducationLevelSchoolYearId(
               schoolId,
               schoolYear.id.toString(),
-              newSchoolYear.id.toString()
+              newSchoolYear.id.toString(),
             );
           }
         }
@@ -326,120 +350,137 @@ export class SchoolYearResolver {
               schoolId,
               schoolYear.id.toString(),
               newSchoolYear.id.toString(),
-              newSchoolYear?.schoolYearImportOptions?.academicHour ? newSchoolYear?.schoolYearImportOptions?.academicDay : false,
+              newSchoolYear?.schoolYearImportOptions?.academicHour
+                ? newSchoolYear?.schoolYearImportOptions?.academicHour
+                : false,
             );
           }
         }
-        if (newSchoolYear?.schoolYearImportOptions?.modality) {
-          let dataModalityNew = await this.repositoryModality.findBy({
-            where: { schoolId: schoolId, schoolYearId: newSchoolYear?.id?.toString() },
-          });
-          console.log('Modality New: ', dataModalityNew?.length);
-          if (dataModalityNew.length == 0) {
-            await this.modalityResolver.importModalitySchoolYearId(
-              schoolId,
-              schoolYear.id.toString(),
-              newSchoolYear.id.toString(),
-              newSchoolYear?.schoolYearImportOptions?.speciality ? newSchoolYear?.schoolYearImportOptions?.speciality : false,
-            );
-          }
-        }
-        if (newSchoolYear?.schoolYearImportOptions?.grade) {
-          let dataAcademicGradeNew = await this.repositoryAcademicGrade.findBy({
-            where: { schoolId: schoolId, schoolYearId: newSchoolYear?.id?.toString() },
-          });
-          console.log('Academic Grade New: ', dataAcademicGradeNew?.length);
-          if (dataAcademicGradeNew?.length == 0) {
-            await this.academicGradeResolver.importAcademicGradeSchoolYearId(
-              schoolId,
-              schoolYear.id.toString(),
-              newSchoolYear.id.toString(),
-              newSchoolYear?.schoolYearImportOptions?.course ? newSchoolYear?.schoolYearImportOptions?.course : false,
-            );
-          }
-        }
-        if (newSchoolYear?.schoolYearImportOptions?.performanceLevel) {
-          let dataPerformanceLevelNew = await this.repositoryPerformanceLevel.findBy({
-            where: { schoolId: schoolId, schoolYearId: newSchoolYear?.id?.toString() },
-          });
-          console.log('Performance Level New: ', dataPerformanceLevelNew?.length);
-          if (dataPerformanceLevelNew?.length == 0) {
-            await this.performanceLevelResolver.importPerformanceLevelSchoolYearId(
-              schoolId,
-              schoolYear.id.toString(),
-              newSchoolYear.id.toString()
-            );
-          }
-        }
-        if (newSchoolYear?.schoolYearImportOptions?.area) {
-          let dataAcademicAreaNew = await this.repositoryAcademicArea.findBy({
-            where: { schoolId: schoolId, schoolYearId: newSchoolYear?.id?.toString() },
-          });
-          console.log('Academic Area New: ', dataAcademicAreaNew?.length);
-          if (dataAcademicAreaNew?.length == 0) {
-            await this.academicAreaResolver.importAcademicAreaSchoolYearId(
-              schoolId,
-              schoolYear.id.toString(),
-              newSchoolYear.id.toString(),
-              newSchoolYear?.schoolYearImportOptions?.asignature ? newSchoolYear?.schoolYearImportOptions?.asignature : false,
-            );
-          }
-        }
-        if (newSchoolYear?.schoolYearImportOptions?.evaluativeComponent) {
-          let dataEvaluativeComponentNew = await this.repositoryEvaluativeComponent.findBy({
-            where: { schoolId: schoolId, schoolYearId: newSchoolYear?.id?.toString() },
-          });
-          console.log('Evaluative Component New: ', dataEvaluativeComponentNew?.length);
-          if (dataEvaluativeComponentNew?.length == 0) {
-            await this.evaluativeComponentResolver.importEvaluativeComponentSchoolYearId(
-              schoolId,
-              schoolYear.id.toString(),
-              newSchoolYear.id.toString()
-            );
-          }
-        }
-        if (newSchoolYear?.schoolYearImportOptions?.gradeAssignment) {
-          let dataGradeAssignmentNew = await this.repositoryGradeAssignment.findBy({
-            where: { schoolId: schoolId, schoolYearId: newSchoolYear?.id?.toString() },
-          });
-          console.log('Grade Assigment New: ', dataGradeAssignmentNew?.length);
-          if (dataGradeAssignmentNew?.length == 0) {
-            await this.gradeAssignmentResolver.importGradeAssignmentSchoolYearId(
-              schoolId,
-              schoolYear.id.toString(),
-              newSchoolYear.id.toString(),
-              newSchoolYear?.schoolYearImportOptions?.academicAsignatureCourse ? newSchoolYear?.schoolYearImportOptions?.academicAsignatureCourse : false,
-            );
-          }
-        }
-        if (newSchoolYear?.schoolYearImportOptions?.teacher) {
-          let dataTeacherNew = await this.repositoryTeacher.findBy({
-            where: { schoolId: schoolId, schoolYearId: newSchoolYear?.id?.toString() },
-          });
-          console.log('Teacher New: ', dataTeacherNew?.length);
-          if (dataTeacherNew?.length == 0) {
-            await this.teacherResolver.importTeacherSchoolYearId(
-              schoolId,
-              schoolYear.id.toString(),
-              newSchoolYear.id.toString()
-            );
-          }
-        }
-        if (newSchoolYear?.schoolYearImportOptions?.studentPromoted || newSchoolYear?.schoolYearImportOptions?.studentNoPromoted) {
-          let dataStudentNew = await this.repositoryStudent.findBy({
-            where: { schoolId: schoolId, schoolYearId: newSchoolYear?.id?.toString() },
-          });
-          console.log('Student New: ', dataStudentNew?.length);
-          if (dataStudentNew?.length == 0) {
-            await this.studentResolver.importStudentSchoolYearId(
-              schoolId,
-              schoolYear.id.toString(),
-              newSchoolYear.id.toString(),
-              newSchoolYear?.schoolYearImportOptions?.studentPromoted ? newSchoolYear?.schoolYearImportOptions?.studentPromoted : false,
-              newSchoolYear?.schoolYearImportOptions?.studentNoPromoted ? newSchoolYear?.schoolYearImportOptions?.studentNoPromoted : false
-            );
-          }
-        }
+        // if (newSchoolYear?.schoolYearImportOptions?.modality) {
+        //   let dataModalityNew = await this.repositoryModality.findBy({
+        //     where: { schoolId: schoolId, schoolYearId: newSchoolYear?.id?.toString() },
+        //   });
+        //   console.log('Modality New: ', dataModalityNew?.length);
+        //   if (dataModalityNew.length == 0) {
+        //     await this.modalityResolver.importModalitySchoolYearId(
+        //       schoolId,
+        //       schoolYear.id.toString(),
+        //       newSchoolYear.id.toString(),
+        //       newSchoolYear?.schoolYearImportOptions?.speciality
+        //         ? newSchoolYear?.schoolYearImportOptions?.speciality
+        //         : false,
+        //     );
+        //   }
+        // }
+        // if (newSchoolYear?.schoolYearImportOptions?.grade) {
+        //   let dataAcademicGradeNew = await this.repositoryAcademicGrade.findBy({
+        //     where: { schoolId: schoolId, schoolYearId: newSchoolYear?.id?.toString() },
+        //   });
+        //   console.log('Academic Grade New: ', dataAcademicGradeNew?.length);
+        //   if (dataAcademicGradeNew?.length == 0) {
+        //     await this.academicGradeResolver.importAcademicGradeSchoolYearId(
+        //       schoolId,
+        //       schoolYear.id.toString(),
+        //       newSchoolYear.id.toString(),
+        //       newSchoolYear?.schoolYearImportOptions?.course
+        //         ? newSchoolYear?.schoolYearImportOptions?.course
+        //         : false,
+        //     );
+        //   }
+        // }
+        // if (newSchoolYear?.schoolYearImportOptions?.performanceLevel) {
+        //   let dataPerformanceLevelNew = await this.repositoryPerformanceLevel.findBy({
+        //     where: { schoolId: schoolId, schoolYearId: newSchoolYear?.id?.toString() },
+        //   });
+        //   console.log('Performance Level New: ', dataPerformanceLevelNew?.length);
+        //   if (dataPerformanceLevelNew?.length == 0) {
+        //     await this.performanceLevelResolver.importPerformanceLevelSchoolYearId(
+        //       schoolId,
+        //       schoolYear.id.toString(),
+        //       newSchoolYear.id.toString(),
+        //     );
+        //   }
+        // }
+        // if (newSchoolYear?.schoolYearImportOptions?.area) {
+        //   let dataAcademicAreaNew = await this.repositoryAcademicArea.findBy({
+        //     where: { schoolId: schoolId, schoolYearId: newSchoolYear?.id?.toString() },
+        //   });
+        //   console.log('Academic Area New: ', dataAcademicAreaNew?.length);
+        //   if (dataAcademicAreaNew?.length == 0) {
+        //     await this.academicAreaResolver.importAcademicAreaSchoolYearId(
+        //       schoolId,
+        //       schoolYear.id.toString(),
+        //       newSchoolYear.id.toString(),
+        //       newSchoolYear?.schoolYearImportOptions?.asignature
+        //         ? newSchoolYear?.schoolYearImportOptions?.asignature
+        //         : false,
+        //     );
+        //   }
+        // }
+        // if (newSchoolYear?.schoolYearImportOptions?.evaluativeComponent) {
+        //   let dataEvaluativeComponentNew = await this.repositoryEvaluativeComponent.findBy({
+        //     where: { schoolId: schoolId, schoolYearId: newSchoolYear?.id?.toString() },
+        //   });
+        //   console.log('Evaluative Component New: ', dataEvaluativeComponentNew?.length);
+        //   if (dataEvaluativeComponentNew?.length == 0) {
+        //     await this.evaluativeComponentResolver.importEvaluativeComponentSchoolYearId(
+        //       schoolId,
+        //       schoolYear.id.toString(),
+        //       newSchoolYear.id.toString(),
+        //     );
+        //   }
+        // }
+        // if (newSchoolYear?.schoolYearImportOptions?.gradeAssignment) {
+        //   let dataGradeAssignmentNew = await this.repositoryGradeAssignment.findBy({
+        //     where: { schoolId: schoolId, schoolYearId: newSchoolYear?.id?.toString() },
+        //   });
+        //   console.log('Grade Assigment New: ', dataGradeAssignmentNew?.length);
+        //   if (dataGradeAssignmentNew?.length == 0) {
+        //     await this.gradeAssignmentResolver.importGradeAssignmentSchoolYearId(
+        //       schoolId,
+        //       schoolYear.id.toString(),
+        //       newSchoolYear.id.toString(),
+        //       newSchoolYear?.schoolYearImportOptions?.academicAsignatureCourse
+        //         ? newSchoolYear?.schoolYearImportOptions?.academicAsignatureCourse
+        //         : false,
+        //     );
+        //   }
+        // }
+        // if (newSchoolYear?.schoolYearImportOptions?.teacher) {
+        //   let dataTeacherNew = await this.repositoryTeacher.findBy({
+        //     where: { schoolId: schoolId, schoolYearId: newSchoolYear?.id?.toString() },
+        //   });
+        //   console.log('Teacher New: ', dataTeacherNew?.length);
+        //   if (dataTeacherNew?.length == 0) {
+        //     await this.teacherResolver.importTeacherSchoolYearId(
+        //       schoolId,
+        //       schoolYear.id.toString(),
+        //       newSchoolYear.id.toString(),
+        //     );
+        //   }
+        // }
+        // if (
+        //   newSchoolYear?.schoolYearImportOptions?.studentPromoted ||
+        //   newSchoolYear?.schoolYearImportOptions?.studentNoPromoted
+        // ) {
+        //   let dataStudentNew = await this.repositoryStudent.findBy({
+        //     where: { schoolId: schoolId, schoolYearId: newSchoolYear?.id?.toString() },
+        //   });
+        //   console.log('Student New: ', dataStudentNew?.length);
+        //   if (dataStudentNew?.length == 0) {
+        //     await this.studentResolver.importStudentSchoolYearId(
+        //       schoolId,
+        //       schoolYear.id.toString(),
+        //       newSchoolYear.id.toString(),
+        //       newSchoolYear?.schoolYearImportOptions?.studentPromoted
+        //         ? newSchoolYear?.schoolYearImportOptions?.studentPromoted
+        //         : false,
+        //       newSchoolYear?.schoolYearImportOptions?.studentNoPromoted
+        //         ? newSchoolYear?.schoolYearImportOptions?.studentNoPromoted
+        //         : false,
+        //     );
+        //   }
+        // }
         // console.log('Step: Final');
       }
     } else {

@@ -3,13 +3,20 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { SchoolConfigurationRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  SchoolConfigurationRepository,
+  SchoolRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewSchoolConfiguration } from '../../inputs/SchoolAdministrator/NewSchoolConfiguration';
 import { IContext } from '../../interfaces/IContext';
 import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
-import { SchoolConfiguration, SchoolConfigurationConnection } from '../../models/SchoolAdministrator/SchoolConfiguration';
+import {
+  SchoolConfiguration,
+  SchoolConfigurationConnection,
+} from '../../models/SchoolAdministrator/SchoolConfiguration';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
 @Resolver(SchoolConfiguration)
@@ -76,7 +83,7 @@ export class SchoolConfigurationResolver {
   @Mutation(() => SchoolConfiguration)
   async createSchoolConfiguration(
     @Arg('data') data: NewSchoolConfiguration,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<SchoolConfiguration> {
     let dataProcess: NewSchoolConfiguration = removeEmptyStringElements(data);
     let createdByUserId = context?.user?.authorization?.id;
@@ -94,7 +101,7 @@ export class SchoolConfigurationResolver {
   async updateSchoolConfiguration(
     @Arg('data') data: NewSchoolConfiguration,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<SchoolConfiguration | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
@@ -113,7 +120,7 @@ export class SchoolConfigurationResolver {
   async changeActiveSchoolConfiguration(
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOneBy(id);
@@ -135,13 +142,14 @@ export class SchoolConfigurationResolver {
   public async createCodeSchoolConfigurations(
     @Arg('code', () => String) code: string,
     @Arg('valueNumber', () => Number) valueNumber: number,
-    @Arg('valueString', () => String) valueString: string,) {
+    @Arg('valueString', () => String) valueString: string,
+  ) {
     let schools = await this.repositorySchool.find();
     for (let school of schools) {
       let create = true;
       let schoolConfigurations = await this.repository.findBy({
         active: true,
-        schoolId: school.id.toString()
+        schoolId: school.id.toString(),
       });
       //console.log(schoolAdministrators.length);
       if (schoolConfigurations?.length > 0) {
@@ -167,23 +175,34 @@ export class SchoolConfigurationResolver {
   }
 
   @Mutation(() => Boolean)
-  async importSchoolConfigurationSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String) {
-    let results = await this.repository.findBy({ where: { schoolId, schoolYearId: oldSchoolYearId } });
-    console.log("IMPORT", results?.length);
+  async importSchoolConfigurationSchoolYearId(
+    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String,
+    @Arg('newSchoolYearId', () => String) newSchoolYearId: String,
+  ) {
+    let results = await this.repository.findBy({
+      where: { schoolId, schoolYearId: oldSchoolYearId },
+    });
+    console.log('IMPORT', results?.length);
     for (let result of results) {
-      const model = await this.repository.create({
-        code: result.code,
-        valueNumber: result.valueNumber,
-        valueString: result.valueString,
-        schoolId: result.schoolId,
-        createdByUserId: result.createdByUserId,
-        updatedByUserId: result.updatedByUserId,
-        active: result?.active,
-        version: 0,
-        schoolYearId: newSchoolYearId.toString(),
-        entityBaseId: result?.id?.toString()
+      let modelEntityBase = await this.repository.findBy({
+        where: { entityBaseId: result?.id?.toString(), schoolYearId: newSchoolYearId.toString() },
       });
-      let resultSave = await this.repository.save(model);
+      if (modelEntityBase?.length < 1) {
+        const model = await this.repository.create({
+          code: result.code,
+          valueNumber: result.valueNumber,
+          valueString: result.valueString,
+          schoolId: result.schoolId,
+          createdByUserId: result.createdByUserId,
+          updatedByUserId: result.updatedByUserId,
+          active: result?.active,
+          version: 0,
+          schoolYearId: newSchoolYearId.toString(),
+          entityBaseId: result?.id?.toString(),
+        });
+        let resultSave = await this.repository.save(model);
+      }
     }
     return true;
   }
@@ -191,7 +210,7 @@ export class SchoolConfigurationResolver {
   @Mutation(() => Boolean)
   async deleteSchoolConfiguration(
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: new ObjectId(id) });

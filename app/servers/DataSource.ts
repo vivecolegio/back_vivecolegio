@@ -25,6 +25,9 @@ import { ExperienceLearningRubricCriteriaValuation } from '../graphql/models/Cam
 import { ExperienceLearningRubricValuation } from '../graphql/models/CampusAdministrator/ExperienceLearningRubricValuation';
 import { ExperienceLearningSelfAssessmentValuation } from '../graphql/models/CampusAdministrator/ExperienceLearningSelfAssessmentValuation';
 import { ExperienceLearningTraditionalValuation } from '../graphql/models/CampusAdministrator/ExperienceLearningTraditionalValuation';
+import { Forum } from '../graphql/models/CampusAdministrator/Forum';
+import { ForumInteraction } from '../graphql/models/CampusAdministrator/ForumInteraction';
+import { ForumQuestion } from '../graphql/models/CampusAdministrator/ForumQuestion';
 import { Guardian } from '../graphql/models/CampusAdministrator/Guardian';
 import { QuestionBankTestOnline } from '../graphql/models/CampusAdministrator/QuestionBankTestOnline';
 import { QuestionCategoryTestOnline } from '../graphql/models/CampusAdministrator/QuestionCategoryTestOnline';
@@ -72,8 +75,6 @@ import { CampusCoordinator } from '../graphql/models/SchoolAdministrator/CampusC
 import { EducationLevel } from '../graphql/models/SchoolAdministrator/EducationLevel';
 import { EvaluativeComponent } from '../graphql/models/SchoolAdministrator/EvaluativeComponent';
 import { EvidenceLearning } from '../graphql/models/SchoolAdministrator/EvidenceLearning';
-import { Forum } from '../graphql/models/SchoolAdministrator/Forum';
-import { ForumInteraction } from '../graphql/models/SchoolAdministrator/ForumInteraction';
 import { GradeAssignment } from '../graphql/models/SchoolAdministrator/GradeAssignment';
 import { Learning } from '../graphql/models/SchoolAdministrator/Learning';
 import { Modality } from '../graphql/models/SchoolAdministrator/Modality';
@@ -172,7 +173,8 @@ export const dataSource = new DataSource({
     AverageAcademicYearCourse,
     StudentYearBehaviour,
     VideoTutorial,
-    FrecuentQuestion
+    FrecuentQuestion,
+    ForumQuestion
   ],
   synchronize: true,
   logger: 'advanced-console',
@@ -240,37 +242,37 @@ export const GeneralBasicLearningRightRepository =
   dataSource.getMongoRepository(GeneralBasicLearningRight);
 export const ExperienceLearningRepository = dataSource.getMongoRepository(ExperienceLearning);
 export const ExperienceLearningTraditionalValuationRepository = dataSource.getMongoRepository(
-  ExperienceLearningTraditionalValuation
+  ExperienceLearningTraditionalValuation,
 );
 export const ExperienceLearningSelfAssessmentValuationRepository = dataSource.getMongoRepository(
-  ExperienceLearningSelfAssessmentValuation
+  ExperienceLearningSelfAssessmentValuation,
 );
 export const ExperienceLearningCoEvaluationValuationRepository = dataSource.getMongoRepository(
-  ExperienceLearningCoEvaluationValuation
+  ExperienceLearningCoEvaluationValuation,
 );
 export const ExperienceLearningCoEvaluationRepository = dataSource.getMongoRepository(
-  ExperienceLearningCoEvaluation
+  ExperienceLearningCoEvaluation,
 );
 export const ExperienceLearningRubricCriteriaRepository = dataSource.getMongoRepository(
-  ExperienceLearningRubricCriteria
+  ExperienceLearningRubricCriteria,
 );
 export const ExperienceLearningRubricValuationRepository = dataSource.getMongoRepository(
-  ExperienceLearningRubricValuation
+  ExperienceLearningRubricValuation,
 );
 export const ExperienceLearningRubricCriteriaValuationRepository = dataSource.getMongoRepository(
-  ExperienceLearningRubricCriteriaValuation
+  ExperienceLearningRubricCriteriaValuation,
 );
 export const ExperienceLearningAverageValuationRepository = dataSource.getMongoRepository(
-  ExperienceLearningAverageValuation
+  ExperienceLearningAverageValuation,
 );
 export const AcademicAsignatureCoursePeriodValuationRepository = dataSource.getMongoRepository(
-  AcademicAsignatureCoursePeriodValuation
+  AcademicAsignatureCoursePeriodValuation,
 );
 export const QuestionTestOnlineRepository = dataSource.getMongoRepository(QuestionTestOnline);
 export const QuestionBankTestOnlineRepository =
   dataSource.getMongoRepository(QuestionBankTestOnline);
 export const QuestionCategoryTestOnlineRepository = dataSource.getMongoRepository(
-  QuestionCategoryTestOnline
+  QuestionCategoryTestOnline,
 );
 export const ClassroomPlanRepository = dataSource.getMongoRepository(ClassroomPlan);
 export const PlantaDocenteRepository = dataSource.getMongoRepository(PlantaDocente);
@@ -279,18 +281,35 @@ export const JornadasRepository = dataSource.getMongoRepository(Jornadas);
 export const CursosRepository = dataSource.getMongoRepository(Cursos);
 export const SchoolAdministrativeRepository = dataSource.getMongoRepository(SchoolAdministrative);
 export const StudentAttendanceRepository = dataSource.getMongoRepository(StudentAttendance);
-export const AcademicAreaCoursePeriodValuationRepository = dataSource.getMongoRepository(AcademicAreaCoursePeriodValuation);
+export const AcademicAreaCoursePeriodValuationRepository = dataSource.getMongoRepository(
+  AcademicAreaCoursePeriodValuation,
+);
 export const SchoolConfigurationRepository = dataSource.getMongoRepository(SchoolConfiguration);
-export const AcademicAsignatureCoursePeriodEvidenceLearningValuationRepository = dataSource.getMongoRepository(AcademicAsignatureCoursePeriodEvidenceLearningValuation);
-export const AverageAcademicPeriodStudentRepository = dataSource.getMongoRepository(AverageAcademicPeriodStudent);
-export const AverageAcademicPeriodCourseRepository = dataSource.getMongoRepository(AverageAcademicPeriodCourse);
+export const AcademicAsignatureCoursePeriodEvidenceLearningValuationRepository =
+  dataSource.getMongoRepository(AcademicAsignatureCoursePeriodEvidenceLearningValuation);
+export const AverageAcademicPeriodStudentRepository = dataSource.getMongoRepository(
+  AverageAcademicPeriodStudent,
+);
+export const AverageAcademicPeriodCourseRepository = dataSource.getMongoRepository(
+  AverageAcademicPeriodCourse,
+);
 export const StudentBehaviourRepository = dataSource.getMongoRepository(StudentBehaviour);
-export const ObserverAnnotationTypeRepository = dataSource.getMongoRepository(ObserverAnnotationType);
-export const StudentObserverAnnotationRepository = dataSource.getMongoRepository(StudentObserverAnnotation);
-export const AcademicAsignatureCourseYearValuationRepository = dataSource.getMongoRepository(AcademicAsignatureCourseYearValuation);
-export const AcademicAreaCourseYearValuationRepository = dataSource.getMongoRepository(AcademicAreaCourseYearValuation);
-export const AverageAcademicYearStudentRepository = dataSource.getMongoRepository(AverageAcademicYearStudent);
-export const AverageAcademicYearCourseRepository = dataSource.getMongoRepository(AverageAcademicYearCourse);
+export const ObserverAnnotationTypeRepository =
+  dataSource.getMongoRepository(ObserverAnnotationType);
+export const StudentObserverAnnotationRepository =
+  dataSource.getMongoRepository(StudentObserverAnnotation);
+export const AcademicAsignatureCourseYearValuationRepository = dataSource.getMongoRepository(
+  AcademicAsignatureCourseYearValuation,
+);
+export const AcademicAreaCourseYearValuationRepository = dataSource.getMongoRepository(
+  AcademicAreaCourseYearValuation,
+);
+export const AverageAcademicYearStudentRepository = dataSource.getMongoRepository(
+  AverageAcademicYearStudent,
+);
+export const AverageAcademicYearCourseRepository =
+  dataSource.getMongoRepository(AverageAcademicYearCourse);
 export const StudentYearBehaviourRepository = dataSource.getMongoRepository(StudentYearBehaviour);
 export const VideoTutorialRepository = dataSource.getMongoRepository(VideoTutorial);
 export const FrecuentQuestionRepository = dataSource.getMongoRepository(FrecuentQuestion);
+export const ForumQuestionRepository = dataSource.getMongoRepository(ForumQuestion);
