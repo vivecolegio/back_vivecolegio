@@ -37,6 +37,9 @@ import { ExperienceLearningRubricValuationResolver } from '../graphql/resolvers/
 import { ExperienceLearningSelfAssessmentValuationResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningSelfAssessmentValuationResolver';
 import { ExperienceLearningTraditionalValuationResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningTraditionalValuationResolver';
 import { ExperienceLearningValuationResolver } from '../graphql/resolvers/CampusAdministrator/ExperienceLearningValuationResolver';
+import { ForumInteractionResolver } from '../graphql/resolvers/CampusAdministrator/ForumInteractionResolver';
+import { ForumQuestionResolver } from '../graphql/resolvers/CampusAdministrator/ForumQuestionResolver';
+import { ForumResolver } from '../graphql/resolvers/CampusAdministrator/ForumResolver';
 import { QuestionBankTestOnlineResolver } from '../graphql/resolvers/CampusAdministrator/QuestionBankTestOnlineResolver';
 import { QuestionCategoryTestOnlineResolver } from '../graphql/resolvers/CampusAdministrator/QuestionCategoryTestOnlineResolver';
 import { QuestionTestOnlineResolver } from '../graphql/resolvers/CampusAdministrator/QuestionTestOnlineResolver';
@@ -45,6 +48,7 @@ import { StudentBehaviourResolver } from '../graphql/resolvers/CampusAdministrat
 import { StudentObserverAnnotationResolver } from '../graphql/resolvers/CampusAdministrator/StudentObserverAnnotationResolver';
 import { StudentYearBehaviourResolver } from '../graphql/resolvers/CampusAdministrator/StudentYearBehaviourResolver';
 import { AuditLoginResolver } from '../graphql/resolvers/GeneralAdministrator/AuditLoginResolver';
+import { BackupResolver } from '../graphql/resolvers/GeneralAdministrator/BackupResolver';
 import { GenderResolver } from '../graphql/resolvers/GeneralAdministrator/GenderResolver';
 import { GeneralAcademicAsignatureResolver } from '../graphql/resolvers/GeneralAdministrator/GeneralAcademicAsignatureResolver';
 import { GeneralBasicLearningRightResolver } from '../graphql/resolvers/GeneralAdministrator/GeneralBasicLearningRightResolver';
@@ -53,8 +57,6 @@ import { SchoolAdministrativeResolver } from '../graphql/resolvers/GeneralAdmini
 import { VideoTutorialResolver } from '../graphql/resolvers/GeneralAdministrator/VideoTutorialResolver';
 import { CertificateFinalReportResolver } from '../graphql/resolvers/SchoolAdministrator/CertificateFinalReport';
 import { EvidenceLearningResolver } from '../graphql/resolvers/SchoolAdministrator/EvidenceLearningResolver';
-import { ForumInteractionResolver } from '../graphql/resolvers/SchoolAdministrator/ForumInteractionResolver';
-import { ForumResolver } from '../graphql/resolvers/SchoolAdministrator/ForumResolver';
 import { LearningResolver } from '../graphql/resolvers/SchoolAdministrator/LearningResolver';
 import { ObserverAnnotationTypeResolver } from '../graphql/resolvers/SchoolAdministrator/ObserverAnnotationTypeResolver';
 import { PerformanceFinalReportResolver } from '../graphql/resolvers/SchoolAdministrator/PerformanceFinalReportResolver';
@@ -198,7 +200,9 @@ async function app() {
         PerformanceFinalReportResolver,
         StudentYearBehaviourResolver,
         ImportDataSchoolResolver,
-        VideoTutorialResolver
+        VideoTutorialResolver,
+        BackupResolver,
+        ForumQuestionResolver,
       ],
       emitSchemaFile: true,
       validate: false,
