@@ -2,6 +2,7 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { AcademicHourResolver } from './../CampusAdministrator/AcademicHourResolver';
 
 import {
   AcademicAreaRepository,
@@ -100,6 +101,8 @@ export class SchoolYearResolver {
   private repositoryStudent = StudentRepository;
 
   private academicDayResolver = new AcademicDayResolver();
+
+  private academicHourResolver = new AcademicHourResolver();
 
   private studentResolver = new StudentResolver();
 
@@ -487,6 +490,29 @@ export class SchoolYearResolver {
       //console.log('Step Fail: School Years 2022', dataSchoolYear2022?.length);
       //console.log('Step Fail: School Years 2023', dataSchoolYear2023?.length);
     }
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  async fixSchoolIdAndSchoolYearId() {
+    await this.educationLevelResolver.fixAllEducationLevelSchoolAndSchoolYear();
+    await this.academicDayResolver.fixAllAcademicDaySchoolAndSchoolYear();
+    await this.academicHourResolver.fixAllAcademicDaySchoolAndSchoolYear();
+
+    let dataSchoolYears = await this.repository.findBy({
+      where: {
+        schoolYearImportId: { $ne: null },
+      },
+    });
+    console.log(dataSchoolYears?.length);
+    // for (let schoolYear of dataSchoolYears) {
+    //   await this.importDataSchoolActiveOldYear(
+    //     schoolYear?.schoolId + '',
+    //     schoolYear?.schoolYearImportId + '',
+    //     schoolYear?.id?.toString(),
+    //   );
+    // }
+
     return true;
   }
 }

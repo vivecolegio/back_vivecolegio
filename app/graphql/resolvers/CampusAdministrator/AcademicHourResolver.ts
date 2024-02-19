@@ -290,7 +290,7 @@ export class AcademicHourResolver {
                 version: (result?.version as number) + 1,
               });
             } else {
-              console.log('school -: ', number);
+              console.log('school -1: ', number);
               result = await this.repository.save({
                 _id: new ObjectId(result?.id?.toString()),
                 ...result,
@@ -299,35 +299,36 @@ export class AcademicHourResolver {
               });
             }
           } else {
-            if (result?.academicDayId) {
-              let academicDay = await this.repositoryAcademicDay.findOneBy(result?.academicDayId);
-              if (academicDay) {
-                result = await this.repository.save({
-                  _id: new ObjectId(result?.id?.toString()),
-                  ...result,
-                  schoolId: academicDay?.schoolId,
-                  schoolYearId: academicDay?.schoolYearId,
-                  version: (result?.version as number) + 1,
-                });
-              }
-            } else {
-              console.log('school -: ', number);
+            console.log('school -2: ', number);
+            result = await this.repository.save({
+              _id: new ObjectId(result?.id?.toString()),
+              ...result,
+              active: false,
+              version: -1,
+            });
+          }
+        } else {
+          if (result?.academicDayId) {
+            let academicDay = await this.repositoryAcademicDay.findOneBy(result?.academicDayId);
+            if (academicDay && academicDay?.schoolId && academicDay?.schoolYearId) {
+              console.log('school 1: ', number);
               result = await this.repository.save({
                 _id: new ObjectId(result?.id?.toString()),
                 ...result,
-                active: false,
-                version: -1,
+                schoolId: academicDay?.schoolId,
+                schoolYearId: academicDay?.schoolYearId,
+                version: (result?.version as number) + 1,
               });
             }
+          } else {
+            console.log('school -3: ', number);
+            result = await this.repository.save({
+              _id: new ObjectId(result?.id?.toString()),
+              ...result,
+              active: false,
+              version: -1,
+            });
           }
-        } else {
-          console.log('school -: ', number);
-          result = await this.repository.save({
-            _id: new ObjectId(result?.id?.toString()),
-            ...result,
-            active: false,
-            version: -1,
-          });
         }
       }
     }
