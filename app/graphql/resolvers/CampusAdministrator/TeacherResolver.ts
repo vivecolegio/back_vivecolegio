@@ -4,7 +4,14 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { CampusRepository, PlantaDocenteRepository, SchoolRepository, SchoolYearRepository, TeacherRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  CampusRepository,
+  PlantaDocenteRepository,
+  SchoolRepository,
+  SchoolYearRepository,
+  TeacherRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewTeacher } from '../../inputs/CampusAdministrator/NewTeacher';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
@@ -52,7 +59,7 @@ export class TeacherResolver {
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => [String]) schoolId: String[],
     @Arg('campusId', () => [String], { nullable: true }) campusId: String[],
-    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String,
   ): Promise<TeacherConnection> {
     let result;
     if (allData) {
@@ -74,7 +81,9 @@ export class TeacherResolver {
             where: { schoolId: { $in: schoolId }, campusId: { $in: campusId }, schoolYearId },
           });
         } else {
-          result = await this.repository.findBy({ where: { schoolId: { $in: schoolId }, schoolYearId } });
+          result = await this.repository.findBy({
+            where: { schoolId: { $in: schoolId }, schoolYearId },
+          });
         }
       }
     } else {
@@ -137,7 +146,10 @@ export class TeacherResolver {
     delete dataProcess.newUser;
     let user = await this.repositoryUser.findBy({ documentNumber: dataUserProcess.documentNumber });
     if (user.length > 0) {
-      let teacher = await this.repository.findBy({ userId: user[0]?.id?.toString(), schoolYearId: dataProcess.schoolYearId })
+      let teacher = await this.repository.findBy({
+        userId: user[0]?.id?.toString(),
+        schoolYearId: dataProcess.schoolYearId,
+      });
       if (teacher.length == 0) {
         const model = await this.repository.create({
           ...dataProcess,
@@ -222,10 +234,10 @@ export class TeacherResolver {
                     docente.sexo == 'F' ? '60cfc51e445f133f9e261ead' : '60ecc36d6c716a21bee51e00',
                   birthdate: fechaNacimiento
                     ? new Date(
-                      Number(fechaNacimiento[2]),
-                      Number(fechaNacimiento[1]) - 1,
-                      Number(fechaNacimiento[0])
-                    )
+                        Number(fechaNacimiento[2]),
+                        Number(fechaNacimiento[1]) - 1,
+                        Number(fechaNacimiento[0]),
+                      )
                     : undefined,
                   phone: docente.telefono,
                   email: docente.email,
@@ -276,7 +288,7 @@ export class TeacherResolver {
   async updateTeacher(
     @Arg('data') data: NewTeacher,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Teacher | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
@@ -305,7 +317,7 @@ export class TeacherResolver {
   async changeActiveTeacher(
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOneBy(id);
@@ -332,9 +344,15 @@ export class TeacherResolver {
   }
 
   @Mutation(() => Boolean)
-  async importTeacherSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String) {
-    let results = await this.repository.findBy({ where: { schoolId, schoolYearId: oldSchoolYearId } });
-    console.log("IMPORT", results?.length);
+  async importTeacherSchoolYearId(
+    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String,
+    @Arg('newSchoolYearId', () => String) newSchoolYearId: String,
+  ) {
+    let results = await this.repository.findBy({
+      where: { schoolId, schoolYearId: oldSchoolYearId },
+    });
+    console.log('IMPORT', results?.length);
     for (let result of results) {
       const model = await this.repository.create({
         attentionSchedule: result.attentionSchedule,
@@ -346,7 +364,7 @@ export class TeacherResolver {
         active: result?.active,
         version: 0,
         schoolYearId: newSchoolYearId.toString(),
-        entityBaseId: result?.id?.toString()
+        entityBaseId: result?.id?.toString(),
       });
       let resultSave = await this.repository.save(model);
     }
@@ -354,9 +372,99 @@ export class TeacherResolver {
   }
 
   @Mutation(() => Boolean)
+  async fixAllTeacherSchoolAndSchoolYear() {
+    let results = await this.repository.findBy({
+      where: {
+        $or: [
+          {
+            schoolId: null,
+          },
+          { schoolYearId: null },
+        ],
+      },
+      order: { createdAt: 'DESC' },
+    });
+    console.log(results?.length);
+    let number = 0;
+    for (let result of results) {
+      number++;
+      if (result?.schoolYearId) {
+        console.log('schoolYearId: ', number);
+        let schoolYear = await this.repositorySchoolYear.findOneBy(result?.schoolYearId);
+        if (schoolYear) {
+          result = await this.repository.save({
+            _id: new ObjectId(result?.id?.toString()),
+            ...result,
+            schoolId: [schoolYear?.schoolId + ''],
+            version: (result?.version as number) + 1,
+          });
+        }
+      } else {
+        if (result?.schoolId || result?.campusId) {
+          let schoolId;
+          if (result?.schoolId) {
+            let school = await this.repositorySchool.findOneBy(result?.schoolId);
+            if (school) {
+              schoolId = school?.id?.toString();
+            }
+          } else {
+            if (result?.campusId) {
+              let campus = await this.repositoryCampus.findOneBy(result?.campusId);
+              if (campus) {
+                schoolId = campus?.schoolId;
+              }
+            }
+          }
+          if (schoolId) {
+            console.log('schoolYears: ', number);
+            let schoolYears = await this.repositorySchoolYear.findBy({
+              where: { schoolId: schoolId },
+            });
+            console.log('schoolYears length: ', schoolYears?.length);
+            if (schoolYears && schoolYears?.length === 1) {
+              result = await this.repository.save({
+                _id: new ObjectId(result?.id?.toString()),
+                ...result,
+                schoolId: [schoolYears[0]?.schoolId + ''],
+                schoolYearId: schoolYears[0]?.id?.toString(),
+                version: (result?.version as number) + 1,
+              });
+            } else {
+              console.log('school -: ', number);
+              result = await this.repository.save({
+                _id: new ObjectId(result?.id?.toString()),
+                ...result,
+                active: false,
+                version: -1,
+              });
+            }
+          } else {
+            console.log('school -: ', number);
+            result = await this.repository.save({
+              _id: new ObjectId(result?.id?.toString()),
+              ...result,
+              active: false,
+              version: -1,
+            });
+          }
+        } else {
+          console.log('school -: ', number);
+          result = await this.repository.save({
+            _id: new ObjectId(result?.id?.toString()),
+            ...result,
+            active: false,
+            version: -1,
+          });
+        }
+      }
+    }
+    return true;
+  }
+
+  @Mutation(() => Boolean)
   async deleteTeacher(
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: new ObjectId(id) });

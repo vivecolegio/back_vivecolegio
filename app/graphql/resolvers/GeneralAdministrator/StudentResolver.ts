@@ -4,7 +4,18 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicGradeRepository, AverageAcademicYearStudentRepository, CampusRepository, CourseRepository, EstudiantesRepository, GeneralAcademicGradeRepository, SchoolRepository, SchoolYearRepository, StudentRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  AcademicGradeRepository,
+  AverageAcademicYearStudentRepository,
+  CampusRepository,
+  CourseRepository,
+  EstudiantesRepository,
+  GeneralAcademicGradeRepository,
+  SchoolRepository,
+  SchoolYearRepository,
+  StudentRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewStudent } from '../../inputs/GeneralAdministrator/NewStudent';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
@@ -379,10 +390,10 @@ export class StudentResolver {
                     : '60ecc36d6c716a21bee51e00',
                 birthdate: fechaNacimiento
                   ? new Date(
-                    Number(fechaNacimiento[2]),
-                    Number(fechaNacimiento[1]) - 1,
-                    Number(fechaNacimiento[0]),
-                  )
+                      Number(fechaNacimiento[2]),
+                      Number(fechaNacimiento[1]) - 1,
+                      Number(fechaNacimiento[0]),
+                    )
                   : undefined,
                 roleId: '619551d1882a2fb6525a3078',
                 schoolId: school.id.toString(),
@@ -684,7 +695,7 @@ export class StudentResolver {
           });
           //console.log('averageAcademicYearStudent', averageAcademicYearStudent);
           if (averageAcademicYearStudent?.length > 0) {
-            if (studentPromoted && (averageAcademicYearStudent[0]?.promoted == true)) {
+            if (studentPromoted && averageAcademicYearStudent[0]?.promoted == true) {
               const model = await this.repository.create({
                 userId: result.userId,
                 campusId: result.campusId,
@@ -700,7 +711,7 @@ export class StudentResolver {
               //console.log('PROMOTED', model);
               let resultSave = await this.repository.save(model);
             }
-            if (studentNoPromoted && (averageAcademicYearStudent[0]?.promoted == false)) {
+            if (studentNoPromoted && averageAcademicYearStudent[0]?.promoted == false) {
               const model = await this.repository.create({
                 userId: result.userId,
                 campusId: result.campusId,
@@ -732,6 +743,96 @@ export class StudentResolver {
             //console.log('PROMOTED', model);
             let resultSave = await this.repository.save(model);
           }
+        }
+      }
+    }
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  async fixAllSudentSchoolAndSchoolYear() {
+    let results = await this.repository.findBy({
+      where: {
+        $or: [
+          {
+            schoolId: null,
+          },
+          { schoolYearId: null },
+        ],
+      },
+      order: { createdAt: 'DESC' },
+    });
+    console.log(results?.length);
+    let number = 0;
+    for (let result of results) {
+      number++;
+      if (result?.schoolYearId) {
+        console.log('schoolYearId: ', number);
+        let schoolYear = await this.repositorySchoolYear.findOneBy(result?.schoolYearId);
+        if (schoolYear) {
+          result = await this.repository.save({
+            _id: new ObjectId(result?.id?.toString()),
+            ...result,
+            schoolId: [schoolYear?.schoolId + ''],
+            version: (result?.version as number) + 1,
+          });
+        }
+      } else {
+        if (result?.schoolId || result?.campusId) {
+          let schoolId;
+          if (result?.schoolId) {
+            let school = await this.repositorySchool.findOneBy(result?.schoolId);
+            if (school) {
+              schoolId = school?.id?.toString();
+            }
+          } else {
+            if (result?.campusId) {
+              let campus = await this.repositoryCampus.findOneBy(result?.campusId);
+              if (campus) {
+                schoolId = campus?.schoolId;
+              }
+            }
+          }
+          if (schoolId) {
+            console.log('schoolYears: ', number);
+            let schoolYears = await this.repositorySchoolYear.findBy({
+              where: { schoolId: schoolId },
+            });
+            console.log('schoolYears length: ', schoolYears?.length);
+            if (schoolYears && schoolYears?.length === 1) {
+              result = await this.repository.save({
+                _id: new ObjectId(result?.id?.toString()),
+                ...result,
+                schoolId: [schoolYears[0]?.schoolId + ''],
+                schoolYearId: schoolYears[0]?.id?.toString(),
+                version: (result?.version as number) + 1,
+              });
+            } else {
+              console.log('school -: ', number);
+              result = await this.repository.save({
+                _id: new ObjectId(result?.id?.toString()),
+                ...result,
+                active: false,
+                version: -1,
+              });
+            }
+          } else {
+            console.log('school -: ', number);
+            result = await this.repository.save({
+              _id: new ObjectId(result?.id?.toString()),
+              ...result,
+              active: false,
+              version: -1,
+            });
+          }
+        } else {
+          console.log('school -: ', number);
+          result = await this.repository.save({
+            _id: new ObjectId(result?.id?.toString()),
+            ...result,
+            active: false,
+            version: -1,
+          });
         }
       }
     }

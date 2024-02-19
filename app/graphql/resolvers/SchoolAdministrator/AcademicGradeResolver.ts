@@ -3,7 +3,17 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicGradeRepository, EducationLevelRepository, GeneralAcademicCycleRepository, GeneralAcademicGradeRepository, SchoolRepository, SchoolYearRepository, SpecialtyRepository, StudentRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  AcademicGradeRepository,
+  EducationLevelRepository,
+  GeneralAcademicCycleRepository,
+  GeneralAcademicGradeRepository,
+  SchoolRepository,
+  SchoolYearRepository,
+  SpecialtyRepository,
+  StudentRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicGrade } from '../../inputs/SchoolAdministrator/NewAcademicGrade';
 import { IContext } from '../../interfaces/IContext';
@@ -12,7 +22,10 @@ import { GeneralAcademicGrade } from '../../models/GeneralAdministrator/GeneralA
 import { School } from '../../models/GeneralAdministrator/School';
 import { Student } from '../../models/GeneralAdministrator/Student';
 import { User } from '../../models/GeneralAdministrator/User';
-import { AcademicGrade, AcademicGradeConnection } from '../../models/SchoolAdministrator/AcademicGrade';
+import {
+  AcademicGrade,
+  AcademicGradeConnection,
+} from '../../models/SchoolAdministrator/AcademicGrade';
 import { EducationLevel } from '../../models/SchoolAdministrator/EducationLevel';
 import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { Specialty } from '../../models/SchoolAdministrator/Specialty';
@@ -62,7 +75,7 @@ export class AcademicGradeResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => String) schoolId: String,
-    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String,
   ): Promise<AcademicGradeConnection> {
     let result;
     if (allData) {
@@ -106,7 +119,7 @@ export class AcademicGradeResolver {
   @Mutation(() => AcademicGrade)
   async createAcademicGrade(
     @Arg('data') data: NewAcademicGrade,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<AcademicGrade> {
     let dataProcess: NewAcademicGrade = removeEmptyStringElements(data);
     let createdByUserId = context?.user?.authorization?.id;
@@ -124,7 +137,7 @@ export class AcademicGradeResolver {
   async updateAcademicGrade(
     @Arg('data') data: NewAcademicGrade,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<AcademicGrade | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
@@ -143,7 +156,7 @@ export class AcademicGradeResolver {
   async changeActiveAcademicGrade(
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOneBy(id);
@@ -162,14 +175,25 @@ export class AcademicGradeResolver {
   }
 
   @Mutation(() => Boolean)
-  async importAcademicGradeSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String, @Arg('course', () => Boolean) course: boolean) {
-    let results = await this.repository.findBy({ where: { schoolId, schoolYearId: oldSchoolYearId } });
-    console.log("IMPORT", results?.length);
+  async importAcademicGradeSchoolYearId(
+    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String,
+    @Arg('newSchoolYearId', () => String) newSchoolYearId: String,
+    @Arg('course', () => Boolean) course: boolean,
+  ) {
+    let results = await this.repository.findBy({
+      where: { schoolId, schoolYearId: oldSchoolYearId },
+    });
+    console.log('IMPORT', results?.length);
     for (let result of results) {
       let educationLevelNew: any;
-      let educationLevelOld = await this.repositoryEducationLevel.findOneBy(result?.educationLevelId);
+      let educationLevelOld = await this.repositoryEducationLevel.findOneBy(
+        result?.educationLevelId,
+      );
       if (educationLevelOld) {
-        educationLevelNew = await this.repositoryEducationLevel.findBy({ where: { entityBaseId: result?.educationLevelId, schoolYearId: newSchoolYearId } });
+        educationLevelNew = await this.repositoryEducationLevel.findBy({
+          where: { entityBaseId: result?.educationLevelId, schoolYearId: newSchoolYearId },
+        });
       }
       // let specialityNew: any;
       // let specialityOld = await this.repositorySpecialty.findOneBy(result?.specialtyId);
@@ -178,7 +202,8 @@ export class AcademicGradeResolver {
       // }
       const model = await this.repository.create({
         name: result.name,
-        educationLevelId: educationLevelNew?.length > 0 ? educationLevelNew[0]?.id?.toString() : null,
+        educationLevelId:
+          educationLevelNew?.length > 0 ? educationLevelNew[0]?.id?.toString() : null,
         specialtyId: result.specialtyId,
         generalAcademicCycleId: result.generalAcademicCycleId,
         generalAcademicGradeId: result.generalAcademicGradeId,
@@ -188,17 +213,98 @@ export class AcademicGradeResolver {
         active: result?.active,
         version: 0,
         schoolYearId: newSchoolYearId.toString(),
-        entityBaseId: result?.id?.toString()
+        entityBaseId: result?.id?.toString(),
       });
       let resultSave = await this.repository.save(model);
-      console.log("courseResolver");
+      console.log('courseResolver');
       if (course) {
         await this.courseResolver.importCourseSchoolYearId(
           schoolId,
           result.id.toString(),
           resultSave.id.toString(),
-          newSchoolYearId.toString()
+          newSchoolYearId.toString(),
         );
+      }
+    }
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  async fixAllAcademicGradeSchoolAndSchoolYear() {
+    let results = await this.repository.findBy({
+      where: {
+        $or: [
+          {
+            schoolId: null,
+          },
+          { schoolYearId: null },
+        ],
+      },
+      order: { createdAt: 'DESC' },
+    });
+    console.log(results?.length);
+    let number = 0;
+    for (let result of results) {
+      number++;
+      if (result?.schoolYearId) {
+        console.log('schoolYearId: ', number);
+        let schoolYear = await this.repositorySchoolYear.findOneBy(result?.schoolYearId);
+        if (schoolYear) {
+          result = await this.repository.save({
+            _id: new ObjectId(result?.id?.toString()),
+            ...result,
+            schoolId: schoolYear?.schoolId,
+            version: (result?.version as number) + 1,
+          });
+        }
+      } else {
+        if (result?.schoolId) {
+          let schoolId;
+          let school = await this.repositorySchool.findOneBy(result?.schoolId);
+          if (school) {
+            schoolId = school?.id?.toString();
+          }
+          if (schoolId) {
+            console.log('schoolYears: ', number);
+            let schoolYears = await this.repositorySchoolYear.findBy({
+              where: { schoolId: schoolId },
+            });
+            console.log('schoolYears length: ', schoolYears?.length);
+            if (schoolYears && schoolYears?.length === 1) {
+              result = await this.repository.save({
+                _id: new ObjectId(result?.id?.toString()),
+                ...result,
+                schoolId: schoolId,
+                schoolYearId: schoolYears[0]?.id?.toString(),
+                version: (result?.version as number) + 1,
+              });
+            } else {
+              console.log('school -: ', number);
+              result = await this.repository.save({
+                _id: new ObjectId(result?.id?.toString()),
+                ...result,
+                active: false,
+                version: -1,
+              });
+            }
+          } else {
+            console.log('school -: ', number);
+            result = await this.repository.save({
+              _id: new ObjectId(result?.id?.toString()),
+              ...result,
+              active: false,
+              version: -1,
+            });
+          }
+        } else {
+          console.log('school -: ', number);
+          result = await this.repository.save({
+            _id: new ObjectId(result?.id?.toString()),
+            ...result,
+            active: false,
+            version: -1,
+          });
+        }
       }
     }
     return true;
@@ -207,7 +313,7 @@ export class AcademicGradeResolver {
   @Mutation(() => Boolean)
   async deleteAcademicGrade(
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
@@ -300,12 +406,11 @@ export class AcademicGradeResolver {
     if (id !== null && id !== undefined) {
       const result = await this.repositoryStudent.findBy({
         where: {
-          academicGradeId: data?.id?.toString()
-        }
-      })
+          academicGradeId: data?.id?.toString(),
+        },
+      });
       return result?.length;
     }
     return 0;
   }
-
 }

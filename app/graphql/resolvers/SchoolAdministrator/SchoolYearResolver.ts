@@ -3,6 +3,7 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { AcademicHourResolver } from './../CampusAdministrator/AcademicHourResolver';
+import { CourseResolver } from './../CampusAdministrator/CourseResolver';
 
 import {
   AcademicAreaRepository,
@@ -40,10 +41,12 @@ import { PerformanceLevel } from '../../models/SchoolAdministrator/PerformanceLe
 import { SchoolConfiguration } from '../../models/SchoolAdministrator/SchoolConfiguration';
 import { SchoolYear, SchoolYearConnection } from '../../models/SchoolAdministrator/SchoolYear';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
+import { AcademicAsignatureCourseResolver } from '../CampusAdministrator/AcademicAsignatureCourseResolver';
 import { AcademicDayResolver } from '../CampusAdministrator/AcademicDayResolver';
 import { TeacherResolver } from '../CampusAdministrator/TeacherResolver';
 import { StudentResolver } from '../GeneralAdministrator/StudentResolver';
 import { AcademicAreaResolver } from './AcademicAreaResolver';
+import { AcademicAsignatureResolver } from './AcademicAsignatureResolver';
 import { AcademicGradeResolver } from './AcademicGradeResolver';
 import { AcademicPeriodResolver } from './AcademicPeriodResolver';
 import { EducationLevelResolver } from './EducationLevelResolver';
@@ -52,6 +55,7 @@ import { GradeAssignmentResolver } from './GradeAssignmentResolver';
 import { ModalityResolver } from './ModalityResolver';
 import { PerformanceLevelResolver } from './PerformanceLevelResolver';
 import { SchoolConfigurationResolver } from './SchoolConfigurationResolver';
+import { SpecialtyResolver } from './SpecialtyResolver';
 
 @Resolver(SchoolYear)
 export class SchoolYearResolver {
@@ -116,13 +120,21 @@ export class SchoolYearResolver {
 
   private modalityResolver = new ModalityResolver();
 
+  private specialtyResolver = new SpecialtyResolver();
+
   private academicAreaResolver = new AcademicAreaResolver();
 
+  private academicAsignatureResolver = new AcademicAsignatureResolver();
+
   private academicGradeResolver = new AcademicGradeResolver();
+
+  private courseResolver = new CourseResolver();
 
   private gradeAssignmentResolver = new GradeAssignmentResolver();
 
   private schoolConfigurationResolver = new SchoolConfigurationResolver();
+
+  private academicAsignatureCourseResolver = new AcademicAsignatureCourseResolver();
 
   private teacherResolver = new TeacherResolver();
 
@@ -497,7 +509,19 @@ export class SchoolYearResolver {
   async fixSchoolIdAndSchoolYearId() {
     await this.educationLevelResolver.fixAllEducationLevelSchoolAndSchoolYear();
     await this.academicDayResolver.fixAllAcademicDaySchoolAndSchoolYear();
-    await this.academicHourResolver.fixAllAcademicDaySchoolAndSchoolYear();
+    await this.academicHourResolver.fixAllAcademicHourSchoolAndSchoolYear();
+    await this.modalityResolver.fixAllModalitySchoolAndSchoolYear();
+    await this.specialtyResolver.fixAllSpecialtySchoolAndSchoolYear();
+    await this.academicGradeResolver.fixAllAcademicGradeSchoolAndSchoolYear();
+    await this.courseResolver.fixAllCourseSchoolAndSchoolYear();
+    await this.performanceLevelResolver.fixAllPerformanceLevelSchoolAndSchoolYear();
+    await this.academicAreaResolver.fixAllAcademicAreaSchoolAndSchoolYear();
+    await this.academicAsignatureResolver.fixAllAcademicAsignatureSchoolAndSchoolYear();
+    await this.evaluativeComponentResolver.fixAllEvaluativeComponentSchoolAndSchoolYear();
+    //await this.gradeAssignmentResolver.fixAllGradeAssignmentSchoolAndSchoolYear();
+    //await this.academicAsignatureCourseResolver.fixAllAcademicAsignatureCourseSchoolAndSchoolYear();
+    await this.teacherResolver.fixAllTeacherSchoolAndSchoolYear();
+    //await this.studentResolver.fixAllSudentSchoolAndSchoolYear();
 
     let dataSchoolYears = await this.repository.findBy({
       where: {

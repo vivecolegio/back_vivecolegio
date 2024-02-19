@@ -232,7 +232,7 @@ export class AcademicHourResolver {
   }
 
   @Mutation(() => Boolean)
-  async fixAllAcademicDaySchoolAndSchoolYear() {
+  async fixAllAcademicHourSchoolAndSchoolYear() {
     let results = await this.repository.findBy({
       where: {
         $or: [

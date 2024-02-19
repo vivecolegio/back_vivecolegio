@@ -3,7 +3,17 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicAreaRepository, AcademicAsignatureCourseRepository, AcademicAsignatureRepository, CampusRepository, CourseRepository, EvaluativeComponentRepository, SchoolRepository, SchoolYearRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  AcademicAreaRepository,
+  AcademicAsignatureCourseRepository,
+  AcademicAsignatureRepository,
+  CampusRepository,
+  CourseRepository,
+  EvaluativeComponentRepository,
+  SchoolRepository,
+  SchoolYearRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewEvaluativeComponent } from '../../inputs/SchoolAdministrator/NewEvaluativeComponent';
 import { IContext } from '../../interfaces/IContext';
@@ -14,7 +24,10 @@ import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
 import { AcademicArea } from '../../models/SchoolAdministrator/AcademicArea';
 import { AcademicAsignature } from '../../models/SchoolAdministrator/AcademicAsignature';
-import { EvaluativeComponent, EvaluativeComponentConnection } from '../../models/SchoolAdministrator/EvaluativeComponent';
+import {
+  EvaluativeComponent,
+  EvaluativeComponentConnection,
+} from '../../models/SchoolAdministrator/EvaluativeComponent';
 import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
@@ -60,7 +73,7 @@ export class EvaluativeComponentResolver {
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => String) schoolId: String,
     @Arg('academicAsignatureId', () => String, { nullable: true }) academicAsignatureId: String,
-    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String,
   ): Promise<EvaluativeComponentConnection> {
     let result;
     if (allData) {
@@ -84,7 +97,8 @@ export class EvaluativeComponentResolver {
         if (academicAsignatureId) {
           result = await this.repository.findBy({
             where: {
-              schoolId, schoolYearId,
+              schoolId,
+              schoolYearId,
               academicAsignatureId: { $in: [academicAsignatureId] },
             },
           });
@@ -149,16 +163,16 @@ export class EvaluativeComponentResolver {
   @Query(() => EvaluativeComponentConnection)
   async getAllEvaluativeComponentAcademicAsignatureCourse(
     @Args() args: ConnectionArgs,
-    @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: String
+    @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: String,
   ): Promise<EvaluativeComponentConnection> {
     let result: any[] = [];
     let academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(
-      academicAsignatureCourseId
+      academicAsignatureCourseId,
     );
     if (academicAsignatureCourse) {
       let course = await this.repositoryCourse.findOneBy(academicAsignatureCourse.courseId);
       let academicAsignature = await this.repositoryAcademicAsignature.findOneBy(
-        academicAsignatureCourse.academicAsignatureId
+        academicAsignatureCourse.academicAsignatureId,
       );
       if (course && academicAsignature) {
         let schoolYear = await this.repositorySchoolYear.findOneBy(course.schoolYearId);
@@ -209,7 +223,7 @@ export class EvaluativeComponentResolver {
   @Mutation(() => EvaluativeComponent)
   async createEvaluativeComponent(
     @Arg('data') data: NewEvaluativeComponent,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<EvaluativeComponent> {
     let dataProcess: NewEvaluativeComponent = removeEmptyStringElements(data);
     let createdByUserId = context?.user?.authorization?.id;
@@ -227,7 +241,7 @@ export class EvaluativeComponentResolver {
   async updateEvaluativeComponent(
     @Arg('data') data: NewEvaluativeComponent,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<EvaluativeComponent | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
@@ -246,7 +260,7 @@ export class EvaluativeComponentResolver {
   async changeActiveEvaluativeComponent(
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOneBy(id);
@@ -267,7 +281,7 @@ export class EvaluativeComponentResolver {
   @Mutation(() => Boolean)
   async deleteEvaluativeComponent(
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
@@ -275,9 +289,15 @@ export class EvaluativeComponentResolver {
   }
 
   @Mutation(() => Boolean)
-  async importEvaluativeComponentSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String) {
-    let results = await this.repository.findBy({ where: { schoolId, schoolYearId: oldSchoolYearId } });
-    console.log("IMPORT", results?.length);
+  async importEvaluativeComponentSchoolYearId(
+    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String,
+    @Arg('newSchoolYearId', () => String) newSchoolYearId: String,
+  ) {
+    let results = await this.repository.findBy({
+      where: { schoolId, schoolYearId: oldSchoolYearId },
+    });
+    console.log('IMPORT', results?.length);
     for (let result of results) {
       let academicAreasId = [];
       if (result?.academicAreasId) {
@@ -285,7 +305,9 @@ export class EvaluativeComponentResolver {
           let academicAreaNew: any;
           let academicAreaOld = await this.repositoryAcademicArea.findOneBy(academicAreaId);
           if (academicAreaOld) {
-            academicAreaNew = await this.repositoryAcademicArea.findBy({ where: { entityBaseId: academicAreaId, schoolYearId: newSchoolYearId } });
+            academicAreaNew = await this.repositoryAcademicArea.findBy({
+              where: { entityBaseId: academicAreaId, schoolYearId: newSchoolYearId },
+            });
             if (academicAreaNew?.length > 0) {
               academicAreasId.push(academicAreaNew[0]?.id?.toString());
             }
@@ -296,9 +318,12 @@ export class EvaluativeComponentResolver {
       if (result?.academicAsignaturesId) {
         for (let academicAsignatureId of result?.academicAsignaturesId) {
           let academicAsignatureNew: any;
-          let academicAsignatureOld = await this.repositoryAcademicArea.findOneBy(academicAsignatureId);
+          let academicAsignatureOld =
+            await this.repositoryAcademicArea.findOneBy(academicAsignatureId);
           if (academicAsignatureOld) {
-            academicAsignatureNew = await this.repositoryAcademicArea.findBy({ where: { entityBaseId: academicAsignatureId, schoolYearId: newSchoolYearId } });
+            academicAsignatureNew = await this.repositoryAcademicArea.findBy({
+              where: { entityBaseId: academicAsignatureId, schoolYearId: newSchoolYearId },
+            });
             if (academicAsignatureNew?.length > 0) {
               academicAsignaturesId.push(academicAsignatureNew[0]?.id?.toString());
             }
@@ -317,9 +342,90 @@ export class EvaluativeComponentResolver {
         active: result?.active,
         version: 0,
         schoolYearId: newSchoolYearId.toString(),
-        entityBaseId: result?.id?.toString()
+        entityBaseId: result?.id?.toString(),
       });
       let resultSave = await this.repository.save(model);
+    }
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  async fixAllEvaluativeComponentSchoolAndSchoolYear() {
+    let results = await this.repository.findBy({
+      where: {
+        $or: [
+          {
+            schoolId: null,
+          },
+          { schoolYearId: null },
+        ],
+      },
+      order: { createdAt: 'DESC' },
+    });
+    console.log(results?.length);
+    let number = 0;
+    for (let result of results) {
+      number++;
+      if (result?.schoolYearId) {
+        console.log('schoolYearId: ', number);
+        let schoolYear = await this.repositorySchoolYear.findOneBy(result?.schoolYearId);
+        if (schoolYear) {
+          result = await this.repository.save({
+            _id: new ObjectId(result?.id?.toString()),
+            ...result,
+            schoolId: schoolYear?.schoolId,
+            version: (result?.version as number) + 1,
+          });
+        }
+      } else {
+        if (result?.schoolId) {
+          let schoolId;
+          let school = await this.repositorySchool.findOneBy(result?.schoolId);
+          if (school) {
+            schoolId = school?.id?.toString();
+          }
+          if (schoolId) {
+            console.log('schoolYears: ', number);
+            let schoolYears = await this.repositorySchoolYear.findBy({
+              where: { schoolId: schoolId },
+            });
+            console.log('schoolYears length: ', schoolYears?.length);
+            if (schoolYears && schoolYears?.length === 1) {
+              result = await this.repository.save({
+                _id: new ObjectId(result?.id?.toString()),
+                ...result,
+                schoolId: schoolId,
+                schoolYearId: schoolYears[0]?.id?.toString(),
+                version: (result?.version as number) + 1,
+              });
+            } else {
+              console.log('school -: ', number);
+              result = await this.repository.save({
+                _id: new ObjectId(result?.id?.toString()),
+                ...result,
+                active: false,
+                version: -1,
+              });
+            }
+          } else {
+            console.log('school -: ', number);
+            result = await this.repository.save({
+              _id: new ObjectId(result?.id?.toString()),
+              ...result,
+              active: false,
+              version: -1,
+            });
+          }
+        } else {
+          console.log('school -: ', number);
+          result = await this.repository.save({
+            _id: new ObjectId(result?.id?.toString()),
+            ...result,
+            active: false,
+            version: -1,
+          });
+        }
+      }
     }
     return true;
   }

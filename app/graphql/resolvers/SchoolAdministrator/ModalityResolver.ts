@@ -3,7 +3,12 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { ModalityRepository, SchoolRepository, SchoolYearRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  ModalityRepository,
+  SchoolRepository,
+  SchoolYearRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewModality } from '../../inputs/SchoolAdministrator/NewModality';
 import { IContext } from '../../interfaces/IContext';
@@ -42,7 +47,7 @@ export class ModalityResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => String) schoolId: String,
-    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String,
   ): Promise<ModalityConnection> {
     let result;
     if (allData) {
@@ -86,7 +91,7 @@ export class ModalityResolver {
   @Mutation(() => Modality)
   async createModality(
     @Arg('data') data: NewModality,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Modality> {
     let dataProcess: NewModality = removeEmptyStringElements(data);
     let createdByUserId = context?.user?.authorization?.id;
@@ -104,7 +109,7 @@ export class ModalityResolver {
   async updateModality(
     @Arg('data') data: NewModality,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Modality | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
@@ -123,7 +128,7 @@ export class ModalityResolver {
   async changeActiveModality(
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOneBy(id);
@@ -144,7 +149,7 @@ export class ModalityResolver {
   @Mutation(() => Boolean)
   async deleteModality(
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
@@ -152,9 +157,16 @@ export class ModalityResolver {
   }
 
   @Mutation(() => Boolean)
-  async importModalitySchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String, @Arg('speciality', () => Boolean) speciality: boolean) {
-    let results = await this.repository.findBy({ where: { schoolId, schoolYearId: oldSchoolYearId } });
-    console.log("IMPORT", results?.length);
+  async importModalitySchoolYearId(
+    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String,
+    @Arg('newSchoolYearId', () => String) newSchoolYearId: String,
+    @Arg('speciality', () => Boolean) speciality: boolean,
+  ) {
+    let results = await this.repository.findBy({
+      where: { schoolId, schoolYearId: oldSchoolYearId },
+    });
+    console.log('IMPORT', results?.length);
     for (let result of results) {
       const model = await this.repository.create({
         code: result.code,
@@ -165,17 +177,98 @@ export class ModalityResolver {
         active: result?.active,
         version: 0,
         schoolYearId: newSchoolYearId.toString(),
-        entityBaseId: result?.id?.toString()
+        entityBaseId: result?.id?.toString(),
       });
       let resultSave = await this.repository.save(model);
-      console.log("specialityResolver");
+      console.log('specialityResolver');
       if (speciality) {
         await this.specialityResolver.importSpecialitySchoolYearId(
           schoolId,
           result.id.toString(),
           resultSave.id.toString(),
-          newSchoolYearId.toString()
+          newSchoolYearId.toString(),
         );
+      }
+    }
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  async fixAllModalitySchoolAndSchoolYear() {
+    let results = await this.repository.findBy({
+      where: {
+        $or: [
+          {
+            schoolId: null,
+          },
+          { schoolYearId: null },
+        ],
+      },
+      order: { createdAt: 'DESC' },
+    });
+    console.log(results?.length);
+    let number = 0;
+    for (let result of results) {
+      number++;
+      if (result?.schoolYearId) {
+        console.log('schoolYearId: ', number);
+        let schoolYear = await this.repositorySchoolYear.findOneBy(result?.schoolYearId);
+        if (schoolYear) {
+          result = await this.repository.save({
+            _id: new ObjectId(result?.id?.toString()),
+            ...result,
+            schoolId: schoolYear?.schoolId,
+            version: (result?.version as number) + 1,
+          });
+        }
+      } else {
+        if (result?.schoolId) {
+          let schoolId;
+          let school = await this.repositorySchool.findOneBy(result?.schoolId);
+          if (school) {
+            schoolId = school?.id?.toString();
+          }
+          if (schoolId) {
+            console.log('schoolYears: ', number);
+            let schoolYears = await this.repositorySchoolYear.findBy({
+              where: { schoolId: schoolId },
+            });
+            console.log('schoolYears length: ', schoolYears?.length);
+            if (schoolYears && schoolYears?.length === 1) {
+              result = await this.repository.save({
+                _id: new ObjectId(result?.id?.toString()),
+                ...result,
+                schoolId: schoolId,
+                schoolYearId: schoolYears[0]?.id?.toString(),
+                version: (result?.version as number) + 1,
+              });
+            } else {
+              console.log('school -: ', number);
+              result = await this.repository.save({
+                _id: new ObjectId(result?.id?.toString()),
+                ...result,
+                active: false,
+                version: -1,
+              });
+            }
+          } else {
+            console.log('school -: ', number);
+            result = await this.repository.save({
+              _id: new ObjectId(result?.id?.toString()),
+              ...result,
+              active: false,
+              version: -1,
+            });
+          }
+        } else {
+          console.log('school -: ', number);
+          result = await this.repository.save({
+            _id: new ObjectId(result?.id?.toString()),
+            ...result,
+            active: false,
+            version: -1,
+          });
+        }
       }
     }
     return true;

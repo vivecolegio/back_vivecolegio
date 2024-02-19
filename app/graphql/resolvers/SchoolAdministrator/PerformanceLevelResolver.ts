@@ -3,7 +3,17 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { AcademicAsignatureCourseRepository, AcademicGradeRepository, CampusRepository, CourseRepository, GeneralPerformanceLevelRepository, PerformanceLevelRepository, SchoolRepository, SchoolYearRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  AcademicAsignatureCourseRepository,
+  AcademicGradeRepository,
+  CampusRepository,
+  CourseRepository,
+  GeneralPerformanceLevelRepository,
+  PerformanceLevelRepository,
+  SchoolRepository,
+  SchoolYearRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { PerformanceLevelCategory } from '../../enums/PerformanceLevelCategory';
 import { PerformanceLevelCategoryGrade } from '../../enums/PerformanceLevelCategoryGrade';
@@ -16,7 +26,10 @@ import { Campus } from '../../models/GeneralAdministrator/Campus';
 import { GeneralPerformanceLevel } from '../../models/GeneralAdministrator/GeneralPerformanceLevel';
 import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
-import { PerformanceLevel, PerformanceLevelConnection } from '../../models/SchoolAdministrator/PerformanceLevel';
+import {
+  PerformanceLevel,
+  PerformanceLevelConnection,
+} from '../../models/SchoolAdministrator/PerformanceLevel';
 import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 import { AcademicGrade } from './../../models/SchoolAdministrator/AcademicGrade';
@@ -62,7 +75,7 @@ export class PerformanceLevelResolver {
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => String) schoolId: String,
-    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String,
   ): Promise<PerformanceLevelConnection> {
     let result;
     if (allData) {
@@ -78,7 +91,8 @@ export class PerformanceLevelResolver {
       if (orderCreated) {
         result = await this.repository.findBy({
           where: {
-            schoolId, schoolYearId,
+            schoolId,
+            schoolYearId,
             active: true,
           },
           order: { createdAt: 'DESC' },
@@ -86,7 +100,8 @@ export class PerformanceLevelResolver {
       } else {
         result = await this.repository.findBy({
           where: {
-            schoolId, schoolYearId,
+            schoolId,
+            schoolYearId,
             active: true,
           },
         });
@@ -104,11 +119,11 @@ export class PerformanceLevelResolver {
   @Query(() => PerformanceLevelConnection)
   async getAllPerformanceLevelAcademicAsignatureCourse(
     @Args() args: ConnectionArgs,
-    @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: String
+    @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: String,
   ): Promise<PerformanceLevelConnection> {
     let result: any[] = [];
     let academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(
-      academicAsignatureCourseId
+      academicAsignatureCourseId,
     );
     if (academicAsignatureCourse) {
       let course = await this.repositoryCourse.findOneBy(academicAsignatureCourse.courseId);
@@ -173,11 +188,11 @@ export class PerformanceLevelResolver {
   @Query(() => PerformanceLevelConnection)
   async getAllPerformanceLevelAcademicAsignatureCourseFinal(
     @Args() args: ConnectionArgs,
-    @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: String
+    @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: String,
   ): Promise<PerformanceLevelConnection> {
     let result: any[] = [];
     let academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(
-      academicAsignatureCourseId
+      academicAsignatureCourseId,
     );
     if (academicAsignatureCourse) {
       let course = await this.repositoryCourse.findOneBy(academicAsignatureCourse.courseId);
@@ -246,7 +261,7 @@ export class PerformanceLevelResolver {
   @Query(() => PerformanceLevelConnection)
   async getAllPerformanceLevelAcademicCourse(
     @Args() args: ConnectionArgs,
-    @Arg('courseId', () => String) courseId: String
+    @Arg('courseId', () => String) courseId: String,
   ): Promise<PerformanceLevelConnection> {
     let result: any[] = [];
     if (courseId) {
@@ -309,11 +324,10 @@ export class PerformanceLevelResolver {
     return resultConn;
   }
 
-
   @Query(() => PerformanceLevelConnection)
   async getAllPerformanceLevelAcademicCourseFinal(
     @Args() args: ConnectionArgs,
-    @Arg('courseId', () => String) courseId: String
+    @Arg('courseId', () => String) courseId: String,
   ): Promise<PerformanceLevelConnection> {
     let result: any[] = [];
     if (courseId) {
@@ -383,7 +397,7 @@ export class PerformanceLevelResolver {
   @Mutation(() => PerformanceLevel)
   async createPerformanceLevel(
     @Arg('data') data: NewPerformanceLevel,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<PerformanceLevel> {
     let dataProcess: NewPerformanceLevel = removeEmptyStringElements(data);
     let createdByUserId = context?.user?.authorization?.id;
@@ -415,7 +429,7 @@ export class PerformanceLevelResolver {
   async updatePerformanceLevel(
     @Arg('data') data: NewPerformanceLevel,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<PerformanceLevel | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
@@ -448,7 +462,7 @@ export class PerformanceLevelResolver {
   async changeActivePerformanceLevel(
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOneBy(id);
@@ -469,7 +483,7 @@ export class PerformanceLevelResolver {
   @Mutation(() => Boolean)
   async deletePerformanceLevel(
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
@@ -477,9 +491,15 @@ export class PerformanceLevelResolver {
   }
 
   @Mutation(() => Boolean)
-  async importPerformanceLevelSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String) {
-    let results = await this.repository.findBy({ where: { schoolId, schoolYearId: oldSchoolYearId } });
-    console.log("IMPORT", results?.length);
+  async importPerformanceLevelSchoolYearId(
+    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('oldSchoolYearId', () => String) oldSchoolYearId: String,
+    @Arg('newSchoolYearId', () => String) newSchoolYearId: String,
+  ) {
+    let results = await this.repository.findBy({
+      where: { schoolId, schoolYearId: oldSchoolYearId },
+    });
+    console.log('IMPORT', results?.length);
     for (let result of results) {
       let academicGradesId = [];
       if (result?.academicGradesId) {
@@ -487,7 +507,9 @@ export class PerformanceLevelResolver {
           let academicGradeNew: any;
           let academicGradeOld = await this.repositoryAcademicGrade.findOneBy(academicGradeId);
           if (academicGradeOld) {
-            academicGradeNew = await this.repositoryAcademicGrade.findBy({ where: { entityBaseId: academicGradeId, schoolYearId: newSchoolYearId } });
+            academicGradeNew = await this.repositoryAcademicGrade.findBy({
+              where: { entityBaseId: academicGradeId, schoolYearId: newSchoolYearId },
+            });
             if (academicGradeNew?.length > 0) {
               academicGradesId.push(academicGradeNew[0]?.id?.toString());
             }
@@ -515,9 +537,99 @@ export class PerformanceLevelResolver {
         active: result?.active,
         version: 0,
         schoolYearId: newSchoolYearId.toString(),
-        entityBaseId: result?.id?.toString()
+        entityBaseId: result?.id?.toString(),
       });
       let resultSave = await this.repository.save(model);
+    }
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  async fixAllPerformanceLevelSchoolAndSchoolYear() {
+    let results = await this.repository.findBy({
+      where: {
+        $or: [
+          {
+            schoolId: null,
+          },
+          { schoolYearId: null },
+        ],
+      },
+      order: { createdAt: 'DESC' },
+    });
+    console.log(results?.length);
+    let number = 0;
+    for (let result of results) {
+      number++;
+      if (result?.schoolYearId) {
+        console.log('schoolYearId: ', number);
+        let schoolYear = await this.repositorySchoolYear.findOneBy(result?.schoolYearId);
+        if (schoolYear) {
+          result = await this.repository.save({
+            _id: new ObjectId(result?.id?.toString()),
+            ...result,
+            schoolId: schoolYear?.schoolId,
+            version: (result?.version as number) + 1,
+          });
+        }
+      } else {
+        if (result?.schoolId || result?.campusId) {
+          let schoolId;
+          if (result?.schoolId) {
+            let school = await this.repositorySchool.findOneBy(result?.schoolId);
+            if (school) {
+              schoolId = school?.id?.toString();
+            }
+          } else {
+            if (result?.campusId) {
+              let campus = await this.repositoryCampus.findOneBy(result?.campusId);
+              if (campus) {
+                schoolId = campus?.schoolId;
+              }
+            }
+          }
+          if (schoolId) {
+            console.log('schoolYears: ', number);
+            let schoolYears = await this.repositorySchoolYear.findBy({
+              where: { schoolId: schoolId },
+            });
+            console.log('schoolYears length: ', schoolYears?.length);
+            if (schoolYears && schoolYears?.length === 1) {
+              result = await this.repository.save({
+                _id: new ObjectId(result?.id?.toString()),
+                ...result,
+                schoolId: schoolId,
+                schoolYearId: schoolYears[0]?.id?.toString(),
+                version: (result?.version as number) + 1,
+              });
+            } else {
+              console.log('school -: ', number);
+              result = await this.repository.save({
+                _id: new ObjectId(result?.id?.toString()),
+                ...result,
+                active: false,
+                version: -1,
+              });
+            }
+          } else {
+            console.log('school -: ', number);
+            result = await this.repository.save({
+              _id: new ObjectId(result?.id?.toString()),
+              ...result,
+              active: false,
+              version: -1,
+            });
+          }
+        } else {
+          console.log('school -: ', number);
+          result = await this.repository.save({
+            _id: new ObjectId(result?.id?.toString()),
+            ...result,
+            active: false,
+            version: -1,
+          });
+        }
+      }
     }
     return true;
   }

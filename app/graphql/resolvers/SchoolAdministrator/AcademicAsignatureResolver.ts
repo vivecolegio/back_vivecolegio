@@ -2,16 +2,28 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { AcademicArea } from './../../models/SchoolAdministrator/AcademicArea';
 
-import { AcademicAreaRepository, AcademicAsignatureRepository, AcademicGradeRepository, GeneralAcademicAsignatureRepository, GradeAssignmentRepository, SchoolRepository, SchoolYearRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  AcademicAreaRepository,
+  AcademicAsignatureRepository,
+  AcademicGradeRepository,
+  GeneralAcademicAsignatureRepository,
+  GradeAssignmentRepository,
+  SchoolRepository,
+  SchoolYearRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewAcademicAsignature } from '../../inputs/SchoolAdministrator/NewAcademicAsignature';
 import { IContext } from '../../interfaces/IContext';
 import { GeneralAcademicAsignature } from '../../models/GeneralAdministrator/GeneralAcademicAsignature';
 import { School } from '../../models/GeneralAdministrator/School';
 import { User } from '../../models/GeneralAdministrator/User';
-import { AcademicArea } from '../../models/SchoolAdministrator/AcademicArea';
-import { AcademicAsignature, AcademicAsignatureConnection } from '../../models/SchoolAdministrator/AcademicAsignature';
+import {
+  AcademicAsignature,
+  AcademicAsignatureConnection,
+} from '../../models/SchoolAdministrator/AcademicAsignature';
 import { AcademicGrade } from '../../models/SchoolAdministrator/AcademicGrade';
 import { GradeAssignment } from '../../models/SchoolAdministrator/GradeAssignment';
 import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
@@ -56,7 +68,7 @@ export class AcademicAsignatureResolver {
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
     @Arg('schoolId', () => String) schoolId: String,
     @Arg('academicAreaId', () => String, { nullable: true }) academicAreaId: string,
-    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String,
   ): Promise<AcademicAsignatureConnection> {
     let result;
     if (allData) {
@@ -74,7 +86,9 @@ export class AcademicAsignatureResolver {
         }
       } else {
         if (academicAreaId) {
-          result = await this.repository.findBy({ where: { schoolId, academicAreaId, schoolYearId } });
+          result = await this.repository.findBy({
+            where: { schoolId, academicAreaId, schoolYearId },
+          });
         } else {
           result = await this.repository.findBy({ where: { schoolId, schoolYearId } });
         }
@@ -136,7 +150,7 @@ export class AcademicAsignatureResolver {
     @Args() args: ConnectionArgs,
     @Arg('schoolId', () => String) schoolId: String,
     @Arg('academicGradeId', () => String) academicGradeId: string,
-    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String,
   ): Promise<AcademicAsignatureConnection> {
     let gradeAssignmentAsignatureIds: any[] = [];
     let gradeAssignmentsAcademicGrade = await this.repositoryGradeAssignment.findBy({
@@ -149,7 +163,7 @@ export class AcademicAsignatureResolver {
     });
     gradeAssignmentsAcademicGrade.forEach((gradeAssignmentAcademicGrade: any) => {
       gradeAssignmentAsignatureIds.push(
-        new ObjectId(gradeAssignmentAcademicGrade.academicAsignatureId)
+        new ObjectId(gradeAssignmentAcademicGrade.academicAsignatureId),
       );
     });
     let result;
@@ -173,7 +187,7 @@ export class AcademicAsignatureResolver {
   @Mutation(() => AcademicAsignature)
   async createAcademicAsignature(
     @Arg('data') data: NewAcademicAsignature,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<AcademicAsignature> {
     let dataProcess: NewAcademicAsignature = removeEmptyStringElements(data);
     let createdByUserId = context?.user?.authorization?.id;
@@ -191,7 +205,7 @@ export class AcademicAsignatureResolver {
   async updateAcademicAsignature(
     @Arg('data') data: NewAcademicAsignature,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<AcademicAsignature | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
@@ -210,7 +224,7 @@ export class AcademicAsignatureResolver {
   async changeActiveAcademicAsignature(
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOneBy(id);
@@ -231,7 +245,7 @@ export class AcademicAsignatureResolver {
   @Mutation(() => Boolean)
   async deleteAcademicAsignature(
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
@@ -239,9 +253,16 @@ export class AcademicAsignatureResolver {
   }
 
   @Mutation(() => Boolean)
-  async importAcademicAsignatureSchoolYearId(@Arg('schoolId', () => String) schoolId: String, @Arg('oldAcademicAreaId', () => String) oldAcademicAreaId: String, @Arg('newAcademicAreaId', () => String) newAcademicAreaId: String, @Arg('newSchoolYearId', () => String) newSchoolYearId: String) {
-    let results = await this.repository.findBy({ where: { schoolId, academicAreaId: oldAcademicAreaId } });
-    console.log("IMPORT", results?.length);
+  async importAcademicAsignatureSchoolYearId(
+    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('oldAcademicAreaId', () => String) oldAcademicAreaId: String,
+    @Arg('newAcademicAreaId', () => String) newAcademicAreaId: String,
+    @Arg('newSchoolYearId', () => String) newSchoolYearId: String,
+  ) {
+    let results = await this.repository.findBy({
+      where: { schoolId, academicAreaId: oldAcademicAreaId },
+    });
+    console.log('IMPORT', results?.length);
     for (let result of results) {
       let academicGradesId = [];
       if (result?.academicGradeId) {
@@ -249,7 +270,9 @@ export class AcademicAsignatureResolver {
           let academicGradeNew: any;
           let academicGradeOld = await this.repositoryAcademicGrade.findOneBy(academicGradeId);
           if (academicGradeOld) {
-            academicGradeNew = await this.repositoryAcademicGrade.findBy({ where: { entityBaseId: academicGradeId, schoolYearId: newSchoolYearId } });
+            academicGradeNew = await this.repositoryAcademicGrade.findBy({
+              where: { entityBaseId: academicGradeId, schoolYearId: newSchoolYearId },
+            });
             if (academicGradeNew?.length > 0) {
               academicGradesId.push(academicGradeNew[0]?.id?.toString());
             }
@@ -272,9 +295,104 @@ export class AcademicAsignatureResolver {
         active: result?.active,
         version: 0,
         schoolYearId: newSchoolYearId.toString(),
-        entityBaseId: result?.id?.toString()
+        entityBaseId: result?.id?.toString(),
       });
       let resultSave = await this.repository.save(model);
+    }
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  async fixAllAcademicAsignatureSchoolAndSchoolYear() {
+    let results = await this.repository.findBy({
+      where: {
+        $or: [
+          {
+            schoolId: null,
+          },
+          { schoolYearId: null },
+        ],
+      },
+      order: { createdAt: 'DESC' },
+    });
+    console.log(results?.length);
+    let number = 0;
+    for (let result of results) {
+      number++;
+      if (result?.schoolYearId) {
+        console.log('schoolYearId: ', number);
+        let schoolYear = await this.repositorySchoolYear.findOneBy(result?.schoolYearId);
+        if (schoolYear) {
+          result = await this.repository.save({
+            _id: new ObjectId(result?.id?.toString()),
+            ...result,
+            schoolId: schoolYear?.schoolId,
+            version: (result?.version as number) + 1,
+          });
+        }
+      } else {
+        if (result?.schoolId) {
+          let schoolId;
+          let school = await this.repositorySchool.findOneBy(result?.schoolId);
+          if (school) {
+            schoolId = school?.id?.toString();
+          }
+          if (schoolId) {
+            console.log('schoolYears: ', number);
+            let schoolYears = await this.repositorySchoolYear.findBy({
+              where: { schoolId: schoolId },
+            });
+            console.log('schoolYears length: ', schoolYears?.length);
+            if (schoolYears && schoolYears?.length === 1) {
+              result = await this.repository.save({
+                _id: new ObjectId(result?.id?.toString()),
+                ...result,
+                schoolId: schoolId,
+                schoolYearId: schoolYears[0]?.id?.toString(),
+                version: (result?.version as number) + 1,
+              });
+            } else {
+              console.log('school -1: ', number);
+              result = await this.repository.save({
+                _id: new ObjectId(result?.id?.toString()),
+                ...result,
+                active: false,
+                version: -1,
+              });
+            }
+          } else {
+            console.log('school -2: ', number);
+            result = await this.repository.save({
+              _id: new ObjectId(result?.id?.toString()),
+              ...result,
+              active: false,
+              version: -1,
+            });
+          }
+        } else {
+          if (result?.academicAreaId) {
+            let academicArea = await this.repositoryAcademicArea.findOneBy(result?.academicAreaId);
+            if (academicArea && academicArea?.schoolId && academicArea?.schoolYearId) {
+              console.log('school 1: ', number);
+              result = await this.repository.save({
+                _id: new ObjectId(result?.id?.toString()),
+                ...result,
+                schoolId: academicArea?.schoolId,
+                schoolYearId: academicArea?.schoolYearId,
+                version: (result?.version as number) + 1,
+              });
+            }
+          } else {
+            console.log('school -3: ', number);
+            result = await this.repository.save({
+              _id: new ObjectId(result?.id?.toString()),
+              ...result,
+              active: false,
+              version: -1,
+            });
+          }
+        }
+      }
     }
     return true;
   }
