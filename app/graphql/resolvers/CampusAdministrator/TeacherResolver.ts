@@ -403,13 +403,13 @@ export class TeacherResolver {
         if (result?.schoolId || result?.campusId) {
           let schoolId;
           if (result?.schoolId) {
-            let school = await this.repositorySchool.findOneBy(result?.schoolId);
+            let school = await this.repositorySchool.findOneBy(result?.schoolId[0]);
             if (school) {
               schoolId = school?.id?.toString();
             }
           } else {
             if (result?.campusId) {
-              let campus = await this.repositoryCampus.findOneBy(result?.campusId);
+              let campus = await this.repositoryCampus.findOneBy(result?.campusId[0]);
               if (campus) {
                 schoolId = campus?.schoolId;
               }
