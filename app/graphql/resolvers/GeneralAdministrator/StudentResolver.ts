@@ -690,12 +690,53 @@ export class StudentResolver {
         //results = [results[0]];
         //console.log('results', results);
         for (let result of results) {
-          let averageAcademicYearStudent = await this.repositoryAverageAcademicYearStudent.findBy({
-            where: { studentId: result?.id?.toString(), schoolYearId: oldSchoolYearId },
+          let modelEntityBase = await this.repository.findBy({
+            where: {
+              entityBaseId: result?.id?.toString(),
+              schoolYearId: newSchoolYearId.toString(),
+            },
           });
-          //console.log('averageAcademicYearStudent', averageAcademicYearStudent);
-          if (averageAcademicYearStudent?.length > 0) {
-            if (studentPromoted && averageAcademicYearStudent[0]?.promoted == true) {
+          if (modelEntityBase?.length < 1) {
+            let averageAcademicYearStudent = await this.repositoryAverageAcademicYearStudent.findBy(
+              {
+                where: { studentId: result?.id?.toString(), schoolYearId: oldSchoolYearId },
+              },
+            );
+            //console.log('averageAcademicYearStudent', averageAcademicYearStudent);
+            if (averageAcademicYearStudent?.length > 0) {
+              if (studentPromoted && averageAcademicYearStudent[0]?.promoted == true) {
+                const model = await this.repository.create({
+                  userId: result.userId,
+                  campusId: result.campusId,
+                  schoolId: result.schoolId,
+                  academicGradeId: academicGradeNext[0]?.id?.toString(),
+                  createdByUserId: result.createdByUserId,
+                  updatedByUserId: result.updatedByUserId,
+                  active: result?.active,
+                  version: 0,
+                  schoolYearId: newSchoolYearId.toString(),
+                  entityBaseId: result?.id?.toString(),
+                });
+                //console.log('PROMOTED', model);
+                let resultSave = await this.repository.save(model);
+              }
+              if (studentNoPromoted && averageAcademicYearStudent[0]?.promoted == false) {
+                const model = await this.repository.create({
+                  userId: result.userId,
+                  campusId: result.campusId,
+                  schoolId: result.schoolId,
+                  academicGradeId: academicGradeCurrent[0]?.id?.toString(),
+                  createdByUserId: result.createdByUserId,
+                  updatedByUserId: result.updatedByUserId,
+                  active: result?.active,
+                  version: 0,
+                  schoolYearId: newSchoolYearId.toString(),
+                  entityBaseId: result?.id?.toString(),
+                });
+                //console.log('NO PROMOTED', model);
+                let resultSave = await this.repository.save(model);
+              }
+            } else {
               const model = await this.repository.create({
                 userId: result.userId,
                 campusId: result.campusId,
@@ -711,37 +752,6 @@ export class StudentResolver {
               //console.log('PROMOTED', model);
               let resultSave = await this.repository.save(model);
             }
-            if (studentNoPromoted && averageAcademicYearStudent[0]?.promoted == false) {
-              const model = await this.repository.create({
-                userId: result.userId,
-                campusId: result.campusId,
-                schoolId: result.schoolId,
-                academicGradeId: academicGradeCurrent[0]?.id?.toString(),
-                createdByUserId: result.createdByUserId,
-                updatedByUserId: result.updatedByUserId,
-                active: result?.active,
-                version: 0,
-                schoolYearId: newSchoolYearId.toString(),
-                entityBaseId: result?.id?.toString(),
-              });
-              //console.log('NO PROMOTED', model);
-              let resultSave = await this.repository.save(model);
-            }
-          } else {
-            const model = await this.repository.create({
-              userId: result.userId,
-              campusId: result.campusId,
-              schoolId: result.schoolId,
-              academicGradeId: academicGradeNext[0]?.id?.toString(),
-              createdByUserId: result.createdByUserId,
-              updatedByUserId: result.updatedByUserId,
-              active: result?.active,
-              version: 0,
-              schoolYearId: newSchoolYearId.toString(),
-              entityBaseId: result?.id?.toString(),
-            });
-            //console.log('PROMOTED', model);
-            let resultSave = await this.repository.save(model);
           }
         }
       }
