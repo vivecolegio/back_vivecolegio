@@ -2572,7 +2572,23 @@ type Mutation {
   fixAcademicAsignatureCourseSchoolYear: Boolean!
   fixAcademicAsignatureCourseTeacherV2(schoolYearId: String, teacherId: String!): Boolean!
   fixAcademicAsignatureWithDeleteAcademicArea: Boolean!
+  fixAllAcademicAreaSchoolAndSchoolYear: Boolean!
+  fixAllAcademicAsignatureCourseSchoolAndSchoolYear: Boolean!
+  fixAllAcademicAsignatureSchoolAndSchoolYear: Boolean!
+  fixAllAcademicDaySchoolAndSchoolYear: Boolean!
+  fixAllAcademicGradeSchoolAndSchoolYear: Boolean!
+  fixAllAcademicHourSchoolAndSchoolYear: Boolean!
+  fixAllCourseSchoolAndSchoolYear: Boolean!
+  fixAllEducationLevelSchoolAndSchoolYear: Boolean!
+  fixAllEvaluativeComponentSchoolAndSchoolYear: Boolean!
+  fixAllGradeAssignmentSchoolAndSchoolYear: Boolean!
+  fixAllModalitySchoolAndSchoolYear: Boolean!
+  fixAllPerformanceLevelSchoolAndSchoolYear: Boolean!
+  fixAllSpecialtySchoolAndSchoolYear: Boolean!
+  fixAllSudentSchoolAndSchoolYear: Boolean!
+  fixAllTeacherSchoolAndSchoolYear: Boolean!
   fixImportCourseSchoolYearId(schoolYearId: String!): Boolean!
+  fixSchoolIdAndSchoolYearId: Boolean!
   fixStudentCourseYearOld(schoolId: String!, schoolYearId: String!): Boolean!
   generateCertificateFinalReportCourse(format: String!, id: String!, schoolId: String!, schoolYearId: String!, studentId: String): String!
   generatePerformanceFinalReportCourse(format: String!, id: String!, schoolId: String!, schoolYearId: String!, studentId: String): String!
@@ -2598,6 +2614,7 @@ type Mutation {
   importStudentSchoolYearId(newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!, studentNoPromoted: Boolean!, studentPromoted: Boolean!): Boolean!
   importTeacherSchoolYearId(newSchoolYearId: String!, oldSchoolYearId: String!, schoolId: String!): Boolean!
   login(password: String!, username: String!): Jwt!
+  loginSyncOffline(password: String!, username: String!): Boolean!
   resetPasswordUser(id: String!): Boolean!
   schoolImgPrincipalSignatureUploadImage(file: Upload, id: String!): Boolean!
   schoolImgSecretarySignatureUploadImage(file: Upload, id: String!): Boolean!

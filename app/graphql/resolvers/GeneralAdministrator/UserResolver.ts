@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import { connectionFromArraySlice } from 'graphql-relay';
+import { GraphQLClient } from 'graphql-request';
 import { FileUpload, GraphQLUpload } from 'graphql-upload';
 import jsonwebtoken from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
@@ -7,7 +8,6 @@ import ShortUniqueId from 'short-unique-id';
 import { finished } from 'stream/promises';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-
 import {
   AuditLoginRepository,
   CampusAdministratorRepository,
@@ -45,6 +45,8 @@ import { CampusCoordinator } from '../../models/SchoolAdministrator/CampusCoordi
 import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { Jwt } from '../../modelsUtils/Jwt';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
+import { MUTATION_LOGIN } from '../../queries/mutations';
+import { QUERT_GET_USER } from '../../queries/queries';
 import { AuditLogin } from './../../models/GeneralAdministrator/AuditLogin';
 import { Campus } from './../../models/GeneralAdministrator/Campus';
 
@@ -767,5 +769,42 @@ export class UserResolver {
     } else {
       return false;
     }
+  }
+
+  @Mutation(() => Boolean)
+  async loginSyncOffline(
+    @Arg('username') username: string,
+    @Arg('password') password: string,
+    @Ctx() context: IContext,
+  ) {
+    const client = new GraphQLClient('http://vivecolegios.nortedesantander.gov.co:4000/graphql', {
+      // headers: {
+      //   authorization: 'Apikey ' + process.env.STEPZEN_API_KEY,
+      // },
+    });
+    let data: any = null;
+    const variables = {
+      username: username,
+      password: password,
+    };
+    let userData: any = null;
+    const results = await client.request(MUTATION_LOGIN, variables).then(async (result: any) => {
+      data = result.data;
+      if (data != null) {
+        console.log('yesty', data?.userId);
+        if (data?.userId) {
+          userData = await client.request(QUERT_GET_USER, { id: data?.userId });
+          let result = await this.repository.findOneBy(data?.userId);
+          result = await this.repository.save({
+            _id: new ObjectId(data?.userId),
+            ...userData.data,
+          });
+          console.log(userData);
+        }
+      } else {
+        console.log('noy');
+      }
+    });
+    return true;
   }
 }
