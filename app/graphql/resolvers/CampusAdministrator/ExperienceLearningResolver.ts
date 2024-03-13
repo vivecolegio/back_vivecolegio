@@ -1502,7 +1502,7 @@ export class ExperienceLearningResolver {
           evaluativeComponents = await this.repositoryEvaluativeComponent.findBy({
             where: {
               academicAsignaturesId: { $in: [academicAsignature.id.toString()] },
-              academicAreasId: null,
+              academicAreasId: [],
               schoolId: campus.schoolId,
               schoolYearId: course?.schoolYearId,
               active: true,
@@ -1512,7 +1512,7 @@ export class ExperienceLearningResolver {
           if (evaluativeComponents.length === 0) {
             evaluativeComponents = await this.repositoryEvaluativeComponent.findBy({
               where: {
-                academicAsignaturesId: null,
+                academicAsignaturesId: [],
                 academicAreasId: { $in: [academicAsignature.academicAreaId] },
                 schoolId: campus.schoolId,
                 schoolYearId: course?.schoolYearId,
@@ -1523,8 +1523,8 @@ export class ExperienceLearningResolver {
             if (evaluativeComponents.length === 0) {
               evaluativeComponents = await this.repositoryEvaluativeComponent.findBy({
                 where: {
-                  academicAsignaturesId: null,
-                  academicAreasId: null,
+                  academicAsignaturesId: [],
+                  academicAreasId: [],
                   schoolId: campus.schoolId,
                   schoolYearId: course?.schoolYearId,
                   active: true,
@@ -1772,7 +1772,7 @@ export class ExperienceLearningResolver {
           evaluativeComponents = await this.repositoryEvaluativeComponent.findBy({
             where: {
               academicAsignaturesId: { $in: [academicAsignature.id.toString()] },
-              academicAreasId: null,
+              academicAreasId: [],
               schoolId: campus.schoolId,
               schoolYearId: course?.schoolYearId,
               active: true,
@@ -1782,7 +1782,7 @@ export class ExperienceLearningResolver {
           if (evaluativeComponents.length === 0) {
             evaluativeComponents = await this.repositoryEvaluativeComponent.findBy({
               where: {
-                academicAsignaturesId: null,
+                academicAsignaturesId: [],
                 academicAreasId: { $in: [academicAsignature.academicAreaId] },
                 schoolId: campus.schoolId,
                 schoolYearId: course?.schoolYearId,
@@ -1793,8 +1793,8 @@ export class ExperienceLearningResolver {
             if (evaluativeComponents.length === 0) {
               evaluativeComponents = await this.repositoryEvaluativeComponent.findBy({
                 where: {
-                  academicAsignaturesId: null,
-                  academicAreasId: null,
+                  academicAsignaturesId: [],
+                  academicAreasId: [],
                   schoolId: campus.schoolId,
                   schoolYearId: course?.schoolYearId,
                   active: true,
