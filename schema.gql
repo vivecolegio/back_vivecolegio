@@ -2482,6 +2482,7 @@ type Mutation {
   createSchoolAdministrator(data: NewSchoolAdministrator!): SchoolAdministrator!
   createSchoolConfiguration(data: NewSchoolConfiguration!): SchoolConfiguration!
   createSchoolYear(data: NewSchoolYear!): SchoolYear!
+  createSchoolYearsDaneCode: Boolean!
   createSpecialty(data: NewSpecialty!): Specialty!
   createStudent(data: NewStudent!): Student!
   createStudentAttendance(data: NewStudentAttendance!): StudentAttendance!

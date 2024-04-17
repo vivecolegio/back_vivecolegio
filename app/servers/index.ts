@@ -1,14 +1,16 @@
-import { buildSubgraphSchema } from '@apollo/federation';
-import { printSubgraphSchema } from '@apollo/subgraph';
-import { ApolloServerPluginLandingPageLocalDefault, ApolloServerPluginLandingPageProductionDefault } from 'apollo-server-core';
-import { ApolloServer } from 'apollo-server-express';
-import express from 'express';
-import gql from 'graphql-tag';
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@apollo/server/express4';
+import {
+  ApolloServerPluginLandingPageLocalDefault,
+  ApolloServerPluginLandingPageProductionDefault,
+} from '@apollo/server/plugin/landingPage/default';
+import express, { RequestHandler } from 'express';
 import { graphqlUploadExpress } from 'graphql-upload';
 import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
+import http from 'http';
 import Morgan from 'morgan';
 import { env } from 'process';
-import { buildSchemaSync, createResolversMap } from 'type-graphql';
+import { buildFederatedSchema } from '../graphql/helpers/buildFederatedSchema';
 
 import { SERVER_NAME_APP, SERVER_PORT_APP } from '../config';
 import { AcademicAreaCoursePeriodValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAreaCoursePeriodValuationResolver';
@@ -102,18 +104,21 @@ import { SpecialtyResolver } from './../graphql/resolvers/SchoolAdministrator/Sp
 import { dataSource } from './DataSource';
 
 import 'reflect-metadata';
+import { ErrorLoggerMiddleware } from '../graphql/middlewares/error-logger';
+import { LogAccessMiddleware } from '../graphql/middlewares/log-access';
+import { ResolveTimeMiddleware } from '../graphql/middlewares/resolve-time';
 
 const PORT = SERVER_PORT_APP;
 const SERVER_NAME = SERVER_NAME_APP;
 
 const cluster = require('node:cluster');
 //const numCPUs = env.NODE_ENV === "development" ? 2 : require('node:os').cpus().length;
-const numCPUs = env.NODE_ENV === "development" ? 1 : 10;
+const numCPUs = env.NODE_ENV === 'development' ? 1 : 1;
 const expressHealthApi = require('express-health-api');
 
 async function app() {
   try {
-    const schema = buildSchemaSync({
+    const federatedSchema = await buildFederatedSchema({
       resolvers: [
         AuditLoginResolver,
         DocumentTypeResolver,
@@ -204,8 +209,7 @@ async function app() {
         BackupResolver,
         ForumQuestionResolver,
       ],
-      emitSchemaFile: true,
-      validate: false,
+      globalMiddlewares: [ErrorLoggerMiddleware, ResolveTimeMiddleware, LogAccessMiddleware],
     });
 
     const configExpressStatusMonitor = {
@@ -246,11 +250,6 @@ async function app() {
       ],
     };
 
-    const federatedSchema = buildSubgraphSchema({
-      typeDefs: gql(printSubgraphSchema(schema)),
-      resolvers: createResolversMap(schema) as any,
-    });
-
     await dataSource
       .initialize()
       .then((connection) => {
@@ -263,22 +262,15 @@ async function app() {
       });
 
     const server = new ApolloServer({
-      //schema: applyMiddleware(federatedSchema, permissions),
       schema: federatedSchema,
-      context: ({ req }: any) => {
-        const user = req?.headers?.user ? JSON.parse(req?.headers?.user) : null;
-        const requestData = req?.headers?.requestdata
-          ? JSON.parse(req?.headers?.requestdata)
-          : null;
-        return { user, requestData };
-      },
       introspection: true,
       plugins: [
         process.env.NODE_ENV === 'production'
           ? ApolloServerPluginLandingPageProductionDefault({ footer: false })
           : ApolloServerPluginLandingPageLocalDefault({ footer: false }),
       ],
-      formatError: (err) => {
+      formatError: (err: any) => {
+        console.error('GraphQL Error', err);
         const errorReport = {
           message: err.message,
           locations: err.locations,
@@ -298,6 +290,8 @@ async function app() {
     });
 
     const app = express();
+    const httpServer = http.createServer(app);
+    await server.start();
     // Middlewares
     app.use(`/healthcheck-${SERVER_NAME}`, require('express-healthcheck')());
     app.use(require('express-status-monitor')(configExpressStatusMonitor));
@@ -336,14 +330,19 @@ async function app() {
 
     app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }));
 
-    server.start().then(() => {
-      server.applyMiddleware({ app });
-    });
+    app.use(
+      expressMiddleware(server, {
+        context: async ({ req }: any) => {
+          const user = req?.headers?.user ? JSON.parse(req?.headers?.user) : null;
+          return { user };
+        },
+      }) as RequestHandler,
+    );
 
-    app.listen({ port: PORT }, () => {
-      console.log(
-        `🚀 Server ${SERVER_NAME} Ready and Listening at ==> http://localhost:${PORT}${server.graphqlPath}`
-      );
+    await new Promise((resolve) => {
+      app.listen({ port: PORT }, () => {
+        console.log(`🚀 Server ${SERVER_NAME} Ready and Listening at ==> http://localhost:${PORT}`);
+      });
     });
   } catch (err) {
     console.error(err);
@@ -357,7 +356,7 @@ if (cluster.isMaster) {
     cluster.fork();
   }
   // This event is firs when worker died
-  cluster.on('exit', (worker: { process: { pid: any; }; }, code: any, signal: any) => {
+  cluster.on('exit', (worker: { process: { pid: any } }, code: any, signal: any) => {
     console.log(`worker ${worker.process.pid} died`);
   });
 }
@@ -365,4 +364,3 @@ if (cluster.isMaster) {
 else {
   app();
 }
-

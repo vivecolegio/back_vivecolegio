@@ -3,10 +3,7 @@
     "experimentalDecorators": true,
     "target": "es2017",
     "module": "commonjs",
-    "lib": [
-      "dom",
-      "es6"
-    ],
+    "lib": ["dom", "es6"],
     "outDir": "dist",
     "rootDir": "app",
     "removeComments": true,
@@ -17,8 +14,9 @@
     "emitDecoratorMetadata": true,
     "downlevelIteration": true,
     "moduleResolution": "node",
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
+  },
+  "ts-node": {
+    "esm": true
   }
 }
