@@ -179,13 +179,13 @@ async function app() {
     await new Promise((resolve) => {
       httpServer.listen({ port: GATEWAY_HTTP_PORT_APP }, () => {
         console.log(
-          `🚀 Server ready and listening at ==> http://vivecolegios.nortedesantander.gov.co:${GATEWAY_HTTP_PORT_APP}${server.graphqlPath}`,
+          `🚀 Server ready and listening at ==> http://vivecolegios.nortedesantander.gov.co:${GATEWAY_HTTP_PORT_APP}`,
         );
         console.log(`Worker ${process.pid} started`);
       });
       httpsServer.listen({ port: GATEWAY_HTTPS_PORT_APP }, () => {
         console.log(
-          `🚀 Server ready and listening at ==> https://vivecolegios.nortedesantander.gov.co:${GATEWAY_HTTPS_PORT_APP}${server.graphqlPath}`,
+          `🚀 Server ready and listening at ==> https://vivecolegios.nortedesantander.gov.co:${GATEWAY_HTTPS_PORT_APP}`,
         );
         console.log(`Worker ${process.pid} started`);
       });

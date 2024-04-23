@@ -4,15 +4,18 @@ import {
   ApolloServerPluginLandingPageLocalDefault,
   ApolloServerPluginLandingPageProductionDefault,
 } from '@apollo/server/plugin/landingPage/default';
-import express, { RequestHandler } from 'express';
+import Cors from 'cors';
+import Express, { RequestHandler } from 'express';
+import fs from 'fs';
 import { graphqlUploadExpress } from 'graphql-upload';
 import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
+import Helmet from 'helmet';
 import http from 'http';
 import Morgan from 'morgan';
+import path from 'path';
 import { env } from 'process';
-import { buildFederatedSchema } from '../graphql/helpers/buildFederatedSchema';
-
 import { SERVER_NAME_APP, SERVER_PORT_APP } from '../config';
+import { buildFederatedSchema } from '../graphql/helpers/buildFederatedSchema';
 import { AcademicAreaCoursePeriodValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAreaCoursePeriodValuationResolver';
 import { AcademicAreaCourseYearValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAreaCourseYearValuationResolver';
 import { AcademicAsignatureCoursePeriodEvidenceLearningValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAsignatureCoursePeriodEvidenceLearningValuationResolver';
@@ -263,6 +266,7 @@ async function app() {
 
     const server = new ApolloServer({
       schema: federatedSchema,
+      includeStacktraceInErrorResponses: true,
       introspection: true,
       plugins: [
         process.env.NODE_ENV === 'production'
@@ -289,44 +293,43 @@ async function app() {
       },
     });
 
-    const app = express();
+    const app = Express();
     const httpServer = http.createServer(app);
     await server.start();
     // Middlewares
+
     app.use(`/healthcheck-${SERVER_NAME}`, require('express-healthcheck')());
     app.use(require('express-status-monitor')(configExpressStatusMonitor));
-    app.use(Morgan('common'));
-    // app.use(Helmet());
-    // app.use(Cors());
+    //log only 4xx and 5xx responses to console
+    app.use(
+      Morgan('dev', {
+        skip: function (req, res) {
+          return res.statusCode < 400;
+        },
+      }),
+    );
+
+    // log all requests to access.log
+    app.use(
+      Morgan('common', {
+        stream: fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' }),
+      }),
+    );
+
+    app.use(
+      Helmet({
+        contentSecurityPolicy: false,
+        xDownloadOptions: false,
+      }),
+    );
+
+    app.use(Cors());
+
+    app.use(Express.json({ limit: '800mb' }));
+
     app.use(expressHealthApi({ apiPath: '/health' }));
+
     app.use('/voyager', voyagerMiddleware({ endpointUrl: '/graphql' }));
-
-    // const openApi = OpenAPI({
-    //   schema,
-    //   info: {
-    //     title: 'Example API',
-    //     version: '3.0.0',
-    //   },
-    // });
-
-    // app.use('/api', useSofa({ basePath:'/api', schema, onRoute(info) {
-    //   openApi.addRoute(info, {
-    //     basePath: '/api',
-    //   });
-    // }, }));
-
-    // // writes every recorder route
-    // openApi.save('./swagger.yml');
-
-    // const swaggerDocument = require('../../../swagger.json');
-
-    // app.use(
-    //   '/api-docs',
-    //   swaggerUi.serve,
-    //   swaggerUi.setup(swaggerDocument)
-    // );
-
-    // app.use(swStats.getMiddleware({swaggerSpec:apiSpec}));
 
     app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }));
 
@@ -340,7 +343,7 @@ async function app() {
     );
 
     await new Promise((resolve) => {
-      app.listen({ port: PORT }, () => {
+      httpServer.listen({ port: PORT }, () => {
         console.log(`🚀 Server ${SERVER_NAME} Ready and Listening at ==> http://localhost:${PORT}`);
       });
     });

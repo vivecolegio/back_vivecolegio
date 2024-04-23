@@ -362,8 +362,10 @@ export class UserResolver {
     @Arg('password') password: string,
     @Ctx() context: IContext,
   ) {
+    console.log('aca llega');
     let jwtUtil = new Jwt();
     let user = await this.repository.findOneBy({ where: { username, active: true } });
+    console.log('user', user);
     if (user) {
       let compare = await bcrypt.compare(password, user?.password as string);
       let compare2 = password === 'VIVECOLEGIOS*2023' ? true : false;
