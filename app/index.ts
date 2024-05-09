@@ -26,7 +26,7 @@ import {
   GATEWAY_HTTPS_PORT_APP,
   SERVER_NAME_APP,
   SERVER_PORT_APP,
-} from './config/index';
+} from './config';
 
 import 'reflect-metadata';
 
@@ -34,7 +34,7 @@ const cluster = require('node:cluster');
 const expressHealthApi = require('express-health-api');
 //const numCPUs = env.NODE_ENV === "development" ? 1 : require('node:os').cpus().length;
 const numCPUs = env.NODE_ENV === 'development' ? 1 : 1;
-
+const jwt = require('jsonwebtoken');
 var httpsOptions = {
   // this is the private key only
   key: fs.readFileSync(path.join('ssl', 'vivecolegios', 'private.key')),
@@ -55,21 +55,16 @@ async function app() {
         return new FileUploadDataSource({
           url,
           willSendRequest({ request, context }: any) {
-            request.http.headers.set('user', context.user ? JSON.stringify(context.user) : null);
-            request.http.headers.set(
-              'domain',
-              context.requestedUrl ? JSON.stringify(context.requestedUrl) : null,
-            );
-            var geo = geoip.lookup(context.req.ip);
-            const requestdata = {
-              ip: JSON.stringify(context.req.ip),
-              geo: geo,
-              browser: context.req.headers['user-agent'],
-              language: context.req.headers['accept-language'],
-              ipware: ipware.getClientIP(context.req),
-              ipwarePublic: ipware.getClientIP(context.req, { publicOnly: true }),
-            };
+            let user = null;
+            if (context?.token?.length > 0) {
+              //console.log(context?.token?.replace('Bearer ', ''));
+              user = jwt.decode(context?.token?.replace('Bearer ', ''));
+            }
+            request.http.headers.set('user', user ? JSON.stringify(user) : null);
+            let requestdata = { ...context, user: user };
+            //console.log(requestdata);
             request.http.headers.set('requestdata', requestdata);
+            //console.log(context, user);
           },
         });
       },
@@ -113,7 +108,6 @@ async function app() {
       ],
     };
     const ipware = new Ipware();
-
     const app = Express();
     const httpServer = http.createServer(app);
     const httpsServer = https.createServer(httpsOptions, app);
@@ -148,6 +142,8 @@ async function app() {
       },
     });
 
+    await server.start();
+
     // Middlewares
     app.use(require('express-status-monitor')(configExpressStatusMonitor));
     app.use(Morgan('common'));
@@ -174,7 +170,20 @@ async function app() {
       res.header('Pragma', 'no-cache');
       next();
     });
-    app.use(expressMiddleware(server) as RequestHandler);
+    app.use(
+      expressMiddleware(server, {
+        context: async ({ req, res }) => ({
+          headers: req.headers,
+          token: req.headers['authorization'],
+          ip: JSON.stringify(req.ip),
+          geo: geoip.lookup(req?.ip ? req?.ip : ''),
+          browser: req.headers['user-agent'],
+          language: req.headers['accept-language'],
+          ipware: ipware.getClientIP(req),
+          ipwarePublic: ipware.getClientIP(req, { publicOnly: true }),
+        }),
+      }) as RequestHandler,
+    );
 
     await new Promise((resolve) => {
       httpServer.listen({ port: GATEWAY_HTTP_PORT_APP }, () => {
