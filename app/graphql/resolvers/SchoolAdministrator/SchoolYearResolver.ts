@@ -541,42 +541,28 @@ export class SchoolYearResolver {
   }
 
   @Mutation(() => Boolean)
-  async createSchoolYearsDaneCode() {
-    let dataSchoolDane = [
-      '254003000283',
+  async createSchoolYearsCode() {
+    let dataSchoolCreate = [
       '254003002278',
       '254003000364',
       '254003000062',
       '254003000445',
-      '254003000470',
       '254003000046',
       '254003000381',
       '254003002359',
       '154003000823',
       '254003000330',
-      '254003001611',
       '254003000526',
       '154003001668',
-      '154051000860',
-      '254051000872',
       '254051000821',
-      '254099000041',
       '254099000289',
-      '154109000431',
       '254109000177',
-      '254109000096',
+      '254109000045',
       '154128000680',
-      '254128000463',
-      '254128000030',
-      '254128001427',
       '154128000019',
-      '254125000101',
       '254172000233',
-      '254172000128',
       '254172000039',
       '254174000371',
-      '254174000087',
-      '254174000095',
       '254206000149',
       '154206000012',
       '254206001030',
@@ -586,11 +572,6 @@ export class SchoolYearResolver {
       '254206001196',
       '254206001102',
       '254223000691',
-      '254223000039',
-      '254223000110',
-      '254223000519',
-      '254239000110',
-      '254245000547',
       '254245000776',
       '254245000270',
       '154245000607',
@@ -599,7 +580,6 @@ export class SchoolYearResolver {
       '254810000629',
       '254670000488',
       '254670000445',
-      '254250000253',
       '154670001056',
       '254810000106',
       '254261000166',
@@ -612,14 +592,7 @@ export class SchoolYearResolver {
       '254344000133',
       '254344000290',
       '154344000465',
-      '154347000016',
-      '254385000431',
       '254385000270',
-      '254385000288',
-      '254128001338',
-      '254385000130',
-      '254128001028',
-      '254128001078',
       '254385000121',
       '254398000490',
       '254398000368',
@@ -638,77 +611,134 @@ export class SchoolYearResolver {
       '154498000018',
       '154498000085',
       '254498000721',
-      '254498000691',
-      '254498000110',
       '154498001944',
       '254498000705',
       '254498000144',
-      '154498000051',
       '154498001928',
       '154498000069',
       '154498002223',
       '254498000209',
-      '154518000265',
-      '254518000499',
       '154518000753',
       '154518000273',
-      '154520000108',
-      '254520000056',
       '254001004761',
       '154660000698',
-      '154660000086',
       '254660000200',
       '254670000798',
       '254670000470',
-      '154670000025',
       '254670000364',
       '254670001301',
-      '154680000015',
-      '154720001681',
-      '254720000271',
-      '254720000778',
-      '254720000328',
       '254720001677',
       '254720000034',
       '254720000930',
       '254743000104',
       '254800000582',
-      '254800001104',
       '254800000108',
-      '254800000736',
-      '254800000850',
       '154810003020',
       '254810000696',
-      '254810000394',
       '254810000386',
-      '254810000122',
       '254810002265',
       '254810000165',
       '254810002061',
       '254810001013',
-      '254820000279',
       '254820000759',
       '254820000368',
-      '254820000538',
       '254820000384',
       '254820000856',
       '254820000848',
       '254874000070',
-      '154871000261',
     ];
     let dataSchool = await this.repositorySchool.findBy({
-      where: { daneCode: { $in: dataSchoolDane } },
+      where: { daneCode: { $in: dataSchoolCreate } },
     });
     let countSchools = dataSchool?.length;
     let countNoYears = 0;
     console.log('SCHOOLS: ', countSchools);
     for (let school of dataSchool) {
       if (school?.active) {
+        console.log('SCHOOL: ', school?.daneCode);
         let schoolYear = await this.repository.findBy({
           where: { schoolYear: 2024, schoolId: school?.id?.toString() },
         });
+        console.log('SCHOOL YEARS: ', schoolYear?.length);
         if (schoolYear?.length == 0) {
           countNoYears++;
+          const model = await this.repository.create({
+            schoolYear: 2024,
+            startDate: new Date(2024, 0, 1),
+            endDate: new Date(2024, 11, 31),
+            schoolId: school?.id?.toString(),
+            active: false,
+            version: -2024,
+          });
+          let resultSchoolYear = await this.repository.save(model);
+          if (resultSchoolYear != null) {
+            // CREANDO PERIODOS ACADEMICOS
+            const modelAcademicPeriod1 = await this.repositoryAcademicPeriod.create({
+              name: 'Primer Periodo',
+              startDate: new Date(2024, 0, 1),
+              endDate: new Date(2024, 3, 30),
+              startDateRecovery: new Date(2024, 0, 1),
+              endDateRecovery: new Date(2024, 3, 30),
+              weight: 33,
+              order: 1,
+              schoolId: resultSchoolYear?.schoolId?.toString(),
+              schoolYearId: resultSchoolYear?.id?.toString(),
+              active: false,
+              version: -2024,
+            });
+            let resultAcademicPeriod1 =
+              await this.repositoryAcademicPeriod.save(modelAcademicPeriod1);
+
+            const modelAcademicPeriod2 = await this.repositoryAcademicPeriod.create({
+              name: 'Segundo Periodo',
+              startDate: new Date(2024, 4, 1),
+              endDate: new Date(2024, 7, 31),
+              startDateRecovery: new Date(2024, 4, 1),
+              endDateRecovery: new Date(2024, 7, 31),
+              weight: 33,
+              order: 2,
+              schoolId: resultSchoolYear?.schoolId?.toString(),
+              schoolYearId: resultSchoolYear?.id?.toString(),
+              active: false,
+              version: -2024,
+            });
+            let resultAcademicPeriod2 =
+              await this.repositoryAcademicPeriod.save(modelAcademicPeriod2);
+
+            const modelAcademicPeriod3 = await this.repositoryAcademicPeriod.create({
+              name: 'Tercer Periodo',
+              startDate: new Date(2024, 8, 1),
+              endDate: new Date(2024, 11, 31),
+              startDateRecovery: new Date(2024, 8, 1),
+              endDateRecovery: new Date(2024, 11, 31),
+              weight: 34,
+              order: 3,
+              schoolId: resultSchoolYear?.schoolId?.toString(),
+              schoolYearId: resultSchoolYear?.id?.toString(),
+              active: false,
+              version: -2024,
+            });
+            let resultAcademicPeriod3 =
+              await this.repositoryAcademicPeriod.save(modelAcademicPeriod3);
+
+            // CREANDO NIVELES DE DESEMPENO
+
+            const modelPerformanceLevel1 = await this.repositoryPerformanceLevel.create({
+              name: 'test',
+              minimumScore: 0,
+              topScore: 0,
+              isFinal: true,
+              isRecovery: true,
+              type: null,
+              category: null,
+              schoolId: resultSchoolYear?.schoolId?.toString(),
+              schoolYearId: resultSchoolYear?.id?.toString(),
+              active: true,
+              version: 0,
+            });
+            let resultPerfomanceLevel1 =
+              await this.repositoryPerformanceLevel.save(modelPerformanceLevel1);
+          }
           //console.log('DANE IE: ', school?.daneCode);
           //console.log('Count: ', countNoYears);
         } else {
@@ -718,6 +748,7 @@ export class SchoolYearResolver {
         }
       }
     }
+    console.log('SCHOOLNOYEARS: ', countNoYears);
     return true;
   }
 }
