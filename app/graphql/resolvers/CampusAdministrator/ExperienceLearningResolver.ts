@@ -2383,7 +2383,11 @@ export class ExperienceLearningResolver {
             : 0;
         }
       }
-      hourlyIntensityTotal += hourlyIntensityArea;
+      if (configurationAverageArea == 'IHS') {
+        hourlyIntensityTotal += hourlyIntensityArea;
+      } else {
+        hourlyIntensityTotal += 1;
+      }
       let studentAreaPeriodValuationList =
         await this.repositoryAcademicAreaCoursePeriodValuation.findBy({
           where: {
@@ -2430,7 +2434,7 @@ export class ExperienceLearningResolver {
           }
         }
       }
-      //console.log(studentAreaPeriodValuationAux)
+      //console.log(studentAreaPeriodValuationAux);
       let averageArea = 0;
       if (studentAreaPeriodValuationAux != null) {
         let averageAsignatureCourse = 0;
@@ -2461,12 +2465,13 @@ export class ExperienceLearningResolver {
             break;
         }
       }
-      //console.log("Area: ", area?.name);
-      //console.log("IH:", hourlyIntensityArea);
-      //console.log("AverageArea:", averageArea);
+      //console.log('Area: ', area?.name);
+      //console.log('IH:', hourlyIntensityArea);
+      //console.log('AverageArea:', averageArea);
     }
-    //console.log("AverageTotal:", average / hourlyIntensityTotal)
-    //console.log("IHT:", hourlyIntensityTotal);
+    //console.log('Average:', average);
+    //console.log('AverageTotal:', average / hourlyIntensityTotal);
+    //console.log('IHT:', hourlyIntensityTotal);
     average = average / hourlyIntensityTotal;
     let perf = null;
     let performanceLevelId = undefined;
@@ -2535,7 +2540,7 @@ export class ExperienceLearningResolver {
     }
     //console.log(averageAcademicPeriodStudent);
     if (averageAcademicPeriodStudent.id) {
-      //console.log("problema aca ", averageAcademicPeriodStudent);
+      //console.log('problema aca ', averageAcademicPeriodStudent);
       averageAcademicPeriodStudent = await this.repositoryAverageAcademicPeriodStudent.save({
         _id: new ObjectId(averageAcademicPeriodStudent.id.toString()),
         ...averageAcademicPeriodStudent,
