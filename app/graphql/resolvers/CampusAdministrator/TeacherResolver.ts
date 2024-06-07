@@ -303,30 +303,37 @@ export class TeacherResolver {
     });
     let count = 0;
     for (let school of schools) {
-      let schoolYear = await this.repository.findBy({
-        where: { schoolYear: 2024, schoolId: school?.id?.toString() },
+      console.log('school', school);
+      let schoolYear = await this.repositorySchoolYear.findBy({
+        where: { schoolYear: 2024, schoolId: school?.id?.toString(), active: true },
       });
       let data = await this.repositoryPlantaDocente.findBy({
         where: { school_id: school?.daneCode, procesado: null },
       });
-      for (let docente of data) {
-        if (
-          docente.documento &&
-          docente.school_id &&
-          docente.sede_dane &&
-          docente.cargo === 'Docente'
-        ) {
+      console.log('data', data?.length);
+      console.log('schoolYear', schoolYear);
+      if (schoolYear?.length == 1) {
+        for (let docente of data) {
           if (
-            docente.documento.length > 1 &&
-            docente.school_id.length > 1 &&
-            docente.sede_dane.length > 1
+            docente.documento &&
+            docente.school_id &&
+            docente.sede_dane &&
+            docente.cargo === 'Docente'
           ) {
-            let user = await this.repositoryUser.findBy({ username: docente.documento });
-            if (user.length === 0) {
+            if (
+              docente.documento.length > 1 &&
+              docente.school_id.length > 1 &&
+              docente.sede_dane.length > 1
+            ) {
+              let user = await this.repositoryUser.findBy({
+                username: docente.documento,
+                active: true,
+              });
               let campus = await this.repositoryCampus.findBy({
                 where: { consecutive: docente.sede_dane },
               });
-              if (campus.length === 1) {
+              let resultUser = null;
+              if (user.length === 0) {
                 let passwordHash = await bcrypt
                   .hash(docente.documento ? docente.documento : 'VIVE2022', BCRYPT_SALT_ROUNDS)
                   .then(function (hashedPassword: any) {
@@ -356,35 +363,36 @@ export class TeacherResolver {
                   version: 0,
                 });
                 //console.log(modelUser);
-                let resultUser = await this.repositoryUser.save(modelUser);
+                resultUser = await this.repositoryUser.save(modelUser);
+              } else {
+                resultUser = user[0];
+              }
+
+              let teacher = await this.repository.findBy({
+                userId: resultUser?.id.toString(),
+                schoolYearId: schoolYear[0]?.id?.toString(),
+                active: true,
+              });
+              if (teacher?.length == 0) {
                 const model = await this.repository.create({
                   schoolId: [school.id.toString()],
-                  campusId: [campus[0].id.toString()],
-                  userId: resultUser.id.toString(),
+                  campusId: campus.length === 1 ? [campus[0].id.toString()] : [],
+                  userId: resultUser?.id.toString(),
+                  schoolYearId: schoolYear[0]?.id?.toString(),
                   active: true,
                   version: 0,
                 });
                 //console.log(model);
                 let result = await this.repository.save(model);
-                count += 1;
-                //console.log(count);
               }
-            } else {
-              for (let use of user) {
-                await this.repositoryUser.save({
-                  _id: new ObjectId(use.id.toString()),
-                  ...use,
-                  documentNumber: use.username,
-                  version: (use?.version as number) + 1,
-                });
-              }
-              const model = await this.repositoryPlantaDocente.create({
+
+              const modelPlantaDocente = await this.repositoryPlantaDocente.create({
                 ...docente,
                 procesado: true,
               });
               count += 1;
-              //console.log(model);
-              let result = await this.repositoryPlantaDocente.save(model);
+              //console.log(modelPlantaDocente);
+              let resultPLantaDocente = await this.repositoryPlantaDocente.save(modelPlantaDocente);
               console.log('procesados ' + count);
             }
           }
