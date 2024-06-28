@@ -27,3 +27,31 @@ export const QUERT_GET_USER = gql`
     }
   }
 `;
+
+export const QUERY_GET_ALL_ROLE = gql`
+  query getAllRole {
+    data: getAllRole(orderCreated: true, allData: true) {
+      edges {
+        node {
+          id
+          active
+          version
+          createdAt
+          updatedAt
+          createdByUserId
+          updatedByUserId
+          name
+          isSchoolAdministrator
+          isSchoolAdministrative
+          isCampusAdministrator
+          isCampusCoordinator
+          isStudent
+          isTeacher
+          isGuardian
+        }
+        cursor
+      }
+      totalCount
+    }
+  }
+`;

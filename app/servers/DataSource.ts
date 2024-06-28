@@ -88,7 +88,7 @@ import { Jornadas } from './../graphql/models/Data/Jornadas';
 
 export const dataSource = new DataSource({
   type: 'mongodb',
-  url: env.DATABASE_URL_TYPE_ORM,
+  url: env.DATABASE_URL_TYPE_ORM_DEV,
   authSource: 'admin',
   entities: [
     AuditLogin,
@@ -174,7 +174,7 @@ export const dataSource = new DataSource({
     StudentYearBehaviour,
     VideoTutorial,
     FrecuentQuestion,
-    ForumQuestion
+    ForumQuestion,
   ],
   synchronize: true,
   logger: 'advanced-console',

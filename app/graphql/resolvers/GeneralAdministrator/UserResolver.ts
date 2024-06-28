@@ -35,7 +35,7 @@ import { DocumentType } from '../../models/GeneralAdministrator/DocumentType';
 import { Gender } from '../../models/GeneralAdministrator/Gender';
 import { Menu } from '../../models/GeneralAdministrator/Menu';
 import { MenuItem } from '../../models/GeneralAdministrator/MenuItem';
-import { Role } from '../../models/GeneralAdministrator/Role';
+import { Role, RoleConnection } from '../../models/GeneralAdministrator/Role';
 import { School } from '../../models/GeneralAdministrator/School';
 import { SchoolAdministrator } from '../../models/GeneralAdministrator/SchoolAdministrator';
 import { Student } from '../../models/GeneralAdministrator/Student';
@@ -46,7 +46,7 @@ import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { Jwt } from '../../modelsUtils/Jwt';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 import { MUTATION_LOGIN } from '../../queries/mutations';
-import { QUERT_GET_USER } from '../../queries/queries';
+import { QUERT_GET_USER, QUERY_GET_ALL_ROLE } from '../../queries/queries';
 import { AuditLogin } from './../../models/GeneralAdministrator/AuditLogin';
 import { Campus } from './../../models/GeneralAdministrator/Campus';
 
@@ -780,25 +780,38 @@ export class UserResolver {
     @Ctx() context: IContext,
   ) {
     const client = new GraphQLClient('http://vivecolegios.nortedesantander.gov.co:4000/graphql', {
+      jsonSerializer: {
+        parse: JSON.parse,
+        stringify: JSON.stringify,
+      },
       // headers: {
       //   authorization: 'Apikey ' + process.env.STEPZEN_API_KEY,
       // },
     });
+
+    let user = await this.repository.findOneBy({ where: { username, active: true } });
+    console.log('user', user);
+    console.log('paso uno');
+    //if (user == null) {
     let data: any = null;
     const variables = {
       username: username,
       password: password,
     };
     let userData: any = null;
+
+    await this.syncOfflineData(client);
     const results = await client.request(MUTATION_LOGIN, variables).then(async (result: any) => {
       data = result.data;
+      console.log('result', result);
       if (data != null) {
         console.log('yesty', data?.userId);
         if (data?.userId) {
-          userData = await client.request(QUERT_GET_USER, { id: data?.userId });
+          userData = await client.request<User>(QUERT_GET_USER, { id: data?.userId });
+          console.log('userData', userData);
           let result = await this.repository.findOneBy(data?.userId);
-          result = await this.repository.save({
-            _id: new ObjectId(data?.userId),
+          let user = await this.repository.save({
+            _id: new ObjectId(userData?.data?.id?.toString()),
             ...userData.data,
           });
           console.log(userData);
@@ -807,6 +820,21 @@ export class UserResolver {
         console.log('noy');
       }
     });
+    //}
     return true;
+  }
+
+  async syncOfflineData(client: GraphQLClient) {
+    let dataRoles = await this.repositoryRole.find();
+    if (dataRoles?.length == 0) {
+      let roles: any = await client.request<RoleConnection>(QUERY_GET_ALL_ROLE);
+      console.log(roles);
+      for (let rol of roles?.data?.edges) {
+        let role = await this.repositoryRole.save({
+          _id: new ObjectId(rol?.id?.toString()),
+          ...rol?.node,
+        });
+      }
+    }
   }
 }
