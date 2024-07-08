@@ -1,4 +1,4 @@
-FROM node:20.11.0 as build
+FROM node:18.18.2 as build
 
 RUN apt-get update \
     && apt-get install -y wget gnupg \
