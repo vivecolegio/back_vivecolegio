@@ -27,3 +27,171 @@ export const QUERT_GET_USER = gql`
     }
   }
 `;
+
+export const QUERT_GET_SCHOOL_ADMINISTRATOR_USER_ID = gql`
+  query getSchoolAdministratorUserId($UserId: String!) {
+    data: getSchoolAdministratorUserId(UserId: $UserId) {
+      active
+      campusId
+      createdAt
+      createdByUserId
+      id
+      schoolId
+      support
+      updatedAt
+      updatedByUserId
+      userId
+      version
+    }
+  }
+`;
+
+export const QUERY_GET_ALL_ROLE = gql`
+  query getAllRole {
+    data: getAllRole(orderCreated: true, allData: true) {
+      edges {
+        node {
+          id
+          active
+          version
+          createdAt
+          updatedAt
+          createdByUserId
+          updatedByUserId
+          name
+          isSchoolAdministrator
+          isSchoolAdministrative
+          isCampusAdministrator
+          isCampusCoordinator
+          isStudent
+          isTeacher
+          isGuardian
+        }
+        cursor
+      }
+      totalCount
+    }
+  }
+`;
+
+export const QUERY_GET_ALL_MODULE = gql`
+  query getAllModule {
+    data: getAllModule(orderCreated: true, allData: true) {
+      edges {
+        node {
+          active
+          createdAt
+          createdByUserId
+          id
+          name
+          updatedAt
+          updatedByUserId
+          url
+          version
+        }
+        cursor
+      }
+      totalCount
+    }
+  }
+`;
+
+export const QUERY_GET_ALL_MENU = gql`
+  query getAllMenu {
+    data: getAllMenu(orderCreated: true, allData: true) {
+      edges {
+        node {
+          activateAction
+          active
+          createAction
+          createdAt
+          createdByUserId
+          deleteAction
+          fullAccess
+          icon
+          id
+          inactiveAction
+          isHidden
+          moduleId
+          name
+          order
+          readAction
+          rolesId
+          updateAction
+          updatedAt
+          updatedByUserId
+          version
+        }
+        cursor
+      }
+      totalCount
+    }
+  }
+`;
+
+export const QUERY_GET_ALL_MENU_ITEM = gql`
+  query getAllMenuItem {
+    data: getAllMenuItem(orderCreated: true, allData: true) {
+      edges {
+        node {
+          activateAction
+          active
+          createAction
+          createdAt
+          createdByUserId
+          deleteAction
+          fullAccess
+          icon
+          id
+          inactiveAction
+          isHidden
+          menuId
+          moduleId
+          name
+          order
+          readAction
+          rolesId
+          updateAction
+          updatedAt
+          updatedByUserId
+          version
+        }
+        cursor
+      }
+      totalCount
+    }
+  }
+`;
+
+export const QUERY_GET_ALL_SCHOOL = gql`
+  query getAllSchool {
+    data: getAllSchool(orderCreated: true, allData: true) {
+      edges {
+        node {
+          active
+          createdAt
+          createdByUserId
+          curricularComponent
+          daneCode
+          educationalModel
+          id
+          imgPrincipalSignature
+          imgSecretarySignature
+          logo
+          name
+          pedagogicalModel
+          textAddress
+          textDaneNit
+          textPrincipalSignature
+          textResolution
+          textSecretarySignature
+          updatedAt
+          updatedByUserId
+          version
+        }
+        cursor
+      }
+      totalCount
+    }
+  }
+`;

@@ -193,30 +193,147 @@ export class TeacherResolver {
 
   @Mutation(() => Boolean)
   public async createAllInitialsTeachers() {
-    let schools = await this.repositorySchool.find();
+    let dataSchoolCreate = [
+      '254003002278',
+      '254003000364',
+      '254003000062',
+      '254003000445',
+      '254003000046',
+      '254003000381',
+      '254003002359',
+      '154003000823',
+      '254003000330',
+      '254003000526',
+      '154003001668',
+      '254051000821',
+      '254099000289',
+      '254109000177',
+      '254109000096',
+      '154128000680',
+      '154128000019',
+      '254172000233',
+      '254172000039',
+      '254174000371',
+      '254206000149',
+      '154206000012',
+      '254206001030',
+      '254206000041',
+      '254206000157',
+      '154206000021',
+      '254206001196',
+      '254206001102',
+      '254223000691',
+      '254245000776',
+      '254245000270',
+      '154245000607',
+      '254245000041',
+      '254245001292',
+      '254810000629',
+      '254670000488',
+      '254670000445',
+      '154670001056',
+      '254810000106',
+      '254261000166',
+      '254261000476',
+      '154261000099',
+      '254261000484',
+      '154313000033',
+      '254313000054',
+      '254344000338',
+      '254344000133',
+      '254344000290',
+      '154344000465',
+      '254385000270',
+      '254385000121',
+      '254398000490',
+      '254398000368',
+      '254398000724',
+      '254398000121',
+      '254398000732',
+      '154377000207',
+      '154405000986',
+      '354405000098',
+      '254874000363',
+      '254874000568',
+      '154418000331',
+      '154480000118',
+      '254480000066',
+      '254480000139',
+      '154498000018',
+      '154498000085',
+      '254498000721',
+      '154498001944',
+      '254498000705',
+      '254498000144',
+      '154498001928',
+      '154498000069',
+      '154498002223',
+      '254498000209',
+      '154518000753',
+      '154518000273',
+      '254001004761',
+      '154660000698',
+      '254660000200',
+      '254670000798',
+      '254670000470',
+      '254670000364',
+      '254670001301',
+      '254720001677',
+      '254720000034',
+      '254720000930',
+      '254743000104',
+      '254800000582',
+      '254800000108',
+      '154810003020',
+      '254810000696',
+      '254810000386',
+      '254810002265',
+      '254810000165',
+      '254810002061',
+      '254810001013',
+      '254820000759',
+      '254820000368',
+      '254820000384',
+      '254820000856',
+      '254820000848',
+      '254874000070',
+    ];
+    let schools = await this.repositorySchool.findBy({
+      where: { daneCode: { $in: dataSchoolCreate } },
+    });
     let count = 0;
     for (let school of schools) {
-      let data = await this.repositoryPlantaDocente.findBy({
-        where: { school_id: school.id.toString(), procesado: null },
+      console.log('school', school);
+      let schoolYear = await this.repositorySchoolYear.findBy({
+        where: { schoolYear: 2024, schoolId: school?.id?.toString(), active: true },
       });
-      for (let docente of data) {
-        if (
-          docente.documento &&
-          docente.school_id &&
-          docente.sede_dane &&
-          docente.cargo === 'Docente'
-        ) {
+      let data = await this.repositoryPlantaDocente.findBy({
+        where: { school_id: school?.daneCode, procesado: null },
+      });
+      console.log('data', data?.length);
+      console.log('schoolYear', schoolYear);
+      if (schoolYear?.length == 1) {
+        for (let docente of data) {
           if (
-            docente.documento.length > 1 &&
-            docente.school_id.length > 1 &&
-            docente.sede_dane.length > 1
+            docente.documento &&
+            docente.school_id &&
+            docente.sede_dane &&
+            docente.cargo === 'Docente'
           ) {
-            let user = await this.repositoryUser.findBy({ username: docente.documento });
-            if (user.length === 0) {
+            if (
+              docente.documento.length > 1 &&
+              docente.school_id.length > 1 &&
+              docente.sede_dane.length > 1
+            ) {
+              let user = await this.repositoryUser.findBy({
+                username: docente.documento,
+                active: true,
+              });
               let campus = await this.repositoryCampus.findBy({
                 where: { consecutive: docente.sede_dane },
               });
-              if (campus.length === 1) {
+              let resultUser = null;
+              if (user.length === 0) {
                 let passwordHash = await bcrypt
                   .hash(docente.documento ? docente.documento : 'VIVE2022', BCRYPT_SALT_ROUNDS)
                   .then(function (hashedPassword: any) {
@@ -246,35 +363,36 @@ export class TeacherResolver {
                   version: 0,
                 });
                 //console.log(modelUser);
-                let resultUser = await this.repositoryUser.save(modelUser);
+                resultUser = await this.repositoryUser.save(modelUser);
+              } else {
+                resultUser = user[0];
+              }
+
+              let teacher = await this.repository.findBy({
+                userId: resultUser?.id.toString(),
+                schoolYearId: schoolYear[0]?.id?.toString(),
+                active: true,
+              });
+              if (teacher?.length == 0) {
                 const model = await this.repository.create({
                   schoolId: [school.id.toString()],
-                  campusId: [campus[0].id.toString()],
-                  userId: resultUser.id.toString(),
+                  campusId: campus.length === 1 ? [campus[0].id.toString()] : [],
+                  userId: resultUser?.id.toString(),
+                  schoolYearId: schoolYear[0]?.id?.toString(),
                   active: true,
                   version: 0,
                 });
                 //console.log(model);
                 let result = await this.repository.save(model);
-                count += 1;
-                //console.log(count);
               }
-            } else {
-              for (let use of user) {
-                await this.repositoryUser.save({
-                  _id: new ObjectId(use.id.toString()),
-                  ...use,
-                  documentNumber: use.username,
-                  version: (use?.version as number) + 1,
-                });
-              }
-              const model = await this.repositoryPlantaDocente.create({
+
+              const modelPlantaDocente = await this.repositoryPlantaDocente.create({
                 ...docente,
                 procesado: true,
               });
               count += 1;
-              //console.log(model);
-              let result = await this.repositoryPlantaDocente.save(model);
+              //console.log(modelPlantaDocente);
+              let resultPLantaDocente = await this.repositoryPlantaDocente.save(modelPlantaDocente);
               console.log('procesados ' + count);
             }
           }

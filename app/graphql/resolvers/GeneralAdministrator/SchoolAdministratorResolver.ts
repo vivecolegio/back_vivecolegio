@@ -4,13 +4,20 @@ import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
-import { SchoolAdministratorRepository, SchoolRepository, UserRepository } from '../../../servers/DataSource';
+import {
+  SchoolAdministratorRepository,
+  SchoolRepository,
+  UserRepository,
+} from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewSchoolAdministrator } from '../../inputs/GeneralAdministrator/NewSchoolAdministrator';
 import { NewUser } from '../../inputs/GeneralAdministrator/NewUser';
 import { IContext } from '../../interfaces/IContext';
 import { School } from '../../models/GeneralAdministrator/School';
-import { SchoolAdministrator, SchoolAdministratorConnection } from '../../models/GeneralAdministrator/SchoolAdministrator';
+import {
+  SchoolAdministrator,
+  SchoolAdministratorConnection,
+} from '../../models/GeneralAdministrator/SchoolAdministrator';
 import { User } from '../../models/GeneralAdministrator/User';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 
@@ -33,12 +40,18 @@ export class SchoolAdministratorResolver {
     return result;
   }
 
+  @Query(() => SchoolAdministrator, { nullable: true })
+  async getSchoolAdministratorUserId(@Arg('userId', () => String) userId: string) {
+    const result = await this.repository.findBy({ where: { userId } });
+    return result?.length > 0 ? [0] : null;
+  }
+
   @Query(() => SchoolAdministratorConnection)
   async getAllSchoolAdministrator(
     @Args() args: ConnectionArgs,
     @Arg('allData', () => Boolean) allData: Boolean,
     @Arg('orderCreated', () => Boolean) orderCreated: Boolean,
-    @Arg('schoolId', () => String) schoolId: String
+    @Arg('schoolId', () => String) schoolId: String,
   ): Promise<SchoolAdministratorConnection> {
     let result;
     if (allData) {
@@ -54,7 +67,8 @@ export class SchoolAdministratorResolver {
       if (orderCreated) {
         result = await this.repository.findBy({
           where: {
-            schoolId, support: false,
+            schoolId,
+            support: false,
             active: true,
           },
           order: { createdAt: 'DESC' },
@@ -62,7 +76,8 @@ export class SchoolAdministratorResolver {
       } else {
         result = await this.repository.findBy({
           where: {
-            schoolId, support: false,
+            schoolId,
+            support: false,
             active: true,
           },
         });
@@ -80,7 +95,7 @@ export class SchoolAdministratorResolver {
   @Mutation(() => SchoolAdministrator)
   async createSchoolAdministrator(
     @Arg('data') data: NewSchoolAdministrator,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<SchoolAdministrator> {
     let dataProcess: NewSchoolAdministrator = removeEmptyStringElements(data);
     let dataUserProcess: NewUser = removeEmptyStringElements(dataProcess.newUser);
@@ -154,7 +169,7 @@ export class SchoolAdministratorResolver {
   async updateSchoolAdministrator(
     @Arg('data') data: NewSchoolAdministrator,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<SchoolAdministrator | null> {
     let dataProcess = removeEmptyStringElements(data);
     let updatedByUserId = context?.user?.authorization?.id;
@@ -183,7 +198,7 @@ export class SchoolAdministratorResolver {
   async changeActiveSchoolAdministrator(
     @Arg('active', () => Boolean) active: boolean,
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOneBy(id);
@@ -212,7 +227,7 @@ export class SchoolAdministratorResolver {
   @Mutation(() => Boolean)
   async deleteSchoolAdministrator(
     @Arg('id', () => String) id: string,
-    @Ctx() context: IContext
+    @Ctx() context: IContext,
   ): Promise<Boolean | null> {
     let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: new ObjectId(id) });

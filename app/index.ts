@@ -1,10 +1,15 @@
 import { ApolloGateway, IntrospectAndCompose } from '@apollo/gateway';
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@apollo/server/express4';
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import {
+  ApolloServerPluginLandingPageLocalDefault,
+  ApolloServerPluginLandingPageProductionDefault,
+} from '@apollo/server/plugin/landingPage/default';
 import { Ipware } from '@fullerstack/nax-ipware';
 import FileUploadDataSource from '@profusion/apollo-federation-upload';
-import { ApolloServerPluginLandingPageLocalDefault, ApolloServerPluginLandingPageProductionDefault } from 'apollo-server-core';
-import { ApolloServer } from 'apollo-server-express';
 import Cors from 'cors';
-import Express from 'express';
+import Express, { RequestHandler } from 'express';
 import { expressjwt } from 'express-jwt';
 import * as fs from 'fs';
 import geoip from 'geoip-lite';
@@ -16,15 +21,20 @@ import Morgan from 'morgan';
 import path from 'path';
 import { env } from 'process';
 
-import { GATEWAY_HTTP_PORT_APP, GATEWAY_HTTPS_PORT_APP, SERVER_NAME_APP, SERVER_PORT_APP } from './config/index';
+import {
+  GATEWAY_HTTP_PORT_APP,
+  GATEWAY_HTTPS_PORT_APP,
+  SERVER_NAME_APP,
+  SERVER_PORT_APP,
+} from './config';
 
 import 'reflect-metadata';
 
 const cluster = require('node:cluster');
 const expressHealthApi = require('express-health-api');
 //const numCPUs = env.NODE_ENV === "development" ? 1 : require('node:os').cpus().length;
-const numCPUs = env.NODE_ENV === "development" ? 1 : 10;
-
+const numCPUs = env.NODE_ENV === 'development' ? 1 : 10;
+const jwt = require('jsonwebtoken');
 var httpsOptions = {
   // this is the private key only
   key: fs.readFileSync(path.join('ssl', 'vivecolegios', 'private.key')),
@@ -32,7 +42,7 @@ var httpsOptions = {
   cert: fs.readFileSync(path.join('ssl', 'vivecolegios', 'certificate.crt')),
   // this stuff is generally only for peer certificates
   ca: fs.readFileSync(path.join('ssl', 'vivecolegios', 'ca_bundle.crt')),
-  requestCert: false
+  requestCert: false,
 };
 
 async function app() {
@@ -45,17 +55,20 @@ async function app() {
         return new FileUploadDataSource({
           url,
           willSendRequest({ request, context }: any) {
-            request.http.headers.set('user', context.user ? JSON.stringify(context.user) : null);
-            request.http.headers.set(
-              'requestdata',
-              context.requestdata ? JSON.stringify(context.requestdata) : null
-            );
+            let user = null;
+            if (context?.token?.length > 0) {
+              //console.log(context?.token?.replace('Bearer ', ''));
+              user = jwt.decode(context?.token?.replace('Bearer ', ''));
+            }
+            request.http.headers.set('user', user ? JSON.stringify(user) : null);
+            let requestdata = { ...context, user: user };
+            //console.log(requestdata);
+            request.http.headers.set('requestdata', requestdata);
+            //console.log(context, user);
           },
         });
       },
     });
-
-    const { schema, executor } = await gateway.load();
 
     const configExpressStatusMonitor = {
       title: 'Express Status ViveColegios', // Default title
@@ -95,33 +108,41 @@ async function app() {
       ],
     };
     const ipware = new Ipware();
+    const app = Express();
+    const httpServer = http.createServer(app);
+    const httpsServer = https.createServer(httpsOptions, app);
 
     const server = new ApolloServer({
-      schema,
-      executor,
-      // playground: true,
+      gateway,
+      includeStacktraceInErrorResponses: true,
+      introspection: true,
       plugins: [
         process.env.NODE_ENV === 'production'
           ? ApolloServerPluginLandingPageProductionDefault({ footer: false })
           : ApolloServerPluginLandingPageLocalDefault({ footer: false }),
+        ApolloServerPluginDrainHttpServer({ httpServer }),
       ],
-      introspection: true,
-      context: (context: any) => {
-        const user = context.req?.auth || null;
-        var geo = geoip.lookup(context.req.ip);
-        const requestdata = {
-          ip: JSON.stringify(context.req.ip),
-          geo: geo,
-          browser: context.req.headers['user-agent'],
-          language: context.req.headers['accept-language'],
-          ipware: ipware.getClientIP(context.req),
-          ipwarePublic: ipware.getClientIP(context.req, { publicOnly: true }),
+      formatError: (err: any) => {
+        console.error('GraphQL Error', err);
+        const errorReport = {
+          message: err.message,
+          locations: err.locations,
+          path: err.path,
+          stacktrace: err.extensions?.exception?.stacktrace || [],
+          code: err.extensions?.code,
         };
-        return { user, requestdata };
+        console.error('GraphQL Error', errorReport);
+        if (errorReport.code == 'INTERNAL_SERVER_ERROR') {
+          return {
+            message: 'Oops! Something went wrong! :(',
+            code: errorReport.code,
+          };
+        }
+        return errorReport;
       },
     });
 
-    const app = Express();
+    await server.start();
 
     // Middlewares
     app.use(require('express-status-monitor')(configExpressStatusMonitor));
@@ -141,7 +162,7 @@ async function app() {
         secret: 'f1BtnWgD3VKY',
         algorithms: ['HS256'],
         credentialsRequired: false,
-      })
+      }),
     );
     app.use(function (req, res, next) {
       res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
@@ -149,24 +170,35 @@ async function app() {
       res.header('Pragma', 'no-cache');
       next();
     });
-    server.start().then(() => {
-      server.applyMiddleware({ app });
-    });
-    var httpServer = http.createServer(app);
-    var httpsServer = https.createServer(httpsOptions, app);
-    httpServer.listen({ port: GATEWAY_HTTP_PORT_APP }, () => {
-      console.log(
-        `🚀 Server ready and listening at ==> http://vivecolegios.nortedesantander.gov.co:${GATEWAY_HTTP_PORT_APP}${server.graphqlPath}`
-      );
-      console.log(`Worker ${process.pid} started`);
-    });;
-    httpsServer.listen({ port: GATEWAY_HTTPS_PORT_APP }, () => {
-      console.log(
-        `🚀 Server ready and listening at ==> https://vivecolegios.nortedesantander.gov.co:${GATEWAY_HTTPS_PORT_APP}${server.graphqlPath}`
-      );
-      console.log(`Worker ${process.pid} started`);
-    });;;
+    app.use(
+      expressMiddleware(server, {
+        context: async ({ req, res }) => ({
+          headers: req.headers,
+          token: req.headers['authorization'],
+          ip: JSON.stringify(req.ip),
+          geo: geoip.lookup(req?.ip ? req?.ip : ''),
+          browser: req.headers['user-agent'],
+          language: req.headers['accept-language'],
+          ipware: ipware.getClientIP(req),
+          ipwarePublic: ipware.getClientIP(req, { publicOnly: true }),
+        }),
+      }) as RequestHandler,
+    );
 
+    await new Promise((resolve) => {
+      httpServer.listen({ port: GATEWAY_HTTP_PORT_APP }, () => {
+        console.log(
+          `🚀 Server ready and listening at ==> http://vivecolegios.nortedesantander.gov.co:${GATEWAY_HTTP_PORT_APP}`,
+        );
+        console.log(`Worker ${process.pid} started`);
+      });
+      httpsServer.listen({ port: GATEWAY_HTTPS_PORT_APP }, () => {
+        console.log(
+          `🚀 Server ready and listening at ==> https://vivecolegios.nortedesantander.gov.co:${GATEWAY_HTTPS_PORT_APP}`,
+        );
+        console.log(`Worker ${process.pid} started`);
+      });
+    });
   } catch (err) {
     console.error(err);
   }
@@ -179,7 +211,7 @@ if (cluster.isMaster) {
     cluster.fork();
   }
   // This event is firs when worker died
-  cluster.on('exit', (worker: { process: { pid: any; }; }, code: any, signal: any) => {
+  cluster.on('exit', (worker: { process: { pid: any } }, code: any, signal: any) => {
     console.log(`worker ${worker.process.pid} died`);
   });
 }

@@ -174,7 +174,7 @@ export const dataSource = new DataSource({
     StudentYearBehaviour,
     VideoTutorial,
     FrecuentQuestion,
-    ForumQuestion
+    ForumQuestion,
   ],
   synchronize: true,
   logger: 'advanced-console',
