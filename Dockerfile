@@ -1,4 +1,4 @@
-FROM node:18.18.1 as build
+FROM node:20.11.0 as build
 
 RUN apt-get update \
     && apt-get install -y wget gnupg \
@@ -17,6 +17,7 @@ WORKDIR /usr/src/app
 
 COPY . .
 
+#RUN yarn install --ignore-scripts
 RUN yarn install
 RUN yarn build
 
