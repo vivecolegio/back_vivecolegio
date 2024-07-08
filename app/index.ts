@@ -33,7 +33,7 @@ import 'reflect-metadata';
 const cluster = require('node:cluster');
 const expressHealthApi = require('express-health-api');
 //const numCPUs = env.NODE_ENV === "development" ? 1 : require('node:os').cpus().length;
-const numCPUs = env.NODE_ENV === 'development' ? 1 : 1;
+const numCPUs = env.NODE_ENV === 'development' ? 1 : 10;
 const jwt = require('jsonwebtoken');
 var httpsOptions = {
   // this is the private key only

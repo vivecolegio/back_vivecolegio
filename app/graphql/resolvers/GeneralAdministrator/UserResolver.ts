@@ -18,6 +18,7 @@ import {
   GuardianRepository,
   MenuItemRepository,
   MenuRepository,
+  ModuleRepository,
   RoleRepository,
   SchoolAdministratorRepository,
   SchoolRepository,
@@ -33,10 +34,11 @@ import { Guardian } from '../../models/CampusAdministrator/Guardian';
 import { Teacher } from '../../models/CampusAdministrator/Teacher';
 import { DocumentType } from '../../models/GeneralAdministrator/DocumentType';
 import { Gender } from '../../models/GeneralAdministrator/Gender';
-import { Menu } from '../../models/GeneralAdministrator/Menu';
-import { MenuItem } from '../../models/GeneralAdministrator/MenuItem';
+import { Menu, MenuConnection } from '../../models/GeneralAdministrator/Menu';
+import { MenuItem, MenuItemConnection } from '../../models/GeneralAdministrator/MenuItem';
+import { Module, ModuleConnection } from '../../models/GeneralAdministrator/Module';
 import { Role, RoleConnection } from '../../models/GeneralAdministrator/Role';
-import { School } from '../../models/GeneralAdministrator/School';
+import { School, SchoolConnection } from '../../models/GeneralAdministrator/School';
 import { SchoolAdministrator } from '../../models/GeneralAdministrator/SchoolAdministrator';
 import { Student } from '../../models/GeneralAdministrator/Student';
 import { User, UserConnection } from '../../models/GeneralAdministrator/User';
@@ -46,9 +48,17 @@ import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { Jwt } from '../../modelsUtils/Jwt';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 import { MUTATION_LOGIN } from '../../queries/mutations';
-import { QUERT_GET_USER, QUERY_GET_ALL_ROLE } from '../../queries/queries';
+import {
+  QUERT_GET_USER,
+  QUERY_GET_ALL_MENU,
+  QUERY_GET_ALL_MENU_ITEM,
+  QUERY_GET_ALL_MODULE,
+  QUERY_GET_ALL_ROLE,
+  QUERY_GET_ALL_SCHOOL,
+} from '../../queries/queries';
 import { AuditLogin } from './../../models/GeneralAdministrator/AuditLogin';
 import { Campus } from './../../models/GeneralAdministrator/Campus';
+import { QUERT_GET_SCHOOL_ADMINISTRATOR_USER_ID } from './../../queries/queries';
 
 const BCRYPT_SALT_ROUNDS = 12;
 
@@ -65,6 +75,9 @@ export class UserResolver {
 
   @InjectRepository(Role)
   private repositoryRole = RoleRepository;
+
+  @InjectRepository(Module)
+  private repositoryModule = ModuleRepository;
 
   @InjectRepository(Menu)
   private repositoryMenu = MenuRepository;
@@ -788,52 +801,149 @@ export class UserResolver {
       //   authorization: 'Apikey ' + process.env.STEPZEN_API_KEY,
       // },
     });
-
-    let user = await this.repository.findOneBy({ where: { username, active: true } });
-    console.log('user', user);
-    console.log('paso uno');
-    //if (user == null) {
     let data: any = null;
     const variables = {
       username: username,
       password: password,
     };
     let userData: any = null;
-
     await this.syncOfflineData(client);
-    const results = await client.request(MUTATION_LOGIN, variables).then(async (result: any) => {
+    await client.request(MUTATION_LOGIN, variables).then(async (result: any) => {
       data = result.data;
-      console.log('result', result);
       if (data != null) {
-        console.log('yesty', data?.userId);
         if (data?.userId) {
           userData = await client.request<User>(QUERT_GET_USER, { id: data?.userId });
-          console.log('userData', userData);
           let result = await this.repository.findOneBy(data?.userId);
-          let user = await this.repository.save({
-            _id: new ObjectId(userData?.data?.id?.toString()),
-            ...userData.data,
-          });
+          let id = data?.userId;
+          delete userData.data.id;
+          if (result == null) {
+            data = await this.repository.save({
+              _id: new ObjectId(id),
+              ...userData.data,
+            });
+          } else {
+            await this.repository.update(
+              {
+                id: id,
+              },
+              userData.data,
+            );
+          }
           console.log(userData);
         }
-      } else {
-        console.log('noy');
       }
     });
-    //}
+    let schoolAdministratorData: any = null;
+    schoolAdministratorData = await client.request<SchoolAdministrator>(
+      QUERT_GET_SCHOOL_ADMINISTRATOR_USER_ID,
+      { id: data?.userId },
+    );
+
     return true;
   }
 
   async syncOfflineData(client: GraphQLClient) {
-    let dataRoles = await this.repositoryRole.find();
-    if (dataRoles?.length == 0) {
-      let roles: any = await client.request<RoleConnection>(QUERY_GET_ALL_ROLE);
-      console.log(roles);
-      for (let rol of roles?.data?.edges) {
-        let role = await this.repositoryRole.save({
-          _id: new ObjectId(rol?.id?.toString()),
+    console.log('Update Roles');
+    let roles: any = await client.request<RoleConnection>(QUERY_GET_ALL_ROLE);
+    for (let rol of roles?.data?.edges) {
+      let id = rol?.node?.id?.toString();
+      delete rol?.node.id;
+      let data = await this.repositoryRole.findOneBy(id);
+      if (data == null) {
+        data = await this.repositoryRole.save({
+          _id: new ObjectId(id),
           ...rol?.node,
         });
+      } else {
+        await this.repositoryRole.update(
+          {
+            id: id,
+          },
+          rol?.node,
+        );
+      }
+    }
+    console.log('Update Modules');
+    let modules: any = await client.request<ModuleConnection>(QUERY_GET_ALL_MODULE);
+    for (let module of modules?.data?.edges) {
+      let id = module?.node?.id?.toString();
+      delete module?.node.id;
+      let data = await this.repositoryModule.findOneBy(id);
+      if (data == null) {
+        data = await this.repositoryModule.save({
+          _id: new ObjectId(id),
+          ...module?.node,
+        });
+      } else {
+        await this.repositoryModule.update(
+          {
+            id: id,
+          },
+          module?.node,
+        );
+      }
+    }
+
+    console.log('Update Menu');
+    let menus: any = await client.request<MenuConnection>(QUERY_GET_ALL_MENU);
+    for (let menu of menus?.data?.edges) {
+      let id = menu?.node?.id?.toString();
+      delete menu?.node.id;
+      let data = await this.repositoryMenu.findOneBy(id);
+      if (data == null) {
+        data = await this.repositoryMenu.save({
+          _id: new ObjectId(id),
+          ...menu?.node,
+        });
+      } else {
+        await this.repositoryMenu.update(
+          {
+            id: id,
+          },
+          menu?.node,
+        );
+      }
+    }
+
+    console.log('Update MenuItem');
+    let menuItems: any = await client.request<MenuItemConnection>(QUERY_GET_ALL_MENU_ITEM);
+    for (let menuItem of menuItems?.data?.edges) {
+      let id = menuItem?.node?.id?.toString();
+      delete menuItem?.node.id;
+      let data = await this.repositoryMenuItem.findOneBy(id);
+      if (data == null) {
+        data = await this.repositoryMenuItem.save({
+          _id: new ObjectId(id),
+          ...menuItem?.node,
+        });
+      } else {
+        await this.repositoryMenuItem.update(
+          {
+            id: id,
+          },
+          menuItem?.node,
+        );
+      }
+    }
+
+    console.log('Update Schools');
+    let schools: any = await client.request<SchoolConnection>(QUERY_GET_ALL_SCHOOL);
+    for (let school of schools?.data?.edges) {
+      let id = school?.node?.id?.toString();
+      delete school?.node.id;
+      let data = await this.repositorySchool.findOneBy(id);
+      if (data == null) {
+        data = await this.repositorySchool.save({
+          _id: new ObjectId(id),
+          ...school?.node,
+        });
+      } else {
+        await this.repositorySchool.update(
+          {
+            id: id,
+          },
+          school?.node,
+        );
       }
     }
   }
