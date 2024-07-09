@@ -43,7 +43,7 @@ export function ConnectionType<
   return Connection;
 }
 
-export function EdgeType<NodeType>(nodeName: string, nodeType: ClassType<NodeType>) {
+export function EdgeType<NodeType extends object>(nodeName: string, nodeType: ClassType<NodeType>) {
   @ObjectType(`${nodeName}Edge`)
   abstract class Edge implements Relay.Edge<NodeType> {
     @Field((type) => nodeType)

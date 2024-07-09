@@ -17,8 +17,9 @@ WORKDIR /usr/src/app
 
 COPY . .
 
-RUN yarn install --ignore-scripts
-#RUN yarn install
+RUN yarn global add node-gyp
+#RUN yarn install --ignore-scripts
+RUN yarn install
 RUN yarn build
 
 #RUN npm prune --production

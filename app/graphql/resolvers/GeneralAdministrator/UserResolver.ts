@@ -792,7 +792,7 @@ export class UserResolver {
     @Arg('password') password: string,
     @Ctx() context: IContext,
   ) {
-    const client = new GraphQLClient('http://vivecolegios.nortedesantander.gov.co:4000/graphql', {
+    const client = new GraphQLClient('http://vivecolegios.nortedesantander.gov.co:5000/graphql', {
       jsonSerializer: {
         parse: JSON.parse,
         stringify: JSON.stringify,
@@ -807,13 +807,14 @@ export class UserResolver {
       password: password,
     };
     let userData: any = null;
-    await this.syncOfflineData(client);
+
     await client.request(MUTATION_LOGIN, variables).then(async (result: any) => {
       data = result.data;
       if (data != null) {
         if (data?.userId) {
           userData = await client.request<User>(QUERT_GET_USER, { id: data?.userId });
           let result = await this.repository.findOneBy(data?.userId);
+          await this.syncOfflineData(client,data?.userId);
           let id = data?.userId;
           delete userData.data.id;
           if (result == null) {
@@ -842,7 +843,7 @@ export class UserResolver {
     return true;
   }
 
-  async syncOfflineData(client: GraphQLClient) {
+  async syncOfflineData(client: GraphQLClient,userId: string) {
     console.log('Update Roles');
     let roles: any = await client.request<RoleConnection>(QUERY_GET_ALL_ROLE);
     for (let rol of roles?.data?.edges) {
@@ -945,6 +946,27 @@ export class UserResolver {
           school?.node,
         );
       }
+    }
+
+    console.log("School Administrator");
+    let schoolAdministratorData = await client.request<SchoolAdministrator>(QUERT_GET_SCHOOL_ADMINISTRATOR_USER_ID, { userId: userId });
+
+    console.log("schoolAdministratorData",schoolAdministratorData);
+    let result = await this.repositorySchoolAdministrator.findOneBy(userId);
+    let id = null;
+    if (result == null) {
+      id = schoolAdministratorData?.id?.toString();
+      await this.repositorySchoolAdministrator.save({
+        _id: new ObjectId(id),
+        ...schoolAdministratorData,
+      });
+    } else {
+      await this.repositorySchoolAdministrator.update(
+        {
+          id: result?.id?.toString(),
+        },
+        schoolAdministratorData,
+      );
     }
   }
 }
