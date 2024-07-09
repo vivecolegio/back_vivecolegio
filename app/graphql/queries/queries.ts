@@ -195,3 +195,57 @@ export const QUERY_GET_ALL_SCHOOL = gql`
     }
   }
 `;
+
+export const QUERT_GET_ALL_SCHOOL_YEAR = gql`
+  query getAllSchoolYear($schoolId: String!) {
+    data: getAllSchoolYear(schoolId: $schoolId, orderCreated: true, allData: true) {
+      edges {
+        node {
+          id
+          schoolId
+          active
+          version
+          createdAt
+          updatedAt
+          createdByUserId
+          updatedByUserId
+          schoolYear
+          startDate
+          endDate
+          folioNumber
+          schoolYearImportId
+        }
+      }
+      totalCount
+    }
+  }
+`;
+
+export const QUERT_GET_ACADEMIC_PERIOD_SCHOOL_YEAR = gql`
+  query getAcademicPeriodSchoolYear($schoolId: String!, $schoolYearId: String!) {
+    data: getAcademicPeriodSchoolYear(schoolId: $schoolId, schoolYearId: $schoolYearId) {
+      edges {
+        node {
+          id
+          schoolId
+          active
+          version
+          createdAt
+          updatedAt
+          createdByUserId
+          updatedByUserId
+          name
+          schoolYearId
+          startDate
+          endDate
+          startDateRecovery
+          endDateRecovery
+          weight
+          order
+          entityBaseId
+        }
+      }
+      totalCount
+    }
+  }
+`;

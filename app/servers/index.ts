@@ -110,6 +110,7 @@ import 'reflect-metadata';
 import { ErrorLoggerMiddleware } from '../graphql/middlewares/error-logger';
 import { LogAccessMiddleware } from '../graphql/middlewares/log-access';
 import { ResolveTimeMiddleware } from '../graphql/middlewares/resolve-time';
+import { SyncOfflineResolver } from '../graphql/resolvers/SchoolAdministrator/SyncOfflineResolver';
 
 const PORT = SERVER_PORT_APP;
 const SERVER_NAME = SERVER_NAME_APP;
@@ -211,6 +212,7 @@ async function app() {
         VideoTutorialResolver,
         BackupResolver,
         ForumQuestionResolver,
+        SyncOfflineResolver,
       ],
       globalMiddlewares: [ErrorLoggerMiddleware, ResolveTimeMiddleware, LogAccessMiddleware],
     });

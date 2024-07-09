@@ -9,6 +9,7 @@ import { finished } from 'stream/promises';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import {
+  AcademicPeriodRepository,
   AuditLoginRepository,
   CampusAdministratorRepository,
   CampusCoordinatorRepository,
@@ -42,13 +43,19 @@ import { School, SchoolConnection } from '../../models/GeneralAdministrator/Scho
 import { SchoolAdministrator } from '../../models/GeneralAdministrator/SchoolAdministrator';
 import { Student } from '../../models/GeneralAdministrator/Student';
 import { User, UserConnection } from '../../models/GeneralAdministrator/User';
+import {
+  AcademicPeriod,
+  AcademicPeriodConnection,
+} from '../../models/SchoolAdministrator/AcademicPeriod';
 import { CampusAdministrator } from '../../models/SchoolAdministrator/CampusAdministrator';
 import { CampusCoordinator } from '../../models/SchoolAdministrator/CampusCoordinator';
-import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
+import { SchoolYear, SchoolYearConnection } from '../../models/SchoolAdministrator/SchoolYear';
 import { Jwt } from '../../modelsUtils/Jwt';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 import { MUTATION_LOGIN } from '../../queries/mutations';
 import {
+  QUERT_GET_ACADEMIC_PERIOD_SCHOOL_YEAR,
+  QUERT_GET_ALL_SCHOOL_YEAR,
   QUERT_GET_USER,
   QUERY_GET_ALL_MENU,
   QUERY_GET_ALL_MENU_ITEM,
@@ -114,6 +121,9 @@ export class UserResolver {
 
   @InjectRepository(SchoolYear)
   private repositorySchoolYear = SchoolYearRepository;
+
+  @InjectRepository(AcademicPeriod)
+  private repositoryAcademicPeriod = AcademicPeriodRepository;
 
   @Query(() => User, { nullable: true })
   async getUser(@Arg('id', () => String) id: string) {
@@ -814,7 +824,7 @@ export class UserResolver {
         if (data?.userId) {
           userData = await client.request<User>(QUERT_GET_USER, { id: data?.userId });
           let result = await this.repository.findOneBy(data?.userId);
-          await this.syncOfflineData(client,data?.userId);
+          await this.syncOfflineData(client, data?.userId);
           let id = data?.userId;
           delete userData.data.id;
           if (result == null) {
@@ -834,16 +844,10 @@ export class UserResolver {
         }
       }
     });
-    let schoolAdministratorData: any = null;
-    schoolAdministratorData = await client.request<SchoolAdministrator>(
-      QUERT_GET_SCHOOL_ADMINISTRATOR_USER_ID,
-      { id: data?.userId },
-    );
-
     return true;
   }
 
-  async syncOfflineData(client: GraphQLClient,userId: string) {
+  async syncOfflineData(client: GraphQLClient, userId: string) {
     console.log('Update Roles');
     let roles: any = await client.request<RoleConnection>(QUERY_GET_ALL_ROLE);
     for (let rol of roles?.data?.edges) {
@@ -948,25 +952,81 @@ export class UserResolver {
       }
     }
 
-    console.log("School Administrator");
-    let schoolAdministratorData = await client.request<SchoolAdministrator>(QUERT_GET_SCHOOL_ADMINISTRATOR_USER_ID, { userId: userId });
-
-    console.log("schoolAdministratorData",schoolAdministratorData);
+    console.log('School Administrator');
+    let schoolAdministratorData: any = null;
+    schoolAdministratorData = await client.request<SchoolAdministrator>(
+      QUERT_GET_SCHOOL_ADMINISTRATOR_USER_ID,
+      { userId: userId },
+    );
     let result = await this.repositorySchoolAdministrator.findOneBy(userId);
     let id = null;
     if (result == null) {
       id = schoolAdministratorData?.id?.toString();
       await this.repositorySchoolAdministrator.save({
         _id: new ObjectId(id),
-        ...schoolAdministratorData,
+        ...schoolAdministratorData?.data,
       });
     } else {
       await this.repositorySchoolAdministrator.update(
         {
           id: result?.id?.toString(),
         },
-        schoolAdministratorData,
+        schoolAdministratorData?.data,
       );
+    }
+    console.log('School Year');
+    let schoolIds = schoolAdministratorData?.data?.schoolId;
+    for (let schoolId of schoolIds) {
+      let schoolYears: any = null;
+      schoolYears = await client.request<SchoolYearConnection>(QUERT_GET_ALL_SCHOOL_YEAR, {
+        schoolId: schoolId,
+      });
+      for (let schoolYear of schoolYears?.data?.edges) {
+        let id = schoolYear?.node?.id?.toString();
+        delete schoolYear?.node.id;
+        let data = await this.repositorySchoolYear.findOneBy(id);
+        if (data == null) {
+          data = await this.repositorySchoolYear.save({
+            _id: new ObjectId(id),
+            ...schoolYear?.node,
+          });
+        } else {
+          await this.repositorySchoolYear.update(
+            {
+              id: id,
+            },
+            schoolYear?.node,
+          );
+        }
+        console.log('Academic Period');
+
+        let academicPeriods: any = null;
+        academicPeriods = await client.request<AcademicPeriodConnection>(
+          QUERT_GET_ACADEMIC_PERIOD_SCHOOL_YEAR,
+          {
+            schoolId: schoolId,
+            schoolYearId: id,
+          },
+        );
+        for (let academicPeriod of academicPeriods?.data?.edges) {
+          let id = academicPeriod?.node?.id?.toString();
+          delete academicPeriod?.node.id;
+          let data = await this.repositoryAcademicPeriod.findOneBy(id);
+          if (data == null) {
+            data = await this.repositoryAcademicPeriod.save({
+              _id: new ObjectId(id),
+              ...academicPeriod?.node,
+            });
+          } else {
+            await this.repositoryAcademicPeriod.update(
+              {
+                id: id,
+              },
+              academicPeriod?.node,
+            );
+          }
+        }
+      }
     }
   }
 }

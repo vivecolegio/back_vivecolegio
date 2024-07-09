@@ -1,5 +1,6 @@
 import { env } from 'process';
 import { DataSource } from 'typeorm';
+import { SyncOffline } from './../graphql/models/SchoolAdministrator/SyncOffline';
 
 import { AcademicAreaCoursePeriodValuation } from '../graphql/models/CampusAdministrator/AcademicAreaCoursePeriodValuation';
 import { AcademicAreaCourseYearValuation } from '../graphql/models/CampusAdministrator/AcademicAreaCourseYearValuation';
@@ -175,6 +176,7 @@ export const dataSource = new DataSource({
     VideoTutorial,
     FrecuentQuestion,
     ForumQuestion,
+    SyncOffline,
   ],
   synchronize: true,
   logger: 'advanced-console',
@@ -313,3 +315,4 @@ export const StudentYearBehaviourRepository = dataSource.getMongoRepository(Stud
 export const VideoTutorialRepository = dataSource.getMongoRepository(VideoTutorial);
 export const FrecuentQuestionRepository = dataSource.getMongoRepository(FrecuentQuestion);
 export const ForumQuestionRepository = dataSource.getMongoRepository(ForumQuestion);
+export const SyncOfflineRepository = dataSource.getMongoRepository(SyncOffline);
