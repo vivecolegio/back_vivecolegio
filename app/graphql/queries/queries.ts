@@ -29,8 +29,8 @@ export const QUERT_GET_USER = gql`
 `;
 
 export const QUERT_GET_SCHOOL_ADMINISTRATOR_USER_ID = gql`
-  query getSchoolAdministratorUserId($UserId: String!) {
-    data: getSchoolAdministratorUserId(UserId: $UserId) {
+  query getSchoolAdministratorUserId($userId: String!) {
+    data: getSchoolAdministratorUserId(userId: $userId) {
       active
       campusId
       createdAt

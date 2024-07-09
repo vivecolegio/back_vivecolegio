@@ -43,7 +43,7 @@ export class SchoolAdministratorResolver {
   @Query(() => SchoolAdministrator, { nullable: true })
   async getSchoolAdministratorUserId(@Arg('userId', () => String) userId: string) {
     const result = await this.repository.findBy({ where: { userId } });
-    return result?.length > 0 ? [0] : null;
+    return result?.length > 0 ? result[0] : null;
   }
 
   @Query(() => SchoolAdministratorConnection)
