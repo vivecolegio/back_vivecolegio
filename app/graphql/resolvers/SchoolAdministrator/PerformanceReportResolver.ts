@@ -1414,8 +1414,9 @@ export class PerformanceReportResolver {
         },
       );
       const browser = await puppeteer.launch({
-        headless: 'new',
         args: ['--no-sandbox'],
+        headless: 'new',
+        timeout: 0,
       });
       const page = await browser.newPage();
       //console.log(data)
@@ -1492,9 +1493,11 @@ export class PerformanceReportResolver {
           return opts.inverse(this);
         },
       );
+      process.setMaxListeners(0);
       const browser = await puppeteer.launch({
-        headless: 'new',
         args: ['--no-sandbox'],
+        headless: 'new',
+        timeout: 0,
       });
       const page = await browser.newPage();
       //console.log(data)
@@ -1538,9 +1541,11 @@ export class PerformanceReportResolver {
     const path = require('path');
     const data = require('../../../reports/performanceReport/data.json');
     try {
+      process.setMaxListeners(0);
       const browser = await puppeteer.launch({
-        headless: 'new',
         args: ['--no-sandbox'],
+        headless: 'new',
+        timeout: 0,
       });
       const page = await browser.newPage();
       //console.log(data)

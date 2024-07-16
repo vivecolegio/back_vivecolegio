@@ -709,8 +709,11 @@ export class PerformanceFinalReportResolver {
         }
         return opts.inverse(this);
       });
+      process.setMaxListeners(0);
       const browser = await puppeteer.launch({
-        args: ['--no-sandbox']
+        args: ['--no-sandbox'],
+        headless: 'new',
+        timeout: 0,
       });
       const page = await browser.newPage();
       //console.log(data)
@@ -776,8 +779,11 @@ export class PerformanceFinalReportResolver {
         }
         return opts.inverse(this);
       });
+      process.setMaxListeners(0);
       const browser = await puppeteer.launch({
-        args: ['--no-sandbox']
+        args: ['--no-sandbox'],
+        headless: 'new',
+        timeout: 0,
       });
       const page = await browser.newPage();
       //console.log(data)
