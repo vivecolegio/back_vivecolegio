@@ -1,4 +1,4 @@
-FROM node:18.18.2 as build
+FROM arm32v7/node:18.20.4  as build
 
 RUN apt-get update \
     && apt-get install -y wget gnupg \
@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y default-jre default-jdk
 WORKDIR /usr/src/app
 
 COPY . .
-
+RUN yarn config set network-timeout 300000
 RUN yarn global add node-gyp
 #RUN yarn install --ignore-scripts
 RUN yarn install
