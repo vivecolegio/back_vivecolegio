@@ -14,9 +14,6 @@
     "emitDecoratorMetadata": true,
     "downlevelIteration": true,
     "moduleResolution": "node",
-    "types": ["node"],
-  },
-  "ts-node": {
-    "esm": true
+    "types": ["node"]
   }
 }
