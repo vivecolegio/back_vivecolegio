@@ -1116,13 +1116,22 @@ export class PerformanceFinalReportResolver {
       );
       process.setMaxListeners(0);
       const browser = await puppeteer.launch({
-        args: ['--disable-setuid-sandbox', '--no-sandbox', '--single-process', '--no-zygote'],
+        pipe: true,
+        args: [
+          '--headless',
+          '--disable-gpu',
+          '--full-memory-crash-report',
+          '--unlimited-storage',
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+        ],
         protocolTimeout: 240000,
         headless: 'new',
         timeout: 0,
       });
       const page = await browser.newPage();
-      await page.setDefaultNavigationTimeout(0);
+      //await page.setDefaultNavigationTimeout(0);
       //console.log(data)
       const content = await this.compile('index', data);
 
@@ -1192,13 +1201,22 @@ export class PerformanceFinalReportResolver {
       );
       process.setMaxListeners(0);
       const browser = await puppeteer.launch({
-        args: ['--disable-setuid-sandbox', '--no-sandbox', '--single-process', '--no-zygote'],
+        pipe: true,
+        args: [
+          '--headless',
+          '--disable-gpu',
+          '--full-memory-crash-report',
+          '--unlimited-storage',
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+        ],
         protocolTimeout: 240000,
         headless: 'new',
         timeout: 0,
       });
       const page = await browser.newPage();
-      await page.setDefaultNavigationTimeout(0);
+      //await page.setDefaultNavigationTimeout(0);
       //console.log(data)
       const content = await this.compile('index2', data);
       //console.log(content)

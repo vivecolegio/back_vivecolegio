@@ -1413,17 +1413,26 @@ export class PerformanceReportResolver {
         },
       );
       const browser = await puppeteer.launch({
-        args: ['--no-sandbox'],
+        pipe: true,
+        args: [
+          '--headless',
+          '--disable-gpu',
+          '--full-memory-crash-report',
+          '--unlimited-storage',
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+        ],
         protocolTimeout: 240000,
         headless: 'new',
         timeout: 0,
       });
       const page = await browser.newPage();
-      await page.setDefaultNavigationTimeout(0);
+      //await page.setDefaultNavigationTimeout(0);
       //console.log(data)
       const content = await this.compile('index', data);
 
-      await page.setContent(content, { waitUntil: ['load', 'networkidle0', 'domcontentloaded'] });
+      await page.setContent(content);
       var dir = './public/downloads/reports/students/' + id;
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
@@ -1492,7 +1501,16 @@ export class PerformanceReportResolver {
       );
       process.setMaxListeners(0);
       const browser = await puppeteer.launch({
-        args: ['--disable-setuid-sandbox', '--no-sandbox', '--single-process', '--no-zygote'],
+        pipe: true,
+        args: [
+          '--headless',
+          '--disable-gpu',
+          '--full-memory-crash-report',
+          '--unlimited-storage',
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+        ],
         protocolTimeout: 240000,
         headless: 'new',
         timeout: 0,
@@ -1502,11 +1520,12 @@ export class PerformanceReportResolver {
       //console.log(data)
       const content = await this.compile('index2', data);
       //console.log(content)
-      await page.setContent(content, { waitUntil: ['load', 'networkidle0', 'domcontentloaded'] });
+      await page.setContent(content);
       var dir = './public/downloads/reports/students/' + id;
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
+
       await report.pdfPage(page, {
         path: dir + '/' + id + '-2' + '.pdf',
         format: format,
@@ -1539,7 +1558,16 @@ export class PerformanceReportResolver {
     try {
       process.setMaxListeners(0);
       const browser = await puppeteer.launch({
-        args: ['--disable-setuid-sandbox', '--no-sandbox', '--single-process', '--no-zygote'],
+        pipe: true,
+        args: [
+          '--headless',
+          '--disable-gpu',
+          '--full-memory-crash-report',
+          '--unlimited-storage',
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+        ],
         protocolTimeout: 240000,
         headless: 'new',
         timeout: 0,
@@ -1549,7 +1577,7 @@ export class PerformanceReportResolver {
       //console.log(data)
       const content = await this.compile('index', data);
       //console.log(content)
-      await page.setContent(content, { waitUntil: ['load', 'networkidle0', 'domcontentloaded'] });
+      await page.setContent(content);
       await page.pdf({
         path: 'output.pdf',
         format: 'A4',
