@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import { connectionFromArraySlice } from 'graphql-relay';
 import { GraphQLClient } from 'graphql-request';
-import { FileUpload, GraphQLUpload } from 'graphql-upload';
+import { FileUpload, GraphQLUpload } from 'graphql-upload-minimal';
 import jsonwebtoken from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
 import ShortUniqueId from 'short-unique-id';

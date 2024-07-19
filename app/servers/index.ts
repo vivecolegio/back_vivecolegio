@@ -1,13 +1,11 @@
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
-import {
-  ApolloServerPluginLandingPageLocalDefault,
-  ApolloServerPluginLandingPageProductionDefault,
-} from '@apollo/server/plugin/landingPage/default';
+import { ApolloServerPluginLandingPageDisabled } from '@apollo/server/plugin/disabled';
+import { ApolloServerPluginLandingPageProductionDefault } from '@apollo/server/plugin/landingPage/default';
 import Cors from 'cors';
 import Express, { RequestHandler } from 'express';
 import fs from 'fs';
-import { graphqlUploadExpress } from 'graphql-upload';
+import { graphqlUploadExpress } from 'graphql-upload-minimal';
 import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
 import Helmet from 'helmet';
 import http from 'http';
@@ -117,7 +115,7 @@ const SERVER_NAME = SERVER_NAME_APP;
 
 const cluster = require('node:cluster');
 //const numCPUs = env.NODE_ENV === "development" ? 2 : require('node:os').cpus().length;
-const numCPUs = env.NODE_ENV === 'development' ? 1 : 10;
+const numCPUs = env.NODE_ENV === 'development' ? 1 : 4;
 const expressHealthApi = require('express-health-api');
 
 async function app() {
@@ -268,15 +266,16 @@ async function app() {
 
     const server = new ApolloServer({
       schema: federatedSchema,
-      includeStacktraceInErrorResponses: true,
+      includeStacktraceInErrorResponses: false,
       introspection: true,
       plugins: [
         process.env.NODE_ENV === 'production'
-          ? ApolloServerPluginLandingPageProductionDefault({ footer: false })
-          : ApolloServerPluginLandingPageLocalDefault({ footer: false }),
+          ? ApolloServerPluginLandingPageDisabled()
+          : ApolloServerPluginLandingPageProductionDefault({ footer: false }),
       ],
+      csrfPrevention: true,
       formatError: (err: any) => {
-        console.error('GraphQL Error', err);
+        console.error('GraphQL Error 2', err);
         const errorReport = {
           message: err.message,
           locations: err.locations,
@@ -284,13 +283,8 @@ async function app() {
           stacktrace: err.extensions?.exception?.stacktrace || [],
           code: err.extensions?.code,
         };
-        console.error('GraphQL Error', errorReport);
-        if (errorReport.code == 'INTERNAL_SERVER_ERROR') {
-          return {
-            message: 'Oops! Something went wrong! :(',
-            code: errorReport.code,
-          };
-        }
+        console.error('GraphQL Error 2', errorReport);
+
         return errorReport;
       },
     });
@@ -353,7 +347,7 @@ async function app() {
     console.error(err);
   }
 }
-process.setMaxListeners(0);
+
 if (cluster.isMaster) {
   console.log(`Master Services ${process.pid} is running`);
   // Fork workers.

@@ -1,11 +1,9 @@
 import { ApolloGateway, IntrospectAndCompose } from '@apollo/gateway';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
+import { ApolloServerPluginLandingPageDisabled } from '@apollo/server/plugin/disabled';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
-import {
-  ApolloServerPluginLandingPageLocalDefault,
-  ApolloServerPluginLandingPageProductionDefault,
-} from '@apollo/server/plugin/landingPage/default';
+import { ApolloServerPluginLandingPageProductionDefault } from '@apollo/server/plugin/landingPage/default';
 import { Ipware } from '@fullerstack/nax-ipware';
 import FileUploadDataSource from '@profusion/apollo-federation-upload';
 import Cors from 'cors';
@@ -13,27 +11,26 @@ import Express, { RequestHandler } from 'express';
 import { expressjwt } from 'express-jwt';
 import * as fs from 'fs';
 import geoip from 'geoip-lite';
-import { graphqlUploadExpress } from 'graphql-upload';
+import { graphqlUploadExpress } from 'graphql-upload-minimal';
 import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
+import Helmet from 'helmet';
 import http from 'http';
 import https from 'https';
 import Morgan from 'morgan';
 import path from 'path';
 import { env } from 'process';
-
+import 'reflect-metadata';
 import {
-  GATEWAY_HTTP_PORT_APP,
   GATEWAY_HTTPS_PORT_APP,
+  GATEWAY_HTTP_PORT_APP,
   SERVER_NAME_APP,
   SERVER_PORT_APP,
 } from './config';
 
-import 'reflect-metadata';
-
 const cluster = require('node:cluster');
 const expressHealthApi = require('express-health-api');
 //const numCPUs = env.NODE_ENV === "development" ? 1 : require('node:os').cpus().length;
-const numCPUs = env.NODE_ENV === 'development' ? 1 : 10;
+const numCPUs = env.NODE_ENV === 'development' ? 1 : 8;
 const jwt = require('jsonwebtoken');
 var httpsOptions = {
   // this is the private key only
@@ -60,12 +57,17 @@ async function app() {
               //console.log(context?.token?.replace('Bearer ', ''));
               user = jwt.decode(context?.token?.replace('Bearer ', ''));
             }
-            request.http.headers.set('user', user ? JSON.stringify(user) : null);
-            let requestdata = { ...context, user: user };
-            //console.log(requestdata);
-            request.http.headers.set('requestdata', requestdata);
-            //console.log(context, user);
+            if (request?.http) {
+              if (request.http.headers) {
+                request.http.headers.set('user', user ? JSON.stringify(user) : null);
+                let requestdata = { ...context, user: user };
+                //console.log(requestdata);
+                request.http.headers.set('requestdata', requestdata);
+                //console.log(context, user);
+              }
+            }
           },
+          useChunkedTransfer: true,
         });
       },
     });
@@ -114,14 +116,15 @@ async function app() {
 
     const server = new ApolloServer({
       gateway,
-      includeStacktraceInErrorResponses: true,
-      introspection: true,
+      includeStacktraceInErrorResponses: false,
+      introspection: false,
       plugins: [
         process.env.NODE_ENV === 'production'
-          ? ApolloServerPluginLandingPageProductionDefault({ footer: false })
-          : ApolloServerPluginLandingPageLocalDefault({ footer: false }),
+          ? ApolloServerPluginLandingPageDisabled()
+          : ApolloServerPluginLandingPageProductionDefault({ footer: false }),
         ApolloServerPluginDrainHttpServer({ httpServer }),
       ],
+      csrfPrevention: true,
       formatError: (err: any) => {
         console.error('GraphQL Error', err);
         const errorReport = {
@@ -132,12 +135,7 @@ async function app() {
           code: err.extensions?.code,
         };
         console.error('GraphQL Error', errorReport);
-        if (errorReport.code == 'INTERNAL_SERVER_ERROR') {
-          return {
-            message: 'Oops! Something went wrong! :(',
-            code: errorReport.code,
-          };
-        }
+
         return errorReport;
       },
     });
@@ -147,16 +145,19 @@ async function app() {
     // Middlewares
     app.use(require('express-status-monitor')(configExpressStatusMonitor));
     app.use(Morgan('common'));
-    // app.use(Helmet({
-    //   contentSecurityPolicy: false,
-    // }));
+    app.use(
+      Helmet({
+        contentSecurityPolicy: false,
+        xDownloadOptions: false,
+      }),
+    );
     app.use(Cors());
     app.use(expressHealthApi({ apiPath: '/health' }));
     app.use('/voyager', voyagerMiddleware({ endpointUrl: '/graphql' }));
-
+    app.use(Express.json({ limit: '800mb' }));
     app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }));
     app.use('/public', Express.static(path.join(__dirname, '../public')));
-    app.use(Express.json());
+
     app.use(
       expressjwt({
         secret: 'f1BtnWgD3VKY',

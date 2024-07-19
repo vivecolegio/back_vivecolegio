@@ -1,5 +1,5 @@
 import { connectionFromArraySlice } from 'graphql-relay';
-import { FileUpload, GraphQLUpload } from 'graphql-upload';
+import { FileUpload, GraphQLUpload } from 'graphql-upload-minimal';
 import { ObjectId } from 'mongodb';
 import ShortUniqueId from 'short-unique-id';
 import { finished } from 'stream/promises';
@@ -186,7 +186,7 @@ export class SchoolResolver {
     @Arg('file', () => GraphQLUpload, { nullable: true }) file: FileUpload,
     @Ctx() context: IContext,
   ) {
-    //console.log(context);
+    console.log('aca llega');
     let updatedByUserId = context?.user?.authorization?.id;
     if (file?.filename) {
       var fs = require('fs');

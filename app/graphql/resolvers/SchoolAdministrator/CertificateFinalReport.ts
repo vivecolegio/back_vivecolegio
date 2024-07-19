@@ -3,6 +3,10 @@ import report from 'puppeteer-report';
 import { Arg, Ctx, Mutation, Resolver } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
+import fs from 'fs-extra';
+import hbs from 'handlebars';
+import path from 'path';
+import puppeteer from 'puppeteer';
 import {
   AcademicAreaCoursePeriodValuationRepository,
   AcademicAreaCourseYearValuationRepository,
@@ -55,7 +59,6 @@ import { PerformanceLevel } from '../../models/SchoolAdministrator/PerformanceLe
 import { SchoolConfiguration } from '../../models/SchoolAdministrator/SchoolConfiguration';
 import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { PerformanceLevelResolver } from './PerformanceLevelResolver';
-
 @Resolver(SchoolConfiguration)
 export class CertificateFinalReportResolver {
   @InjectRepository(School)
@@ -1126,10 +1129,6 @@ export class CertificateFinalReportResolver {
   }
 
   async generatePerformanceReportStudent(data: any, id: any, format: any) {
-    const puppeteer = require('puppeteer');
-    const fs = require('fs-extra');
-    const hbs = require('handlebars');
-    const path = require('path');
     try {
       hbs.registerHelper(
         `iff`,
@@ -1170,11 +1169,13 @@ export class CertificateFinalReportResolver {
       );
       process.setMaxListeners(0);
       const browser = await puppeteer.launch({
-        args: ['--no-sandbox'],
+        args: ['--disable-setuid-sandbox', '--no-sandbox', '--single-process', '--no-zygote'],
+        protocolTimeout: 240000,
         headless: 'new',
         timeout: 0,
       });
       const page = await browser.newPage();
+      await page.setDefaultNavigationTimeout(0);
       //console.log(data)
       const content = await this.compile('index', data);
 
@@ -1196,6 +1197,7 @@ export class CertificateFinalReportResolver {
         },
       });
       //console.log("done creating pdf");
+      await page.close();
       await browser.close();
       return dir + '/' + id + '-1' + '.pdf';
       //process.exit();
@@ -1206,11 +1208,6 @@ export class CertificateFinalReportResolver {
   }
 
   async generatePerformanceReportStudentDetails(data: any, id: any, format: any) {
-    const puppeteer = require('puppeteer');
-    const fs = require('fs-extra');
-    const hbs = require('handlebars');
-    const path = require('path');
-
     try {
       hbs.registerHelper(
         `iff`,
@@ -1248,11 +1245,13 @@ export class CertificateFinalReportResolver {
       );
       process.setMaxListeners(0);
       const browser = await puppeteer.launch({
-        args: ['--no-sandbox'],
+        args: ['--disable-setuid-sandbox', '--no-sandbox', '--single-process', '--no-zygote'],
+        protocolTimeout: 240000,
         headless: 'new',
         timeout: 0,
       });
       const page = await browser.newPage();
+      await page.setDefaultNavigationTimeout(0);
       //console.log(data)
       const content = await this.compile('index2', data);
       //console.log(content)
@@ -1274,6 +1273,7 @@ export class CertificateFinalReportResolver {
         },
       });
       //console.log("done creating pdf");
+      await page.close();
       await browser.close();
       return dir + '/' + id + '-2' + '.pdf';
       //process.exit();
@@ -1285,9 +1285,6 @@ export class CertificateFinalReportResolver {
 
   async compile(templateName: any, data: any) {
     //console.log(data)
-    const path = require('path');
-    const fs = require('fs-extra');
-    const hbs = require('handlebars');
     const filePath = path.join(
       process.cwd(),
       'app',

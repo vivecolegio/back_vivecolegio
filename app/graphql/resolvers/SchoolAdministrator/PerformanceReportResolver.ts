@@ -1,9 +1,11 @@
 import { ObjectId } from 'mongodb';
-import PDFMerger from 'pdf-merger-js/browser';
 import report from 'puppeteer-report';
 import { Arg, Ctx, Mutation, Resolver } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
+import fs from 'fs-extra';
+import hbs from 'handlebars';
+import puppeteer from 'puppeteer';
 import {
   AcademicAreaCoursePeriodValuationRepository,
   AcademicAreaCourseYearValuationRepository,
@@ -60,6 +62,9 @@ import { PerformanceLevel } from '../../models/SchoolAdministrator/PerformanceLe
 import { SchoolConfiguration } from '../../models/SchoolAdministrator/SchoolConfiguration';
 import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { PerformanceLevelResolver } from './PerformanceLevelResolver';
+
+import path from 'path';
+const merge = require('easy-pdf-merge');
 
 @Resolver(SchoolConfiguration)
 export class PerformanceReportResolver {
@@ -176,7 +181,6 @@ export class PerformanceReportResolver {
     @Ctx() context: IContext,
   ): Promise<String | undefined> {
     // id = "6298c6ede686a07d17a79e2c";
-    const merger = new PDFMerger();
     let data = {};
     let course = await this.repositoryCourse.findOneBy(id);
     if (course) {
@@ -1342,14 +1346,13 @@ export class PerformanceReportResolver {
                 }
               }
               //console.log(urlsAux);
-              const merge = require('easy-pdf-merge');
+
               const opts = {
                 maxBuffer: 1024 * 5096, // 500kb
                 maxHeap: '2g', // for setting JVM heap limits to 2GB
               };
               //console.log(urls);
               var dir = './public/downloads/reports/courses/' + id;
-              const fs = require('fs-extra');
               if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir, { recursive: true });
               }
@@ -1371,10 +1374,6 @@ export class PerformanceReportResolver {
   }
 
   async generatePerformanceReportStudent(data: any, id: any, format: any) {
-    const puppeteer = require('puppeteer');
-    const fs = require('fs-extra');
-    const hbs = require('handlebars');
-    const path = require('path');
     try {
       hbs.registerHelper(
         `iff`,
@@ -1415,10 +1414,12 @@ export class PerformanceReportResolver {
       );
       const browser = await puppeteer.launch({
         args: ['--no-sandbox'],
+        protocolTimeout: 240000,
         headless: 'new',
         timeout: 0,
       });
       const page = await browser.newPage();
+      await page.setDefaultNavigationTimeout(0);
       //console.log(data)
       const content = await this.compile('index', data);
 
@@ -1440,6 +1441,7 @@ export class PerformanceReportResolver {
         },
       });
       //console.log("done creating pdf");
+      await page.close();
       await browser.close();
       return dir + '/' + id + '-1' + '.pdf';
       //process.exit();
@@ -1450,11 +1452,6 @@ export class PerformanceReportResolver {
   }
 
   async generatePerformanceReportStudentDetails(data: any, id: any, format: any) {
-    const puppeteer = require('puppeteer');
-    const fs = require('fs-extra');
-    const hbs = require('handlebars');
-    const path = require('path');
-
     try {
       hbs.registerHelper(
         `iff`,
@@ -1495,11 +1492,13 @@ export class PerformanceReportResolver {
       );
       process.setMaxListeners(0);
       const browser = await puppeteer.launch({
-        args: ['--no-sandbox'],
+        args: ['--disable-setuid-sandbox', '--no-sandbox', '--single-process', '--no-zygote'],
+        protocolTimeout: 240000,
         headless: 'new',
         timeout: 0,
       });
       const page = await browser.newPage();
+      //await page.setDefaultNavigationTimeout(0);
       //console.log(data)
       const content = await this.compile('index2', data);
       //console.log(content)
@@ -1521,6 +1520,7 @@ export class PerformanceReportResolver {
         },
       });
       //console.log("done creating pdf");
+      await page.close();
       await browser.close();
       return dir + '/' + id + '-2' + '.pdf';
       //process.exit();
@@ -1535,19 +1535,17 @@ export class PerformanceReportResolver {
     @Arg('id', () => String) id: string,
     @Ctx() context: IContext,
   ): Promise<Boolean | null> {
-    const puppeteer = require('puppeteer');
-    const fs = require('fs-extra');
-    const hbs = require('handlebars');
-    const path = require('path');
     const data = require('../../../reports/performanceReport/data.json');
     try {
       process.setMaxListeners(0);
       const browser = await puppeteer.launch({
-        args: ['--no-sandbox'],
+        args: ['--disable-setuid-sandbox', '--no-sandbox', '--single-process', '--no-zygote'],
+        protocolTimeout: 240000,
         headless: 'new',
         timeout: 0,
       });
       const page = await browser.newPage();
+      //await page.setDefaultNavigationTimeout(0);
       //console.log(data)
       const content = await this.compile('index', data);
       //console.log(content)
@@ -1564,6 +1562,7 @@ export class PerformanceReportResolver {
         },
       });
       //console.log("done creating pdf");
+      await page.close();
       await browser.close();
       //process.exit();
     } catch (e) {
@@ -1574,9 +1573,6 @@ export class PerformanceReportResolver {
 
   async compile(templateName: any, data: any) {
     //console.log(data)
-    const path = require('path');
-    const fs = require('fs-extra');
-    const hbs = require('handlebars');
     const filePath = path.join(
       process.cwd(),
       'app',
