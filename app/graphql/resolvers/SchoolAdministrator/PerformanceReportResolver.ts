@@ -1424,7 +1424,7 @@ export class PerformanceReportResolver {
           '--disable-dev-shm-usage',
         ],
         protocolTimeout: 240000,
-        headless: 'new',
+        headless: true,
         timeout: 0,
       });
       const page = await browser.newPage();
@@ -1512,7 +1512,7 @@ export class PerformanceReportResolver {
           '--disable-dev-shm-usage',
         ],
         protocolTimeout: 240000,
-        headless: 'new',
+        headless: true,
         timeout: 0,
       });
       const page = await browser.newPage();
@@ -1569,7 +1569,7 @@ export class PerformanceReportResolver {
           '--disable-dev-shm-usage',
         ],
         protocolTimeout: 240000,
-        headless: 'new',
+        headless: true,
         timeout: 0,
       });
       const page = await browser.newPage();
