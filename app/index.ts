@@ -149,10 +149,10 @@ async function app() {
       Helmet({
         contentSecurityPolicy: false,
         xDownloadOptions: false,
-        crossOriginResourcePolicy: false,
+        crossOriginResourcePolicy: { policy: 'cross-origin' },
       }),
     );
-    app.use(Cors());
+    app.use(Cors({ origin: '*' }));
     app.use(expressHealthApi({ apiPath: '/health' }));
     app.use('/voyager', voyagerMiddleware({ endpointUrl: '/graphql' }));
     app.use(Express.json({ limit: '800mb' }));

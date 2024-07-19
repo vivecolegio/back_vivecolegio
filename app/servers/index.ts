@@ -12,8 +12,12 @@ import http from 'http';
 import Morgan from 'morgan';
 import path from 'path';
 import { env } from 'process';
+import 'reflect-metadata';
 import { SERVER_NAME_APP, SERVER_PORT_APP } from '../config';
 import { buildFederatedSchema } from '../graphql/helpers/buildFederatedSchema';
+import { ErrorLoggerMiddleware } from '../graphql/middlewares/error-logger';
+import { LogAccessMiddleware } from '../graphql/middlewares/log-access';
+import { ResolveTimeMiddleware } from '../graphql/middlewares/resolve-time';
 import { AcademicAreaCoursePeriodValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAreaCoursePeriodValuationResolver';
 import { AcademicAreaCourseYearValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAreaCourseYearValuationResolver';
 import { AcademicAsignatureCoursePeriodEvidenceLearningValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAsignatureCoursePeriodEvidenceLearningValuationResolver';
@@ -65,6 +69,7 @@ import { ObserverAnnotationTypeResolver } from '../graphql/resolvers/SchoolAdmin
 import { PerformanceFinalReportResolver } from '../graphql/resolvers/SchoolAdministrator/PerformanceFinalReportResolver';
 import { PerformanceReportResolver } from '../graphql/resolvers/SchoolAdministrator/PerformanceReportResolver';
 import { SchoolConfigurationResolver } from '../graphql/resolvers/SchoolAdministrator/SchoolConfigurationResolver';
+import { SyncOfflineResolver } from '../graphql/resolvers/SchoolAdministrator/SyncOfflineResolver';
 import { AcademicDayResolver } from './../graphql/resolvers/CampusAdministrator/AcademicDayResolver';
 import { CourseResolver } from './../graphql/resolvers/CampusAdministrator/CourseResolver';
 import { GuardianResolver } from './../graphql/resolvers/CampusAdministrator/GuardianResolver';
@@ -103,12 +108,6 @@ import { PerformanceLevelResolver } from './../graphql/resolvers/SchoolAdministr
 import { SchoolYearResolver } from './../graphql/resolvers/SchoolAdministrator/SchoolYearResolver';
 import { SpecialtyResolver } from './../graphql/resolvers/SchoolAdministrator/SpecialtyResolver';
 import { dataSource } from './DataSource';
-
-import 'reflect-metadata';
-import { ErrorLoggerMiddleware } from '../graphql/middlewares/error-logger';
-import { LogAccessMiddleware } from '../graphql/middlewares/log-access';
-import { ResolveTimeMiddleware } from '../graphql/middlewares/resolve-time';
-import { SyncOfflineResolver } from '../graphql/resolvers/SchoolAdministrator/SyncOfflineResolver';
 
 const PORT = SERVER_PORT_APP;
 const SERVER_NAME = SERVER_NAME_APP;
@@ -316,11 +315,11 @@ async function app() {
       Helmet({
         contentSecurityPolicy: false,
         xDownloadOptions: false,
-        crossOriginResourcePolicy: false,
+        crossOriginResourcePolicy: { policy: 'cross-origin' },
       }),
     );
 
-    app.use(Cors());
+    app.use(Cors({ origin: '*' }));
 
     app.use(Express.json({ limit: '800mb' }));
 
