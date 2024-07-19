@@ -266,7 +266,7 @@ async function app() {
 
     const server = new ApolloServer({
       schema: federatedSchema,
-      includeStacktraceInErrorResponses: false,
+      includeStacktraceInErrorResponses: true,
       introspection: true,
       plugins: [
         process.env.NODE_ENV === 'production'

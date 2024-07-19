@@ -116,8 +116,8 @@ async function app() {
 
     const server = new ApolloServer({
       gateway,
-      includeStacktraceInErrorResponses: false,
-      introspection: false,
+      includeStacktraceInErrorResponses: true,
+      introspection: true,
       plugins: [
         process.env.NODE_ENV === 'production'
           ? ApolloServerPluginLandingPageDisabled()
