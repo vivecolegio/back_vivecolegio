@@ -1423,7 +1423,7 @@ export class PerformanceReportResolver {
       //console.log(data)
       const content = await this.compile('index', data);
 
-      await page.setContent(content);
+      await page.setContent(content, { waitUntil: ['load', 'networkidle0', 'domcontentloaded'] });
       var dir = './public/downloads/reports/students/' + id;
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
@@ -1502,7 +1502,7 @@ export class PerformanceReportResolver {
       //console.log(data)
       const content = await this.compile('index2', data);
       //console.log(content)
-      await page.setContent(content);
+      await page.setContent(content, { waitUntil: ['load', 'networkidle0', 'domcontentloaded'] });
       var dir = './public/downloads/reports/students/' + id;
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
@@ -1549,7 +1549,7 @@ export class PerformanceReportResolver {
       //console.log(data)
       const content = await this.compile('index', data);
       //console.log(content)
-      await page.setContent(content);
+      await page.setContent(content, { waitUntil: ['load', 'networkidle0', 'domcontentloaded'] });
       await page.pdf({
         path: 'output.pdf',
         format: 'A4',

@@ -1179,7 +1179,7 @@ export class CertificateFinalReportResolver {
       //console.log(data)
       const content = await this.compile('index', data);
 
-      await page.setContent(content);
+      await page.setContent(content, { waitUntil: ['load', 'networkidle0', 'domcontentloaded'] });
       var dir = './public/downloads/reports/certificate/students/' + id;
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
