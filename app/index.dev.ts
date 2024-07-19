@@ -13,7 +13,7 @@ import Express, { RequestHandler } from 'express';
 import { expressjwt } from 'express-jwt';
 import * as fs from 'fs';
 import geoip from 'geoip-lite';
-import { graphqlUploadExpress } from 'graphql-upload';
+import { graphqlUploadExpress } from 'graphql-upload-minimal';
 import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
 import http from 'http';
 import https from 'https';
