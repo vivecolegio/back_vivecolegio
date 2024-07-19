@@ -115,7 +115,7 @@ const SERVER_NAME = SERVER_NAME_APP;
 
 const cluster = require('node:cluster');
 //const numCPUs = env.NODE_ENV === "development" ? 2 : require('node:os').cpus().length;
-const numCPUs = env.NODE_ENV === 'development' ? 1 : 4;
+const numCPUs = env.NODE_ENV === 'development' ? 1 : 8;
 const expressHealthApi = require('express-health-api');
 
 async function app() {
