@@ -1304,29 +1304,29 @@ export class PerformanceReportResolver {
             };
             switch (reportPerformanceType) {
               case 'DETAILS':
-                promisesGeneratePDF.push(
-                  this.generatePerformanceReportStudentDetails(dataPDF, studentId, format).then(
-                    (dataUrl) => {
-                      urls.push(dataUrl);
-                    },
-                  ),
+                //promisesGeneratePDF.push(
+                await this.generatePerformanceReportStudentDetails(dataPDF, studentId, format).then(
+                  (dataUrl) => {
+                    urls.push(dataUrl);
+                  },
                 );
-                promisesGeneratePDF.push(
-                  this.generatePerformanceReportStudent(dataPDF, studentId, format).then(
-                    (dataUrl) => {
-                      urls.push(dataUrl);
-                    },
-                  ),
+                //);
+                //promisesGeneratePDF.push(
+                await this.generatePerformanceReportStudent(dataPDF, studentId, format).then(
+                  (dataUrl) => {
+                    urls.push(dataUrl);
+                  },
                 );
+                //);
                 break;
               case 'SINGLE':
-                promisesGeneratePDF.push(
-                  this.generatePerformanceReportStudent(dataPDF, studentId, format).then(
-                    (dataUrl) => {
-                      urls.push(dataUrl);
-                    },
-                  ),
+                //promisesGeneratePDF.push(
+                await this.generatePerformanceReportStudent(dataPDF, studentId, format).then(
+                  (dataUrl) => {
+                    urls.push(dataUrl);
+                  },
                 );
+                //);
                 break;
             }
           }
