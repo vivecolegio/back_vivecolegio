@@ -1,5 +1,6 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Teacher } from '../models/CampusAdministrator/Teacher';
+import { AuditLogin } from '../models/GeneralAdministrator/AuditLogin';
 import { Campus } from '../models/GeneralAdministrator/Campus';
 import { Menu } from '../models/GeneralAdministrator/Menu';
 import { Role } from '../models/GeneralAdministrator/Role';
@@ -46,4 +47,7 @@ export class Jwt {
 
   @Field((_type) => [Student], { nullable: true })
   students?: Student[];
+
+  @Field({ nullable: true })
+  lastLogin?: AuditLogin;
 }
