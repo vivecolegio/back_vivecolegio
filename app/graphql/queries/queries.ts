@@ -249,3 +249,68 @@ export const QUERT_GET_ACADEMIC_PERIOD_SCHOOL_YEAR = gql`
     }
   }
 `;
+
+export const QUERT_GET_TOTAL_COUNT_EDUCATION_LEVEL = gql`
+  query getAllEducationLevelTotalCount($schoolId: String!, $schoolYearId: String!) {
+    data: getAllEducationLevel(
+      schoolId: $schoolId
+      schoolYearId: $schoolYearId
+      orderCreated: true
+      allData: true
+    ) {
+      totalCount
+    }
+  }
+`;
+
+export const QUERT_GET_TOTAL_COUNT_PERFORMANCE_LEVEL = gql`
+  query getAllPerformanceLevelTotalCount($schoolId: String!, $schoolYearId: String!) {
+    data: getAllPerformanceLevel(
+      schoolId: $schoolId
+      schoolYearId: $schoolYearId
+      orderCreated: true
+      allData: true
+    ) {
+      totalCount
+    }
+  }
+`;
+
+export const QUERT_GET_TOTAL_COUNT_EVALUATIVE_COMPONENT = gql`
+  query getAllEvaluativeComponentTotalCount($schoolId: String!, $schoolYearId: String!) {
+    data: getAllEvaluativeComponent(
+      schoolId: $schoolId
+      schoolYearId: $schoolYearId
+      orderCreated: true
+      allData: true
+    ) {
+      totalCount
+    }
+  }
+`;
+
+export const QUERT_GET_TOTAL_COUNT_MODALITY = gql`
+  query getAllModalityTotalCount($schoolId: String!, $schoolYearId: String!) {
+    data: getAllModality(
+      schoolId: $schoolId
+      schoolYearId: $schoolYearId
+      orderCreated: true
+      allData: true
+    ) {
+      totalCount
+    }
+  }
+`;
+
+export const QUERT_GET_TOTAL_COUNT_SPECIALITY = gql`
+  query getAllSpecialtyTotalCount($schoolId: String!, $schoolYearId: String!) {
+    data: getAllSpecialty(
+      schoolId: $schoolId
+      schoolYearId: $schoolYearId
+      orderCreated: true
+      allData: true
+    ) {
+      totalCount
+    }
+  }
+`;
