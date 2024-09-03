@@ -22,7 +22,6 @@ import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { SyncOffline, SyncOfflineConnection } from '../../models/SchoolAdministrator/SyncOffline';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 import {
-  QUERT_GET_TOTAL_COUNT___,
   QUERT_GET_TOTAL_COUNT_ACADEMIC_AREA,
   QUERT_GET_TOTAL_COUNT_ACADEMIC_ASIGNATURE,
   QUERT_GET_TOTAL_COUNT_ACADEMIC_GRADE,
@@ -217,6 +216,11 @@ export class SyncOfflineResolver {
     };
 
     syncOfflineDescriptions.push({ ...(await this.syncEducationLevel(false, client, schoolData)) });
+    syncOfflineDescriptions.push({
+      ...(await this.syncEvaluativeComponent(false, client, schoolData)),
+    });
+    syncOfflineDescriptions.push({ ...(await this.syncModality(false, client, schoolData)) });
+    syncOfflineDescriptions.push({ ...(await this.syncSpeciality(false, client, schoolData)) });
 
     ///continuar aca
 
@@ -224,11 +228,11 @@ export class SyncOfflineResolver {
     let dataSchoolConfiguration: any = null;
     let dataCampus: any = null;
 
-    await client.request(QUERT_GET_TOTAL_COUNT___, schoolData).then(async (result: any) => {
-      dataAcademicAsignatureCourse = result.data;
-      dataSchoolConfiguration = result.data;
-      dataCampus = result.data;
-    });
+    //await client.request(QUERT_GET_TOTAL_COUNT___, schoolData).then(async (result: any) => {
+    //  dataAcademicAsignatureCourse = result.data;
+    //  dataSchoolConfiguration = result.data;
+    //  dataCampus = result.data;
+    //});
 
     syncOfflineDescriptions.push({
       entity: 'ACADEMIC_ASIGNATURE_COURSE',

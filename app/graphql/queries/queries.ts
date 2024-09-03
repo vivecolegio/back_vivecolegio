@@ -392,16 +392,3 @@ export const QUERT_GET_TOTAL_COUNT_STUDENT = gql`
     }
   }
 `;
-
-export const QUERT_GET_TOTAL_COUNT___ = gql`
-  query getAll--TotalCount($schoolId: String!, $schoolYearId: String!) {
-    data: getAll--(
-      schoolId: $schoolId
-      schoolYearId: $schoolYearId
-      orderCreated: true
-      allData: true
-    ) {
-      totalCount
-    }
-  }
-`;
