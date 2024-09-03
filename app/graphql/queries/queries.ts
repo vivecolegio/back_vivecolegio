@@ -314,3 +314,94 @@ export const QUERT_GET_TOTAL_COUNT_SPECIALITY = gql`
     }
   }
 `;
+
+export const QUERT_GET_TOTAL_COUNT_ACADEMIC_AREA = gql`
+  query getAllAcademicAreaTotalCount($schoolId: String!, $schoolYearId: String!) {
+    data: getAllAcademicArea(
+      schoolId: $schoolId
+      schoolYearId: $schoolYearId
+      orderCreated: true
+      allData: true
+    ) {
+      totalCount
+    }
+  }
+`;
+
+export const QUERT_GET_TOTAL_COUNT_ACADEMIC_ASIGNATURE = gql`
+  query getAllAcademicAsignatureTotalCount($schoolId: String!, $schoolYearId: String!) {
+    data: getAllAcademicAsignature(
+      schoolId: $schoolId
+      schoolYearId: $schoolYearId
+      orderCreated: true
+      allData: true
+    ) {
+      totalCount
+    }
+  }
+`;
+
+export const QUERT_GET_TOTAL_COUNT_ACADEMIC_GRADE = gql`
+  query getAllAcademicGradeTotalCount($schoolId: String!, $schoolYearId: String!) {
+    data: getAllAcademicGrade(
+      schoolId: $schoolId
+      schoolYearId: $schoolYearId
+      orderCreated: true
+      allData: true
+    ) {
+      totalCount
+    }
+  }
+`;
+
+export const QUERT_GET_TOTAL_COUNT_COURSE = gql`
+  query getAllCourseTotalCount($schoolId: String!, $schoolYearId: String!) {
+    data: getAllCourse(
+      schoolId: $schoolId
+      schoolYearId: $schoolYearId
+      orderCreated: true
+      allData: true
+    ) {
+      totalCount
+    }
+  }
+`;
+
+export const QUERT_GET_TOTAL_COUNT_TEACHER = gql`
+  query getAllTeacherTotalCount($schoolId: String!, $schoolYearId: String!) {
+    data: getAllTeacher(
+      schoolId: $schoolId
+      schoolYearId: $schoolYearId
+      orderCreated: true
+      allData: true
+    ) {
+      totalCount
+    }
+  }
+`;
+
+export const QUERT_GET_TOTAL_COUNT_STUDENT = gql`
+  query getAllStudentTotalCount($schoolId: String!, $schoolYearId: String!) {
+    data: getAllStudent(
+      schoolId: $schoolId
+      schoolYearId: $schoolYearId
+      orderCreated: true
+      allData: true
+    ) {
+      totalCount
+    }
+  }
+`;
+
+export const QUERT_GET_TOTAL_COUNT___ = gql`
+  query getAll--TotalCount($schoolId: String!, $schoolYearId: String!) {
+    data: getAll--(
+      schoolId: $schoolId
+      schoolYearId: $schoolYearId
+      orderCreated: true
+      allData: true
+    ) {
+      totalCount
+    }
+  }
+`;

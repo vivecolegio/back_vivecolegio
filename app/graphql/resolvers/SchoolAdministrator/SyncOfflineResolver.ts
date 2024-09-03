@@ -22,12 +22,18 @@ import { SchoolYear } from '../../models/SchoolAdministrator/SchoolYear';
 import { SyncOffline, SyncOfflineConnection } from '../../models/SchoolAdministrator/SyncOffline';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
 import {
-  QUERT_GET_TOTAL_COUNT__,
+  QUERT_GET_TOTAL_COUNT___,
+  QUERT_GET_TOTAL_COUNT_ACADEMIC_AREA,
+  QUERT_GET_TOTAL_COUNT_ACADEMIC_ASIGNATURE,
+  QUERT_GET_TOTAL_COUNT_ACADEMIC_GRADE,
+  QUERT_GET_TOTAL_COUNT_COURSE,
   QUERT_GET_TOTAL_COUNT_EDUCATION_LEVEL,
   QUERT_GET_TOTAL_COUNT_EVALUATIVE_COMPONENT,
   QUERT_GET_TOTAL_COUNT_MODALITY,
   QUERT_GET_TOTAL_COUNT_PERFORMANCE_LEVEL,
   QUERT_GET_TOTAL_COUNT_SPECIALITY,
+  QUERT_GET_TOTAL_COUNT_STUDENT,
+  QUERT_GET_TOTAL_COUNT_TEACHER,
 } from '../../queries/queries';
 import { SpecialtyResolver } from './SpecialtyResolver';
 
@@ -193,91 +199,37 @@ export class SyncOfflineResolver {
         stringify: JSON.stringify,
       },
     });
-    let dataEducationLevel: any = null;
+
     let dataPerformanceLevel: any = null;
     let dataEvaluativeComponent: any = null;
     let dataModality: any = null;
     let dataSpecialty: any = null;
-
-    const variables = {
-      schoolId: schoolId,
-      schoolYearId: schoolYearId,
-    };
-    await client
-      .request(QUERT_GET_TOTAL_COUNT_EDUCATION_LEVEL, variables)
-      .then(async (result: any) => {
-        dataEducationLevel = result.data;
-      });
-
-    await client
-      .request(QUERT_GET_TOTAL_COUNT_PERFORMANCE_LEVEL, variables)
-      .then(async (result: any) => {
-        dataPerformanceLevel = result.data;
-      });
-
-    await client
-      .request(QUERT_GET_TOTAL_COUNT_EVALUATIVE_COMPONENT, variables)
-      .then(async (result: any) => {
-        dataEvaluativeComponent = result.data;
-      });
-
-    await client.request(QUERT_GET_TOTAL_COUNT_MODALITY, variables).then(async (result: any) => {
-      dataModality = result.data;
-    });
-
-    await client.request(QUERT_GET_TOTAL_COUNT_SPECIALITY, variables).then(async (result: any) => {
-      dataSpecialty = result.data;
-    });
-    syncOfflineDescriptions.push({
-      entity: 'EDUCATION_LEVEL',
-      online: dataEducationLevel?.totalCount,
-    });
-    syncOfflineDescriptions.push({
-      entity: 'PERFORMANCE_LEVEL',
-      online: dataPerformanceLevel?.totalCount,
-    });
-    syncOfflineDescriptions.push({
-      entity: 'EVALUATIVE_COMPONENT',
-      online: dataEvaluativeComponent?.totalCount,
-    });
-    syncOfflineDescriptions.push({ entity: 'MODALITY', online: dataModality?.totalCount });
-    syncOfflineDescriptions.push({ entity: 'SPECIALITY', online: dataSpecialty?.totalCount });
-
-    ///continuar aca
     let dataAcademicArea: any = null;
     let dataAcademicAsignature: any = null;
     let dataAcademicGrade: any = null;
     let dataCourse: any = null;
     let dataTeacher: any = null;
     let dataStudent: any = null;
+
+    const schoolData = {
+      schoolId: schoolId,
+      schoolYearId: schoolYearId,
+    };
+
+    syncOfflineDescriptions.push({ ...(await this.syncEducationLevel(false, client, schoolData)) });
+
+    ///continuar aca
+
     let dataAcademicAsignatureCourse: any = null;
     let dataSchoolConfiguration: any = null;
     let dataCampus: any = null;
 
-    await client.request(QUERT_GET_TOTAL_COUNT__, variables).then(async (result: any) => {
-      dataAcademicArea = result.data;
-      dataAcademicAsignature = result.data;
-      dataAcademicGrade = result.data;
-      dataCourse = result.data;
-      dataTeacher = result.data;
-      dataStudent = result.data;
+    await client.request(QUERT_GET_TOTAL_COUNT___, schoolData).then(async (result: any) => {
       dataAcademicAsignatureCourse = result.data;
       dataSchoolConfiguration = result.data;
       dataCampus = result.data;
     });
 
-    syncOfflineDescriptions.push({ entity: 'ACADEMIC_AREA', online: dataAcademicArea?.totalCount });
-    syncOfflineDescriptions.push({
-      entity: 'ACADEMIC_ASIGNATURE',
-      online: dataAcademicAsignature?.totalCount,
-    });
-    syncOfflineDescriptions.push({
-      entity: 'ACADEMIC_GRADE',
-      online: dataAcademicGrade?.totalCount,
-    });
-    syncOfflineDescriptions.push({ entity: 'COURSE', online: dataCourse?.totalCount });
-    syncOfflineDescriptions.push({ entity: 'TEACHER', online: dataTeacher?.totalCount });
-    syncOfflineDescriptions.push({ entity: 'STUDENT', online: dataStudent?.totalCount });
     syncOfflineDescriptions.push({
       entity: 'ACADEMIC_ASIGNATURE_COURSE',
       online: dataAcademicAsignatureCourse?.totalCount,
@@ -289,6 +241,174 @@ export class SyncOfflineResolver {
     syncOfflineDescriptions.push({ entity: 'CAMPUS', online: dataCampus?.totalCount });
 
     return syncOfflineDescriptions;
+  }
+
+  async syncEducationLevel(typeSyncFull: boolean, client: GraphQLClient, schoolData: any) {
+    let data: any = null;
+    if (typeSyncFull) {
+    } else {
+      await client
+        .request(QUERT_GET_TOTAL_COUNT_EDUCATION_LEVEL, schoolData)
+        .then(async (result: any) => {
+          data = result.data;
+        });
+      return {
+        entity: 'EDUCATION_LEVEL',
+        online: data?.totalCount,
+      };
+    }
+  }
+
+  async syncPerformanceLevel(typeSyncFull: boolean, client: GraphQLClient, schoolData: any) {
+    let data: any = null;
+    if (typeSyncFull) {
+    } else {
+      await client
+        .request(QUERT_GET_TOTAL_COUNT_PERFORMANCE_LEVEL, schoolData)
+        .then(async (result: any) => {
+          data = result.data;
+        });
+      return {
+        entity: 'PERFORMANCE_LEVEL',
+        online: data?.totalCount,
+      };
+    }
+  }
+
+  async syncEvaluativeComponent(typeSyncFull: boolean, client: GraphQLClient, schoolData: any) {
+    let data: any = null;
+    if (typeSyncFull) {
+    } else {
+      await client
+        .request(QUERT_GET_TOTAL_COUNT_EVALUATIVE_COMPONENT, schoolData)
+        .then(async (result: any) => {
+          data = result.data;
+        });
+      return {
+        entity: 'EVALUATIVE_COMPONENT',
+        online: data?.totalCount,
+      };
+    }
+  }
+
+  async syncModality(typeSyncFull: boolean, client: GraphQLClient, schoolData: any) {
+    let data: any = null;
+    if (typeSyncFull) {
+    } else {
+      await client.request(QUERT_GET_TOTAL_COUNT_MODALITY, schoolData).then(async (result: any) => {
+        data = result.data;
+      });
+      return {
+        entity: 'MODALITY',
+        online: data?.totalCount,
+      };
+    }
+  }
+
+  async syncSpeciality(typeSyncFull: boolean, client: GraphQLClient, schoolData: any) {
+    let data: any = null;
+    if (typeSyncFull) {
+    } else {
+      await client
+        .request(QUERT_GET_TOTAL_COUNT_SPECIALITY, schoolData)
+        .then(async (result: any) => {
+          data = result.data;
+        });
+      return {
+        entity: 'SPECIALITY',
+        online: data?.totalCount,
+      };
+    }
+  }
+
+  async syncAcademicArea(typeSyncFull: boolean, client: GraphQLClient, schoolData: any) {
+    let data: any = null;
+    if (typeSyncFull) {
+    } else {
+      await client
+        .request(QUERT_GET_TOTAL_COUNT_ACADEMIC_AREA, schoolData)
+        .then(async (result: any) => {
+          data = result.data;
+        });
+      return {
+        entity: 'ACADEMIC_AREA',
+        online: data?.totalCount,
+      };
+    }
+  }
+
+  async syncAcademicAsignature(typeSyncFull: boolean, client: GraphQLClient, schoolData: any) {
+    let data: any = null;
+    if (typeSyncFull) {
+    } else {
+      await client
+        .request(QUERT_GET_TOTAL_COUNT_ACADEMIC_ASIGNATURE, schoolData)
+        .then(async (result: any) => {
+          data = result.data;
+        });
+      return {
+        entity: 'ACADEMIC_ASIGNATURE',
+        online: data?.totalCount,
+      };
+    }
+  }
+
+  async syncAcademicGrade(typeSyncFull: boolean, client: GraphQLClient, schoolData: any) {
+    let data: any = null;
+    if (typeSyncFull) {
+    } else {
+      await client
+        .request(QUERT_GET_TOTAL_COUNT_ACADEMIC_GRADE, schoolData)
+        .then(async (result: any) => {
+          data = result.data;
+        });
+      return {
+        entity: 'ACADEMIC_GRADE',
+        online: data?.totalCount,
+      };
+    }
+  }
+
+  async syncCourse(typeSyncFull: boolean, client: GraphQLClient, schoolData: any) {
+    let data: any = null;
+    if (typeSyncFull) {
+    } else {
+      await client.request(QUERT_GET_TOTAL_COUNT_COURSE, schoolData).then(async (result: any) => {
+        data = result.data;
+      });
+      return {
+        entity: 'COURSE',
+        online: data?.totalCount,
+      };
+    }
+  }
+
+  async syncTeacher(typeSyncFull: boolean, client: GraphQLClient, schoolData: any) {
+    let data: any = null;
+    if (typeSyncFull) {
+    } else {
+      await client.request(QUERT_GET_TOTAL_COUNT_TEACHER, schoolData).then(async (result: any) => {
+        data = result.data;
+      });
+      return {
+        entity: 'TEACHER',
+        online: data?.totalCount,
+      };
+    }
+  }
+
+  async syncStudent(typeSyncFull: boolean, client: GraphQLClient, schoolData: any) {
+    let data: any = null;
+    if (typeSyncFull) {
+    } else {
+      await client.request(QUERT_GET_TOTAL_COUNT_STUDENT, schoolData).then(async (result: any) => {
+        data = result.data;
+      });
+      return {
+        entity: 'STUDENT',
+        online: data?.totalCount,
+      };
+    }
   }
 
   @FieldResolver((_type) => User, { nullable: true })
