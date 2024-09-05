@@ -160,6 +160,28 @@ export class StudentResolver {
   }
 
   @Query(() => StudentConnection)
+  async getAllStudentSyncOffline(
+    @Args() args: ConnectionArgs,
+    @Arg('schoolId', () => String, { nullable: true }) schoolId: String,
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String,
+  ): Promise<StudentConnection> {
+    let result;
+    result = await this.repository.findBy({
+      where: {
+        schoolId,
+        schoolYearId,
+      },
+    });
+    let resultConn = new StudentConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
+  }
+
+  @Query(() => StudentConnection)
   async getAllStudentAcademicGradeIdWithoutCourse(
     @Args() args: ConnectionArgs,
     @Arg('schoolId', () => String) schoolId: String,

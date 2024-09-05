@@ -88,6 +88,28 @@ export class ModalityResolver {
     return resultConn;
   }
 
+  @Query(() => ModalityConnection)
+  async getAllModalitySyncOffline(
+    @Args() args: ConnectionArgs,
+    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String,
+  ): Promise<ModalityConnection> {
+    let result;
+    result = await this.repository.findBy({
+      where: {
+        schoolId,
+        schoolYearId,
+      },
+    });
+    let resultConn = new ModalityConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
+  }
+
   @Mutation(() => Modality)
   async createModality(
     @Arg('data') data: NewModality,
