@@ -168,7 +168,7 @@ export class StudentResolver {
     let result;
     result = await this.repository.findBy({
       where: {
-        schoolId: { $in: schoolId },
+        schoolId: { $in: [schoolId] },
         schoolYearId,
       },
     });

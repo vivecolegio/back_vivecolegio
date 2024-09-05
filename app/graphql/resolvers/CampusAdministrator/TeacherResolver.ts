@@ -141,13 +141,13 @@ export class TeacherResolver {
   @Query(() => TeacherConnection)
   async getAllTeacherSyncOffline(
     @Args() args: ConnectionArgs,
-    @Arg('schoolId', () => [String]) schoolId: String[],
+    @Arg('schoolId', () => String) schoolId: String,
     @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String,
   ): Promise<TeacherConnection> {
     let result;
     result = await this.repository.findBy({
       where: {
-        schoolId: { $in: schoolId },
+        schoolId: { $in: [schoolId] },
         schoolYearId,
         active: true,
       },
