@@ -252,12 +252,7 @@ export const QUERT_GET_ACADEMIC_PERIOD_SCHOOL_YEAR = gql`
 
 export const QUERT_GET_TOTAL_COUNT_EDUCATION_LEVEL = gql`
   query getAllEducationLevelTotalCount($schoolId: String!, $schoolYearId: String!) {
-    data: getAllEducationLevel(
-      schoolId: $schoolId
-      schoolYearId: $schoolYearId
-      orderCreated: true
-      allData: true
-    ) {
+    data: getAllEducationLevelSyncOffline(schoolId: $schoolId, schoolYearId: $schoolYearId) {
       totalCount
     }
   }
@@ -265,12 +260,7 @@ export const QUERT_GET_TOTAL_COUNT_EDUCATION_LEVEL = gql`
 
 export const QUERT_GET_TOTAL_COUNT_PERFORMANCE_LEVEL = gql`
   query getAllPerformanceLevelTotalCount($schoolId: String!, $schoolYearId: String!) {
-    data: getAllPerformanceLevel(
-      schoolId: $schoolId
-      schoolYearId: $schoolYearId
-      orderCreated: true
-      allData: true
-    ) {
+    data: getAllPerformanceLevelSyncOffline(schoolId: $schoolId, schoolYearId: $schoolYearId) {
       totalCount
     }
   }
@@ -278,12 +268,7 @@ export const QUERT_GET_TOTAL_COUNT_PERFORMANCE_LEVEL = gql`
 
 export const QUERT_GET_TOTAL_COUNT_EVALUATIVE_COMPONENT = gql`
   query getAllEvaluativeComponentTotalCount($schoolId: String!, $schoolYearId: String!) {
-    data: getAllEvaluativeComponent(
-      schoolId: $schoolId
-      schoolYearId: $schoolYearId
-      orderCreated: true
-      allData: true
-    ) {
+    data: getAllEvaluativeComponentSyncOffline(schoolId: $schoolId, schoolYearId: $schoolYearId) {
       totalCount
     }
   }
@@ -291,12 +276,7 @@ export const QUERT_GET_TOTAL_COUNT_EVALUATIVE_COMPONENT = gql`
 
 export const QUERT_GET_TOTAL_COUNT_MODALITY = gql`
   query getAllModalityTotalCount($schoolId: String!, $schoolYearId: String!) {
-    data: getAllModality(
-      schoolId: $schoolId
-      schoolYearId: $schoolYearId
-      orderCreated: true
-      allData: true
-    ) {
+    data: getAllModalitySyncOffline(schoolId: $schoolId, schoolYearId: $schoolYearId) {
       totalCount
     }
   }
@@ -304,12 +284,7 @@ export const QUERT_GET_TOTAL_COUNT_MODALITY = gql`
 
 export const QUERT_GET_TOTAL_COUNT_SPECIALITY = gql`
   query getAllSpecialtyTotalCount($schoolId: String!, $schoolYearId: String!) {
-    data: getAllSpecialty(
-      schoolId: $schoolId
-      schoolYearId: $schoolYearId
-      orderCreated: true
-      allData: true
-    ) {
+    data: getAllSpecialtySyncOffline(schoolId: $schoolId, schoolYearId: $schoolYearId) {
       totalCount
     }
   }
@@ -317,12 +292,7 @@ export const QUERT_GET_TOTAL_COUNT_SPECIALITY = gql`
 
 export const QUERT_GET_TOTAL_COUNT_ACADEMIC_AREA = gql`
   query getAllAcademicAreaTotalCount($schoolId: String!, $schoolYearId: String!) {
-    data: getAllAcademicArea(
-      schoolId: $schoolId
-      schoolYearId: $schoolYearId
-      orderCreated: true
-      allData: true
-    ) {
+    data: getAllAcademicAreaSyncOffline(schoolId: $schoolId, schoolYearId: $schoolYearId) {
       totalCount
     }
   }
@@ -330,12 +300,7 @@ export const QUERT_GET_TOTAL_COUNT_ACADEMIC_AREA = gql`
 
 export const QUERT_GET_TOTAL_COUNT_ACADEMIC_ASIGNATURE = gql`
   query getAllAcademicAsignatureTotalCount($schoolId: String!, $schoolYearId: String!) {
-    data: getAllAcademicAsignature(
-      schoolId: $schoolId
-      schoolYearId: $schoolYearId
-      orderCreated: true
-      allData: true
-    ) {
+    data: getAllAcademicAsignatureSyncOffline(schoolId: $schoolId, schoolYearId: $schoolYearId) {
       totalCount
     }
   }
@@ -343,12 +308,7 @@ export const QUERT_GET_TOTAL_COUNT_ACADEMIC_ASIGNATURE = gql`
 
 export const QUERT_GET_TOTAL_COUNT_ACADEMIC_GRADE = gql`
   query getAllAcademicGradeTotalCount($schoolId: String!, $schoolYearId: String!) {
-    data: getAllAcademicGrade(
-      schoolId: $schoolId
-      schoolYearId: $schoolYearId
-      orderCreated: true
-      allData: true
-    ) {
+    data: getAllAcademicGradeSyncOffline(schoolId: $schoolId, schoolYearId: $schoolYearId) {
       totalCount
     }
   }
@@ -356,12 +316,7 @@ export const QUERT_GET_TOTAL_COUNT_ACADEMIC_GRADE = gql`
 
 export const QUERT_GET_TOTAL_COUNT_COURSE = gql`
   query getAllCourseTotalCount($schoolId: String!, $schoolYearId: String!) {
-    data: getAllCourse(
-      schoolId: $schoolId
-      schoolYearId: $schoolYearId
-      orderCreated: true
-      allData: true
-    ) {
+    data: getAllCourseSyncOffline(schoolId: $schoolId, schoolYearId: $schoolYearId) {
       totalCount
     }
   }
@@ -369,12 +324,7 @@ export const QUERT_GET_TOTAL_COUNT_COURSE = gql`
 
 export const QUERT_GET_TOTAL_COUNT_TEACHER = gql`
   query getAllTeacherTotalCount($schoolId: String!, $schoolYearId: String!) {
-    data: getAllTeacher(
-      schoolId: $schoolId
-      schoolYearId: $schoolYearId
-      orderCreated: true
-      allData: true
-    ) {
+    data: getAllTeacherSyncOffline(schoolId: $schoolId, schoolYearId: $schoolYearId) {
       totalCount
     }
   }
@@ -382,12 +332,7 @@ export const QUERT_GET_TOTAL_COUNT_TEACHER = gql`
 
 export const QUERT_GET_TOTAL_COUNT_STUDENT = gql`
   query getAllStudentTotalCount($schoolId: String!, $schoolYearId: String!) {
-    data: getAllStudent(
-      schoolId: $schoolId
-      schoolYearId: $schoolYearId
-      orderCreated: true
-      allData: true
-    ) {
+    data: getAllStudentSyncOffline(schoolId: $schoolId, schoolYearId: $schoolYearId) {
       totalCount
     }
   }
