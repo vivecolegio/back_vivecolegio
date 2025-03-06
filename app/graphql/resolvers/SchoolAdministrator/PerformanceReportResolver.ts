@@ -1568,16 +1568,18 @@ export class PerformanceReportResolver {
           '--disable-setuid-sandbox',
           '--disable-dev-shm-usage',
         ],
-        protocolTimeout: 240000,
+        protocolTimeout: 500000,
         headless: true,
         timeout: 0,
       });
       const page = await browser.newPage();
       //await page.setDefaultNavigationTimeout(0);
+      await page.setDefaultTimeout(60000);
+      await page.setDefaultNavigationTimeout(60000);
       //console.log(data)
       const content = await this.compile('index', data);
       //console.log(content)
-      await page.setContent(content);
+      await page.setContent(content, { waitUntil: 'networkidle0', timeout: 60000 });
       await page.pdf({
         path: 'output.pdf',
         format: 'A4',
