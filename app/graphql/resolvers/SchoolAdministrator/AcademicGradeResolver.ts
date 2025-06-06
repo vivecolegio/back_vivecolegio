@@ -116,28 +116,6 @@ export class AcademicGradeResolver {
     return resultConn;
   }
 
-  @Query(() => AcademicGradeConnection)
-  async getAllAcademicGradeSyncOffline(
-    @Args() args: ConnectionArgs,
-    @Arg('schoolId', () => String) schoolId: String,
-    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String,
-  ): Promise<AcademicGradeConnection> {
-    let result;
-    result = await this.repository.findBy({
-      where: {
-        schoolId,
-        schoolYearId,
-      },
-    });
-    let resultConn = new AcademicGradeConnection();
-    let resultConnection = connectionFromArraySlice(result, args, {
-      sliceStart: 0,
-      arrayLength: result.length,
-    });
-    resultConn = { ...resultConnection, totalCount: result.length };
-    return resultConn;
-  }
-
   @Mutation(() => AcademicGrade)
   async createAcademicGrade(
     @Arg('data') data: NewAcademicGrade,

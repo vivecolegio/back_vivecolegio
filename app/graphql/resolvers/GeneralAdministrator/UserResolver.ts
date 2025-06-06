@@ -527,14 +527,13 @@ export class UserResolver {
             jwtUtil.roleMenus = menus as [Menu];
           }
           let lastLogin = await this.repositoryAuditLogin.findBy({
-            //where: { userId: user?.id.toString(), ip: { $ne: null } },
-            where: { userId: user?.id.toString(), auth: true },
-            take: 1,
+            where: { userId: user?.id.toString() },
+            take: 10,
             order: { createdAt: 'DESC' },
           });
           if (lastLogin && lastLogin?.length == 1) {
             jwtUtil.lastLogin = lastLogin[0];
-            console.log(lastLogin);
+            console.log(lastLogin)
           }
           jwtUtil.jwt = jwtS;
         }

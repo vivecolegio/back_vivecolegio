@@ -183,28 +183,6 @@ export class CourseResolver {
   }
 
   @Query(() => CourseConnection)
-  async getAllCourseSyncOffline(
-    @Args() args: ConnectionArgs,
-    @Arg('schoolId', () => String, { nullable: true }) schoolId: String,
-    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String,
-  ): Promise<CourseConnection> {
-    let result;
-    result = await this.repository.findBy({
-      where: {
-        schoolId,
-        schoolYearId,
-      },
-    });
-    let resultConn = new CourseConnection();
-    let resultConnection = connectionFromArraySlice(result, args, {
-      sliceStart: 0,
-      arrayLength: result.length,
-    });
-    resultConn = { ...resultConnection, totalCount: result.length };
-    return resultConn;
-  }
-
-  @Query(() => CourseConnection)
   async getAllCourseTeacher(
     @Args() args: ConnectionArgs,
     @Arg('teacherId', () => String) teacherId: String,
