@@ -34,9 +34,9 @@ const numCPUs = env.NODE_ENV === 'development' ? 1 : 1;
 const jwt = require('jsonwebtoken');
 var httpsOptions = {
   // this is the private key only
-  key: fs.readFileSync(path.join('ssl', 'vivecolegios', 'private.key')),
+  key: fs.readFileSync(path.join('ssl', 'vivecolegios', 'wildcard_nortedesantander_gov_co.key')),
   // this must be the fullchain (cert + intermediates)
-  cert: fs.readFileSync(path.join('ssl', 'vivecolegios', 'certificate.crt')),
+  cert: fs.readFileSync(path.join('ssl', 'vivecolegios', 'wildcard_nortedesantander_gov_co.crt')),
   // this stuff is generally only for peer certificates
   ca: fs.readFileSync(path.join('ssl', 'vivecolegios', 'ca_bundle.crt')),
   requestCert: false,
