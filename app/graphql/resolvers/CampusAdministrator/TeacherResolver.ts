@@ -138,6 +138,28 @@ export class TeacherResolver {
     return resultConn;
   }
 
+  @Query(() => TeacherConnection)
+  async getAllTeacherSyncOffline(
+    @Args() args: ConnectionArgs,
+    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String,
+  ): Promise<TeacherConnection> {
+    let result;
+    result = await this.repository.findBy({
+      where: {
+        schoolId: { $in: [schoolId] },
+        schoolYearId,
+        active: true,
+      },
+    });
+    let resultConn = new TeacherConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
+  }
   @Mutation(() => Teacher)
   async createTeacher(@Arg('data') data: NewTeacher, @Ctx() context: IContext): Promise<Teacher> {
     let dataProcess: NewTeacher = removeEmptyStringElements(data);
