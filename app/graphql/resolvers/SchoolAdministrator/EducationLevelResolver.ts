@@ -87,7 +87,27 @@ export class EducationLevelResolver {
     resultConn = { ...resultConnection, totalCount: result.length };
     return resultConn;
   }
-
+  @Query(() => EducationLevelConnection)
+  async getAllEducationLevelSyncOffline(
+    @Args() args: ConnectionArgs,
+    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String,
+  ): Promise<EducationLevelConnection> {
+    let result;
+    result = await this.repository.findBy({
+      where: {
+        schoolId,
+        schoolYearId,
+      },
+    });
+    let resultConn = new EducationLevelConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
+  }
   @Mutation(() => EducationLevel)
   async createEducationLevel(
     @Arg('data') data: NewEducationLevel,
