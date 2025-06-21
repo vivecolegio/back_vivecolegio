@@ -116,7 +116,7 @@ export class AcademicGradeResolver {
     return resultConn;
   }
 
-  @Query(() => AcademicGradeConnection)
+    @Query(() => AcademicGradeConnection)
   async getAllAcademicGradeSyncOffline(
     @Args() args: ConnectionArgs,
     @Arg('schoolId', () => String) schoolId: String,

@@ -181,8 +181,7 @@ export class CourseResolver {
     resultConn = { ...resultConnection, totalCount: result.length };
     return resultConn;
   }
-
-  @Query(() => CourseConnection)
+    @Query(() => CourseConnection)
   async getAllCourseSyncOffline(
     @Args() args: ConnectionArgs,
     @Arg('schoolId', () => String, { nullable: true }) schoolId: String,
@@ -203,7 +202,6 @@ export class CourseResolver {
     resultConn = { ...resultConnection, totalCount: result.length };
     return resultConn;
   }
-
   @Query(() => CourseConnection)
   async getAllCourseTeacher(
     @Args() args: ConnectionArgs,

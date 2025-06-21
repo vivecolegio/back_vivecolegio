@@ -159,8 +159,8 @@ export class EvaluativeComponentResolver {
     resultConn = { ...resultConnection, totalCount: result.length };
     return resultConn;
   }
-
-  @Query(() => EvaluativeComponentConnection)
+  
+    @Query(() => EvaluativeComponentConnection)
   async getAllEvaluativeComponentSyncOffline(
     @Args() args: ConnectionArgs,
     @Arg('schoolId', () => String) schoolId: String,
@@ -181,7 +181,6 @@ export class EvaluativeComponentResolver {
     resultConn = { ...resultConnection, totalCount: result.length };
     return resultConn;
   }
-
   @Query(() => EvaluativeComponentConnection)
   async getAllEvaluativeComponentAcademicAsignatureCourse(
     @Args() args: ConnectionArgs,

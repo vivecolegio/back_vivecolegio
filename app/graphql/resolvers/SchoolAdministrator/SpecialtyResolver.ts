@@ -111,7 +111,6 @@ export class SpecialtyResolver {
     resultConn = { ...resultConnection, totalCount: result.length };
     return resultConn;
   }
-
   @Mutation(() => Specialty)
   async createSpecialty(
     @Arg('data') data: NewSpecialty,

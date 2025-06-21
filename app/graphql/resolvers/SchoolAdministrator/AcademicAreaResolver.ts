@@ -108,8 +108,7 @@ export class AcademicAreaResolver {
     resultConn = { ...resultConnection, totalCount: result.length };
     return resultConn;
   }
-
-  @Query(() => AcademicAreaConnection)
+   @Query(() => AcademicAreaConnection)
   async getAllAcademicAreaSyncOffline(
     @Args() args: ConnectionArgs,
     @Arg('schoolId', () => String) schoolId: String,
@@ -130,7 +129,6 @@ export class AcademicAreaResolver {
     resultConn = { ...resultConnection, totalCount: result.length };
     return resultConn;
   }
-
   @Mutation(() => AcademicArea)
   async createAcademicArea(
     @Arg('data') data: NewAcademicArea,

@@ -109,7 +109,6 @@ export class ModalityResolver {
     resultConn = { ...resultConnection, totalCount: result.length };
     return resultConn;
   }
-
   @Mutation(() => Modality)
   async createModality(
     @Arg('data') data: NewModality,

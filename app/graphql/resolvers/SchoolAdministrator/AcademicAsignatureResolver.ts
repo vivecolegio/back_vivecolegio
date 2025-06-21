@@ -166,7 +166,6 @@ export class AcademicAsignatureResolver {
     resultConn = { ...resultConnection, totalCount: result.length };
     return resultConn;
   }
-
   @Query(() => AcademicAsignatureConnection)
   async getAllAcademicAsignatureNotAssignedInAcademicGrade(
     @Args() args: ConnectionArgs,

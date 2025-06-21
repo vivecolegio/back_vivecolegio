@@ -87,7 +87,6 @@ export class EducationLevelResolver {
     resultConn = { ...resultConnection, totalCount: result.length };
     return resultConn;
   }
-
   @Query(() => EducationLevelConnection)
   async getAllEducationLevelSyncOffline(
     @Args() args: ConnectionArgs,
@@ -109,7 +108,6 @@ export class EducationLevelResolver {
     resultConn = { ...resultConnection, totalCount: result.length };
     return resultConn;
   }
-
   @Mutation(() => EducationLevel)
   async createEducationLevel(
     @Arg('data') data: NewEducationLevel,

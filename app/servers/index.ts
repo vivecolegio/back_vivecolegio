@@ -15,6 +15,9 @@ import { env } from 'process';
 import 'reflect-metadata';
 import { SERVER_NAME_APP, SERVER_PORT_APP } from '../config';
 import { buildFederatedSchema } from '../graphql/helpers/buildFederatedSchema';
+import { ErrorLoggerMiddleware } from '../graphql/middlewares/error-logger';
+import { LogAccessMiddleware } from '../graphql/middlewares/log-access';
+import { ResolveTimeMiddleware } from '../graphql/middlewares/resolve-time';
 import { AcademicAreaCoursePeriodValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAreaCoursePeriodValuationResolver';
 import { AcademicAreaCourseYearValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAreaCourseYearValuationResolver';
 import { AcademicAsignatureCoursePeriodEvidenceLearningValuationResolver } from '../graphql/resolvers/CampusAdministrator/AcademicAsignatureCoursePeriodEvidenceLearningValuationResolver';
@@ -208,7 +211,7 @@ async function app() {
         ForumQuestionResolver,
         SyncOfflineResolver,
       ],
-      //globalMiddlewares: [ErrorLoggerMiddleware, ResolveTimeMiddleware, LogAccessMiddleware],
+      globalMiddlewares: [ErrorLoggerMiddleware, ResolveTimeMiddleware, LogAccessMiddleware],
     });
 
     const configExpressStatusMonitor = {

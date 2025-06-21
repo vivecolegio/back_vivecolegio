@@ -160,7 +160,6 @@ export class TeacherResolver {
     resultConn = { ...resultConnection, totalCount: result.length };
     return resultConn;
   }
-
   @Mutation(() => Teacher)
   async createTeacher(@Arg('data') data: NewTeacher, @Ctx() context: IContext): Promise<Teacher> {
     let dataProcess: NewTeacher = removeEmptyStringElements(data);
