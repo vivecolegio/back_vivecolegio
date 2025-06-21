@@ -146,6 +146,27 @@ export class AcademicAsignatureResolver {
   }
 
   @Query(() => AcademicAsignatureConnection)
+  async getAllAcademicAsignatureSyncOffline(
+    @Args() args: ConnectionArgs,
+    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String,
+  ): Promise<AcademicAsignatureConnection> {
+    let result;
+    result = await this.repository.findBy({
+      where: {
+        schoolId,
+        schoolYearId,
+      },
+    });
+    let resultConn = new AcademicAsignatureConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
+  }
+  @Query(() => AcademicAsignatureConnection)
   async getAllAcademicAsignatureNotAssignedInAcademicGrade(
     @Args() args: ConnectionArgs,
     @Arg('schoolId', () => String) schoolId: String,
