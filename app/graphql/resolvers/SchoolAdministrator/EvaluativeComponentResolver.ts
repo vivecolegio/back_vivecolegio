@@ -159,7 +159,28 @@ export class EvaluativeComponentResolver {
     resultConn = { ...resultConnection, totalCount: result.length };
     return resultConn;
   }
-
+  
+    @Query(() => EvaluativeComponentConnection)
+  async getAllEvaluativeComponentSyncOffline(
+    @Args() args: ConnectionArgs,
+    @Arg('schoolId', () => String) schoolId: String,
+    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String,
+  ): Promise<EvaluativeComponentConnection> {
+    let result;
+    result = await this.repository.findBy({
+      where: {
+        schoolId,
+        schoolYearId,
+      },
+    });
+    let resultConn = new EvaluativeComponentConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
+  }
   @Query(() => EvaluativeComponentConnection)
   async getAllEvaluativeComponentAcademicAsignatureCourse(
     @Args() args: ConnectionArgs,
