@@ -18,4 +18,16 @@ export class SyncOfflineDescription {
   @Field({ nullable: true })
   @Column({ nullable: true })
   finish?: boolean;
+
+  @Field(() => [String], { nullable: true })
+  @Column({ nullable: true })
+  entityIds?: string[];
+
+  @Field(() => [String], { nullable: true })
+  @Column({ nullable: true })
+  entityNames?: string[];
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  entityDetails?: string; // JSON string con detalles adicionales
 }

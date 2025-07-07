@@ -20,4 +20,13 @@ export class NewSyncOfflineDescription implements Partial<SyncOfflineDescription
 
   @Field({ nullable: true })
   endDate?: Date;
+
+  @Field(() => [String], { nullable: true })
+  entityIds?: string[];
+
+  @Field(() => [String], { nullable: true })
+  entityNames?: string[];
+
+  @Field({ nullable: true })
+  entityDetails?: string; // JSON string con detalles adicionales
 }

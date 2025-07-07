@@ -13,9 +13,9 @@ import {
   AuditLoginRepository,
   CampusAdministratorRepository,
   CampusCoordinatorRepository,
-  CampusRepository,
   DocumentTypeRepository,
   GenderRepository,
+  GeneralPerformanceLevelRepository,
   GuardianRepository,
   MenuItemRepository,
   MenuRepository,
@@ -35,6 +35,7 @@ import { Guardian } from '../../models/CampusAdministrator/Guardian';
 import { Teacher } from '../../models/CampusAdministrator/Teacher';
 import { DocumentType } from '../../models/GeneralAdministrator/DocumentType';
 import { Gender } from '../../models/GeneralAdministrator/Gender';
+import { GeneralPerformanceLevel } from '../../models/GeneralAdministrator/GeneralPerformanceLevel';
 import { Menu, MenuConnection } from '../../models/GeneralAdministrator/Menu';
 import { MenuItem, MenuItemConnection } from '../../models/GeneralAdministrator/MenuItem';
 import { Module, ModuleConnection } from '../../models/GeneralAdministrator/Module';
@@ -57,6 +58,9 @@ import {
   QUERT_GET_ACADEMIC_PERIOD_SCHOOL_YEAR,
   QUERT_GET_ALL_SCHOOL_YEAR,
   QUERT_GET_USER,
+  QUERY_GET_ALL_DOCUMENT_TYPE,
+  QUERY_GET_ALL_GENDER,
+  QUERY_GET_ALL_GENERAL_PERFORMANCE_LEVEL,
   QUERY_GET_ALL_MENU,
   QUERY_GET_ALL_MENU_ITEM,
   QUERY_GET_ALL_MODULE,
@@ -64,7 +68,6 @@ import {
   QUERY_GET_ALL_SCHOOL,
 } from '../../queries/queries';
 import { AuditLogin } from './../../models/GeneralAdministrator/AuditLogin';
-import { Campus } from './../../models/GeneralAdministrator/Campus';
 import { QUERT_GET_SCHOOL_ADMINISTRATOR_USER_ID } from './../../queries/queries';
 
 const BCRYPT_SALT_ROUNDS = 12;
@@ -79,6 +82,9 @@ export class UserResolver {
 
   @InjectRepository(DocumentType)
   private repositoryDocumentType = DocumentTypeRepository;
+
+  @InjectRepository(GeneralPerformanceLevel)
+  private repositoryGeneralPerformanceLevel = GeneralPerformanceLevelRepository;
 
   @InjectRepository(Role)
   private repositoryRole = RoleRepository;
@@ -109,9 +115,6 @@ export class UserResolver {
 
   @InjectRepository(Guardian)
   private repositoryGuardian = GuardianRepository;
-
-  @InjectRepository(Campus)
-  private repositoryCampus = CampusRepository;
 
   @InjectRepository(School)
   private repositorySchool = SchoolRepository;
@@ -326,7 +329,7 @@ export class UserResolver {
   ): Promise<Boolean | null> {
     let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
-    return result?.result?.ok === 1 ?? true;
+    return result?.result?.ok === 1 || true;
   }
 
   @FieldResolver((_type) => User, { nullable: true })
@@ -482,17 +485,19 @@ export class UserResolver {
               }
             }
           }
-          let campus;
+          // ✅ Campus ya no se sincroniza en el primer login
+          // let campus;
           let school;
-          if (campusId !== undefined) {
-            let campusIds: any[] = [];
-            campusId.forEach((id: any) => {
-              campusIds.push(new ObjectId(id));
-            });
-            campus = await this.repositoryCampus.findBy({
-              where: { _id: { $in: campusIds } },
-            });
-          }
+          // Campus data will be loaded later in SyncOffline module
+          // if (campusId !== undefined) {
+          //   let campusIds: any[] = [];
+          //   campusId.forEach((id: any) => {
+          //     campusIds.push(new ObjectId(id));
+          //   });
+          //   campus = await this.repositoryCampus.findBy({
+          //     where: { _id: { $in: campusIds } },
+          //   });
+          // }
           if (schoolId) {
             let schoolIds: any[] = [];
             schoolId.forEach((id: any) => {
@@ -502,9 +507,10 @@ export class UserResolver {
               where: { _id: { $in: schoolIds } },
             });
           }
-          if (campus && campus !== undefined) {
-            jwtUtil.campus = campus;
-          }
+          // Campus data will be available after SyncOffline synchronization
+          // if (campus && campus !== undefined) {
+          //   jwtUtil.campus = campus;
+          // }
           if (school && school !== undefined) {
             jwtUtil.schools = school;
           }
@@ -536,6 +542,25 @@ export class UserResolver {
             console.log(lastLogin)
           }
           jwtUtil.jwt = jwtS;
+
+          // 🚀 SINCRONIZACIÓN DE ENTIDADES GENERALES EN PRIMER LOGIN
+          // Solo ejecutar si es la primera vez que alguien hace login (verificar si hay pocos datos)
+          const generalPerformanceLevelCount = await this.repositoryGeneralPerformanceLevel.count();
+          const genderCount = await this.repositoryGender.count();
+          const documentTypeCount = await this.repositoryDocumentType.count();
+          
+          // Si alguna de las entidades está vacía o tiene pocos registros, sincronizar
+          if (generalPerformanceLevelCount <= 2 || genderCount <= 2 || documentTypeCount <= 2) {
+            console.log('🌟 [FIRST-LOGIN] Detectado primer login o datos faltantes, sincronizando entidades generales...');
+            console.log(`🌟 [FIRST-LOGIN] Counts actuales - GeneralPerformanceLevel: ${generalPerformanceLevelCount}, Gender: ${genderCount}, DocumentType: ${documentTypeCount}`);
+            
+            // Ejecutar sincronización en background para no bloquear el login
+            this.syncGeneralEntitiesOnFirstLogin().catch(error => {
+              console.error('❌ [FIRST-LOGIN] Error en sincronización background:', error);
+            });
+          } else {
+            console.log('✅ [FIRST-LOGIN] Entidades generales ya sincronizadas, omitiendo sincronización');
+          }
         }
       }
       const modelAuditLogin = await this.repositoryAuditLogin.create({
@@ -645,17 +670,19 @@ export class UserResolver {
           }
         }
       }
-      let campus;
+      // ✅ Campus ya no se sincroniza en el primer login - se comenta para optimizar
+      // let campus;
       let school;
-      if (campusId !== undefined) {
-        let campusIds: any[] = [];
-        campusId.forEach((id: any) => {
-          campusIds.push(new ObjectId(id));
-        });
-        campus = await this.repositoryCampus.findBy({
-          where: { _id: { $in: campusIds } },
-        });
-      }
+      // Campus data will be loaded later in SyncOffline module
+      // if (campusId !== undefined) {
+      //   let campusIds: any[] = [];
+      //   campusId.forEach((id: any) => {
+      //     campusIds.push(new ObjectId(id));
+      //   });
+      //   campus = await this.repositoryCampus.findBy({
+      //     where: { _id: { $in: campusIds } },
+      //   });
+      // }
       if (schoolId) {
         let schoolIds: any[] = [];
         schoolId.forEach((id: any) => {
@@ -665,9 +692,10 @@ export class UserResolver {
           where: { _id: { $in: schoolIds } },
         });
       }
-      if (campus && campus !== undefined) {
-        jwtUtil.campus = campus;
-      }
+      // Campus data will be available after SyncOffline synchronization
+      // if (campus && campus !== undefined) {
+      //   jwtUtil.campus = campus;
+      // }
       if (school && school !== undefined) {
         jwtUtil.schools = school;
       }
@@ -829,19 +857,27 @@ export class UserResolver {
 
     await client.request(MUTATION_LOGIN, variables).then(async (result: any) => {
       data = result.data;
+      console.log('[LOGIN-SYNC-OFFLINE] Login result from remote server:', data ? 'Success' : 'Failed');
       if (data != null) {
         if (data?.userId) {
+          console.log(`[LOGIN-SYNC-OFFLINE] Starting sync for user: ${data.userId}`);
           userData = await client.request<User>(QUERT_GET_USER, { id: data?.userId });
           let result = await this.repository.findOneBy(data?.userId);
+          
+          console.log('[LOGIN-SYNC-OFFLINE] Starting full offline data synchronization...');
           await this.syncOfflineData(client, data?.userId);
+          console.log('[LOGIN-SYNC-OFFLINE] Offline data synchronization completed');
+          
           let id = data?.userId;
           delete userData.data.id;
           if (result == null) {
+            console.log(`[LOGIN-SYNC-OFFLINE] Creating new local user: ${userData.data.username}`);
             data = await this.repository.save({
               _id: new ObjectId(id),
               ...userData.data,
             });
           } else {
+            console.log(`[LOGIN-SYNC-OFFLINE] Updating existing local user: ${userData.data.username}`);
             await this.repository.update(
               {
                 id: id,
@@ -1036,6 +1072,168 @@ export class UserResolver {
           }
         }
       }
+    }
+
+    // ✅ CAMPUS Y SCHOOL CONFIGURATION SE SINCRONIZAN EN SyncOfflineResolver, NO AQUÍ
+    // Se quitó la sincronización de Campus y SchoolConfiguration del primer login
+    // para mejorar el rendimiento. Ahora solo se sincronizan en la segunda fase.
+  }
+
+  /**
+   * 🚀 SINCRONIZACIÓN DE ENTIDADES GENERALES EN PRIMER LOGIN
+   * Sincroniza entidades críticas necesarias para el primer registro de usuarios
+   * Estas entidades se llenan automáticamente la primera vez que alguien hace login
+   */
+  private async syncGeneralEntitiesOnFirstLogin(): Promise<void> {
+    try {
+      const client = new GraphQLClient('http://vivecolegios.nortedesantander.gov.co:5000/graphql', {
+        jsonSerializer: {
+          parse: JSON.parse,
+          stringify: JSON.stringify,
+        },
+      });
+
+      console.log('🌟 [FIRST-LOGIN-SYNC] ===== INICIANDO SINCRONIZACIÓN DE ENTIDADES GENERALES =====');
+      
+      // Sincronizar en paralelo las 3 entidades generales
+      await Promise.all([
+        this.syncGeneralPerformanceLevels(client),
+        this.syncGenders(client),
+        this.syncDocumentTypes(client),
+      ]);
+
+      console.log('🎯 [FIRST-LOGIN-SYNC] ===== SINCRONIZACIÓN DE ENTIDADES GENERALES COMPLETADA =====');
+    } catch (error) {
+      console.error('❌ [FIRST-LOGIN-SYNC] Error en sincronización de entidades generales:', error);
+    }
+  }
+
+  /**
+   * Sincroniza GeneralPerformanceLevels desde el servidor remoto
+   */
+  private async syncGeneralPerformanceLevels(client: GraphQLClient): Promise<void> {
+    try {
+      console.log('🎯 [SYNC-GENERAL-PERFORMANCE-LEVEL] Iniciando sincronización...');
+      
+      const result: any = await client.request(QUERY_GET_ALL_GENERAL_PERFORMANCE_LEVEL);
+      const data = result.data;
+      
+      if (data?.edges?.length > 0) {
+        console.log(`🎯 [SYNC-GENERAL-PERFORMANCE-LEVEL] Procesando ${data.edges.length} niveles de desempeño generales...`);
+        
+        for (const edge of data.edges) {
+          const performanceLevel = edge.node;
+          const id = performanceLevel.id;
+          
+          // Eliminar campos que no se deben insertar directamente
+          delete performanceLevel.id;
+          
+          const existing = await this.repositoryGeneralPerformanceLevel.findOneBy(id);
+          
+          if (!existing) {
+            console.log(`🎯 [SYNC-GENERAL-PERFORMANCE-LEVEL] 🆕 Creando: ${performanceLevel.name} (ID: ${id})`);
+            await this.repositoryGeneralPerformanceLevel.save({
+              _id: new ObjectId(id),
+              ...performanceLevel,
+            });
+          } else {
+            console.log(`🎯 [SYNC-GENERAL-PERFORMANCE-LEVEL] 🔄 Actualizando: ${performanceLevel.name} (ID: ${id})`);
+            await this.repositoryGeneralPerformanceLevel.update({ id }, performanceLevel);
+          }
+        }
+        
+        console.log(`🎯 [SYNC-GENERAL-PERFORMANCE-LEVEL] ✅ Completado: ${data.edges.length} entidades procesadas`);
+      } else {
+        console.log('🎯 [SYNC-GENERAL-PERFORMANCE-LEVEL] ⚠️ No hay datos para sincronizar');
+      }
+    } catch (error) {
+      console.error('❌ [SYNC-GENERAL-PERFORMANCE-LEVEL] Error:', error);
+    }
+  }
+
+  /**
+   * Sincroniza Genders desde el servidor remoto
+   */
+  private async syncGenders(client: GraphQLClient): Promise<void> {
+    try {
+      console.log('👥 [SYNC-GENDER] Iniciando sincronización...');
+      
+      const result: any = await client.request(QUERY_GET_ALL_GENDER);
+      const data = result.data;
+      
+      if (data?.edges?.length > 0) {
+        console.log(`👥 [SYNC-GENDER] Procesando ${data.edges.length} géneros...`);
+        
+        for (const edge of data.edges) {
+          const gender = edge.node;
+          const id = gender.id;
+          
+          // Eliminar campos que no se deben insertar directamente
+          delete gender.id;
+          
+          const existing = await this.repositoryGender.findOneBy(id);
+          
+          if (!existing) {
+            console.log(`👥 [SYNC-GENDER] 🆕 Creando: ${gender.name} (Código: ${gender.code}, ID: ${id})`);
+            await this.repositoryGender.save({
+              _id: new ObjectId(id),
+              ...gender,
+            });
+          } else {
+            console.log(`👥 [SYNC-GENDER] 🔄 Actualizando: ${gender.name} (Código: ${gender.code}, ID: ${id})`);
+            await this.repositoryGender.update({ id }, gender);
+          }
+        }
+        
+        console.log(`👥 [SYNC-GENDER] ✅ Completado: ${data.edges.length} entidades procesadas`);
+      } else {
+        console.log('👥 [SYNC-GENDER] ⚠️ No hay datos para sincronizar');
+      }
+    } catch (error) {
+      console.error('❌ [SYNC-GENDER] Error:', error);
+    }
+  }
+
+  /**
+   * Sincroniza DocumentTypes desde el servidor remoto
+   */
+  private async syncDocumentTypes(client: GraphQLClient): Promise<void> {
+    try {
+      console.log('📄 [SYNC-DOCUMENT-TYPE] Iniciando sincronización...');
+      
+      const result: any = await client.request(QUERY_GET_ALL_DOCUMENT_TYPE);
+      const data = result.data;
+      
+      if (data?.edges?.length > 0) {
+        console.log(`📄 [SYNC-DOCUMENT-TYPE] Procesando ${data.edges.length} tipos de documento...`);
+        
+        for (const edge of data.edges) {
+          const documentType = edge.node;
+          const id = documentType.id;
+          
+          // Eliminar campos que no se deben insertar directamente
+          delete documentType.id;
+          
+          const existing = await this.repositoryDocumentType.findOneBy(id);
+          
+          if (!existing) {
+            console.log(`📄 [SYNC-DOCUMENT-TYPE] 🆕 Creando: ${documentType.name} (Código: ${documentType.code}, ID: ${id})`);
+            await this.repositoryDocumentType.save({
+              _id: new ObjectId(id),
+              ...documentType,
+            });
+          } else {
+            console.log(`📄 [SYNC-DOCUMENT-TYPE] 🔄 Actualizando: ${documentType.name} (Código: ${documentType.code}, ID: ${id})`);
+            await this.repositoryDocumentType.update({ id }, documentType);
+          }
+        }
+        
+        console.log(`📄 [SYNC-DOCUMENT-TYPE] ✅ Completado: ${data.edges.length} entidades procesadas`);
+      } else {
+        console.log('📄 [SYNC-DOCUMENT-TYPE] ⚠️ No hay datos para sincronizar');
+      }
+    } catch (error) {
+      console.error('❌ [SYNC-DOCUMENT-TYPE] Error:', error);
     }
   }
 }

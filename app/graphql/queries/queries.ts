@@ -221,6 +221,74 @@ export const QUERT_GET_ALL_SCHOOL_YEAR = gql`
   }
 `;
 
+// Queries para entidades generales requeridas en primer login
+export const QUERY_GET_ALL_GENERAL_PERFORMANCE_LEVEL = gql`
+  query getAllGeneralPerformanceLevel {
+    data: getAllGeneralPerformanceLevel(orderCreated: true, allData: true) {
+      totalCount
+      edges {
+        cursor
+        node {
+          id
+          active
+          version
+          createdAt
+          updatedAt
+          createdByUserId
+          updatedByUserId
+          name
+        }
+      }
+    }
+  }
+`;
+
+export const QUERY_GET_ALL_GENDER = gql`
+  query getAllGender {
+    data: getAllGender(orderCreated: true, allData: true) {
+      totalCount
+      edges {
+        cursor
+        node {
+          id
+          active
+          version
+          createdAt
+          updatedAt
+          createdByUserId
+          updatedByUserId
+          code
+          name
+          description
+        }
+      }
+    }
+  }
+`;
+
+export const QUERY_GET_ALL_DOCUMENT_TYPE = gql`
+  query getAllDocumentType {
+    data: getAllDocumentType(orderCreated: true, allData: true) {
+      totalCount
+      edges {
+        cursor
+        node {
+          id
+          active
+          version
+          createdAt
+          updatedAt
+          createdByUserId
+          updatedByUserId
+          code
+          name
+          description
+        }
+      }
+    }
+  }
+`;
+
 export const QUERT_GET_ACADEMIC_PERIOD_SCHOOL_YEAR = gql`
   query getAcademicPeriodSchoolYear($schoolId: String!, $schoolYearId: String!) {
     data: getAcademicPeriodSchoolYear(schoolId: $schoolId, schoolYearId: $schoolYearId) {
@@ -260,7 +328,7 @@ export const QUERT_GET_TOTAL_COUNT_EDUCATION_LEVEL = gql`
 
 export const QUERT_GET_TOTAL_COUNT_PERFORMANCE_LEVEL = gql`
   query getAllPerformanceLevelTotalCount($schoolId: String!, $schoolYearId: String!) {
-    data: getAllPerformanceLevelSyncOffline(schoolId: $schoolId, schoolYearId: $schoolYearId) {
+    data: getAllPerformanceLevel(schoolId: $schoolId, orderCreated: true, allData: true, schoolYearId: $schoolYearId) {
       totalCount
     }
   }
@@ -334,6 +402,1079 @@ export const QUERT_GET_TOTAL_COUNT_STUDENT = gql`
   query getAllStudentTotalCount($schoolId: String!, $schoolYearId: String!) {
     data: getAllStudentSyncOffline(schoolId: $schoolId, schoolYearId: $schoolYearId) {
       totalCount
+    }
+  }
+`;
+
+export const QUERT_GET_TOTAL_COUNT_CAMPUS = gql`
+  query getAllCampusTotalCount($schoolId: String!) {
+    data: getAllCampusSyncOffline(schoolId: $schoolId) {
+      totalCount
+    }
+  }
+`;
+
+export const QUERY_GET_ALL_CAMPUS = gql`
+  query getAllCampus($schoolId: String!) {
+    data: getAllCampus(schoolId: $schoolId, orderCreated: true, allData: true) {
+      edges {
+        node {
+          id
+          active
+          version
+          createdAt
+          updatedAt
+          createdByUserId
+          updatedByUserId
+          name
+          daneCodeCampus
+          consecutive
+          schoolId
+        }
+        cursor
+      }
+      totalCount
+    }
+  }
+`;
+
+export const QUERT_GET_TOTAL_COUNT_SCHOOL_CONFIGURATION = gql`
+  query getAllSchoolConfigurationTotalCount($schoolId: String!) {
+    data: getAllSchoolConfigurationSyncOffline(schoolId: $schoolId) {
+      totalCount
+    }
+  }
+`;
+
+export const QUERY_GET_ALL_SCHOOL_CONFIGURATION = gql`
+  query getAllSchoolConfiguration($schoolId: String!) {
+    data: getAllSchoolConfiguration(schoolId: $schoolId, orderCreated: true, allData: true) {
+      edges {
+        node {
+          active
+          code
+          createdAt
+          createdByUserId
+          entityBaseId
+          id
+          schoolId
+          schoolYearId
+          updatedAt
+          updatedByUserId
+          valueNumber
+          valueString
+          version
+        }
+        cursor
+      }
+      totalCount
+    }
+  }
+`;
+
+export const QUERY_GET_CAMPUS = gql`
+  query getCampus($id: String!) {
+    data: getCampus(id: $id) {
+      id
+      active
+      version
+      createdAt
+      updatedAt
+      createdByUserId
+      updatedByUserId
+      name
+      daneCodeCampus
+      consecutive
+      schoolId
+    }
+  }
+`;
+
+export const QUERY_GET_ALL_TEACHER = gql`
+  query getAllTeacherSyncOffline($schoolId: String!, $schoolYearId: String) {
+    data: getAllTeacherSyncOffline(schoolId: $schoolId, schoolYearId: $schoolYearId) {
+      totalCount
+      edges {
+        cursor
+        node {
+          id
+          active
+          version
+          createdAt
+          updatedAt
+          createdByUserId
+          updatedByUserId
+          schoolId
+          campusId
+          userId
+          academicAsignatureId
+          attentionSchedule
+          schoolYearId
+          entityBaseId
+          user {
+            id
+            active
+            version
+            createdAt
+            updatedAt
+            createdByUserId
+            updatedByUserId
+            name
+            lastName
+            username
+            genderId
+            documentTypeId
+            documentNumber
+            birthdate
+            phone
+            email
+            password
+            profilePhoto
+            signaturePhoto
+            roleId
+            schoolId
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const QUERY_GET_TEACHER = gql`
+  query getTeacher($id: String!) {
+    data: getTeacher(id: $id) {
+      id
+      active
+      version
+      createdAt
+      updatedAt
+      createdByUserId
+      updatedByUserId
+      schoolId
+      campusId
+      userId
+      academicAsignatureId
+      attentionSchedule
+      schoolYearId
+      entityBaseId
+      user {
+        id
+        active
+        version
+        createdAt
+        updatedAt
+        createdByUserId
+        updatedByUserId
+        name
+        lastName
+        username
+        genderId
+        documentTypeId
+        documentNumber
+        birthdate
+        phone
+        email
+        password
+        profilePhoto
+        signaturePhoto
+        roleId
+        schoolId
+      }
+    }
+  }
+`;
+
+export const QUERY_GET_ALL_STUDENT = gql`
+  query getAllStudentSyncOffline($schoolId: String!, $schoolYearId: String) {
+    data: getAllStudentSyncOffline(schoolId: $schoolId, schoolYearId: $schoolYearId) {
+      totalCount
+      edges {
+        cursor
+        node {
+          id
+          active
+          version
+          createdAt
+          updatedAt
+          createdByUserId
+          updatedByUserId
+          schoolId
+          campusId
+          userId
+          academicGradeId
+          courseId
+          schoolYearId
+          entityBaseId
+          user {
+            id
+            active
+            version
+            createdAt
+            updatedAt
+            createdByUserId
+            updatedByUserId
+            name
+            lastName
+            username
+            genderId
+            documentTypeId
+            documentNumber
+            birthdate
+            phone
+            email
+            password
+            profilePhoto
+            signaturePhoto
+            roleId
+            schoolId
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const QUERY_GET_STUDENT = gql`
+  query getStudent($id: String!) {
+    data: getStudent(id: $id) {
+      id
+      active
+      version
+      createdAt
+      updatedAt
+      createdByUserId
+      updatedByUserId
+      schoolId
+      campusId
+      userId
+      guardianId
+      academicGradeId
+      courseId
+      schoolYearId
+      entityBaseId
+      user {
+        id
+        active
+        version
+        createdAt
+        updatedAt
+        createdByUserId
+        updatedByUserId
+        name
+        lastName
+        username
+        genderId
+        documentTypeId
+        documentNumber
+        birthdate
+        phone
+        email
+        password
+        profilePhoto
+        signaturePhoto
+        roleId
+        schoolId
+      }
+    }
+  }
+`;
+
+export const QUERY_GET_ALL_SPECIALTY = gql`
+  query getAllSpecialtySyncOffline($schoolId: String!, $schoolYearId: String) {
+    data: getAllSpecialtySyncOffline(schoolId: $schoolId, schoolYearId: $schoolYearId) {
+      totalCount
+      edges {
+        cursor
+        node {
+          id
+          schoolId
+          active
+          version
+          createdAt
+          updatedAt
+          createdByUserId
+          updatedByUserId
+          code
+          name
+          modalityId
+          schoolYearId
+          entityBaseId
+        }
+      }
+    }
+  }
+`;
+
+export const QUERY_GET_SPECIALTY = gql`
+  query getSpecialty($id: String!) {
+    data: getSpecialty(id: $id) {
+      id
+      schoolId
+      active
+      version
+      createdAt
+      updatedAt
+      createdByUserId
+      updatedByUserId
+      code
+      name
+      modalityId
+      schoolYearId
+      entityBaseId
+    }
+  }
+`;
+
+export const QUERY_GET_ALL_EDUCATION_LEVEL = gql`
+  query getAllEducationLevelSyncOffline($schoolId: String!, $schoolYearId: String) {
+    data: getAllEducationLevelSyncOffline(schoolId: $schoolId, schoolYearId: $schoolYearId) {
+      totalCount
+      edges {
+        cursor
+        node {
+          id
+          schoolId
+          active
+          version
+          createdAt
+          updatedAt
+          createdByUserId
+          updatedByUserId
+          name
+          description
+          schoolYearId
+          entityBaseId
+        }
+      }
+    }
+  }
+`;
+
+export const QUERY_GET_EDUCATION_LEVEL = gql`
+  query getEducationLevel($id: String!) {
+    data: getEducationLevel(id: $id) {
+      id
+      schoolId
+      active
+      version
+      createdAt
+      updatedAt
+      createdByUserId
+      updatedByUserId
+      name
+      description
+      schoolYearId
+      entityBaseId
+    }
+  }
+`;
+
+export const QUERY_GET_ALL_COURSE = gql`
+  query getAllCourseSyncOffline($schoolId: String!, $schoolYearId: String) {
+    data: getAllCourseSyncOffline(schoolId: $schoolId, schoolYearId: $schoolYearId) {
+      totalCount
+      edges {
+        cursor
+        node {
+          id
+          campusId
+          schoolId
+          active
+          version
+          createdAt
+          updatedAt
+          createdByUserId
+          updatedByUserId
+          academicGradeId
+          academicDayId
+          name
+          order
+          studentsId
+          teacherId
+          jornadaSIMAT
+          gradoCodSIMAT
+          grupoSIMAT
+          countStudent
+          schoolYearId
+          entityBaseId
+        }
+      }
+    }
+  }
+`;
+
+export const QUERY_GET_COURSE = gql`
+  query getCourse($id: String!) {
+    data: getCourse(id: $id) {
+      id
+      campusId
+      schoolId
+      active
+      version
+      createdAt
+      updatedAt
+      createdByUserId
+      updatedByUserId
+      academicGradeId
+      academicDayId
+      name
+      order
+      studentsId
+      teacherId
+      jornadaSIMAT
+      gradoCodSIMAT
+      grupoSIMAT
+      countStudent
+      schoolYearId
+      entityBaseId
+    }
+  }
+`;
+
+export const QUERY_GET_ALL_MODALITY = gql`
+  query getAllModalitySyncOffline($schoolId: String!, $schoolYearId: String) {
+    data: getAllModalitySyncOffline(schoolId: $schoolId, schoolYearId: $schoolYearId) {
+      totalCount
+      edges {
+        cursor
+        node {
+          id
+          schoolId
+          active
+          version
+          createdAt
+          updatedAt
+          createdByUserId
+          updatedByUserId
+          code
+          name
+          schoolYearId
+          entityBaseId
+        }
+      }
+    }
+  }
+`;
+
+export const QUERY_GET_MODALITY = gql`
+  query getModality($id: String!) {
+    data: getModality(id: $id) {
+      id
+      schoolId
+      active
+      version
+      createdAt
+      updatedAt
+      createdByUserId
+      updatedByUserId
+      code
+      name
+      schoolYearId
+      entityBaseId
+    }
+  }
+`;
+
+export const QUERY_GET_ALL_PERFORMANCE_LEVEL = gql`
+  query getAllPerformanceLevel($schoolId: String!, $schoolYearId: String!) {
+    data: getAllPerformanceLevel(schoolId: $schoolId, orderCreated: true, allData: true, schoolYearId: $schoolYearId) {
+      totalCount
+      edges {
+        cursor
+        node {
+          id
+          schoolId
+          active
+          version
+          createdAt
+          updatedAt
+          createdByUserId
+          updatedByUserId
+          name
+          minimumScore
+          topScore
+          abbreviation
+          colorHex
+          isFinal
+          isRecovery
+          type
+          category
+          categoryGrade
+          generalPerformanceLevelId
+          campusId
+          academicGradesId
+          order
+          schoolYearId
+          entityBaseId
+        }
+      }
+    }
+  }
+`;
+
+export const QUERY_GET_PERFORMANCE_LEVEL = gql`
+  query getPerformanceLevel($id: String!) {
+    data: getPerformanceLevel(id: $id) {
+      id
+      schoolId
+      active
+      version
+      createdAt
+      updatedAt
+      createdByUserId
+      updatedByUserId
+      name
+      minimumScore
+      topScore
+      abbreviation
+      colorHex
+      isFinal
+      isRecovery
+      type
+      category
+      categoryGrade
+      generalPerformanceLevelId
+      campusId
+      academicGradesId
+      order
+      schoolYearId
+      entityBaseId
+    }
+  }
+`;
+
+// ===== SYNC OFFLINE QUERIES FOR HEAVY ENTITIES =====
+
+// Query to get all AcademicArea for sync offline - based on provided schema
+export const QUERY_GET_ALL_ACADEMIC_AREA_SYNC_OFFLINE = gql`
+  query GetAllAcademicAreaSyncOffline($schoolId: String!, $schoolYearId: String!) {
+    getAllAcademicAreaSyncOffline(schoolId: $schoolId, schoolYearId: $schoolYearId) {
+      totalCount
+      edges {
+        cursor
+        node {
+          id
+          schoolId
+          active
+          version
+          createdAt
+          updatedAt
+          createdByUserId
+          updatedByUserId
+          name
+          abbreviation
+          generalAcademicAreaId
+          academicGradeId
+          order
+          isAverage
+          schoolYearId
+          entityBaseId
+          school {
+            id
+            active
+            version
+            createdAt
+            updatedAt
+            createdByUserId
+            updatedByUserId
+            name
+            daneCode
+            pedagogicalModel
+            educationalModel
+            curricularComponent
+            textResolution
+            textAddress
+            textDaneNit
+            logo
+            textPrincipalSignature
+            textSecretarySignature
+            imgPrincipalSignature
+            imgSecretarySignature
+          }
+          generalAcademicArea {
+            id
+            active
+            version
+            createdAt
+            updatedAt
+            createdByUserId
+            updatedByUserId
+            name
+            hasStandard
+            hasDba
+          }
+          academicGrade {
+            id
+            schoolId
+            active
+            version
+            createdAt
+            updatedAt
+            createdByUserId
+            updatedByUserId
+            name
+            educationLevelId
+            specialtyId
+            generalAcademicCycleId
+            generalAcademicGradeId
+            countStudent
+            schoolYearId
+            entityBaseId
+          }
+          schoolYear {
+            id
+            schoolId
+            active
+            version
+            createdAt
+            updatedAt
+            createdByUserId
+            updatedByUserId
+            schoolYear
+            startDate
+            endDate
+            folioNumber
+            schoolYearImportId
+          }
+        }
+      }
+    }
+  }
+`;
+
+// Query to get all AcademicAsignature for sync offline - based on provided schema
+export const QUERY_GET_ALL_ACADEMIC_ASIGNATURE_SYNC_OFFLINE = gql`
+  query GetAllAcademicAsignatureSyncOffline($schoolId: String!, $schoolYearId: String!) {
+    getAllAcademicAsignatureSyncOffline(schoolYearId: $schoolYearId, schoolId: $schoolId) {
+      edges {
+        cursor
+        node {
+          id
+          schoolId
+          active
+          version
+          createdAt
+          updatedAt
+          createdByUserId
+          updatedByUserId
+          name
+          abbreviation
+          code
+          minWeight
+          maxWeight
+          academicAreaId
+          academicGradeId
+          generalAcademicAsignatureId
+          order
+          schoolYearId
+          entityBaseId
+          school {
+            id
+            active
+            version
+            createdAt
+            updatedAt
+            createdByUserId
+            updatedByUserId
+            name
+            daneCode
+            pedagogicalModel
+            educationalModel
+            curricularComponent
+            textResolution
+            textAddress
+            textDaneNit
+            logo
+            textPrincipalSignature
+            textSecretarySignature
+            imgPrincipalSignature
+            imgSecretarySignature
+          }
+          academicArea {
+            id
+            schoolId
+            active
+            version
+            createdAt
+            updatedAt
+            createdByUserId
+            updatedByUserId
+            name
+            abbreviation
+            generalAcademicAreaId
+            academicGradeId
+            order
+            isAverage
+            schoolYearId
+            entityBaseId
+            generalAcademicArea {
+              id
+              active
+              version
+              createdAt
+              updatedAt
+              createdByUserId
+              updatedByUserId
+              name
+              hasStandard
+              hasDba
+            }
+          }
+          academicGrade {
+            id
+            schoolId
+            active
+            version
+            createdAt
+            updatedAt
+            createdByUserId
+            updatedByUserId
+            name
+            educationLevelId
+            specialtyId
+            generalAcademicCycleId
+            generalAcademicGradeId
+            countStudent
+            schoolYearId
+            entityBaseId
+          }
+          generalAcademicAsignature {
+            id
+            active
+            version
+            createdAt
+            updatedAt
+            createdByUserId
+            updatedByUserId
+            name
+            generalAcademicAreaId
+            hasStandard
+            hasDba
+          }
+          schoolYear {
+            id
+            schoolId
+            active
+            version
+            createdAt
+            updatedAt
+            createdByUserId
+            updatedByUserId
+            schoolYear
+            startDate
+            endDate
+            folioNumber
+            schoolYearImportId
+          }
+        }
+      }
+    }
+  }
+`;
+
+// Query to get all AcademicGrade for sync offline - based on provided schema
+export const QUERY_GET_ALL_ACADEMIC_GRADE_SYNC_OFFLINE = gql`
+  query GetAllAcademicGradeSyncOffline($schoolId: String!, $schoolYearId: String!) {
+    getAllAcademicGradeSyncOffline(schoolId: $schoolId, schoolYearId: $schoolYearId) {
+      totalCount
+      edges {
+        cursor
+        node {
+          id
+          schoolId
+          active
+          version
+          createdAt
+          updatedAt
+          createdByUserId
+          updatedByUserId
+          name
+          educationLevelId
+          specialtyId
+          generalAcademicCycleId
+          generalAcademicGradeId
+          countStudent
+          schoolYearId
+          entityBaseId
+          school {
+            id
+            active
+            version
+            createdAt
+            updatedAt
+            createdByUserId
+            updatedByUserId
+            name
+            daneCode
+            pedagogicalModel
+            educationalModel
+            curricularComponent
+            textResolution
+            textAddress
+            textDaneNit
+            logo
+            textPrincipalSignature
+            textSecretarySignature
+            imgPrincipalSignature
+            imgSecretarySignature
+          }
+          educationLevel {
+            id
+            schoolId
+            active
+            version
+            createdAt
+            updatedAt
+            createdByUserId
+            updatedByUserId
+            name
+            description
+            schoolYearId
+            entityBaseId
+          }
+          specialty {
+            id
+            schoolId
+            active
+            version
+            createdAt
+            updatedAt
+            createdByUserId
+            updatedByUserId
+            code
+            name
+            modalityId
+            schoolYearId
+            entityBaseId
+          }
+          generalAcademicCycle {
+            id
+            active
+            version
+            createdAt
+            updatedAt
+            createdByUserId
+            updatedByUserId
+            name
+          }
+          generalAcademicGrade {
+            id
+            active
+            version
+            createdAt
+            updatedAt
+            createdByUserId
+            updatedByUserId
+            name
+            generalAcademicCycleId
+            nextGeneralAcademicGradeId
+            previousGeneralAcademicGradeId
+          }
+          schoolYear {
+            id
+            schoolId
+            active
+            version
+            createdAt
+            updatedAt
+            createdByUserId
+            updatedByUserId
+            schoolYear
+            startDate
+            endDate
+            folioNumber
+            schoolYearImportId
+          }
+        }
+      }
+    }
+  }
+`;
+
+// Query to get all EvaluativeComponent for sync offline - based on provided schema
+export const QUERY_GET_ALL_EVALUATIVE_COMPONENT_SYNC_OFFLINE = gql`
+  query GetAllEvaluativeComponentSyncOffline($schoolId: String!, $schoolYearId: String!) {
+    getAllEvaluativeComponentSyncOffline(schoolId: $schoolId, schoolYearId: $schoolYearId) {
+      totalCount
+      edges {
+        cursor
+        node {
+          id
+          schoolId
+          active
+          version
+          createdAt
+          updatedAt
+          createdByUserId
+          updatedByUserId
+          name
+          weight
+          type
+          academicAsignaturesId
+          academicAreasId
+          schoolYearId
+          entityBaseId
+          school {
+            id
+            active
+            version
+            createdAt
+            updatedAt
+            createdByUserId
+            updatedByUserId
+            name
+            daneCode
+            pedagogicalModel
+            educationalModel
+            curricularComponent
+            textResolution
+            textAddress
+            textDaneNit
+            logo
+            textPrincipalSignature
+            textSecretarySignature
+            imgPrincipalSignature
+            imgSecretarySignature
+          }
+          academicAsignatures {
+            id
+            schoolId
+            active
+            version
+            createdAt
+            updatedAt
+            createdByUserId
+            updatedByUserId
+            name
+            abbreviation
+            code
+            minWeight
+            maxWeight
+            academicAreaId
+            academicGradeId
+            generalAcademicAsignatureId
+            order
+            schoolYearId
+            entityBaseId
+            generalAcademicAsignature {
+              id
+              active
+              version
+              createdAt
+              updatedAt
+              createdByUserId
+              updatedByUserId
+              name
+              generalAcademicAreaId
+              hasStandard
+              hasDba
+            }
+            academicArea {
+              id
+              schoolId
+              active
+              version
+              createdAt
+              updatedAt
+              createdByUserId
+              updatedByUserId
+              name
+              abbreviation
+              generalAcademicAreaId
+              academicGradeId
+              order
+              isAverage
+              schoolYearId
+              entityBaseId
+            }
+          }
+          academicAreas {
+            id
+            schoolId
+            active
+            version
+            createdAt
+            updatedAt
+            createdByUserId
+            updatedByUserId
+            name
+            abbreviation
+            generalAcademicAreaId
+            academicGradeId
+            order
+            isAverage
+            schoolYearId
+            entityBaseId
+            academicGrade {
+              id
+              schoolId
+              active
+              version
+              createdAt
+              updatedAt
+              createdByUserId
+              updatedByUserId
+              name
+              educationLevelId
+              specialtyId
+              generalAcademicCycleId
+              generalAcademicGradeId
+              countStudent
+              schoolYearId
+              entityBaseId
+            }
+            generalAcademicArea {
+              id
+              active
+              version
+              createdAt
+              updatedAt
+              createdByUserId
+              updatedByUserId
+              name
+              hasStandard
+              hasDba
+            }
+            school {
+              id
+              active
+              version
+              createdAt
+              updatedAt
+              createdByUserId
+              updatedByUserId
+              name
+              daneCode
+              pedagogicalModel
+              educationalModel
+              curricularComponent
+              textResolution
+              textAddress
+              textDaneNit
+              logo
+              textPrincipalSignature
+              textSecretarySignature
+              imgPrincipalSignature
+              imgSecretarySignature
+            }
+          }
+          schoolYear {
+            id
+            schoolId
+            active
+            version
+            createdAt
+            updatedAt
+            createdByUserId
+            updatedByUserId
+            schoolYear
+            startDate
+            endDate
+            folioNumber
+            schoolYearImportId
+          }
+        }
+      }
     }
   }
 `;

@@ -80,6 +80,26 @@ export class SchoolConfigurationResolver {
     return resultConn;
   }
 
+  @Query(() => SchoolConfigurationConnection)
+  async getAllSchoolConfigurationSyncOffline(
+    @Args() args: ConnectionArgs,
+    @Arg('schoolId', () => String) schoolId: String,
+  ): Promise<SchoolConfigurationConnection> {
+    console.log(`[SCHOOL-CONFIG-SYNC] Getting all school configuration for school: ${schoolId}`);
+    let result = await this.repository.findBy({
+      where: { schoolId },
+    });
+    console.log(`[SCHOOL-CONFIG-SYNC] Found ${result.length} school configuration records for school ${schoolId}`);
+    
+    let resultConn = new SchoolConfigurationConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
+  }
+
   @Mutation(() => SchoolConfiguration)
   async createSchoolConfiguration(
     @Arg('data') data: NewSchoolConfiguration,

@@ -80,6 +80,26 @@ export class CampusResolver {
     return resultConn;
   }
 
+  @Query(() => CampusConnection)
+  async getAllCampusSyncOffline(
+    @Args() args: ConnectionArgs,
+    @Arg('schoolId', () => String) schoolId: String,
+  ): Promise<CampusConnection> {
+    console.log(`[CAMPUS-SYNC] Getting all campus for school: ${schoolId}`);
+    let result = await this.repository.findBy({
+      where: { schoolId },
+    });
+    console.log(`[CAMPUS-SYNC] Found ${result.length} campus records for school ${schoolId}`);
+    
+    let resultConn = new CampusConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
+  }
+
   @Mutation(() => Campus)
   async createCampus(@Arg('data') data: NewCampus, @Ctx() context: IContext): Promise<Campus> {
     let dataProcess: NewCampus = removeEmptyStringElements(data);
