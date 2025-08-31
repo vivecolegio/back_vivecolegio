@@ -531,13 +531,16 @@ export class ExperienceLearningResolver {
       updatedByUserId,
     });
     if (result?.academicPeriodId && result?.academicAsignatureCourseId) {
-      this.updateAllStudentAcademicAsignatureCoursePeriodValuation(
-        result?.academicAsignatureCourseId,
-        result?.academicPeriodId,
-        result?.experienceLearningType
-          ? result?.experienceLearningType
-          : ExperienceLearningType.NORMAL,
-      );
+      // Solo recalcular si no es una actividad de nivelación
+      if (result?.experienceLearningType !== ExperienceLearningType.RECOVERY) {
+        this.updateAllStudentAcademicAsignatureCoursePeriodValuation(
+          result?.academicAsignatureCourseId,
+          result?.academicPeriodId,
+          result?.experienceLearningType
+            ? result?.experienceLearningType
+            : ExperienceLearningType.NORMAL,
+        );
+      }
     }
     return result;
   }
@@ -558,13 +561,20 @@ export class ExperienceLearningResolver {
       updatedByUserId,
     });
     if (result?.academicPeriodId && result?.academicAsignatureCourseId) {
-      this.updateAllStudentAcademicAsignatureCoursePeriodValuation(
-        result?.academicAsignatureCourseId,
-        result?.academicPeriodId,
-        result?.experienceLearningType
-          ? result?.experienceLearningType
-          : ExperienceLearningType.NORMAL,
-      );
+      /* // Solo recalcular si se está activando o si no es una actividad de nivelación
+      if (active || result?.experienceLearningType !== ExperienceLearningType.RECOVERY) { */
+      // Para actividades normales, siempre recalcular
+      if (result?.experienceLearningType !== ExperienceLearningType.RECOVERY) {
+        this.updateAllStudentAcademicAsignatureCoursePeriodValuation(
+          result?.academicAsignatureCourseId,
+          result?.academicPeriodId,
+          result?.experienceLearningType
+            ? result?.experienceLearningType
+            : ExperienceLearningType.NORMAL,
+        );
+      }
+      // Para actividades de nivelación que se activan, NO recalcular automáticamente
+      // El profesor debe asignar las notas manualmente para cada estudiante que necesita nivelación
     }
     if (result.id) {
       return true;
@@ -580,11 +590,14 @@ export class ExperienceLearningResolver {
   ): Promise<Boolean | null> {
     let data = await this.repository.findOneBy(id);
     if (data?.academicPeriodId && data?.academicAsignatureCourseId) {
-      this.updateAllStudentAcademicAsignatureCoursePeriodValuation(
-        data?.academicAsignatureCourseId,
-        data?.academicPeriodId,
-        data?.experienceLearningType ? data?.experienceLearningType : ExperienceLearningType.NORMAL,
-      );
+      // Solo recalcular si no es una actividad de nivelación
+      if (data?.experienceLearningType !== ExperienceLearningType.RECOVERY) {
+        this.updateAllStudentAcademicAsignatureCoursePeriodValuation(
+          data?.academicAsignatureCourseId,
+          data?.academicPeriodId,
+          data?.experienceLearningType ? data?.experienceLearningType : ExperienceLearningType.NORMAL,
+        );
+      }
     }
     let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
     return result?.result?.ok === 1 ?? true;
@@ -989,7 +1002,9 @@ export class ExperienceLearningResolver {
           active: true,
         },
       });
-      if (experienceLearnings) {
+
+      // Si no hay experiencias activas, no crear ni actualizar valoraciones
+      if (experienceLearnings && experienceLearnings.length > 0) {
         const academicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.findOneBy(
           academicAsignatureCourseId,
         );
@@ -1457,7 +1472,7 @@ export class ExperienceLearningResolver {
               ),
             );
           }
-          await Promise.all(promisesListAsignatures).then(async () => {});
+          await Promise.all(promisesListAsignatures).then(async () => { });
           return true;
         }
       }
@@ -1614,9 +1629,21 @@ export class ExperienceLearningResolver {
           }
         }
         if (countDefinitive == 0) {
+          // Verificar si hay experiencias de aprendizaje activas para este tipo
+          const activeExperiences = await this.repository.findBy({
+            where: {
+              academicAsignatureCourseId,
+              academicPeriodId,
+              experienceLearningType,
+              active: true,
+            },
+          });
+
+          // Solo crear o actualizar valoración si hay experiencias activas o si ya existe una valoración
           if (studentPeriodValuationList.length > 0) {
             studentPeriodValuation = studentPeriodValuationList[0];
-          } else {
+          } else if (activeExperiences.length > 0) {
+            // Solo crear una nueva valoración si hay experiencias activas
             studentPeriodValuation = new AcademicAsignatureCoursePeriodValuation();
             studentPeriodValuation.version = 0;
             studentPeriodValuation.active = true;
@@ -1630,7 +1657,11 @@ export class ExperienceLearningResolver {
             if (experienceLearningType == ExperienceLearningType?.RECOVERY) {
               studentPeriodValuation.valuationType = ValuationType?.RECOVERY;
             }
+          } else {
+            // Si no hay experiencias activas y no existe valoración previa, no hacer nada
+            return true;
           }
+
           let performanceLevelType: any = null;
           let performanceLevels =
             await this.performanceLevelResolver.getAllPerformanceLevelAcademicAsignatureCourseFinal(
@@ -1917,6 +1948,7 @@ export class ExperienceLearningResolver {
                   studentId,
                   evaluativeComponentId: evaluativeComponent.id.toString(),
                   experienceLearningType,
+                  active: true,
                 },
               });
             if (experienceLearningAverageValuation.length > 0) {
