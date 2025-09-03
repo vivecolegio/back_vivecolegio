@@ -5,7 +5,6 @@ import { InjectRepository } from 'typeorm-typedi-extensions';
 
 import fs from 'fs-extra';
 import hbs from 'handlebars';
-import PDFMerger from 'pdf-merger-js';
 import puppeteer from 'puppeteer';
 import {
   AcademicAreaCoursePeriodValuationRepository,
@@ -182,10 +181,8 @@ export class PerformanceReportResolver {
     @Ctx() context: IContext,
   ): Promise<String | undefined> {
     // id = "6298c6ede686a07d17a79e2c";
-    const merger = new PDFMerger();
     let data = {};
     let course = await this.repositoryCourse.findOneBy(id);
-
     if (course) {
       let campus = await this.repositoryCampus.findOneBy(course?.campusId);
       let school = await this.repositorySchool.findOneBy(schoolId);
@@ -708,236 +705,66 @@ export class PerformanceReportResolver {
         //console.log("aca vamos bien", academicAsignaturesCourse);
         let urls: any[] = [];
         if (studentsId) {
-
-          // IMPLEMENTAR PROCESAMIENTO POR LOTES
-          console.log(`Procesando ${studentsId.length} estudiantes por lotes`);
-          const batchSize = 3; // Procesar 3 estudiantes a la vez
-
-          for (let i = 0; i < studentsId.length; i += batchSize) {
-            const batchPromises = [];
-            const currentBatch = studentsId.slice(i, i + batchSize);
-            console.log(`Procesando lote ${Math.floor(i / batchSize) + 1}, estudiantes ${i + 1}-${Math.min(i + batchSize, studentsId.length)} de ${studentsId.length}`);
-
-            // Procesar este lote
-            for (let studentId of currentBatch) {
-              let dataPDF = { ...data };
-              let student = await this.repositoryStudent.findOneBy(studentId + '');
-              //console.log("codigo", student?.code);
-              let studentUser = await this.repositoryUser.findOneBy(student?.userId);
-              dataPDF = { ...dataPDF, studentName: studentUser?.name + ' ' + studentUser?.lastName };
-              dataPDF = { ...dataPDF, studentDocumentNumber: studentUser?.documentNumber };
-              let averageAcademicPeriodStudentList =
-                await this.repositoryAverageAcademicPeriodStudent.findBy({
-                  where: {
-                    courseId: id,
-                    academicPeriodId,
-                    studentId,
-                  },
-                });
-              switch (performanceLevelType) {
-                case PerformanceLevelType.QUALITATIVE:
-                  if (averageAcademicPeriodStudentList[0]?.performanceLevelId != null) {
-                    let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(
-                      averageAcademicPeriodStudentList[0]?.performanceLevelId,
-                    );
-                    dataPDF = { ...dataPDF, promStudent: performanceLevel?.name };
-                  } else {
-                    dataPDF = { ...dataPDF, promStudent: '' };
-                  }
-                  break;
-                case PerformanceLevelType.QUANTITATIVE:
-                  dataPDF = {
-                    ...dataPDF,
-                    promStudent:
-                      averageAcademicPeriodStudentList[0]?.assessment?.toFixed(
-                        countDigitsAverageStudent,
-                      ),
-                  };
-                  break;
-              }
-              dataPDF = { ...dataPDF, puestoEstudiante: averageAcademicPeriodStudentList[0]?.score };
-              let notesAsignatures = [];
-              for (let asignatureCourse of academicAsignaturesCourse) {
-                let academicAsignature = await this.repositoryAcademicAsignature.findOneBy(
-                  asignatureCourse?.academicAsignatureId,
-                );
-                let academicArea = await this.repositoryAcademicArea.findOneBy(
-                  academicAsignature?.academicAreaId,
-                );
-                let teacherAsignatureCourse = await this.repositoryTeacher.findOneBy(
-                  asignatureCourse?.teacherId,
-                );
-                let teacherUserAsignatureCourse = await this.repositoryUser.findOneBy(
-                  teacherAsignatureCourse?.userId,
-                );
-                for (let period of academicPeriods) {
-                  if (period?.order && academicPeriod?.order) {
-                    if (period?.order <= academicPeriod?.order) {
-                      let notesAsignature =
-                        await this.repositoryAcademicAsignatureCoursePeriodValuation.findBy({
-                          academicAsignatureCourseId: asignatureCourse?.id?.toString(),
-                          academicPeriodId: period?.id?.toString(),
-                          studentId,
-                        });
-                      if (notesAsignature?.length > 0) {
-                        if (notesAsignature?.length == 1) {
-                          let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(
-                            notesAsignature[0]?.performanceLevelId,
-                          );
-                          notesAsignatures.push({
-                            assessment: notesAsignature[0]?.assessment?.toFixed(
-                              countDigitsPerformanceLevel,
-                            ),
-                            academicPeriodId: notesAsignature[0]?.academicPeriodId,
-                            performanceLevel: performanceLevel?.name,
-                            asignatureId: academicAsignature?.id?.toString(),
-                            areaId: academicArea?.id?.toString(),
-                            teacher:
-                              teacherUserAsignatureCourse?.name +
-                              ' ' +
-                              teacherUserAsignatureCourse?.lastName,
-                          });
-                        } else {
-                          let valuationAsignatureCalculate;
-                          let valuationAsignatureDefinitive;
-                          let valuationAsignatureRecovery;
-                          for (let notesAsigna of notesAsignature) {
-                            switch (notesAsigna?.valuationType) {
-                              case ValuationType.CALCULATE:
-                                valuationAsignatureCalculate = notesAsigna;
-                                break;
-                              case ValuationType.DEFINITIVE:
-                                valuationAsignatureDefinitive = notesAsigna;
-                                break;
-                              case ValuationType.RECOVERY:
-                                valuationAsignatureRecovery = notesAsigna;
-                                break;
-                            }
-                          }
-                          if (valuationAsignatureRecovery) {
-                            let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(
-                              valuationAsignatureRecovery?.performanceLevelId,
-                            );
-                            ///configuration recovery
-                            if (reportPerformanceShowRecoverylValuation == 'YES') {
-                              notesAsignatures.push({
-                                assessment:
-                                  valuationAsignatureCalculate?.assessment?.toFixed(
-                                    countDigitsPerformanceLevel,
-                                  ) +
-                                  ' - ' +
-                                  valuationAsignatureRecovery?.assessment?.toFixed(
-                                    countDigitsPerformanceLevel,
-                                  ) +
-                                  ' (N)',
-                                academicPeriodId: valuationAsignatureRecovery?.academicPeriodId,
-                                performanceLevel: performanceLevel?.name,
-                                asignatureId: academicAsignature?.id?.toString(),
-                                areaId: academicArea?.id?.toString(),
-                                teacher:
-                                  teacherUserAsignatureCourse?.name +
-                                  ' ' +
-                                  teacherUserAsignatureCourse?.lastName,
-                              });
-                            } else {
-                              notesAsignatures.push({
-                                assessment: valuationAsignatureRecovery?.assessment?.toFixed(
-                                  countDigitsPerformanceLevel,
-                                ),
-                                academicPeriodId: valuationAsignatureRecovery?.academicPeriodId,
-                                performanceLevel: performanceLevel?.name,
-                                asignatureId: academicAsignature?.id?.toString(),
-                                areaId: academicArea?.id?.toString(),
-                                teacher:
-                                  teacherUserAsignatureCourse?.name +
-                                  ' ' +
-                                  teacherUserAsignatureCourse?.lastName,
-                              });
-                            }
-                          } else {
-                            if (valuationAsignatureDefinitive) {
-                              let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(
-                                valuationAsignatureDefinitive?.performanceLevelId,
-                              );
-                              notesAsignatures.push({
-                                assessment: valuationAsignatureDefinitive?.assessment?.toFixed(
-                                  countDigitsPerformanceLevel,
-                                ),
-                                academicPeriodId: valuationAsignatureDefinitive?.academicPeriodId,
-                                performanceLevel: performanceLevel?.name,
-                                asignatureId: academicAsignature?.id?.toString(),
-                                areaId: academicArea?.id?.toString(),
-                                teacher:
-                                  teacherUserAsignatureCourse?.name +
-                                  ' ' +
-                                  teacherUserAsignatureCourse?.lastName,
-                              });
-                            } else {
-                              if (valuationAsignatureCalculate) {
-                                let performanceLevel =
-                                  await this.repositoryPerformanceLevel.findOneBy(
-                                    valuationAsignatureCalculate?.performanceLevelId,
-                                  );
-                                notesAsignatures.push({
-                                  assessment: valuationAsignatureCalculate?.assessment?.toFixed(
-                                    countDigitsPerformanceLevel,
-                                  ),
-                                  academicPeriodId: valuationAsignatureCalculate?.academicPeriodId,
-                                  performanceLevel: performanceLevel?.name,
-                                  asignatureId: academicAsignature?.id?.toString(),
-                                  areaId: academicArea?.id?.toString(),
-                                  teacher:
-                                    teacherUserAsignatureCourse?.name +
-                                    ' ' +
-                                    teacherUserAsignatureCourse?.lastName,
-                                });
-                              }
-                            }
-                          }
-                        }
-                      } else {
-                        notesAsignatures.push({
-                          assessment: '-',
-                          academicPeriodId: period?.id?.toString(),
-                          performanceLevel: '-',
-                          asignatureId: academicAsignature?.id?.toString(),
-                          areaId: academicArea?.id?.toString(),
-                          teacher:
-                            teacherUserAsignatureCourse?.name +
-                            ' ' +
-                            teacherUserAsignatureCourse?.lastName,
-                        });
-                      }
-                    } else {
-                      notesAsignatures.push({
-                        assessment: '-',
-                        academicPeriodId: period?.id?.toString(),
-                        performanceLevel: '-',
-                        asignatureId: academicAsignature?.id?.toString(),
-                        areaId: academicArea?.id?.toString(),
-                        teacher:
-                          teacherUserAsignatureCourse?.name +
-                          ' ' +
-                          teacherUserAsignatureCourse?.lastName,
-                      });
-                    }
-                  }
-                  //else {
-                  // console.log("dime que aca es el problema y listo")
-                  // console.log("academicPeriod", academicPeriod);
-                  // console.log("period", period);
-                  //}
+          let promisesGeneratePDF: any[] = [];
+          // for (let studentId of [studentsId[0]]) {
+          for (let studentId of studentsId) {
+            let dataPDF = { ...data };
+            let student = await this.repositoryStudent.findOneBy(studentId + '');
+            //console.log("codigo", student?.code);
+            let studentUser = await this.repositoryUser.findOneBy(student?.userId);
+            dataPDF = { ...dataPDF, studentName: studentUser?.name + ' ' + studentUser?.lastName };
+            dataPDF = { ...dataPDF, studentDocumentNumber: studentUser?.documentNumber };
+            let averageAcademicPeriodStudentList =
+              await this.repositoryAverageAcademicPeriodStudent.findBy({
+                where: {
+                  courseId: id,
+                  academicPeriodId,
+                  studentId,
+                },
+              });
+            switch (performanceLevelType) {
+              case PerformanceLevelType.QUALITATIVE:
+                if (averageAcademicPeriodStudentList[0]?.performanceLevelId != null) {
+                  let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(
+                    averageAcademicPeriodStudentList[0]?.performanceLevelId,
+                  );
+                  dataPDF = { ...dataPDF, promStudent: performanceLevel?.name };
+                } else {
+                  dataPDF = { ...dataPDF, promStudent: '' };
                 }
-                // Nota Final de Año
-                if (ultimateAcademicPeriod) {
-                  if (
-                    ultimateAcademicPeriod?.id?.toString() == academicPeriodId ||
-                    reportPerformanceShowFinalValuation == 'YES'
-                  ) {
+                break;
+              case PerformanceLevelType.QUANTITATIVE:
+                dataPDF = {
+                  ...dataPDF,
+                  promStudent:
+                    averageAcademicPeriodStudentList[0]?.assessment?.toFixed(
+                      countDigitsAverageStudent,
+                    ),
+                };
+                break;
+            }
+            dataPDF = { ...dataPDF, puestoEstudiante: averageAcademicPeriodStudentList[0]?.score };
+            let notesAsignatures = [];
+            for (let asignatureCourse of academicAsignaturesCourse) {
+              let academicAsignature = await this.repositoryAcademicAsignature.findOneBy(
+                asignatureCourse?.academicAsignatureId,
+              );
+              let academicArea = await this.repositoryAcademicArea.findOneBy(
+                academicAsignature?.academicAreaId,
+              );
+              let teacherAsignatureCourse = await this.repositoryTeacher.findOneBy(
+                asignatureCourse?.teacherId,
+              );
+              let teacherUserAsignatureCourse = await this.repositoryUser.findOneBy(
+                teacherAsignatureCourse?.userId,
+              );
+              for (let period of academicPeriods) {
+                if (period?.order && academicPeriod?.order) {
+                  if (period?.order <= academicPeriod?.order) {
                     let notesAsignature =
-                      await this.repositoryAcademicAsignatureCourseYearValuation.findBy({
+                      await this.repositoryAcademicAsignatureCoursePeriodValuation.findBy({
                         academicAsignatureCourseId: asignatureCourse?.id?.toString(),
-                        schoolYearId: academicPeriods[0]?.schoolYearId?.toString(),
+                        academicPeriodId: period?.id?.toString(),
                         studentId,
                       });
                     if (notesAsignature?.length > 0) {
@@ -949,7 +776,7 @@ export class PerformanceReportResolver {
                           assessment: notesAsignature[0]?.assessment?.toFixed(
                             countDigitsPerformanceLevel,
                           ),
-                          academicPeriodId: 'FINAL',
+                          academicPeriodId: notesAsignature[0]?.academicPeriodId,
                           performanceLevel: performanceLevel?.name,
                           asignatureId: academicAsignature?.id?.toString(),
                           areaId: academicArea?.id?.toString(),
@@ -979,19 +806,42 @@ export class PerformanceReportResolver {
                           let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(
                             valuationAsignatureRecovery?.performanceLevelId,
                           );
-                          notesAsignatures.push({
-                            assessment: valuationAsignatureRecovery?.assessment?.toFixed(
-                              countDigitsPerformanceLevel,
-                            ),
-                            academicPeriodId: 'FINAL',
-                            performanceLevel: performanceLevel?.name,
-                            asignatureId: academicAsignature?.id?.toString(),
-                            areaId: academicArea?.id?.toString(),
-                            teacher:
-                              teacherUserAsignatureCourse?.name +
-                              ' ' +
-                              teacherUserAsignatureCourse?.lastName,
-                          });
+                          ///configuration recovery
+                          if (reportPerformanceShowRecoverylValuation == 'YES') {
+                            notesAsignatures.push({
+                              assessment:
+                                valuationAsignatureCalculate?.assessment?.toFixed(
+                                  countDigitsPerformanceLevel,
+                                ) +
+                                ' - ' +
+                                valuationAsignatureRecovery?.assessment?.toFixed(
+                                  countDigitsPerformanceLevel,
+                                ) +
+                                ' (N)',
+                              academicPeriodId: valuationAsignatureRecovery?.academicPeriodId,
+                              performanceLevel: performanceLevel?.name,
+                              asignatureId: academicAsignature?.id?.toString(),
+                              areaId: academicArea?.id?.toString(),
+                              teacher:
+                                teacherUserAsignatureCourse?.name +
+                                ' ' +
+                                teacherUserAsignatureCourse?.lastName,
+                            });
+                          } else {
+                            notesAsignatures.push({
+                              assessment: valuationAsignatureRecovery?.assessment?.toFixed(
+                                countDigitsPerformanceLevel,
+                              ),
+                              academicPeriodId: valuationAsignatureRecovery?.academicPeriodId,
+                              performanceLevel: performanceLevel?.name,
+                              asignatureId: academicAsignature?.id?.toString(),
+                              areaId: academicArea?.id?.toString(),
+                              teacher:
+                                teacherUserAsignatureCourse?.name +
+                                ' ' +
+                                teacherUserAsignatureCourse?.lastName,
+                            });
+                          }
                         } else {
                           if (valuationAsignatureDefinitive) {
                             let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(
@@ -1001,7 +851,7 @@ export class PerformanceReportResolver {
                               assessment: valuationAsignatureDefinitive?.assessment?.toFixed(
                                 countDigitsPerformanceLevel,
                               ),
-                              academicPeriodId: 'FINAL',
+                              academicPeriodId: valuationAsignatureDefinitive?.academicPeriodId,
                               performanceLevel: performanceLevel?.name,
                               asignatureId: academicAsignature?.id?.toString(),
                               areaId: academicArea?.id?.toString(),
@@ -1012,14 +862,15 @@ export class PerformanceReportResolver {
                             });
                           } else {
                             if (valuationAsignatureCalculate) {
-                              let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(
-                                valuationAsignatureCalculate?.performanceLevelId,
-                              );
+                              let performanceLevel =
+                                await this.repositoryPerformanceLevel.findOneBy(
+                                  valuationAsignatureCalculate?.performanceLevelId,
+                                );
                               notesAsignatures.push({
                                 assessment: valuationAsignatureCalculate?.assessment?.toFixed(
                                   countDigitsPerformanceLevel,
                                 ),
-                                academicPeriodId: 'FINAL',
+                                academicPeriodId: valuationAsignatureCalculate?.academicPeriodId,
                                 performanceLevel: performanceLevel?.name,
                                 asignatureId: academicAsignature?.id?.toString(),
                                 areaId: academicArea?.id?.toString(),
@@ -1035,7 +886,7 @@ export class PerformanceReportResolver {
                     } else {
                       notesAsignatures.push({
                         assessment: '-',
-                        academicPeriodId: 'FINAL',
+                        academicPeriodId: period?.id?.toString(),
                         performanceLevel: '-',
                         asignatureId: academicAsignature?.id?.toString(),
                         areaId: academicArea?.id?.toString(),
@@ -1044,6 +895,130 @@ export class PerformanceReportResolver {
                           ' ' +
                           teacherUserAsignatureCourse?.lastName,
                       });
+                    }
+                  } else {
+                    notesAsignatures.push({
+                      assessment: '-',
+                      academicPeriodId: period?.id?.toString(),
+                      performanceLevel: '-',
+                      asignatureId: academicAsignature?.id?.toString(),
+                      areaId: academicArea?.id?.toString(),
+                      teacher:
+                        teacherUserAsignatureCourse?.name +
+                        ' ' +
+                        teacherUserAsignatureCourse?.lastName,
+                    });
+                  }
+                }
+                //else {
+                // console.log("dime que aca es el problema y listo")
+                // console.log("academicPeriod", academicPeriod);
+                // console.log("period", period);
+                //}
+              }
+              // Nota Final de Año
+              if (ultimateAcademicPeriod) {
+                if (
+                  ultimateAcademicPeriod?.id?.toString() == academicPeriodId ||
+                  reportPerformanceShowFinalValuation == 'YES'
+                ) {
+                  let notesAsignature =
+                    await this.repositoryAcademicAsignatureCourseYearValuation.findBy({
+                      academicAsignatureCourseId: asignatureCourse?.id?.toString(),
+                      schoolYearId: academicPeriods[0]?.schoolYearId?.toString(),
+                      studentId,
+                    });
+                  if (notesAsignature?.length > 0) {
+                    if (notesAsignature?.length == 1) {
+                      let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(
+                        notesAsignature[0]?.performanceLevelId,
+                      );
+                      notesAsignatures.push({
+                        assessment: notesAsignature[0]?.assessment?.toFixed(
+                          countDigitsPerformanceLevel,
+                        ),
+                        academicPeriodId: 'FINAL',
+                        performanceLevel: performanceLevel?.name,
+                        asignatureId: academicAsignature?.id?.toString(),
+                        areaId: academicArea?.id?.toString(),
+                        teacher:
+                          teacherUserAsignatureCourse?.name +
+                          ' ' +
+                          teacherUserAsignatureCourse?.lastName,
+                      });
+                    } else {
+                      let valuationAsignatureCalculate;
+                      let valuationAsignatureDefinitive;
+                      let valuationAsignatureRecovery;
+                      for (let notesAsigna of notesAsignature) {
+                        switch (notesAsigna?.valuationType) {
+                          case ValuationType.CALCULATE:
+                            valuationAsignatureCalculate = notesAsigna;
+                            break;
+                          case ValuationType.DEFINITIVE:
+                            valuationAsignatureDefinitive = notesAsigna;
+                            break;
+                          case ValuationType.RECOVERY:
+                            valuationAsignatureRecovery = notesAsigna;
+                            break;
+                        }
+                      }
+                      if (valuationAsignatureRecovery) {
+                        let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(
+                          valuationAsignatureRecovery?.performanceLevelId,
+                        );
+                        notesAsignatures.push({
+                          assessment: valuationAsignatureRecovery?.assessment?.toFixed(
+                            countDigitsPerformanceLevel,
+                          ),
+                          academicPeriodId: 'FINAL',
+                          performanceLevel: performanceLevel?.name,
+                          asignatureId: academicAsignature?.id?.toString(),
+                          areaId: academicArea?.id?.toString(),
+                          teacher:
+                            teacherUserAsignatureCourse?.name +
+                            ' ' +
+                            teacherUserAsignatureCourse?.lastName,
+                        });
+                      } else {
+                        if (valuationAsignatureDefinitive) {
+                          let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(
+                            valuationAsignatureDefinitive?.performanceLevelId,
+                          );
+                          notesAsignatures.push({
+                            assessment: valuationAsignatureDefinitive?.assessment?.toFixed(
+                              countDigitsPerformanceLevel,
+                            ),
+                            academicPeriodId: 'FINAL',
+                            performanceLevel: performanceLevel?.name,
+                            asignatureId: academicAsignature?.id?.toString(),
+                            areaId: academicArea?.id?.toString(),
+                            teacher:
+                              teacherUserAsignatureCourse?.name +
+                              ' ' +
+                              teacherUserAsignatureCourse?.lastName,
+                          });
+                        } else {
+                          if (valuationAsignatureCalculate) {
+                            let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(
+                              valuationAsignatureCalculate?.performanceLevelId,
+                            );
+                            notesAsignatures.push({
+                              assessment: valuationAsignatureCalculate?.assessment?.toFixed(
+                                countDigitsPerformanceLevel,
+                              ),
+                              academicPeriodId: 'FINAL',
+                              performanceLevel: performanceLevel?.name,
+                              asignatureId: academicAsignature?.id?.toString(),
+                              areaId: academicArea?.id?.toString(),
+                              teacher:
+                                teacherUserAsignatureCourse?.name +
+                                ' ' +
+                                teacherUserAsignatureCourse?.lastName,
+                            });
+                          }
+                        }
+                      }
                     }
                   } else {
                     notesAsignatures.push({
@@ -1066,87 +1041,92 @@ export class PerformanceReportResolver {
                     asignatureId: academicAsignature?.id?.toString(),
                     areaId: academicArea?.id?.toString(),
                     teacher:
-                      teacherUserAsignatureCourse?.name + ' ' + teacherUserAsignatureCourse?.lastName,
+                      teacherUserAsignatureCourse?.name +
+                      ' ' +
+                      teacherUserAsignatureCourse?.lastName,
                   });
                 }
-
-                // Nota Final de Año
+              } else {
+                notesAsignatures.push({
+                  assessment: '-',
+                  academicPeriodId: 'FINAL',
+                  performanceLevel: '-',
+                  asignatureId: academicAsignature?.id?.toString(),
+                  areaId: academicArea?.id?.toString(),
+                  teacher:
+                    teacherUserAsignatureCourse?.name + ' ' + teacherUserAsignatureCourse?.lastName,
+                });
               }
-              let notesAreas = [];
-              for (let area of areas) {
-                for (let period of academicPeriods) {
-                  if (period?.order && academicPeriod?.order) {
-                    if (period?.order <= academicPeriod?.order) {
-                      let notesArea = await this.repositoryAcademicAreaCoursePeriodValuation.findBy({
-                        academicAreaId: area?.id?.toString(),
-                        academicPeriodId: period?.id?.toString(),
-                        studentId,
-                      });
-                      if (notesArea?.length > 0) {
-                        let valuationAreaCalculate;
-                        let valuationAreaDefinitive;
-                        let valuationAreaRecovery;
-                        for (let notesA of notesArea) {
-                          switch (notesA?.valuationType) {
-                            case ValuationType.CALCULATE:
-                              valuationAreaCalculate = notesA;
-                              break;
-                            case ValuationType.DEFINITIVE:
-                              valuationAreaDefinitive = notesA;
-                              break;
-                            case ValuationType.RECOVERY:
-                              valuationAreaRecovery = notesA;
-                              break;
-                          }
+
+              // Nota Final de Año
+            }
+            let notesAreas = [];
+            for (let area of areas) {
+              for (let period of academicPeriods) {
+                if (period?.order && academicPeriod?.order) {
+                  if (period?.order <= academicPeriod?.order) {
+                    let notesArea = await this.repositoryAcademicAreaCoursePeriodValuation.findBy({
+                      academicAreaId: area?.id?.toString(),
+                      academicPeriodId: period?.id?.toString(),
+                      studentId,
+                    });
+                    if (notesArea?.length > 0) {
+                      let valuationAreaCalculate;
+                      let valuationAreaDefinitive;
+                      let valuationAreaRecovery;
+                      for (let notesA of notesArea) {
+                        switch (notesA?.valuationType) {
+                          case ValuationType.CALCULATE:
+                            valuationAreaCalculate = notesA;
+                            break;
+                          case ValuationType.DEFINITIVE:
+                            valuationAreaDefinitive = notesA;
+                            break;
+                          case ValuationType.RECOVERY:
+                            valuationAreaRecovery = notesA;
+                            break;
                         }
-                        if (valuationAreaRecovery) {
+                      }
+                      if (valuationAreaRecovery) {
+                        let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(
+                          valuationAreaRecovery?.performanceLevelId,
+                        );
+                        notesAreas.push({
+                          assessment: valuationAreaRecovery?.assessment?.toFixed(
+                            countDigitsPerformanceLevel,
+                          ),
+                          academicPeriodId: valuationAreaRecovery?.academicPeriodId,
+                          performanceLevel: performanceLevel?.name,
+                          areaId: area?.id?.toString(),
+                        });
+                      } else {
+                        if (valuationAreaDefinitive) {
                           let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(
-                            valuationAreaRecovery?.performanceLevelId,
+                            valuationAreaDefinitive?.performanceLevelId,
                           );
                           notesAreas.push({
-                            assessment: valuationAreaRecovery?.assessment?.toFixed(
+                            assessment: valuationAreaDefinitive?.assessment?.toFixed(
                               countDigitsPerformanceLevel,
                             ),
-                            academicPeriodId: valuationAreaRecovery?.academicPeriodId,
+                            academicPeriodId: valuationAreaDefinitive?.academicPeriodId,
                             performanceLevel: performanceLevel?.name,
                             areaId: area?.id?.toString(),
                           });
                         } else {
-                          if (valuationAreaDefinitive) {
+                          if (valuationAreaCalculate) {
                             let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(
-                              valuationAreaDefinitive?.performanceLevelId,
+                              valuationAreaCalculate?.performanceLevelId,
                             );
                             notesAreas.push({
-                              assessment: valuationAreaDefinitive?.assessment?.toFixed(
+                              assessment: valuationAreaCalculate?.assessment?.toFixed(
                                 countDigitsPerformanceLevel,
                               ),
-                              academicPeriodId: valuationAreaDefinitive?.academicPeriodId,
+                              academicPeriodId: valuationAreaCalculate?.academicPeriodId,
                               performanceLevel: performanceLevel?.name,
                               areaId: area?.id?.toString(),
                             });
-                          } else {
-                            if (valuationAreaCalculate) {
-                              let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(
-                                valuationAreaCalculate?.performanceLevelId,
-                              );
-                              notesAreas.push({
-                                assessment: valuationAreaCalculate?.assessment?.toFixed(
-                                  countDigitsPerformanceLevel,
-                                ),
-                                academicPeriodId: valuationAreaCalculate?.academicPeriodId,
-                                performanceLevel: performanceLevel?.name,
-                                areaId: area?.id?.toString(),
-                              });
-                            }
                           }
                         }
-                      } else {
-                        notesAreas.push({
-                          assessment: '-',
-                          academicPeriodId: period?.id?.toString(),
-                          performanceLevel: '-',
-                          areaId: area?.id?.toString(),
-                        });
                       }
                     } else {
                       notesAreas.push({
@@ -1156,53 +1136,74 @@ export class PerformanceReportResolver {
                         areaId: area?.id?.toString(),
                       });
                     }
+                  } else {
+                    notesAreas.push({
+                      assessment: '-',
+                      academicPeriodId: period?.id?.toString(),
+                      performanceLevel: '-',
+                      areaId: area?.id?.toString(),
+                    });
                   }
                 }
-                if (ultimateAcademicPeriod) {
-                  if (
-                    ultimateAcademicPeriod?.id?.toString() == academicPeriodId ||
-                    reportPerformanceShowFinalValuation == 'YES'
-                  ) {
-                    // Nota Final de Año
-                    let notesArea = await this.repositoryAcademicAreaCourseYearValuation.findBy({
-                      academicAreaId: area?.id?.toString(),
-                      schoolYearId: academicPeriods[0]?.schoolYearId?.toString(),
-                      studentId,
-                    });
-                    if (notesArea?.length > 0) {
-                      if (notesArea?.length == 1) {
+              }
+              if (ultimateAcademicPeriod) {
+                if (
+                  ultimateAcademicPeriod?.id?.toString() == academicPeriodId ||
+                  reportPerformanceShowFinalValuation == 'YES'
+                ) {
+                  // Nota Final de Año
+                  let notesArea = await this.repositoryAcademicAreaCourseYearValuation.findBy({
+                    academicAreaId: area?.id?.toString(),
+                    schoolYearId: academicPeriods[0]?.schoolYearId?.toString(),
+                    studentId,
+                  });
+                  if (notesArea?.length > 0) {
+                    if (notesArea?.length == 1) {
+                      let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(
+                        notesArea[0]?.performanceLevelId,
+                      );
+                      notesAreas.push({
+                        assessment: notesArea[0]?.assessment?.toFixed(countDigitsPerformanceLevel),
+                        academicPeriodId: 'FINAL',
+                        performanceLevel: performanceLevel?.name,
+                        areaId: area?.id?.toString(),
+                      });
+                    } else {
+                      let valuationAreaCalculate;
+                      let valuationAreaDefinitive;
+                      let valuationAreaRecovery;
+                      for (let notesA of notesArea) {
+                        switch (notesA?.valuationType) {
+                          case ValuationType.CALCULATE:
+                            valuationAreaCalculate = notesA;
+                            break;
+                          case ValuationType.DEFINITIVE:
+                            valuationAreaDefinitive = notesA;
+                            break;
+                          case ValuationType.RECOVERY:
+                            valuationAreaRecovery = notesA;
+                            break;
+                        }
+                      }
+                      if (valuationAreaRecovery) {
                         let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(
-                          notesArea[0]?.performanceLevelId,
+                          valuationAreaRecovery?.performanceLevelId,
                         );
                         notesAreas.push({
-                          assessment: notesArea[0]?.assessment?.toFixed(countDigitsPerformanceLevel),
+                          assessment: valuationAreaRecovery?.assessment?.toFixed(
+                            countDigitsPerformanceLevel,
+                          ),
                           academicPeriodId: 'FINAL',
                           performanceLevel: performanceLevel?.name,
                           areaId: area?.id?.toString(),
                         });
                       } else {
-                        let valuationAreaCalculate;
-                        let valuationAreaDefinitive;
-                        let valuationAreaRecovery;
-                        for (let notesA of notesArea) {
-                          switch (notesA?.valuationType) {
-                            case ValuationType.CALCULATE:
-                              valuationAreaCalculate = notesA;
-                              break;
-                            case ValuationType.DEFINITIVE:
-                              valuationAreaDefinitive = notesA;
-                              break;
-                            case ValuationType.RECOVERY:
-                              valuationAreaRecovery = notesA;
-                              break;
-                          }
-                        }
-                        if (valuationAreaRecovery) {
+                        if (valuationAreaDefinitive) {
                           let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(
-                            valuationAreaRecovery?.performanceLevelId,
+                            valuationAreaDefinitive?.performanceLevelId,
                           );
                           notesAreas.push({
-                            assessment: valuationAreaRecovery?.assessment?.toFixed(
+                            assessment: valuationAreaDefinitive?.assessment?.toFixed(
                               countDigitsPerformanceLevel,
                             ),
                             academicPeriodId: 'FINAL',
@@ -1210,42 +1211,21 @@ export class PerformanceReportResolver {
                             areaId: area?.id?.toString(),
                           });
                         } else {
-                          if (valuationAreaDefinitive) {
+                          if (valuationAreaCalculate) {
                             let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(
-                              valuationAreaDefinitive?.performanceLevelId,
+                              valuationAreaCalculate?.performanceLevelId,
                             );
                             notesAreas.push({
-                              assessment: valuationAreaDefinitive?.assessment?.toFixed(
+                              assessment: valuationAreaCalculate?.assessment?.toFixed(
                                 countDigitsPerformanceLevel,
                               ),
                               academicPeriodId: 'FINAL',
                               performanceLevel: performanceLevel?.name,
                               areaId: area?.id?.toString(),
                             });
-                          } else {
-                            if (valuationAreaCalculate) {
-                              let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(
-                                valuationAreaCalculate?.performanceLevelId,
-                              );
-                              notesAreas.push({
-                                assessment: valuationAreaCalculate?.assessment?.toFixed(
-                                  countDigitsPerformanceLevel,
-                                ),
-                                academicPeriodId: 'FINAL',
-                                performanceLevel: performanceLevel?.name,
-                                areaId: area?.id?.toString(),
-                              });
-                            }
                           }
                         }
                       }
-                    } else {
-                      notesAreas.push({
-                        assessment: '-',
-                        academicPeriodId: 'FINAL',
-                        performanceLevel: '-',
-                        areaId: area?.id?.toString(),
-                      });
                     }
                   } else {
                     notesAreas.push({
@@ -1263,208 +1243,134 @@ export class PerformanceReportResolver {
                     areaId: area?.id?.toString(),
                   });
                 }
-                // Nota Final de Año
-              }
-              let notesBehaviour = [];
-              if (reportPerformanceBehaviourStudent == 'DISPLAY') {
-                let noteBehaviour = await this.repositoryStudentBehaviour.findBy({
-                  courseId: course?.id?.toString(),
-                  academicPeriodId: academicPeriod?.id?.toString(),
-                  studentId,
+              } else {
+                notesAreas.push({
+                  assessment: '-',
+                  academicPeriodId: 'FINAL',
+                  performanceLevel: '-',
+                  areaId: area?.id?.toString(),
                 });
-                if (noteBehaviour?.length == 1) {
-                  let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(
-                    noteBehaviour[0]?.performanceLevelId,
-                  );
-                  notesBehaviour.push({
-                    assessment: noteBehaviour[0]?.assessment?.toFixed(countDigitsPerformanceLevel),
-                    academicPeriodId: noteBehaviour[0]?.academicPeriodId,
-                    performanceLevel: performanceLevel?.name,
-                    observation: noteBehaviour[0]?.observation,
-                  });
-                } else {
-                  notesBehaviour.push({
-                    assessment: '-',
-                    academicPeriodId: academicPeriod?.id?.toString(),
-                    performanceLevel: '-',
-                    observation: '-',
-                  });
-                }
               }
-              dataPDF = { ...dataPDF, noteBehaviour: notesBehaviour };
-              //console.log(notesAreas)
-              dataPDF = { ...dataPDF, notesAsignatures: notesAsignatures };
-              dataPDF = { ...dataPDF, notesAreas: notesAreas };
-              dataPDF = {
-                ...dataPDF,
-                generatedDate: new Date().toLocaleString(undefined, {
-                  timeZone: 'America/Bogota',
-                  year: 'numeric',
-                  month: '2-digit',
-                  day: '2-digit',
-                }),
-              };
-              dataPDF = {
-                ...dataPDF,
-                generatedHour: new Date().toLocaleString('en-US', {
-                  timeZone: 'America/Bogota',
-                  hour: '2-digit',
-                  hour12: true,
-                  minute: '2-digit',
-                  second: '2-digit',
-                }),
-              };
-
-              // Se agrega la promesa:
-              /* switch (reportPerformanceType) {
-                case 'DETAILS':
-                  batchPromises.push(
-                    this.generatePerformanceReportStudent(dataPDF, studentId, format)
-                      .then(dataUrl => {
-                        if (dataUrl) urls.push(dataUrl);
-                        console.log(`PDF generado para estudiante ${studentId}, URL: ${dataUrl}`);
-                        return dataUrl;
-                      })
-                      .catch(err => {
-                        console.error(`Error generando PDF para estudiante ${studentId}:`, err);
-                        return null;
-                      })
-                  );
-                  break;
-                case 'SINGLE':
-                  batchPromises.push(
-                    this.generatePerformanceReportStudent(dataPDF, studentId, format)
-                      .then(dataUrl => {
-                        if (dataUrl) urls.push(dataUrl);
-                        console.log(`PDF generado para estudiante ${studentId}, URL: ${dataUrl}`);
-                        return dataUrl;
-                      })
-                      .catch(err => {
-                        console.error(`Error generando PDF para estudiante ${studentId}:`, err);
-                        return null;
-                      })
-                  );
-                  break;
-              } */
-
-              // Generar ambos tipos de PDF para cada estudiante
-              // PDF básico
-              batchPromises.push(
-                this.generatePerformanceReportStudent(dataPDF, studentId, format)
-                  .then(dataUrl => {
-                    if (dataUrl) urls.push(dataUrl);
-                    console.log(`PDF básico generado para estudiante ${studentId}, URL: ${dataUrl}`);
-                    return dataUrl;
-                  })
-                  .catch(err => {
-                    console.error(`Error generando PDF básico para estudiante ${studentId}:`, err);
-                    return null;
-                  })
-              );
-
-              //PDF detallado
-              batchPromises.push(
-                this.generatePerformanceReportStudentDetails(dataPDF, studentId, format)
-                  .then(dataUrl => {
-                    if (dataUrl) urls.push(dataUrl);
-                    console.log(`PDF detallado generado para estudiante ${studentId}, URL: ${dataUrl}`);
-                    return dataUrl;
-                  })
-                  .catch(err => {
-                    console.error(`Error generando PDF detallado para estudiante ${studentId}:`, err);
-                    return null;
-                  })
-              );
+              // Nota Final de Año
             }
-
-            // Esperar a que termine este lote antes de comenzar el siguiente
-            await Promise.all(batchPromises);
-            console.log(`Completado lote ${Math.floor(i / batchSize) + 1}, total PDFs: ${urls.length}`);
+            let notesBehaviour = [];
+            if (reportPerformanceBehaviourStudent == 'DISPLAY') {
+              let noteBehaviour = await this.repositoryStudentBehaviour.findBy({
+                courseId: course?.id?.toString(),
+                academicPeriodId: academicPeriod?.id?.toString(),
+                studentId,
+              });
+              if (noteBehaviour?.length == 1) {
+                let performanceLevel = await this.repositoryPerformanceLevel.findOneBy(
+                  noteBehaviour[0]?.performanceLevelId,
+                );
+                notesBehaviour.push({
+                  assessment: noteBehaviour[0]?.assessment?.toFixed(countDigitsPerformanceLevel),
+                  academicPeriodId: noteBehaviour[0]?.academicPeriodId,
+                  performanceLevel: performanceLevel?.name,
+                  observation: noteBehaviour[0]?.observation,
+                });
+              } else {
+                notesBehaviour.push({
+                  assessment: '-',
+                  academicPeriodId: academicPeriod?.id?.toString(),
+                  performanceLevel: '-',
+                  observation: '-',
+                });
+              }
+            }
+            dataPDF = { ...dataPDF, noteBehaviour: notesBehaviour };
+            //console.log(notesAreas)
+            dataPDF = { ...dataPDF, notesAsignatures: notesAsignatures };
+            dataPDF = { ...dataPDF, notesAreas: notesAreas };
+            dataPDF = {
+              ...dataPDF,
+              generatedDate: new Date().toLocaleString(undefined, {
+                timeZone: 'America/Bogota',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+              }),
+            };
+            dataPDF = {
+              ...dataPDF,
+              generatedHour: new Date().toLocaleString('en-US', {
+                timeZone: 'America/Bogota',
+                hour: '2-digit',
+                hour12: true,
+                minute: '2-digit',
+                second: '2-digit',
+              }),
+            };
+            switch (reportPerformanceType) {
+              case 'DETAILS':
+                //promisesGeneratePDF.push(
+                await this.generatePerformanceReportStudentDetails(dataPDF, studentId, format).then(
+                  (dataUrl) => {
+                    urls.push(dataUrl);
+                  },
+                );
+                //);
+                //promisesGeneratePDF.push(
+                await this.generatePerformanceReportStudent(dataPDF, studentId, format).then(
+                  (dataUrl) => {
+                    urls.push(dataUrl);
+                  },
+                );
+                //);
+                break;
+              case 'SINGLE':
+                //promisesGeneratePDF.push(
+                await this.generatePerformanceReportStudent(dataPDF, studentId, format).then(
+                  (dataUrl) => {
+                    urls.push(dataUrl);
+                  },
+                );
+                //);
+                break;
+            }
           }
-
-          // FUSIÓN DE PDF's
-          console.log(`Total PDFs generados: ${urls.length} de ${studentsId.length} esperados`);
-
-          if (urls?.length > 0) {
-            // Ordenar los URLs
-            let urlsAux = [];
-            if (studentsId) {
-              for (let student of studentsId) {
-                let urlsStudents = urls.filter((url: any) => url && url.includes(student));
-                urlsStudents = urlsStudents.sort();
-                for (let urlStudent of urlsStudents) {
-                  urlsAux.push(urlStudent);
+          let urlsReturn = await Promise.all(promisesGeneratePDF).then(() => {
+            if (urls?.length > 1) {
+              //urls = urls.sort();
+              //console.log(studentsId);
+              //console.log(urls);
+              let urlsAux = [];
+              if (studentsId) {
+                for (let student of studentsId) {
+                  let urlsStudents = urls.filter((url: any) => url.includes(student));
+                  urlsStudents = urlsStudents.sort();
+                  for (let urlStudent of urlsStudents) {
+                    urlsAux.push(urlStudent);
+                  }
                 }
               }
-            }
+              //console.log(urlsAux);
 
-            //NUEVA IMPLEMENTACIÓN CON PDF-MERGER-JS
-            var dir = './public/downloads/reports/courses/' + id;
-            const fs = require('fs-extra');
-            if (!fs.existsSync(dir)) {
-              fs.mkdirSync(dir, { recursive: true });
-            }
-
-            try {
-              console.log(`Intentando fusionar ${urlsAux.length} PDFs usando pdf-merger-js...`);
-
-              // Fusionar en lotes para evitar problemas de memoria
-              const batchSize = 3;
-              const merger = new PDFMerger();
-
-              // Procesar PDFs en lotes pequeños
-              for (let i = 0; i < urlsAux.length; i += batchSize) {
-                const currentBatch = urlsAux.slice(i, Math.min(i + batchSize, urlsAux.length));
-                console.log(`Procesando lote ${Math.floor(i / batchSize) + 1}, PDFs ${i + 1}-${Math.min(i + batchSize, urlsAux.length)}`);
-
-                // Crear un merger para este lote
-                const batchMerger = new PDFMerger();
-
-                // Agregar cada PDF del lote
-                for (const pdfPath of currentBatch) {
-                  await batchMerger.add(pdfPath);
+              const opts = {
+                maxBuffer: 1024 * 5096, // 500kb
+                maxHeap: '2g', // for setting JVM heap limits to 2GB
+              };
+              //console.log(urls);
+              var dir = './public/downloads/reports/courses/' + id;
+              if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+              }
+              merge(urlsAux, dir + '/' + id + '.pdf', opts, function (err: any) {
+                if (err) {
+                  return console.log(err);
                 }
-
-                // Guardar este lote como PDF temporal
-                const tempFilePath = `${dir}/temp_batch_${i}.pdf`;
-                await batchMerger.save(tempFilePath);
-
-                // Agregar el PDF temporal al merger principal
-                await merger.add(tempFilePath);
-              }
-
-              // Guardar el PDF final
-              const outputPath = `${dir}/${id}.pdf`;
-              await merger.save(outputPath);
-              console.log('PDFs fusionados exitosamente con pdf-merger-js!');
-
-              // Limpiar archivos temporales
-              for (let i = 0; i < urlsAux.length; i += batchSize) {
-                const tempFilePath = `${dir}/temp_batch_${i}.pdf`;
-                if (fs.existsSync(tempFilePath)) {
-                  fs.unlinkSync(tempFilePath);
-                }
-              }
-
-            } catch (error) {
-              console.error("Error al fusionar con pdf-merger-js:", error);
-              // Si hay error, intentar devolver al menos el primer PDF
-              if (urlsAux.length > 0) {
-                console.log("Devolviendo el primer PDF como respuesta alternativa");
-                return urlsAux[0];
-              }
+                console.log('Successfully merged!');
+              });
+              return dir + '/' + id + '.pdf';
+            } else {
+              return urls[0];
             }
-
-            return dir + '/' + id + '.pdf';
-          } else if (urls.length === 1) {
-            return urls[0];
-          } else {
-            throw new Error("No se pudieron generar PDFs para ningún estudiante");
-          }
+          });
+          return urlsReturn + '';
         }
       }
     }
-    return "";
   }
 
   async generatePerformanceReportStudent(data: any, id: any, format: any) {
@@ -1516,9 +1422,8 @@ export class PerformanceReportResolver {
           '--no-sandbox',
           '--disable-setuid-sandbox',
           '--disable-dev-shm-usage',
-          '--js-flags=--max-old-space-size=8192' // Memoria V8
         ],
-        protocolTimeout: 600000,
+        protocolTimeout: 240000,
         headless: true,
         timeout: 0,
       });
@@ -1527,9 +1432,7 @@ export class PerformanceReportResolver {
       //console.log(data)
       const content = await this.compile('index', data);
 
-      //await page.setContent(content);
-      await page.setContent(content, { waitUntil: ['load', 'networkidle0', 'domcontentloaded'] });
-      await page.waitForNetworkIdle({ idleTime: 15000 });
+      await page.setContent(content);
       var dir = './public/downloads/reports/students/' + id;
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
@@ -1545,11 +1448,6 @@ export class PerformanceReportResolver {
           right: '0',
           top: '0',
         },
-        scale: 0.95, // Reducir la escala ayuda a comprimir indirectamente
-        displayHeaderFooter: false,
-        omitBackground: false,
-        width: '8.5in',
-        height: format === 'Legal' ? '14in' : '11in', // Legal es más alto que Letter
       });
       //console.log("done creating pdf");
       await page.close();
@@ -1612,9 +1510,8 @@ export class PerformanceReportResolver {
           '--no-sandbox',
           '--disable-setuid-sandbox',
           '--disable-dev-shm-usage',
-          '--js-flags=--max-old-space-size=8192' // Memoria V8
         ],
-        protocolTimeout: 600000,
+        protocolTimeout: 240000,
         headless: true,
         timeout: 0,
       });
@@ -1623,9 +1520,7 @@ export class PerformanceReportResolver {
       //console.log(data)
       const content = await this.compile('index2', data);
       //console.log(content)
-      //await page.setContent(content);
-      await page.setContent(content, { waitUntil: ['load', 'networkidle0', 'domcontentloaded'] });
-      await page.waitForNetworkIdle({ idleTime: 15000 });
+      await page.setContent(content);
       var dir = './public/downloads/reports/students/' + id;
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
@@ -1642,11 +1537,6 @@ export class PerformanceReportResolver {
           right: '0',
           top: '0',
         },
-        scale: 0.95,
-        displayHeaderFooter: false,
-        omitBackground: false,
-        width: '8.5in',
-        height: format === 'Legal' ? '14in' : '11in', // Legal es más alto que Letter
       });
       //console.log("done creating pdf");
       await page.close();
