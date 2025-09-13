@@ -94,6 +94,91 @@ export class VideoTutorialResolver {
     return resultConn;
   }
 
+  @Query(() => VideoTutorialConnection)
+  async getAllVideoTutorialByAcademicAsignatureCourse(
+    @Args() args: ConnectionArgs,
+    @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: String,
+  ): Promise<VideoTutorialConnection> {
+    let result;
+    result = await this.repository.findBy({
+      where: {
+        academicAsignatureCourseId: academicAsignatureCourseId,
+        isPDF: { $ne: true }, // Excluir PDFs, solo videos
+        // Removido el filtro active: true para traer todos los videos
+      },
+      order: { createdAt: 'DESC' },
+    });
+    let resultConn = new VideoTutorialConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
+  }
+
+  @Query(() => VideoTutorialConnection)
+  async getAllPDFByAcademicAsignatureCourse(
+    @Args() args: ConnectionArgs,
+    @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: String,
+  ): Promise<VideoTutorialConnection> {
+    let result;
+    result = await this.repository.findBy({
+      where: {
+        academicAsignatureCourseId: academicAsignatureCourseId,
+        isPDF: true, // Solo PDFs
+      },
+      order: { createdAt: 'DESC' },
+    });
+    let resultConn = new VideoTutorialConnection();
+    let resultConnection = connectionFromArraySlice(result, args, {
+      sliceStart: 0,
+      arrayLength: result.length,
+    });
+    resultConn = { ...resultConnection, totalCount: result.length };
+    return resultConn;
+  }
+
+  @Query(() => [String])
+  async getBibliotecasByAcademicAsignatureCourse(
+    @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: String,
+  ): Promise<String[]> {
+    let result = await this.repository.findBy({
+      where: {
+        academicAsignatureCourseId: academicAsignatureCourseId,
+        isPDF: { $ne: true }, // Solo videos, no PDFs
+        active: true,
+      },
+    });
+    
+    // Extraer nombres únicos de bibliotecas
+    let bibliotecas = result
+      .map(video => video.bibliotecaName)
+      .filter((name, index, self) => name && self.indexOf(name) === index) as string[];
+    
+    return bibliotecas;
+  }
+
+  @Query(() => [String])
+  async getBibliotecasPDFByAcademicAsignatureCourse(
+    @Arg('academicAsignatureCourseId', () => String) academicAsignatureCourseId: String,
+  ): Promise<String[]> {
+    let result = await this.repository.findBy({
+      where: {
+        academicAsignatureCourseId: academicAsignatureCourseId,
+        isPDF: true, // Solo PDFs
+        active: true,
+      },
+    });
+    
+    // Extraer nombres únicos de bibliotecas
+    let bibliotecas = result
+      .map(video => video.bibliotecaName)
+      .filter((name, index, self) => name && self.indexOf(name) === index) as string[];
+    
+    return bibliotecas;
+  }
+
   @Mutation(() => VideoTutorial)
   async createVideoTutorial(
     @Arg('data') data: NewVideoTutorial,
@@ -159,7 +244,7 @@ export class VideoTutorialResolver {
   ): Promise<Boolean | null> {
     let data = await this.repository.findOneBy(id);
     let result = await this.repository.deleteOne({ _id: new ObjectId(id) });
-    return result?.result?.ok === 1 ?? true;
+    return result?.result?.ok === 1 || false;
   }
 
   @FieldResolver((_type) => User, { nullable: true })
