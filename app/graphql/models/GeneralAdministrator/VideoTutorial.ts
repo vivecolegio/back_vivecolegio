@@ -41,6 +41,22 @@ export class VideoTutorial extends IModelData {
   @Column({ nullable: true })
   rolesId?: String[];
 
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  academicAsignatureCourseId?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  asignatureId?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  bibliotecaName?: string;
+
+  @Field({ nullable: true, defaultValue: false })
+  @Column({ nullable: true, default: false })
+  isPDF?: boolean;
+
   @Field(() => [Role], { nullable: true })
   roles?: Role[];
 }

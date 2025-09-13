@@ -2,13 +2,15 @@ import { connectionFromArraySlice } from 'graphql-relay';
 import { ObjectId } from 'mongodb';
 import { Arg, Args, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { InboxRepository, UserRepository } from '../../../servers/DataSource';
+import { InboxRepository, UserRepository, NotificationRepository } from '../../../servers/DataSource';
 import { removeEmptyStringElements } from '../../../types';
 import { NewInbox } from '../../inputs/GeneralAdministrator/NewInbox';
 import { IContext } from '../../interfaces/IContext';
 import { Inbox, InboxConnection } from '../../models/GeneralAdministrator/Inbox';
 import { User } from '../../models/GeneralAdministrator/User';
 import { ConnectionArgs } from '../../pagination/relaySpecs';
+import { getMongoRepository } from 'typeorm';
+import { Notification } from '../../models/GeneralAdministrator/Notification';
 
 @Resolver(Inbox)
 export class InboxResolver {
@@ -17,6 +19,9 @@ export class InboxResolver {
 
   @InjectRepository(User)
   private repositoryUser = UserRepository;
+
+  @InjectRepository(Notification)
+  private notificationRepository = NotificationRepository;
 
   @Query(() => Inbox, { nullable: true })
   async getInbox(@Arg('id', () => String) id: string) {
@@ -72,13 +77,35 @@ export class InboxResolver {
   async createInbox(@Arg('data') data: NewInbox, @Ctx() context: IContext): Promise<Inbox> {
     let dataProcess: NewInbox = removeEmptyStringElements(data);
     let createdByUserId = context?.user?.authorization?.id;
+    // Crear el mensaje de inbox
     const model = await this.repository.create({
       ...dataProcess,
       active: true,
       version: 0,
       createdByUserId,
     });
+    
     let result = await this.repository.save(model);
+    
+    // Crea una nueva notificacion si el mensaje es de inbox es correcto
+    try {
+      const notification = this.notificationRepository.create({
+        title: `Nuevo mensaje: ${dataProcess.title}`,
+        message: `Has recibido un nuevo mensaje en tu bandeja de entrada.`,
+        userId: dataProcess.userId, // Destinatario del mensaje
+        active: true,
+        dateSend: new Date(),
+        version: 0,
+        createdByUserId,
+      });
+      
+      await this.notificationRepository.save(notification);
+      
+      console.log(`Notificación creada para el mensaje ID: ${result.id}`);
+    } catch (error) {
+      console.error('Error al crear notificación automática:', error);
+    }
+    
     return result;
   }
 
@@ -117,6 +144,7 @@ export class InboxResolver {
       updatedByUserId,
     });
     if (result.id) {
+      console.log('Se ha actualizado el estado del inbox con ID:', result.id);
       return true;
     } else {
       return false;

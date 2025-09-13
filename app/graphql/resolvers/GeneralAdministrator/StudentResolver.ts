@@ -160,28 +160,6 @@ export class StudentResolver {
   }
 
   @Query(() => StudentConnection)
-  async getAllStudentSyncOffline(
-    @Args() args: ConnectionArgs,
-    @Arg('schoolId', () => String, { nullable: true }) schoolId: String,
-    @Arg('schoolYearId', () => String, { nullable: true }) schoolYearId: String,
-  ): Promise<StudentConnection> {
-    let result;
-    result = await this.repository.findBy({
-      where: {
-        schoolId: { $in: [schoolId] },
-        schoolYearId,
-      },
-    });
-    let resultConn = new StudentConnection();
-    let resultConnection = connectionFromArraySlice(result, args, {
-      sliceStart: 0,
-      arrayLength: result.length,
-    });
-    resultConn = { ...resultConnection, totalCount: result.length };
-    return resultConn;
-  }
-
-  @Query(() => StudentConnection)
   async getAllStudentAcademicGradeIdWithoutCourse(
     @Args() args: ConnectionArgs,
     @Arg('schoolId', () => String) schoolId: String,
@@ -597,11 +575,12 @@ export class StudentResolver {
           if (studentsId == undefined || studentsId == null) {
             studentsId = [];
           }
+          console.log(`🚨 DESVINCULANDO estudiante ${id} del curso ${result?.courseId}`);
           studentsId = studentsId?.filter((student) => {
             return student !== id;
           });
           let resultCourse = await this.repositoryCourse.save({
-            _id: new ObjectId(data.courseId),
+            _id: new ObjectId(result?.courseId),
             ...course,
             studentsId,
             version: (result?.version as number) + 1,

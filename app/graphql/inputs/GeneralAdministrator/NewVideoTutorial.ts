@@ -27,4 +27,16 @@ export class NewVideoTutorial implements Partial<VideoTutorial> {
 
   @Field(() => [String], { nullable: true })
   rolesId?: String[];
+
+  @Field({ nullable: true })
+  academicAsignatureCourseId?: string;
+
+  @Field({ nullable: true })
+  asignatureId?: string;
+
+  @Field({ nullable: true })
+  bibliotecaName?: string;
+
+  @Field({ nullable: true })
+  isPDF?: boolean;
 }
