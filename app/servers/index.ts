@@ -211,7 +211,7 @@ async function app() {
         ForumQuestionResolver,
         SyncOfflineResolver,
       ],
-      globalMiddlewares: [ErrorLoggerMiddleware, ResolveTimeMiddleware, LogAccessMiddleware],
+      //globalMiddlewares: [ErrorLoggerMiddleware, ResolveTimeMiddleware, LogAccessMiddleware],
     });
 
     const configExpressStatusMonitor = {
@@ -294,7 +294,7 @@ async function app() {
     // Middlewares
 
     app.use(`/healthcheck-${SERVER_NAME}`, require('express-healthcheck')());
-    app.use(require('express-status-monitor')(configExpressStatusMonitor));
+    /**app.use(require('express-status-monitor')(configExpressStatusMonitor));
     //log only 4xx and 5xx responses to console
     app.use(
       Morgan('dev', {
@@ -309,7 +309,7 @@ async function app() {
       Morgan('common', {
         stream: fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' }),
       }),
-    );
+    );**/
 
     app.use(
       Helmet({

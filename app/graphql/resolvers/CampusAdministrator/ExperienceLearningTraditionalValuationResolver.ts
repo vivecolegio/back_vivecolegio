@@ -150,6 +150,12 @@ export class ExperienceLearningTraditionalValuationResolver {
     @Ctx() context: IContext
   ): Promise<ExperienceLearningTraditionalValuation> {
     let dataProcess: NewExperienceLearningTraditionalValuation = removeEmptyStringElements(data);
+    
+    // MODIFICACIÓN: Validación agregada - No se permiten notas de 0 en ninguna institución educativa
+    if (dataProcess.assessment !== undefined && dataProcess.assessment !== null && parseFloat(dataProcess.assessment.toString()) <= 0) {
+      throw new Error('No se pueden guardar notas de 0. Las notas deben ser mayores a 0 según políticas educativas.');
+    }
+    
     let createdByUserId = context?.user?.authorization?.id;
     const model = await this.repository.create({
       ...dataProcess,
@@ -168,6 +174,12 @@ export class ExperienceLearningTraditionalValuationResolver {
     @Ctx() context: IContext
   ): Promise<ExperienceLearningTraditionalValuation | null> {
     let dataProcess = removeEmptyStringElements(data);
+    
+    // MODIFICACIÓN: Validación agregada - No se permiten notas de 0 en ninguna institución educativa
+    if (dataProcess.assessment !== undefined && dataProcess.assessment !== null && parseFloat(dataProcess.assessment.toString()) <= 0) {
+      throw new Error('No se pueden guardar notas de 0. Las notas deben ser mayores a 0 según políticas educativas.');
+    }
+    
     let updatedByUserId = context?.user?.authorization?.id;
     let result = await this.repository.findOneBy(id);
     result = await this.repository.save({
