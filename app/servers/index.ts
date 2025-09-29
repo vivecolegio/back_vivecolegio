@@ -70,6 +70,7 @@ import { PerformanceFinalReportResolver } from '../graphql/resolvers/SchoolAdmin
 import { PerformanceReportResolver } from '../graphql/resolvers/SchoolAdministrator/PerformanceReportResolver';
 import { SchoolConfigurationResolver } from '../graphql/resolvers/SchoolAdministrator/SchoolConfigurationResolver';
 import { SyncOfflineResolver } from '../graphql/resolvers/SchoolAdministrator/SyncOfflineResolver';
+import { SyncUpdateResolver } from '../graphql/resolvers/SchoolAdministrator/SyncUpdateResolver';
 import { AcademicDayResolver } from './../graphql/resolvers/CampusAdministrator/AcademicDayResolver';
 import { CourseResolver } from './../graphql/resolvers/CampusAdministrator/CourseResolver';
 import { GuardianResolver } from './../graphql/resolvers/CampusAdministrator/GuardianResolver';
@@ -210,6 +211,7 @@ async function app() {
         BackupResolver,
         ForumQuestionResolver,
         SyncOfflineResolver,
+        SyncUpdateResolver,
       ],
       //globalMiddlewares: [ErrorLoggerMiddleware, ResolveTimeMiddleware, LogAccessMiddleware],
     });

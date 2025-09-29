@@ -12,6 +12,12 @@ export class NewSyncOffline implements Partial<SyncOffline> {
   schoolYearId?: string;
 
   @Field({ nullable: true })
+  userId?: string;
+
+  @Field({ nullable: true })
+  campusId?: string;
+
+  @Field({ nullable: true })
   academicPeriodId?: string;
 
   @Field((type) => [NewSyncOfflineDescription], { nullable: true })

@@ -5,6 +5,7 @@ import { IModelSchoolData } from '../../interfaces/IModelSchoolData';
 import { ConnectionType, EdgeType } from '../../pagination/relaySpecs';
 import { AcademicPeriod } from './AcademicPeriod';
 import { SchoolYear } from './SchoolYear';
+import { Campus } from '../GeneralAdministrator/Campus';
 import { SyncOfflineDescription } from './objectType/SyncOfflineDescription';
 
 @Index('index_full', ['schoolId', 'schoolYearId'])
@@ -26,6 +27,14 @@ export class SyncOffline extends IModelSchoolData {
 
   @Field({ nullable: true })
   academicPeriod?: AcademicPeriod;
+
+  @Index('index_campusId')
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  campusId?: string;
+
+  @Field({ nullable: true })
+  campus?: Campus;
 
   @Field((type) => [SyncOfflineDescription], { nullable: true })
   @Column({ nullable: true })
