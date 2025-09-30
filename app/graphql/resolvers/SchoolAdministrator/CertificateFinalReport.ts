@@ -580,13 +580,13 @@ export class CertificateFinalReportResolver {
         if (studentsId) {
 
           // IMPLEMENTAR PROCESAMIENTO POR LOTES
-          console.log(`Procesando ${studentsId.length} estudiantes por lotes`);
+          //console.log(`Procesando ${studentsId.length} estudiantes por lotes`);
           const batchSize = 3; // Procesar 3 estudiantes a la vez
 
           for (let i = 0; i < studentsId.length; i += batchSize) {
             const batchPromises = [];
             const currentBatch = studentsId.slice(i, i + batchSize);
-            console.log(`Procesando lote ${Math.floor(i / batchSize) + 1}, estudiantes ${i + 1}-${Math.min(i + batchSize, studentsId.length)} de ${studentsId.length}`);
+            //console.log(`Procesando lote ${Math.floor(i / batchSize) + 1}, estudiantes ${i + 1}-${Math.min(i + batchSize, studentsId.length)} de ${studentsId.length}`);
 
             // Procesar este lote
             for (let studentId of currentBatch) {
@@ -1070,7 +1070,7 @@ export class CertificateFinalReportResolver {
                   second: '2-digit',
                 }),
               };
-              console.log('data', dataPDF);
+              //console.log('data', dataPDF);
 
               // Se agrega la promesa:
               switch (reportPerformanceType) {
@@ -1079,7 +1079,7 @@ export class CertificateFinalReportResolver {
                     this.generatePerformanceReportStudent(dataPDF, studentId, format)
                       .then(dataUrl => {
                         if (dataUrl) urls.push(dataUrl);
-                        console.log(`PDF generado para estudiante ${studentId}, URL: ${dataUrl}`);
+                       // console.log(`PDF generado para estudiante ${studentId}, URL: ${dataUrl}`);
                         return dataUrl;
                       })
                       .catch(err => {
@@ -1093,7 +1093,7 @@ export class CertificateFinalReportResolver {
                     this.generatePerformanceReportStudent(dataPDF, studentId, format)
                       .then(dataUrl => {
                         if (dataUrl) urls.push(dataUrl);
-                        console.log(`PDF generado para estudiante ${studentId}, URL: ${dataUrl}`);
+                        //console.log(`PDF generado para estudiante ${studentId}, URL: ${dataUrl}`);
                         return dataUrl;
                       })
                       .catch(err => {
@@ -1108,11 +1108,11 @@ export class CertificateFinalReportResolver {
 
             // Esperar a que termine este lote antes de comenzar el siguiente
             await Promise.all(batchPromises);
-            console.log(`Completado lote ${Math.floor(i / batchSize) + 1}, total PDFs: ${urls.length}`);
+            //console.log(`Completado lote ${Math.floor(i / batchSize) + 1}, total PDFs: ${urls.length}`);
           }
 
           // FUSIÓN DE PDF's
-          console.log(`Total PDFs generados: ${urls.length} de ${studentsId.length} esperados`);
+          //console.log(`Total PDFs generados: ${urls.length} de ${studentsId.length} esperados`);
 
           if (urls?.length > 0) {
             // Ordenar los URLs
@@ -1163,7 +1163,7 @@ export class CertificateFinalReportResolver {
             }
 
             try {
-              console.log(`Intentando fusionar ${urlsAux.length} PDFs usando pdf-merger-js...`);
+              //console.log(`Intentando fusionar ${urlsAux.length} PDFs usando pdf-merger-js...`);
 
               // Fusionar en lotes para evitar problemas de memoria
               const batchSize = 3;
@@ -1172,7 +1172,7 @@ export class CertificateFinalReportResolver {
               // Procesar PDFs en lotes pequeños
               for (let i = 0; i < urlsAux.length; i += batchSize) {
                 const currentBatch = urlsAux.slice(i, Math.min(i + batchSize, urlsAux.length));
-                console.log(`Procesando lote ${Math.floor(i / batchSize) + 1}, PDFs ${i + 1}-${Math.min(i + batchSize, urlsAux.length)}`);
+                //console.log(`Procesando lote ${Math.floor(i / batchSize) + 1}, PDFs ${i + 1}-${Math.min(i + batchSize, urlsAux.length)}`);
 
                 // Crear un merger para este lote
                 const batchMerger = new PDFMerger();
@@ -1193,7 +1193,7 @@ export class CertificateFinalReportResolver {
               // Guardar el PDF final
               const outputPath = `${dir}/${id}.pdf`;
               await merger.save(outputPath);
-              console.log('PDFs fusionados exitosamente con pdf-merger-js!');
+              //console.log('PDFs fusionados exitosamente con pdf-merger-js!');
 
               // Limpiar archivos temporales
               for (let i = 0; i < urlsAux.length; i += batchSize) {
@@ -1207,7 +1207,7 @@ export class CertificateFinalReportResolver {
               console.error("Error al fusionar con pdf-merger-js:", error);
               // Si hay error, intentar devolver al menos el primer PDF
               if (urlsAux.length > 0) {
-                console.log("Devolviendo el primer PDF como respuesta alternativa");
+                //console.log("Devolviendo el primer PDF como respuesta alternativa");
                 return urlsAux[0];
               }
             }

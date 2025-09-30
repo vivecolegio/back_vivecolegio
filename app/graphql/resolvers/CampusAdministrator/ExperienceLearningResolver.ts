@@ -1303,7 +1303,7 @@ export class ExperienceLearningResolver {
       });
       for (let academicGrade of academicGrades) {
         let promisesList: any[] = [];
-        console.log('Generando =', academicGrade?.name + ' ' + academicGrade?.id?.toString());
+        //console.log('Generando =', academicGrade?.name + ' ' + academicGrade?.id?.toString());
         promisesList.push(
           this.updateAllStudentGradePeriodValuation(
             academicGrade?.id?.toString(),
@@ -1333,7 +1333,7 @@ export class ExperienceLearningResolver {
       });
       for (let course of courses) {
         let promisesList: any[] = [];
-        console.log('Generando =', course?.name + ' ' + course?.academicGradeId);
+       // console.log('Generando =', course?.name + ' ' + course?.academicGradeId);
         promisesList.push(
           this.updateAllStudentCoursePeriodValuation(
             course?.id?.toString(),
@@ -2774,7 +2774,7 @@ export class ExperienceLearningResolver {
       });
       for (let course of courses) {
         let promisesList: any[] = [];
-        console.log('Generando =', course?.name + ' ' + course?.academicGradeId);
+        //console.log('Generando =', course?.name + ' ' + course?.academicGradeId);
         promisesList.push(
           this.updateAllStudentCourseYearValuation(course?.id?.toString(), schoolId, schoolYearId),
         );
@@ -3246,10 +3246,10 @@ export class ExperienceLearningResolver {
     @Arg('schoolId', () => String) schoolId: string,
     @Arg('studentId', () => String) studentId: string,
   ) {
-    console.log('courseId', courseId);
-    console.log('schoolYearId', schoolYearId);
-    console.log('schoolId', schoolId);
-    console.log('studentId', studentId);
+    // console.log('courseId', courseId);
+    // console.log('schoolYearId', schoolYearId);
+    // console.log('schoolId', schoolId);
+    // console.log('studentId', studentId);
 
     let schoolConfigurationPromotedIndicate = await this.repositorySchoolConfiguration.findBy({
       where: { schoolId, code: 'PROMOTED_INDICATE', active: true },
@@ -3440,9 +3440,9 @@ export class ExperienceLearningResolver {
 
     console.log('averageAcademicYearStudentList', averageAcademicYearStudentList?.length);
     if (averageAcademicYearStudentList.length > 1) {
-      console.log('elminando repetidos');
+      //console.log('elminando repetidos');
       for (let averageAcademicYearStudents of averageAcademicYearStudentList) {
-        console.log('elminando repetidos', averageAcademicYearStudents?.id?.toString());
+        //console.log('elminando repetidos', averageAcademicYearStudents?.id?.toString());
         let result = await this.repositoryAverageAcademicYearStudent.deleteOne({
           _id: new ObjectId(averageAcademicYearStudents?.id?.toString()),
         });

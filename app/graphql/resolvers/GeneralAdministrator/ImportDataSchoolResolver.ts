@@ -128,8 +128,8 @@ export class ImportDataSchoolResolver {
     });
     for (let school of dataSchool) {
       let schoolId = school.id.toString();
-      console.log('Actualizando IE: ', school?.name);
-      console.log('DANE IE: ', school?.daneCode);
+      //console.log('Actualizando IE: ', school?.name);
+      //console.log('DANE IE: ', school?.daneCode);
       await this.importDataSchoolInactive(schoolId);
     }
     return true;
@@ -683,9 +683,9 @@ export class ImportDataSchoolResolver {
         where: { schoolId: schoolId },
       });
       let schoolYearId = undefined;
-      console.log('Actualizando IE: ', school?.name);
-      console.log('DANE IE: ', school?.daneCode);
-      console.log('Actualizando: ', dataGradeAssigments?.length);
+      //console.log('Actualizando IE: ', school?.name);
+      //console.log('DANE IE: ', school?.daneCode);
+      //console.log('Actualizando: ', dataGradeAssigments?.length);
       for (let gradeAssigment of dataGradeAssigments) {
         if (gradeAssigment.schoolYearId == undefined) {
           let academicGrade = await this.repositoryAcademicGrade.findOneBy(
@@ -772,8 +772,8 @@ export class ImportDataSchoolResolver {
     let dataSchool = await this.repositorySchool.findOneBy(schoolId);
     if (dataSchool) {
       let schoolId = dataSchool.id.toString();
-      console.log('Actualizando IE: ', dataSchool?.name);
-      console.log('DANE IE: ', dataSchool?.daneCode);
+      //console.log('Actualizando IE: ', dataSchool?.name);
+      //console.log('DANE IE: ', dataSchool?.daneCode);
       let dataSchoolYear = await this.repositorySchoolYear.findOneBy(schoolYearId);
       if (dataSchoolYear) {
         console.log('Step: SIMAT ');
@@ -831,9 +831,9 @@ export class ImportDataSchoolResolver {
         let dataOldGradeAssigments = await this.repositoryGradeAssignment.findBy({
           where: { schoolId: schoolId, schoolYearId: dataSchoolYear2022[0].id.toString() },
         });
-        console.log('Actualizando IE: ', school?.name);
-        console.log('DANE IE: ', school?.daneCode);
-        console.log('Data OLD Grade Assigments: ', dataOldGradeAssigments?.length);
+        //console.log('Actualizando IE: ', school?.name);
+        //console.log('DANE IE: ', school?.daneCode);
+        //console.log('Data OLD Grade Assigments: ', dataOldGradeAssigments?.length);
         for (let oldGradeAssigment of dataOldGradeAssigments) {
           let oldAcademicGrade = await this.repositoryAcademicGrade.findOneBy(
             oldGradeAssigment.academicGradeId
@@ -927,8 +927,8 @@ export class ImportDataSchoolResolver {
       where: { daneCode: { $in: dataSchoolDane } },
     });
     for (let school of dataSchool) {
-      console.log('Actualizando IE: ', school?.name);
-      console.log('DANE IE: ', school?.daneCode);
+      //console.log('Actualizando IE: ', school?.name);
+      //console.log('DANE IE: ', school?.daneCode);
       let dataSchoolYear2023 = await this.repositorySchoolYear.findBy({
         where: { schoolId: school.id.toString(), schoolYear: 2023 },
       });
@@ -969,10 +969,10 @@ export class ImportDataSchoolResolver {
   async updateSchoolYearAllTeacher() {
     let schools = await this.repositorySchool.find();
     for (let school of schools) {
-      console.log('Actualizando IE: ', school?.name);
-      console.log('DANE IE: ', school?.daneCode);
+      //console.log('Actualizando IE: ', school?.name);
+      //console.log('DANE IE: ', school?.daneCode);
       let schoolYearId = '';
-      console.log('Activate Teachers');
+      //console.log('Activate Teachers');
       let dataSchoolYear2022 = await this.repositorySchoolYear.findBy({
         where: { schoolId: school.id.toString(), schoolYear: 2022 },
       });
@@ -1030,8 +1030,8 @@ export class ImportDataSchoolResolver {
       where: { daneCode: { $in: dataSchoolDane } },
     });
     for (let school of dataSchool) {
-      console.log('Actualizando IE: ', school?.name);
-      console.log('DANE IE: ', school?.daneCode);
+      //console.log('Actualizando IE: ', school?.name);
+      //console.log('DANE IE: ', school?.daneCode);
       let dataSchoolYear2023 = await this.repositorySchoolYear.findBy({
         where: { schoolId: school.id.toString(), schoolYear: 2023 },
       });
@@ -1074,8 +1074,8 @@ export class ImportDataSchoolResolver {
                       dataAcademicAsignature?.academicAreaId
                     );
                     if (dataAcademicArea) {
-                      console.log('Academic Area: ', dataAcademicArea?.name);
-                      console.log('Existe el Area');
+                      //console.log('Academic Area: ', dataAcademicArea?.name);
+                      //console.log('Existe el Area');
                       if (
                         academicAsignatureCourse?.academicAsignatureId !==
                         dataGradeAssigment?.academicAsignatureId
@@ -1110,12 +1110,12 @@ export class ImportDataSchoolResolver {
                       });
                       if (data?.length == 1) {
                         //console.log(data);
-                        console.log('Nueva Asignatura', data?.length);
+                        //console.log('Nueva Asignatura', data?.length);
                         dataAcademicArea = await this.repositoryAcademicArea.findOneBy(
                           data[0]?.academicAreaId
                         );
                         if (dataAcademicArea) {
-                          console.log('Existe el Area');
+                          //console.log('Existe el Area');
                           //dataGradeAssigment?.academicAsignatureId = data[0]?.id?.toString();
                           let modelGradeAssigment = await this.repositoryGradeAssignment.create({
                             ...dataGradeAssigment,
@@ -1142,17 +1142,17 @@ export class ImportDataSchoolResolver {
                             'modelAcademicAsignatureCourse',
                             modelAcademicAsignatureCourse
                           );
-                          console.log(
+                       /*    console.log(
                             '************************************************************'
-                          );
+                          ); */
                         }
                       }
                     }
                   } else {
-                    console.log('No Existe la asignatura');
+                    //console.log('No Existe la asignatura');
                   }
                 } else {
-                  console.log('NO Existe la asignacion de grado');
+                  //console.log('NO Existe la asignacion de grado');
                 }
                 // if (academicAsignatureCourse.schoolId == undefined || academicAsignatureCourse.schoolId == null || academicAsignatureCourse.schoolYearId == undefined || academicAsignatureCourse.schoolYearId == null) {
                 //   let resultAcademicAsignatureCourse = await this.repositoryAcademicAsignatureCourse.save({
@@ -1184,8 +1184,8 @@ export class ImportDataSchoolResolver {
       where: { daneCode: { $in: dataSchoolDane } },
     });
     for (let school of dataSchool) {
-      console.log('Actualizando IE: ', school?.name);
-      console.log('DANE IE: ', school?.daneCode);
+      //console.log('Actualizando IE: ', school?.name);
+      //console.log('DANE IE: ', school?.daneCode);
       let dataSchoolYear2023 = await this.repositorySchoolYear.findBy({
         where: { schoolId: school.id.toString(), schoolYear: 2023 },
       });

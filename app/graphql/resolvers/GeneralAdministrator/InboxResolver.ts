@@ -101,9 +101,9 @@ export class InboxResolver {
       
       await this.notificationRepository.save(notification);
       
-      console.log(`Notificación creada para el mensaje ID: ${result.id}`);
+      //console.log(`Notificación creada para el mensaje ID: ${result.id}`);
     } catch (error) {
-      console.error('Error al crear notificación automática:', error);
+      //console.error('Error al crear notificación automática:', error);
     }
     
     return result;
@@ -144,7 +144,7 @@ export class InboxResolver {
       updatedByUserId,
     });
     if (result.id) {
-      console.log('Se ha actualizado el estado del inbox con ID:', result.id);
+      //console.log('Se ha actualizado el estado del inbox con ID:', result.id);
       return true;
     } else {
       return false;

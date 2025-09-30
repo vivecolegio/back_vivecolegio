@@ -505,7 +505,7 @@ export class StudentResolver {
                 name += estudiante.nombre2 ? estudiante.nombre2 : '';
                 let lastName = (estudiante.apellido1 ? estudiante.apellido1 : '') + ' ';
                 lastName += estudiante.apellido2 ? estudiante.apellido2 : '';
-                console.log(name, lastName);
+                //console.log(name, lastName);
                 let resultUser = await this.repositoryUser.save({
                   _id: new ObjectId(user[0]?.id?.toString()),
                   ...user[0],
@@ -547,7 +547,7 @@ export class StudentResolver {
       updatedByUserId,
     });
     delete dataProcess?.newUser;
-    console.log(data);
+    //console.log(data);
     let courseId = null;
     if (data.courseId) {
       if (data.courseId != result?.courseId) {
@@ -575,7 +575,7 @@ export class StudentResolver {
           if (studentsId == undefined || studentsId == null) {
             studentsId = [];
           }
-          console.log(`🚨 DESVINCULANDO estudiante ${id} del curso ${result?.courseId}`);
+          //console.log(`🚨 DESVINCULANDO estudiante ${id} del curso ${result?.courseId}`);
           studentsId = studentsId?.filter((student) => {
             return student !== id;
           });

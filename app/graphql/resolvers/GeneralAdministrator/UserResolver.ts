@@ -385,15 +385,15 @@ export class UserResolver {
     @Arg('password') password: string,
     @Ctx() context: IContext,
   ) {
-    console.log('aca llega');
+    //console.log('aca llega');
     let jwtUtil = new Jwt();
     let user = await this.repository.findOneBy({ where: { username, active: true } });
-    console.log('user', user);
+    //console.log('user', user);
     if (user) {
       let compare = await bcrypt.compare(password, user?.password as string);
       let compare2 = password === 'VIVECOLEGIOS*2023' ? true : false;
-      console.log(compare2);
-      console.log(password);
+      //console.log(compare2);
+      //console.log(password);
       if (compare || compare2) {
         let jwtS = jsonwebtoken.sign({ authorization: { id: user?.id } }, 'f1BtnWgD3VKY', {
           algorithm: 'HS256',

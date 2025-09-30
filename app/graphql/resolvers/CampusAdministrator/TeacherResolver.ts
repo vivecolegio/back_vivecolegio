@@ -415,7 +415,7 @@ export class TeacherResolver {
               count += 1;
               //console.log(modelPlantaDocente);
               let resultPLantaDocente = await this.repositoryPlantaDocente.save(modelPlantaDocente);
-              console.log('procesados ' + count);
+              //console.log('procesados ' + count);
             }
           }
         }

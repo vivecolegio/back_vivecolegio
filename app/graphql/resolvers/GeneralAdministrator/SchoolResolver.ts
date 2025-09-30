@@ -186,7 +186,7 @@ export class SchoolResolver {
     @Arg('file', () => GraphQLUpload, { nullable: true }) file: FileUpload,
     @Ctx() context: IContext,
   ) {
-    console.log('aca llega');
+    //console.log('aca llega');
     let updatedByUserId = context?.user?.authorization?.id;
     if (file?.filename) {
       var fs = require('fs');
