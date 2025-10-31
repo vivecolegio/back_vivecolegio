@@ -169,6 +169,9 @@ export class SyncUpdateResolver {
   @InjectRepository(ExperienceLearningCoEvaluation)
   private repositoryExperienceLearningCoEvaluation = ExperienceLearningCoEvaluationRepository;
 
+  @InjectRepository(StudentObserverAnnotation)
+  private repositoryStudentObserverAnnotation = StudentObserverAnnotationRepository;
+
   // 🗂️ SISTEMA ANTIDUPLICADOS: Mapeo Local→Remoto para evitar duplicados
   private localToRemoteMapping = new Map<string, {
     localId: string;
@@ -399,8 +402,8 @@ export class SyncUpdateResolver {
       { name: 'ACADEMIC_ASIGNATURE_COURSE_PERIOD_VALUATION', displayName: 'Valoraciones Académicas por Período', fn: () => this.updateAcademicAsignatureCoursePeriodValuation(typeSyncFull, remoteClient, schoolData) },
       { name: 'ACADEMIC_ASIGNATURE_COURSE_YEAR_VALUATION', displayName: 'Valoraciones Académicas por Año', fn: () => this.updateAcademicAreaCourseYearValuation(typeSyncFull, remoteClient, schoolData) },
       { name: 'STUDENT_OBSERVER_ANNOTATION', displayName: 'Anotaciones de Observador de Estudiantes', fn: () => this.updateStudentObserverAnnotation(typeSyncFull, remoteClient, schoolData) },
-      { name: 'GRADE_ASSIGNMENT', displayName: 'Asignaciones de Grado', fn: () => this.updateGradeAssignment(typeSyncFull, remoteClient, schoolData) },
-      { name: 'LEARNING', displayName: 'Aprendizajes', fn: () => this.updateLearning(typeSyncFull, remoteClient, schoolData) },
+      //{ name: 'GRADE_ASSIGNMENT', displayName: 'Asignaciones de Grado', fn: () => this.updateGradeAssignment(typeSyncFull, remoteClient, schoolData) },
+      //{ name: 'LEARNING', displayName: 'Aprendizajes', fn: () => this.updateLearning(typeSyncFull, remoteClient, schoolData) },
       // 🚧 IMPLEMENTANDO: { name: 'EXPERIENCE_LEARNING_SELF_ASSESSMENT_VALUATION', displayName: 'Autoevaluaciones de Experiencias', fn: () => this.updateExperienceLearningSelfAssessmentValuation(typeSyncFull, remoteClient, schoolData) },
       // 🚧 IMPLEMENTANDO: { name: 'EXPERIENCE_LEARNING_TRADITIONAL_VALUATION', displayName: 'Valoraciones Tradicionales de Experiencias', fn: () => this.updateExperienceLearningTraditionalValuation(typeSyncFull, remoteClient, schoolData) },
       // 🚧 IMPLEMENTANDO: { name: 'EXPERIENCE_LEARNING_RUBRIC_CRITERIA', displayName: 'Criterios de Rúbricas de Experiencias', fn: () => this.updateExperienceLearningRubricCriteria(typeSyncFull, remoteClient, schoolData) },
@@ -413,19 +416,19 @@ export class SyncUpdateResolver {
       // 🚧 IMPLEMENTANDO: { name: 'EDUCATION_LEVEL', displayName: 'Niveles Educativos', fn: () => this.updateEducationLevel(typeSyncFull, remoteClient, schoolData) },
       { name: 'ACADEMIC_AREA_COURSE_PERIOD_VALUATION', displayName: 'Valoraciones por Área y Período', fn: () => this.updateAcademicAsignatureCoursePeriodValuation(typeSyncFull, remoteClient, schoolData) },
       { name: 'ACADEMIC_AREA_COURSE_YEAR_VALUATION', displayName: 'Valoraciones por Área y Año', fn: () => this.updateAcademicAreaCourseYearValuation(typeSyncFull, remoteClient, schoolData) },
-      { name: 'ACADEMIC_ASIGNATURE_COURSE', displayName: 'Asignaturas por Curso', fn: () => this.updateAcademicAsignatureCourse(typeSyncFull, remoteClient, schoolData) },
-      { name: 'AVERAGE_ACADEMIC_PERIOD_STUDENT', displayName: 'Promedios Académicos de Estudiantes', fn: () => this.updateAverageAcademicPeriodStudent(typeSyncFull, remoteClient, schoolData) },
-      { name: 'COURSE', displayName: 'Cursos', fn: () => this.updateCourse(typeSyncFull, remoteClient, schoolData) },
-       { name: 'EVIDENCE_LEARNING', displayName: 'Evidencias de Aprendizaje', fn: () => this.updateEvidenceLearning(typeSyncFull, remoteClient, schoolData) },
-      { name: 'SCHOOL_CONFIGURATION', displayName: 'Configuraciones del Colegio', fn: () => this.updateSchoolConfiguration(typeSyncFull, remoteClient, schoolData) },
-      { name: 'QUESTION_BANK_TEST_ONLINE', displayName: 'Bancos de Preguntas Online', fn: () => this.updateQuestionBankTestOnline(typeSyncFull, remoteClient, schoolData) },
-      { name: 'QUESTION_CATEGORY_TEST_ONLINE', displayName: 'Categorías de Preguntas Online', fn: () => this.updateQuestionCategoryTestOnline(typeSyncFull, remoteClient, schoolData) },
-      { name: 'QUESTION_TEST_ONLINE', displayName: 'Preguntas de Test Online', fn: () => this.updateQuestionTestOnline(typeSyncFull, remoteClient, schoolData) },
-      { name: 'STUDENT_BEHAVIOUR', displayName: 'Comportamientos de Estudiantes', fn: () => this.updateStudentBehaviour(typeSyncFull, remoteClient, schoolData) },
-      { name: 'STUDENT_YEAR_BEHAVIOUR', displayName: 'Comportamientos Anuales de Estudiantes', fn: () => this.updateStudentYearBehaviour(typeSyncFull, remoteClient, schoolData) },
-      { name: 'FORUM', displayName: 'Foros', fn: () => this.updateForum(typeSyncFull, remoteClient, schoolData) },
-      { name: 'FORUM_QUESTION', displayName: 'Preguntas de Foro', fn: () => this.updateForumQuestion(typeSyncFull, remoteClient, schoolData) },
-      { name: 'FORUM_INTERACTION', displayName: 'Interacciones de Foro', fn: () => this.updateForumInteraction(typeSyncFull, remoteClient, schoolData) },
+      //{ name: 'ACADEMIC_ASIGNATURE_COURSE', displayName: 'Asignaturas por Curso', fn: () => this.updateAcademicAsignatureCourse(typeSyncFull, remoteClient, schoolData) },
+      //{ name: 'AVERAGE_ACADEMIC_PERIOD_STUDENT', displayName: 'Promedios Académicos de Estudiantes', fn: () => this.updateAverageAcademicPeriodStudent(typeSyncFull, remoteClient, schoolData) },
+      //{ name: 'COURSE', displayName: 'Cursos', fn: () => this.updateCourse(typeSyncFull, remoteClient, schoolData) },
+      //{ name: 'EVIDENCE_LEARNING', displayName: 'Evidencias de Aprendizaje', fn: () => this.updateEvidenceLearning(typeSyncFull, remoteClient, schoolData) },
+      //{ name: 'QUESTION_BANK_TEST_ONLINE', displayName: 'Bancos de Preguntas Online', fn: () => this.updateQuestionBankTestOnline(typeSyncFull, remoteClient, schoolData) },
+      //{ name: 'QUESTION_TEST_ONLINE', displayName: 'Preguntas de Test Online', fn: () => this.updateQuestionTestOnline(typeSyncFull, remoteClient, schoolData) },
+      //{ name: 'QUESTION_CATEGORY_TEST_ONLINE', displayName: 'Categorías de Preguntas Online', fn: () => this.updateQuestionCategoryTestOnline(typeSyncFull, remoteClient, schoolData) },
+      //{ name: 'SCHOOL_CONFIGURATION', displayName: 'Configuraciones del Colegio', fn: () => this.updateSchoolConfiguration(typeSyncFull, remoteClient, schoolData) },
+      //{ name: 'STUDENT_BEHAVIOUR', displayName: 'Comportamientos de Estudiantes', fn: () => this.updateStudentBehaviour(typeSyncFull, remoteClient, schoolData) },
+      //{ name: 'STUDENT_YEAR_BEHAVIOUR', displayName: 'Comportamientos Anuales de Estudiantes', fn: () => this.updateStudentYearBehaviour(typeSyncFull, remoteClient, schoolData) },
+      //{ name: 'FORUM', displayName: 'Foros', fn: () => this.updateForum(typeSyncFull, remoteClient, schoolData) },
+      //{ name: 'FORUM_QUESTION', displayName: 'Preguntas de Foro', fn: () => this.updateForumQuestion(typeSyncFull, remoteClient, schoolData) },
+      //{ name: 'FORUM_INTERACTION', displayName: 'Interacciones de Foro', fn: () => this.updateForumInteraction(typeSyncFull, remoteClient, schoolData) },
       // ✅ YA FUNCIONA: { name: 'EXPERIENCE_LEARNING', displayName: 'Experiencias de Aprendizaje', fn: () => this.updateExperienceLearning(typeSyncFull, remoteClient, schoolData) },
     ];
 
@@ -2010,6 +2013,162 @@ export class SyncUpdateResolver {
      console.log(`🗑️ [ANTIDUPLICADOS] Eliminados ${keysToDelete.length} mapeos de ${entityType}`);
    }
 
+  // ==================================================================================
+  // 🔧 MÉTODOS AUXILIARES PARA STUDENT OBSERVER ANNOTATION
+  // ==================================================================================
+
+  /**
+   * 📥 FETCH LOCAL DATA - Obtiene datos locales filtrados
+   */
+  private async fetchLocalStudentObserverAnnotations(schoolData: any): Promise<any[]> {
+    try {
+      const { schoolId, schoolYearId, academicPeriodId } = schoolData;
+      
+      console.log(`📥 [FETCH-LOCAL] Obteniendo StudentObserverAnnotations...`);
+      console.log(`   - School: ${schoolId}`);
+      console.log(`   - SchoolYear: ${schoolYearId}`);
+      console.log(`   - AcademicPeriod: ${academicPeriodId}`);
+
+      // Obtener todas las anotaciones filtradas por academicPeriodId
+      const annotations = await this.repositoryStudentObserverAnnotation.findBy({
+        where: {
+          academicPeriodId: academicPeriodId,
+          active: true
+        },
+        order: { createdAt: 'DESC' }
+      });
+
+      console.log(`📥 [FETCH-LOCAL] ✅ Encontradas ${annotations.length} anotaciones locales`);
+      return annotations;
+      
+    } catch (error: any) {
+      console.error(`❌ [FETCH-LOCAL] Error obteniendo datos locales:`, error.message);
+      return [];
+    }
+  }
+
+  /**
+   * 🔍 DEEP COMPARE - Compara campos modificables para detectar cambios reales
+   * Solo compara campos que pueden cambiar (no IDs ni timestamps)
+   */
+  private hasChangesStudentObserverAnnotation(local: any, remote: any): boolean {
+    // Campos modificables que deben compararse
+    const modifiableFields = [
+      'observation',
+      'commitment',
+      'observerAnnotationTypeId'
+    ];
+
+    for (const field of modifiableFields) {
+      const localValue = local[field];
+      const remoteValue = remote[field];
+
+      // Normalizar valores null/undefined/empty
+      const normalizedLocal = localValue === null || localValue === undefined || localValue === '' ? null : localValue;
+      const normalizedRemote = remoteValue === null || remoteValue === undefined || remoteValue === '' ? null : remoteValue;
+
+      if (normalizedLocal !== normalizedRemote) {
+        console.log(`🔍 [DEEP-COMPARE] Cambio detectado en "${field}": Local="${normalizedLocal}" | Remote="${normalizedRemote}"`);
+        return true;
+      }
+    }
+
+    return false; // No hay cambios
+  }
+
+  /**
+   * 🔄 RETRY LOGIC - Reintenta operaciones fallidas con backoff exponencial
+   */
+  private async retryOperation<T>(
+    operation: () => Promise<T>,
+    maxRetries: number = 3,
+    entityName: string = 'Unknown'
+  ): Promise<T | null> {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        return await operation();
+      } catch (error: any) {
+        console.warn(`⚠️ [RETRY] Intento ${attempt}/${maxRetries} fallido para ${entityName}: ${error.message}`);
+        
+        if (attempt === maxRetries) {
+          console.error(`❌ [RETRY] Todos los intentos fallaron para ${entityName}`);
+          return null;
+        }
+
+        // Backoff exponencial: esperar 1s, 2s, 4s...
+        const waitTime = Math.pow(2, attempt - 1) * 1000;
+        console.log(`⏳ [RETRY] Esperando ${waitTime}ms antes del siguiente intento...`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+      }
+    }
+    return null;
+  }
+
+  /**
+   * 📤 CREATE REMOTE - Crea un nuevo registro en el servidor remoto
+   */
+  private async createRemoteStudentObserverAnnotation(
+    remoteClient: any,
+    annotation: any,
+    mutation: string
+  ): Promise<any> {
+    const createData = {
+      courseId: annotation.courseId,
+      academicPeriodId: annotation.academicPeriodId,
+      studentId: annotation.studentId,
+      observerAnnotationTypeId: annotation.observerAnnotationTypeId,
+      observation: annotation.observation,
+      commitment: annotation.commitment
+    };
+
+    const result = await this.retryOperation(
+      () => remoteClient.request(mutation, { data: createData }),
+      3,
+      `CREATE-${annotation.id}`
+    );
+
+    return result;
+  }
+
+  /**
+   * 🔄 UPDATE REMOTE - Actualiza un registro existente en el servidor remoto
+   */
+  private async updateRemoteStudentObserverAnnotation(
+    remoteClient: any,
+    remoteId: string,
+    annotation: any,
+    mutation: string
+  ): Promise<any> {
+    const updateData = {
+      courseId: annotation.courseId,
+      academicPeriodId: annotation.academicPeriodId,
+      studentId: annotation.studentId,
+      observerAnnotationTypeId: annotation.observerAnnotationTypeId,
+      observation: annotation.observation,
+      commitment: annotation.commitment
+    };
+
+    const result = await this.retryOperation(
+      () => remoteClient.request(mutation, { id: remoteId, data: updateData }),
+      3,
+      `UPDATE-${remoteId}`
+    );
+
+    return result;
+  }
+
+  /**
+   * 💾 CACHE INSERTED ID - Guarda el mapeo Local→Remoto en caché
+   */
+  private cacheInsertedId(localId: string, remoteId: string, entityType: string = 'STUDENT_OBSERVER_ANNOTATION') {
+    this.saveMapping(localId, remoteId, entityType);
+    console.log(`💾 [CACHE] Guardado mapeo: Local ${localId} → Remote ${remoteId}`);
+  }
+
+  // ==================================================================================
+  // 📝 SINCRONIZACIÓN PRINCIPAL DE STUDENT OBSERVER ANNOTATION
+  // ==================================================================================
+
   /**
    * �📝 SINCRONIZACIÓN ANTIDUPLICADOS DE STUDENT OBSERVER ANNOTATION (LOCAL → SERVIDOR REMOTO)
    * ⚡ SOLUCIÓN: Controla mapeo Local→Remoto para evitar duplicados en actualizaciones
@@ -2021,6 +2180,7 @@ export class SyncUpdateResolver {
       created: 0,
       updated: 0,
       errors: 0,
+      skipped: 0, // Agregado: elementos sin cambios
       conflicts: [] as Array<{
         localId: string;
         remoteId: string;
@@ -2032,9 +2192,8 @@ export class SyncUpdateResolver {
     try {
       console.log(`📝 [UPDATE-STUDENT-OBSERVER-ANNOTATION] Iniciando sincronización mejorada...`);
 
-      // Filtrar por academicPeriodId
-      // Simular datos para StudentObserverAnnotation (repositorio no disponible)
-      const localStudentObserverAnnotations: any[] = [];
+      // ✅ PASO 1: OBTENER DATOS LOCALES REALES
+      const localStudentObserverAnnotations = await this.fetchLocalStudentObserverAnnotations(schoolData);
 
       console.log(`📝 [UPDATE-STUDENT-OBSERVER-ANNOTATION] Total anotaciones locales: ${localStudentObserverAnnotations.length}`);
 
@@ -2229,9 +2388,21 @@ export class SyncUpdateResolver {
 
           if (existingAnnotation) {
             // ACTUALIZAR ANNOTATION EXISTENTE
-            console.log(`📝 [UPDATE-STUDENT-OBSERVER-ANNOTATION] 🔄 Actualizando existente: Remote ID ${existingAnnotation.id}`);
+            console.log(`📝 [UPDATE-STUDENT-OBSERVER-ANNOTATION] 🔄 Evaluando actualización: Remote ID ${existingAnnotation.id}`);
             
-            // Verificar conflictos de versión
+            // ⚡ PASO 3A: DEEP COMPARISON - Solo actualizar si HAY CAMBIOS REALES
+            const hasChanges = this.hasChangesStudentObserverAnnotation(annotation, existingAnnotation);
+            
+            if (!hasChanges) {
+              console.log(`📝 [UPDATE-STUDENT-OBSERVER-ANNOTATION] ⏭️ SIN CAMBIOS, omitiendo actualización: ${annotation.id}`);
+              
+              // Guardar mapeo aunque no se actualice
+              this.cacheInsertedId(annotation.id, existingAnnotation.id);
+              syncResults.skipped++;
+              continue; // ⚡ NO actualizar si no hay cambios
+            }
+            
+            // Verificar conflictos de versión solo si hay cambios
             if (annotation.version && existingAnnotation.version) {
               if (annotation.version <= existingAnnotation.version) {
                 console.warn(`📝 [UPDATE-STUDENT-OBSERVER-ANNOTATION] ⚠️ Conflicto de versión: Local ${annotation.version} ≤ Remote ${existingAnnotation.version}`);
@@ -2245,48 +2416,50 @@ export class SyncUpdateResolver {
               }
             }
 
-            const updateData = {
-              courseId: annotation.courseId,
-              academicPeriodId: annotation.academicPeriodId,
-              studentId: annotation.studentId,
-              observerAnnotationTypeId: annotation.observerAnnotationTypeId,
-              observation: annotation.observation,
-              commitment: annotation.commitment
-            };
-
-            await remoteClient.request(UPDATE_STUDENT_OBSERVER_ANNOTATION_MUTATION, { 
-              id: existingAnnotation.id, // Usar el ID remoto encontrado
-              data: updateData 
-            });
+            // ⚡ PASO 3B: ACTUALIZAR usando función auxiliar con reintentos
+            const updateResult = await this.updateRemoteStudentObserverAnnotation(
+              remoteClient,
+              existingAnnotation.id,
+              annotation,
+              UPDATE_STUDENT_OBSERVER_ANNOTATION_MUTATION
+            );
             
-            // 🗂️ ANTIDUPLICADOS: Guardar/actualizar mapeo
-            await this.saveMapping(annotation.id, existingAnnotation.id, 'STUDENT_OBSERVER_ANNOTATION');
-            
-            syncResults.updated++;
-            totalUploaded++;
-            console.log(`📝 [UPDATE-STUDENT-OBSERVER-ANNOTATION] ⬆️ ACTUALIZADO: Local ID ${annotation.id} → Remote ID ${existingAnnotation.id}`);
+            if (updateResult) {
+              // � ANTIDUPLICADOS: Guardar/actualizar mapeo
+              this.cacheInsertedId(annotation.id, existingAnnotation.id);
+              
+              syncResults.updated++;
+              totalUploaded++;
+              console.log(`📝 [UPDATE-STUDENT-OBSERVER-ANNOTATION] ⬆️ ACTUALIZADO CON CAMBIOS: Local ID ${annotation.id} → Remote ID ${existingAnnotation.id}`);
+            } else {
+              syncResults.errors++;
+              totalErrors++;
+              console.error(`📝 [UPDATE-STUDENT-OBSERVER-ANNOTATION] ❌ Falló actualización después de reintentos: ${annotation.id}`);
+            }
 
           } else {
             // CREAR NUEVA ANNOTATION
             console.log(`📝 [UPDATE-STUDENT-OBSERVER-ANNOTATION] ✨ Creando nueva: ${annotation.id}`);
             
-            const createData = {
-              courseId: annotation.courseId,
-              academicPeriodId: annotation.academicPeriodId,
-              studentId: annotation.studentId,
-              observerAnnotationTypeId: annotation.observerAnnotationTypeId,
-              observation: annotation.observation,
-              commitment: annotation.commitment
-            };
-
-            const createResult = await remoteClient.request(CREATE_STUDENT_OBSERVER_ANNOTATION_MUTATION, { data: createData });
+            // ⚡ PASO 4: CREAR usando función auxiliar con reintentos
+            const createResult = await this.createRemoteStudentObserverAnnotation(
+              remoteClient,
+              annotation,
+              CREATE_STUDENT_OBSERVER_ANNOTATION_MUTATION
+            );
             
-            // 🗂️ ANTIDUPLICADOS: Crear mapeo Local→Remoto
-            await this.saveMapping(annotation.id, createResult.createStudentObserverAnnotation.id, 'STUDENT_OBSERVER_ANNOTATION');
-            
-            syncResults.created++;
-            totalUploaded++;
-            console.log(`📝 [UPDATE-STUDENT-OBSERVER-ANNOTATION] ✅ CREADO: Local ID ${annotation.id} → Remote ID ${createResult.createStudentObserverAnnotation.id}`);
+            if (createResult && createResult.createStudentObserverAnnotation) {
+              // � ANTIDUPLICADOS: Crear mapeo Local→Remoto
+              this.cacheInsertedId(annotation.id, createResult.createStudentObserverAnnotation.id);
+              
+              syncResults.created++;
+              totalUploaded++;
+              console.log(`📝 [UPDATE-STUDENT-OBSERVER-ANNOTATION] ✅ CREADO: Local ID ${annotation.id} → Remote ID ${createResult.createStudentObserverAnnotation.id}`);
+            } else {
+              syncResults.errors++;
+              totalErrors++;
+              console.error(`📝 [UPDATE-STUDENT-OBSERVER-ANNOTATION] ❌ Falló creación después de reintentos: ${annotation.id}`);
+            }
           }
 
         } catch (error: any) {
@@ -2296,19 +2469,29 @@ export class SyncUpdateResolver {
         }
       }
 
-      // Resumen final mejorado
+      // Resumen final mejorado con estadísticas detalladas
       console.log(`\n📝 [UPDATE-STUDENT-OBSERVER-ANNOTATION] 🎉 SINCRONIZACIÓN COMPLETADA:`);
-      console.log(`✅ Creados en remoto: ${syncResults.created}`);
-      console.log(`🔄 Actualizados en remoto: ${syncResults.updated}`);
-      console.log(`❌ Errores: ${syncResults.errors}`);
+      console.log(`┌─────────────────────────────────────────┐`);
+      console.log(`│ 📊 ESTADÍSTICAS DE SINCRONIZACIÓN      │`);
+      console.log(`├─────────────────────────────────────────┤`);
+      console.log(`│ ✨ Creados en remoto:   ${String(syncResults.created).padStart(3)} / ${String(localStudentObserverAnnotations.length).padStart(3)} │`);
+      console.log(`│ 🔄 Actualizados:        ${String(syncResults.updated).padStart(3)} / ${String(localStudentObserverAnnotations.length).padStart(3)} │`);
+      console.log(`│ ⏭️  Sin cambios (skip):  ${String(syncResults.skipped).padStart(3)} / ${String(localStudentObserverAnnotations.length).padStart(3)} │`);
+      console.log(`│ ❌ Errores:             ${String(syncResults.errors).padStart(3)} / ${String(localStudentObserverAnnotations.length).padStart(3)} │`);
       if (syncResults.conflicts.length > 0) {
-        console.log(`⚠️ Conflictos detectados: ${syncResults.conflicts.length}`);
-        syncResults.conflicts.forEach((conflict: any) => {
-          console.log(`  - Local ID: ${conflict.localId} | Remote ID: ${conflict.remoteId} | Versiones: L${conflict.localVersion} vs R${conflict.remoteVersion}`);
+        console.log(`│ ⚠️  Conflictos versión:  ${String(syncResults.conflicts.length).padStart(3)} / ${String(localStudentObserverAnnotations.length).padStart(3)} │`);
+      }
+      console.log(`├─────────────────────────────────────────┤`);
+      console.log(`│ 📤 Total sincronizados: ${String(totalUploaded).padStart(3)} / ${String(localStudentObserverAnnotations.length).padStart(3)} │`);
+      console.log(`│ 📋 Total procesados:    ${String(localStudentObserverAnnotations.length).padStart(3)} / ${String(localStudentObserverAnnotations.length).padStart(3)} │`);
+      console.log(`└─────────────────────────────────────────┘`);
+      
+      if (syncResults.conflicts.length > 0) {
+        console.log(`\n⚠️  DETALLES DE CONFLICTOS DE VERSIÓN:`);
+        syncResults.conflicts.forEach((conflict: any, index: number) => {
+          console.log(`   ${index + 1}. Local ID: ${conflict.localId} | Remote ID: ${conflict.remoteId} | Versiones: L${conflict.localVersion} vs R${conflict.remoteVersion}`);
         });
       }
-      console.log(`📊 Total procesados: ${localStudentObserverAnnotations.length}`);
-      console.log(`📤 Total sincronizados: ${totalUploaded}`);
 
       return {
         entity: 'STUDENT_OBSERVER_ANNOTATION',
@@ -2317,19 +2500,30 @@ export class SyncUpdateResolver {
         errors: syncResults.errors,
         created: syncResults.created,
         updated: syncResults.updated,
-        conflicts: syncResults.conflicts
+        skipped: syncResults.skipped,
+        conflicts: syncResults.conflicts,
+        summary: {
+          total: localStudentObserverAnnotations.length,
+          processed: totalUploaded + syncResults.skipped + syncResults.errors,
+          success: totalUploaded,
+          failed: syncResults.errors,
+          noChanges: syncResults.skipped
+        }
       };
 
     } catch (error: any) {
       console.error('❌ [UPDATE-STUDENT-OBSERVER-ANNOTATION] Error general:', error);
+      console.error('Stack trace:', error.stack);
       return {
         entity: 'STUDENT_OBSERVER_ANNOTATION',
         offline: 0,
         online: 0,
         error: String(error),
+        errorStack: error.stack,
         errors: totalErrors,
         created: 0,
-        updated: 0
+        updated: 0,
+        skipped: 0
       };
     }
   }
