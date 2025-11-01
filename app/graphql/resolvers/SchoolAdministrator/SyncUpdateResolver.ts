@@ -109,6 +109,9 @@ export class SyncUpdateResolver {
   @InjectRepository(EvidenceLearning)
   private repositoryEvidenceLearning = EvidenceLearningRepository;
 
+  @InjectRepository(Learning)
+  private repositoryLearning = LearningRepository;
+
   @InjectRepository(PerformanceLevel)
   private repositoryPerformanceLevel = PerformanceLevelRepository;
 
@@ -403,7 +406,7 @@ export class SyncUpdateResolver {
       { name: 'ACADEMIC_ASIGNATURE_COURSE_YEAR_VALUATION', displayName: 'Valoraciones Académicas por Año', fn: () => this.updateAcademicAreaCourseYearValuation(typeSyncFull, remoteClient, schoolData) },
       { name: 'STUDENT_OBSERVER_ANNOTATION', displayName: 'Anotaciones de Observador de Estudiantes', fn: () => this.updateStudentObserverAnnotation(typeSyncFull, remoteClient, schoolData) },
       //{ name: 'GRADE_ASSIGNMENT', displayName: 'Asignaciones de Grado', fn: () => this.updateGradeAssignment(typeSyncFull, remoteClient, schoolData) },
-      //{ name: 'LEARNING', displayName: 'Aprendizajes', fn: () => this.updateLearning(typeSyncFull, remoteClient, schoolData) },
+      { name: 'LEARNING', displayName: 'Aprendizajes', fn: () => this.updateLearning(typeSyncFull, remoteClient, schoolData) },
       // 🚧 IMPLEMENTANDO: { name: 'EXPERIENCE_LEARNING_SELF_ASSESSMENT_VALUATION', displayName: 'Autoevaluaciones de Experiencias', fn: () => this.updateExperienceLearningSelfAssessmentValuation(typeSyncFull, remoteClient, schoolData) },
       // 🚧 IMPLEMENTANDO: { name: 'EXPERIENCE_LEARNING_TRADITIONAL_VALUATION', displayName: 'Valoraciones Tradicionales de Experiencias', fn: () => this.updateExperienceLearningTraditionalValuation(typeSyncFull, remoteClient, schoolData) },
       // 🚧 IMPLEMENTANDO: { name: 'EXPERIENCE_LEARNING_RUBRIC_CRITERIA', displayName: 'Criterios de Rúbricas de Experiencias', fn: () => this.updateExperienceLearningRubricCriteria(typeSyncFull, remoteClient, schoolData) },
@@ -419,7 +422,7 @@ export class SyncUpdateResolver {
       //{ name: 'ACADEMIC_ASIGNATURE_COURSE', displayName: 'Asignaturas por Curso', fn: () => this.updateAcademicAsignatureCourse(typeSyncFull, remoteClient, schoolData) },
       //{ name: 'AVERAGE_ACADEMIC_PERIOD_STUDENT', displayName: 'Promedios Académicos de Estudiantes', fn: () => this.updateAverageAcademicPeriodStudent(typeSyncFull, remoteClient, schoolData) },
       //{ name: 'COURSE', displayName: 'Cursos', fn: () => this.updateCourse(typeSyncFull, remoteClient, schoolData) },
-      //{ name: 'EVIDENCE_LEARNING', displayName: 'Evidencias de Aprendizaje', fn: () => this.updateEvidenceLearning(typeSyncFull, remoteClient, schoolData) },
+      { name: 'EVIDENCE_LEARNING', displayName: 'Evidencias de Aprendizaje', fn: () => this.updateEvidenceLearning(typeSyncFull, remoteClient, schoolData) },
       //{ name: 'QUESTION_BANK_TEST_ONLINE', displayName: 'Bancos de Preguntas Online', fn: () => this.updateQuestionBankTestOnline(typeSyncFull, remoteClient, schoolData) },
       //{ name: 'QUESTION_TEST_ONLINE', displayName: 'Preguntas de Test Online', fn: () => this.updateQuestionTestOnline(typeSyncFull, remoteClient, schoolData) },
       //{ name: 'QUESTION_CATEGORY_TEST_ONLINE', displayName: 'Categorías de Preguntas Online', fn: () => this.updateQuestionCategoryTestOnline(typeSyncFull, remoteClient, schoolData) },
@@ -429,7 +432,7 @@ export class SyncUpdateResolver {
       //{ name: 'FORUM', displayName: 'Foros', fn: () => this.updateForum(typeSyncFull, remoteClient, schoolData) },
       //{ name: 'FORUM_QUESTION', displayName: 'Preguntas de Foro', fn: () => this.updateForumQuestion(typeSyncFull, remoteClient, schoolData) },
       //{ name: 'FORUM_INTERACTION', displayName: 'Interacciones de Foro', fn: () => this.updateForumInteraction(typeSyncFull, remoteClient, schoolData) },
-      // ✅ YA FUNCIONA: { name: 'EXPERIENCE_LEARNING', displayName: 'Experiencias de Aprendizaje', fn: () => this.updateExperienceLearning(typeSyncFull, remoteClient, schoolData) },
+      //{ name: 'EXPERIENCE_LEARNING', displayName: 'Experiencias de Aprendizaje', fn: () => this.updateExperienceLearning(typeSyncFull, remoteClient, schoolData) },
     ];
 
     let current = 0;
@@ -486,6 +489,7 @@ export class SyncUpdateResolver {
       created: 0,
       updated: 0,
       errors: 0,
+      skipped: 0,
       conflicts: [] as Array<{
         localId: string;
         remoteId: string;
@@ -495,14 +499,10 @@ export class SyncUpdateResolver {
     };
 
     try {
-      console.log(`📤 [UPDATE-EVIDENCE-LEARNING] Iniciando sincronización mejorada...`);
+      console.log(`📤 [UPDATE-EVIDENCE-LEARNING] Iniciando sincronización ANTIDUPLICADOS...`);
 
-      // Obtener evidencias del localhost (SIN FILTRO ACTIVE)
-      const localEvidences = await this.repositoryEvidenceLearning.findBy({
-        where: { 
-          schoolId: schoolData.schoolId
-        }
-      });
+      // ✅ PASO 1: OBTENER DATOS LOCALES REALES
+      const localEvidences = await this.fetchLocalEvidenceLearnings(schoolData);
 
       console.log(`📤 [UPDATE-EVIDENCE-LEARNING] Total evidencias locales: ${localEvidences.length}`);
 
@@ -553,7 +553,8 @@ export class SyncUpdateResolver {
         }
       `;
 
-      // Query para verificar existencia por contenido único
+      // ⚠️ PROBLEMA CRÍTICO: learningId NO ES ÚNICO - múltiples evidencias pueden tener el mismo learningId
+      // ⚡ SOLUCIÓN: Buscar por learningId pero VERIFICAR que el remoto no esté ya asignado a otro local
       const CHECK_EVIDENCE_LEARNING_EXISTS_QUERY = `
         query CheckEvidenceLearningExists($schoolId: String!, $learningId: String!) {
           getAllEvidenceLearning(allData: true, orderCreated: false, schoolId: $schoolId, learningId: $learningId) {
@@ -598,12 +599,11 @@ export class SyncUpdateResolver {
         try {
           console.log(`📤 [UPDATE-EVIDENCE-LEARNING] 🔄 [${i + 1}/${localEvidences.length}] Procesando: ${evidence.id}`);
 
-          // 🗂️ PASO 0: ANTIDUPLICADOS - Verificar mapeo local→remoto existente
+          // 🗂️ PASO 0: FAST PATH - Verificar mapeo local→remoto existente
           const mappedRemoteId = this.getRemoteIdByLocalId(evidence.id, 'EVIDENCE_LEARNING');
           if (mappedRemoteId) {
             console.log(`🗂️ [ANTIDUPLICADOS] Encontrado mapeo existente: Local ${evidence.id} → Remote ${mappedRemoteId}`);
             
-            // Verificar que el remoto aún existe
             try {
               const checkMappedResult = await remoteClient.request(CHECK_EVIDENCE_LEARNING_BY_ID_QUERY, { 
                 id: mappedRemoteId 
@@ -611,21 +611,19 @@ export class SyncUpdateResolver {
               
               if (checkMappedResult?.getEvidenceLearning) {
                 // ✅ ACTUALIZAR DIRECTO usando el mapeo
-                const updateData = {
-                  statement: evidence.statement || 'Evidence Statement',
-                  schoolId: evidence.schoolId,
-                  learningId: evidence.learningId
-                };
-
                 await remoteClient.request(UPDATE_EVIDENCE_LEARNING_MUTATION, { 
                   id: mappedRemoteId,
-                  data: updateData 
+                  data: {
+                    statement: evidence.statement || 'Evidence Statement',
+                    schoolId: evidence.schoolId,
+                    learningId: evidence.learningId
+                  }
                 });
                 
                 syncResults.updated++;
                 totalUploaded++;
                 console.log(`✅ [ANTIDUPLICADOS] ACTUALIZADO VIA MAPEO: Local ${evidence.id} → Remote ${mappedRemoteId}`);
-                continue; // ⚡ SALTAR búsquedas adicionales - ya procesado
+                continue; // ⚡ SALTAR búsquedas adicionales
               } else {
                 console.warn(`⚠️ [ANTIDUPLICADOS] Mapeo obsoleto, remoto ${mappedRemoteId} no existe. Buscando nuevamente...`);
               }
@@ -634,19 +632,33 @@ export class SyncUpdateResolver {
             }
           }
 
-          // PASO 1: Verificar si existe por ID exacto (solo si no hay mapeo válido)
+          // PASO 1: Verificar si existe por ID exacto (SOLO SI está en mapeo cache)
           let existingEvidenceById = null;
           try {
             const checkByIdResult = await remoteClient.request(CHECK_EVIDENCE_LEARNING_BY_ID_QUERY, { 
               id: evidence.id 
             });
-            existingEvidenceById = checkByIdResult?.getEvidenceLearning;
+            const foundById = checkByIdResult?.getEvidenceLearning;
+            
+            // ⚠️ CRÍTICO: Solo usar búsqueda por ID si está en el mapeo cache
+            // Si no está en cache, puede ser un ID local nuevo que casualmente coincide con remoto antiguo
+            if (foundById) {
+              const isInCache = this.getRemoteIdByLocalId(evidence.id, 'EVIDENCE_LEARNING') === foundById.id ||
+                               this.getLocalIdByRemoteId(foundById.id, 'EVIDENCE_LEARNING') === evidence.id;
+              
+              if (isInCache) {
+                existingEvidenceById = foundById;
+                console.log(`📤 [UPDATE-EVIDENCE-LEARNING] 🔍 Registro encontrado por ID en cache: ${evidence.id}`);
+              } else {
+                console.log(`📤 [UPDATE-EVIDENCE-LEARNING] ⚠️ ID coincidente ${evidence.id} pero NO está en cache, tratando como nuevo...`);
+              }
+            }
           } catch (checkError: any) {
             console.log(`📤 [UPDATE-EVIDENCE-LEARNING] 🔍 No existe por ID: ${evidence.id}`);
           }
 
-          // PASO 2: BÚSQUEDA ANTIDUPLICADOS POR IDENTIFICADORES ÚNICOS
-          // ⚡ PATRÓN CORRECTO: Buscar por IDs únicos - statement y active son modificables
+          // PASO 2: BÚSQUEDA CON BLOQUEO ANTIDUPLICADOS
+          // ⚠️ CRÍTICO: learningId NO ES ÚNICO - Buscar por learningId pero BLOQUEAR remotos ya asignados
           let existingEvidenceByContent = null;
           if (!existingEvidenceById && evidence.schoolId && evidence.learningId) {
             try {
@@ -655,33 +667,52 @@ export class SyncUpdateResolver {
                 learningId: evidence.learningId
               });
               
-              // ✅ BÚSQUEDA CORRECTA: Solo por identificadores únicos (NO incluir statement/active)
-              existingEvidenceByContent = checkByContentResult?.getAllEvidenceLearning?.edges?.find((edge: any) => {
+              // 🔍 Buscar candidatos por schoolId + learningId
+              const candidates = checkByContentResult?.getAllEvidenceLearning?.edges || [];
+              
+              console.log(`🔍 [ANTIDUPLICADOS] Encontrados ${candidates.length} candidatos remotos para learningId=${evidence.learningId}`);
+              
+              for (const edge of candidates) {
                 const remote = edge.node;
-                const identifiersMatch = 
-                  remote.schoolId === evidence.schoolId &&
-                  remote.learningId === evidence.learningId;
-                  // ⚡ NO incluye 'statement' ni 'active' - son campos modificables
                 
-                if (identifiersMatch) {
-                  console.log(`🔍 [ANTIDUPLICADOS] Registro encontrado por IDs únicos: Local ${evidence.id} → Remote ${remote.id}`);
-                  console.log(`📝 Statement modificable - Local: "${evidence.statement}" | Remote: "${remote.statement}"`);
-                  console.log(`⚡ Active modificable - Local: ${evidence.active} | Remote: ${remote.active}`);
+                // 🚨 BLOQUEO ANTIDUPLICADOS: Verificar que este remoto no esté ya asignado a otro local
+                const existingLocalId = this.getLocalIdByRemoteId(remote.id, 'EVIDENCE_LEARNING');
+                if (existingLocalId && existingLocalId !== evidence.id) {
+                  console.warn(`⚠️ [ANTIDUPLICADOS] Remote ${remote.id} ya está mapeado con Local ${existingLocalId}, omitiendo...`);
+                  continue; // ⚡ Saltar este candidato - ya está asignado
                 }
                 
-                return identifiersMatch;
-              })?.node;
+                // ✅ Este remoto está disponible para este local
+                existingEvidenceByContent = remote;
+                console.log(`🔍 [ANTIDUPLICADOS] Candidato válido encontrado: Local ${evidence.id} → Remote ${remote.id}`);
+                console.log(`📝 Statement modificable - Local: "${evidence.statement}" | Remote: "${remote.statement}"`);
+                break; // Usar este candidato
+              }
+              
+              if (!existingEvidenceByContent && candidates.length > 0) {
+                console.warn(`⚠️ [ANTIDUPLICADOS] Todos los ${candidates.length} candidatos remotos ya están asignados, creando nuevo...`);
+              }
               
             } catch (contentError: any) {
-              console.log(`📤 [UPDATE-EVIDENCE-LEARNING] ⚠️ Error verificando por identificadores únicos: ${contentError.message}`);
+              console.log(`📤 [UPDATE-EVIDENCE-LEARNING] ⚠️ Error verificando por identificadores: ${contentError.message}`);
             }
           }
 
           const existingEvidence = existingEvidenceById || existingEvidenceByContent;
 
           if (existingEvidence) {
-            // ACTUALIZAR EVIDENCE EXISTENTE
-            console.log(`📤 [UPDATE-EVIDENCE-LEARNING] 🔄 Actualizando existente: Remote ID ${existingEvidence.id}`);
+            // 🔄 ACTUALIZAR EVIDENCE EXISTENTE
+            console.log(`📤 [UPDATE-EVIDENCE-LEARNING] 🔄 Evaluando actualización: Remote ID ${existingEvidence.id}`);
+            
+            // ⚡ DEEP COMPARISON
+            const hasChanges = this.hasChangesEvidenceLearning(evidence, existingEvidence);
+            
+            if (!hasChanges) {
+              console.log(`📤 [UPDATE-EVIDENCE-LEARNING] ⏭️ SIN CAMBIOS, omitiendo actualización: ${evidence.id}`);
+              this.cacheInsertedId(evidence.id, existingEvidence.id, 'EVIDENCE_LEARNING');
+              syncResults.skipped++;
+              continue;
+            }
             
             // Verificar conflictos de versión
             if (evidence.version && existingEvidence.version) {
@@ -693,46 +724,49 @@ export class SyncUpdateResolver {
                   localVersion: evidence.version,
                   remoteVersion: existingEvidence.version
                 });
-                continue; // Saltar esta evidencia
+                continue;
               }
             }
 
-            const updateData = {
-              statement: evidence.statement || 'Evidence Statement',
-              schoolId: evidence.schoolId,
-              learningId: evidence.learningId
-            };
-
-            await remoteClient.request(UPDATE_EVIDENCE_LEARNING_MUTATION, { 
-              id: existingEvidence.id, // Usar el ID remoto encontrado
-              data: updateData 
-            });
+            // ⚡ ACTUALIZAR con reintentos
+            const updateResult = await this.updateRemoteEvidenceLearning(
+              remoteClient,
+              existingEvidence.id,
+              evidence,
+              UPDATE_EVIDENCE_LEARNING_MUTATION
+            );
             
-            // 🗂️ ANTIDUPLICADOS: Guardar/actualizar mapeo
-            await this.saveMapping(evidence.id, existingEvidence.id, 'EVIDENCE_LEARNING');
-            
-            syncResults.updated++;
-            totalUploaded++;
-            console.log(`📤 [UPDATE-EVIDENCE-LEARNING] ⬆️ ACTUALIZADO: Local ID ${evidence.id} → Remote ID ${existingEvidence.id}`);
+            if (updateResult) {
+              this.cacheInsertedId(evidence.id, existingEvidence.id, 'EVIDENCE_LEARNING');
+              syncResults.updated++;
+              totalUploaded++;
+              console.log(`📤 [UPDATE-EVIDENCE-LEARNING] ⬆️ ACTUALIZADO CON CAMBIOS: Local ID ${evidence.id} → Remote ID ${existingEvidence.id}`);
+            } else {
+              syncResults.errors++;
+              totalErrors++;
+              console.error(`📤 [UPDATE-EVIDENCE-LEARNING] ❌ Falló actualización: ${evidence.id}`);
+            }
 
           } else {
-            // CREAR NUEVA EVIDENCE
+            // ✨ CREAR NUEVA EVIDENCE
             console.log(`📤 [UPDATE-EVIDENCE-LEARNING] ✨ Creando nueva: ${evidence.id}`);
             
-            const createData = {
-              statement: evidence.statement || 'Evidence Statement',
-              schoolId: evidence.schoolId,
-              learningId: evidence.learningId
-            };
-
-            const createResult = await remoteClient.request(CREATE_EVIDENCE_LEARNING_MUTATION, { data: createData });
+            const createResult = await this.createRemoteEvidenceLearning(
+              remoteClient,
+              evidence,
+              CREATE_EVIDENCE_LEARNING_MUTATION
+            );
             
-            // 🗂️ ANTIDUPLICADOS: Crear mapeo Local→Remoto
-            await this.saveMapping(evidence.id, createResult.createEvidenceLearning.id, 'EVIDENCE_LEARNING');
-            
-            syncResults.created++;
-            totalUploaded++;
-            console.log(`📤 [UPDATE-EVIDENCE-LEARNING] ✅ CREADO: Local ID ${evidence.id} → Remote ID ${createResult.createEvidenceLearning.id}`);
+            if (createResult && createResult.createEvidenceLearning) {
+              this.cacheInsertedId(evidence.id, createResult.createEvidenceLearning.id, 'EVIDENCE_LEARNING');
+              syncResults.created++;
+              totalUploaded++;
+              console.log(`📤 [UPDATE-EVIDENCE-LEARNING] ✅ CREADO: Local ID ${evidence.id} → Remote ID ${createResult.createEvidenceLearning.id}`);
+            } else {
+              syncResults.errors++;
+              totalErrors++;
+              console.error(`📤 [UPDATE-EVIDENCE-LEARNING] ❌ Falló creación: ${evidence.id}`);
+            }
           }
 
         } catch (error: any) {
@@ -742,19 +776,26 @@ export class SyncUpdateResolver {
         }
       }
 
-      // Resumen final mejorado
+      // 📊 RESUMEN FINAL CON ESTADÍSTICAS VISUALES
       console.log(`\n📤 [UPDATE-EVIDENCE-LEARNING] 🎉 SINCRONIZACIÓN COMPLETADA:`);
-      console.log(`✅ Creados en remoto: ${syncResults.created}`);
-      console.log(`🔄 Actualizados en remoto: ${syncResults.updated}`);
-      console.log(`❌ Errores: ${syncResults.errors}`);
+      console.log(`┌─────────────────────────────────────────┐`);
+      console.log(`│ 📊 ESTADÍSTICAS DE SINCRONIZACIÓN      │`);
+      console.log(`├─────────────────────────────────────────┤`);
+      console.log(`│ ✨ Creados:    ${String(syncResults.created).padStart(3)} / ${String(localEvidences.length).padStart(3)} │`);
+      console.log(`│ 🔄 Actualizados: ${String(syncResults.updated).padStart(3)} / ${String(localEvidences.length).padStart(3)} │`);
+      console.log(`│ ⏭️  Sin cambios: ${String(syncResults.skipped).padStart(3)} / ${String(localEvidences.length).padStart(3)} │`);
+      console.log(`│ ❌ Errores:     ${String(syncResults.errors).padStart(3)} / ${String(localEvidences.length).padStart(3)} │`);
       if (syncResults.conflicts.length > 0) {
-        console.log(`⚠️ Conflictos detectados: ${syncResults.conflicts.length}`);
-        syncResults.conflicts.forEach((conflict: any) => {
-          console.log(`  - Local ID: ${conflict.localId} | Remote ID: ${conflict.remoteId} | Versiones: L${conflict.localVersion} vs R${conflict.remoteVersion}`);
+        console.log(`│ ⚠️  Conflictos:  ${String(syncResults.conflicts.length).padStart(3)} / ${String(localEvidences.length).padStart(3)} │`);
+      }
+      console.log(`└─────────────────────────────────────────┘`);
+      
+      if (syncResults.conflicts.length > 0) {
+        console.log(`\n⚠️  DETALLES DE CONFLICTOS DE VERSIÓN:`);
+        syncResults.conflicts.forEach((conflict: any, index: number) => {
+          console.log(`   ${index + 1}. Local ID: ${conflict.localId} | Remote ID: ${conflict.remoteId} | Versiones: L${conflict.localVersion} vs R${conflict.remoteVersion}`);
         });
       }
-      console.log(`📊 Total procesados: ${localEvidences.length}`);
-      console.log(`📤 Total sincronizados: ${totalUploaded}`);
 
       return {
         entity: 'EVIDENCE_LEARNING',
@@ -763,19 +804,30 @@ export class SyncUpdateResolver {
         errors: syncResults.errors,
         created: syncResults.created,
         updated: syncResults.updated,
-        conflicts: syncResults.conflicts
+        skipped: syncResults.skipped,
+        conflicts: syncResults.conflicts,
+        summary: {
+          total: localEvidences.length,
+          processed: totalUploaded + syncResults.skipped + syncResults.errors,
+          success: totalUploaded,
+          failed: syncResults.errors,
+          noChanges: syncResults.skipped
+        }
       };
 
     } catch (error: any) {
       console.error('❌ [UPDATE-EVIDENCE-LEARNING] Error general:', error);
+      console.error('Stack trace:', error.stack);
       return {
         entity: 'EVIDENCE_LEARNING',
         offline: 0,
         online: 0,
         error: String(error),
+        errorStack: error.stack,
         errors: totalErrors,
         created: 0,
-        updated: 0
+        updated: 0,
+        skipped: 0
       };
     }
   }
@@ -2013,6 +2065,228 @@ export class SyncUpdateResolver {
      console.log(`🗑️ [ANTIDUPLICADOS] Eliminados ${keysToDelete.length} mapeos de ${entityType}`);
    }
 
+   /**
+   * 🔍 SISTEMA ANTIDUPLICADOS - Buscar ID local por ID remoto (INVERSO)
+   */
+   private getLocalIdByRemoteId(remoteId: string, entityType: string): string | null {
+     for (const [key, mapping] of this.localToRemoteMapping.entries()) {
+       if (mapping.remoteId === remoteId && mapping.entityType === entityType) {
+         return mapping.localId;
+       }
+     }
+     return null;
+   }
+
+  // ==================================================================================
+  // 🔧 MÉTODOS AUXILIARES PARA LEARNING
+  // ==================================================================================
+
+  /**
+   * 📥 FETCH LOCAL LEARNING - Obtiene datos locales filtrados
+   */
+  private async fetchLocalLearnings(schoolData: any): Promise<any[]> {
+    try {
+      const { schoolId } = schoolData;
+      
+      console.log(`📥 [FETCH-LOCAL-LEARNING] Obteniendo Learning...`);
+      console.log(`   - School: ${schoolId}`);
+
+      const learnings = await this.repositoryLearning.findBy({
+        where: {
+          schoolId: schoolId
+        },
+        order: { createdAt: 'DESC' }
+      });
+
+      console.log(`📥 [FETCH-LOCAL-LEARNING] ✅ Encontrados ${learnings.length} learnings locales`);
+      return learnings;
+      
+    } catch (error: any) {
+      console.error(`❌ [FETCH-LOCAL-LEARNING] Error obteniendo datos locales:`, error.message);
+      return [];
+    }
+  }
+
+  /**
+   * 🔍 DEEP COMPARE LEARNING - Compara campos modificables
+   */
+  private hasChangesLearning(local: any, remote: any): boolean {
+    const modifiableFields = [
+      'statement'
+      // NO comparar: academicAsignatureId, academicGradeId, schoolId (son identificadores únicos)
+    ];
+
+    for (const field of modifiableFields) {
+      const localValue = local[field];
+      const remoteValue = remote[field];
+      const normalizedLocal = localValue === null || localValue === undefined || localValue === '' ? null : localValue;
+      const normalizedRemote = remoteValue === null || remoteValue === undefined || remoteValue === '' ? null : remoteValue;
+
+      if (normalizedLocal !== normalizedRemote) {
+        console.log(`🔍 [DEEP-COMPARE-LEARNING] Cambio detectado en "${field}": Local="${normalizedLocal}" | Remote="${normalizedRemote}"`);
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * 📤 CREATE REMOTE LEARNING
+   */
+  private async createRemoteLearning(
+    remoteClient: any,
+    learning: any,
+    mutation: string
+  ): Promise<any> {
+    const createData = {
+      statement: learning.statement,
+      academicAsignatureId: learning.academicAsignatureId,
+      generalBasicLearningRightId: learning.generalBasicLearningRightId,
+      academicStandardId: learning.academicStandardId,
+      academicGradeId: learning.academicGradeId,
+      schoolId: learning.schoolId,
+      academicPeriodsId: learning.academicPeriodsId
+    };
+
+    const result = await this.retryOperation(
+      () => remoteClient.request(mutation, { data: createData }),
+      3,
+      `CREATE-LEARNING-${learning.id}`
+    );
+
+    return result;
+  }
+
+  /**
+   * 🔄 UPDATE REMOTE LEARNING
+   */
+  private async updateRemoteLearning(
+    remoteClient: any,
+    remoteId: string,
+    learning: any,
+    mutation: string
+  ): Promise<any> {
+    const updateData = {
+      statement: learning.statement,
+      academicAsignatureId: learning.academicAsignatureId,
+      generalBasicLearningRightId: learning.generalBasicLearningRightId,
+      academicStandardId: learning.academicStandardId,
+      academicGradeId: learning.academicGradeId,
+      schoolId: learning.schoolId,
+      academicPeriodsId: learning.academicPeriodsId
+    };
+
+    const result = await this.retryOperation(
+      () => remoteClient.request(mutation, { id: remoteId, data: updateData }),
+      3,
+      `UPDATE-LEARNING-${remoteId}`
+    );
+
+    return result;
+  }
+
+  // ==================================================================================
+  // 🔧 MÉTODOS AUXILIARES PARA EVIDENCE LEARNING
+  // ==================================================================================
+
+  /**
+   * 📥 FETCH LOCAL EVIDENCE LEARNING - Obtiene datos locales filtrados
+   */
+  private async fetchLocalEvidenceLearnings(schoolData: any): Promise<any[]> {
+    try {
+      const { schoolId } = schoolData;
+      
+      console.log(`📥 [FETCH-LOCAL-EVIDENCE] Obteniendo EvidenceLearning...`);
+      console.log(`   - School: ${schoolId}`);
+
+      const evidences = await this.repositoryEvidenceLearning.findBy({
+        where: {
+          schoolId: schoolId
+        },
+        order: { createdAt: 'DESC' }
+      });
+
+      console.log(`📥 [FETCH-LOCAL-EVIDENCE] ✅ Encontradas ${evidences.length} evidencias locales`);
+      return evidences;
+      
+    } catch (error: any) {
+      console.error(`❌ [FETCH-LOCAL-EVIDENCE] Error obteniendo datos locales:`, error.message);
+      return [];
+    }
+  }
+
+  /**
+   * 🔍 DEEP COMPARE EVIDENCE LEARNING - Compara campos modificables
+   */
+  private hasChangesEvidenceLearning(local: any, remote: any): boolean {
+    const modifiableFields = [
+      'statement'
+      // NO comparar: learningId, schoolId (son identificadores únicos)
+    ];
+
+    for (const field of modifiableFields) {
+      const localValue = local[field];
+      const remoteValue = remote[field];
+      const normalizedLocal = localValue === null || localValue === undefined || localValue === '' ? null : localValue;
+      const normalizedRemote = remoteValue === null || remoteValue === undefined || remoteValue === '' ? null : remoteValue;
+
+      if (normalizedLocal !== normalizedRemote) {
+        console.log(`🔍 [DEEP-COMPARE-EVIDENCE] Cambio detectado en "${field}": Local="${normalizedLocal}" | Remote="${normalizedRemote}"`);
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * 📤 CREATE REMOTE EVIDENCE LEARNING
+   */
+  private async createRemoteEvidenceLearning(
+    remoteClient: any,
+    evidence: any,
+    mutation: string
+  ): Promise<any> {
+    const createData = {
+      statement: evidence.statement || 'Evidence Statement',
+      schoolId: evidence.schoolId,
+      learningId: evidence.learningId
+    };
+
+    const result = await this.retryOperation(
+      () => remoteClient.request(mutation, { data: createData }),
+      3,
+      `CREATE-EVIDENCE-${evidence.id}`
+    );
+
+    return result;
+  }
+
+  /**
+   * 🔄 UPDATE REMOTE EVIDENCE LEARNING
+   */
+  private async updateRemoteEvidenceLearning(
+    remoteClient: any,
+    remoteId: string,
+    evidence: any,
+    mutation: string
+  ): Promise<any> {
+    const updateData = {
+      statement: evidence.statement || 'Evidence Statement',
+      schoolId: evidence.schoolId,
+      learningId: evidence.learningId
+    };
+
+    const result = await this.retryOperation(
+      () => remoteClient.request(mutation, { id: remoteId, data: updateData }),
+      3,
+      `UPDATE-EVIDENCE-${remoteId}`
+    );
+
+    return result;
+  }
+
   // ==================================================================================
   // 🔧 MÉTODOS AUXILIARES PARA STUDENT OBSERVER ANNOTATION
   // ==================================================================================
@@ -2688,8 +2962,8 @@ export class SyncUpdateResolver {
   }
 
    /**
-   * 📤 SINCRONIZACIÓN MEJORADA DE LEARNING (LOCAL → SERVIDOR REMOTO)
-   * Implementa detección inteligente de duplicados y manejo de conflictos
+   * 📤 SINCRONIZACIÓN ANTIDUPLICADOS DE LEARNING (LOCAL → SERVIDOR REMOTO)
+   * ⚡ SOLUCIÓN: Controla mapeo Local→Remoto para evitar duplicados en actualizaciones
    */
    async updateLearning(typeSyncFull: boolean, remoteClient: any, schoolData: any) {
     let totalUploaded = 0;
@@ -2698,6 +2972,7 @@ export class SyncUpdateResolver {
       created: 0,
       updated: 0,
       errors: 0,
+      skipped: 0,
       conflicts: [] as Array<{
         localId: string;
         remoteId: string;
@@ -2707,10 +2982,10 @@ export class SyncUpdateResolver {
     };
 
     try {
-      console.log(`📖 [UPDATE-LEARNING] Iniciando sincronización mejorada...`);
+      console.log(`📖 [UPDATE-LEARNING] Iniciando sincronización ANTIDUPLICADOS...`);
 
-      // Simular datos para Learning (repositorio no disponible)
-      const localLearnings: any[] = [];
+      // ✅ PASO 1: OBTENER DATOS LOCALES REALES
+      const localLearnings = await this.fetchLocalLearnings(schoolData);
 
       console.log(`📖 [UPDATE-LEARNING] Total aprendizajes locales: ${localLearnings.length}`);
 
@@ -2769,7 +3044,7 @@ export class SyncUpdateResolver {
         }
       `;
 
-      // Query mejorada para verificar existencia por contenido único
+      // ⚡ QUERY ANTIDUPLICADOS: Buscar SOLO por identificadores únicos
       const CHECK_LEARNING_EXISTS_QUERY = `
         query CheckLearningExists($schoolId: String!, $academicAsignatureId: String!, $academicGradeId: String!) {
           getAllLearning(allData: true, orderCreated: false, schoolId: $schoolId, academicAsignatureId: $academicAsignatureId, academicGradeId: $academicGradeId) {
@@ -2801,6 +3076,11 @@ export class SyncUpdateResolver {
         }
       `;
 
+      // 🔍 ANTIDUPLICADOS: Limpiar y cargar mapeo existente
+      console.log(`🗑️ [ANTIDUPLICADOS] Limpiando mapeo previo para nueva sesión...`);
+      this.clearMapping('LEARNING');
+      await this.loadExistingMapping('LEARNING', schoolData);
+
       // Procesar cada aprendizaje local
       for (let i = 0; i < localLearnings.length; i++) {
         const learning = localLearnings[i];
@@ -2813,19 +3093,69 @@ export class SyncUpdateResolver {
         try {
           console.log(`📖 [UPDATE-LEARNING] 🔄 [${i + 1}/${localLearnings.length}] Procesando: ${learning.id}`);
 
-          // PASO 1: Verificar si existe por ID exacto
+          // 🗂️ PASO 0: FAST PATH - Verificar mapeo local→remoto existente
+          const mappedRemoteId = this.getRemoteIdByLocalId(learning.id, 'LEARNING');
+          if (mappedRemoteId) {
+            console.log(`🗂️ [ANTIDUPLICADOS] Encontrado mapeo existente: Local ${learning.id} → Remote ${mappedRemoteId}`);
+            
+            try {
+              const checkMappedResult = await remoteClient.request(CHECK_LEARNING_BY_ID_QUERY, { 
+                id: mappedRemoteId 
+              });
+              
+              if (checkMappedResult?.getLearning) {
+                // ✅ ACTUALIZAR DIRECTO usando el mapeo
+                await remoteClient.request(UPDATE_LEARNING_MUTATION, { 
+                  id: mappedRemoteId,
+                  data: {
+                    statement: learning.statement,
+                    academicAsignatureId: learning.academicAsignatureId,
+                    generalBasicLearningRightId: learning.generalBasicLearningRightId,
+                    academicStandardId: learning.academicStandardId,
+                    academicGradeId: learning.academicGradeId,
+                    schoolId: learning.schoolId,
+                    academicPeriodsId: learning.academicPeriodsId
+                  }
+                });
+                
+                syncResults.updated++;
+                totalUploaded++;
+                console.log(`✅ [ANTIDUPLICADOS] ACTUALIZADO VIA MAPEO: Local ${learning.id} → Remote ${mappedRemoteId}`);
+                continue; // ⚡ SALTAR búsquedas adicionales
+              } else {
+                console.warn(`⚠️ [ANTIDUPLICADOS] Mapeo obsoleto, remoto ${mappedRemoteId} no existe. Buscando nuevamente...`);
+              }
+            } catch (mappedError) {
+              console.warn(`⚠️ [ANTIDUPLICADOS] Error verificando mapeo ${mappedRemoteId}, buscando nuevamente...`);
+            }
+          }
+
+          // PASO 1: Verificar si existe por ID exacto (SOLO SI está en mapeo cache)
           let existingLearningById = null;
           try {
             const checkByIdResult = await remoteClient.request(CHECK_LEARNING_BY_ID_QUERY, { 
               id: learning.id 
             });
-            existingLearningById = checkByIdResult?.getLearning;
+            const foundById = checkByIdResult?.getLearning;
+            
+            // ⚠️ CRÍTICO: Solo usar búsqueda por ID si está en el mapeo cache
+            // Si no está en cache, puede ser un ID local nuevo que casualmente coincide con remoto antiguo
+            if (foundById) {
+              const isInCache = this.getRemoteIdByLocalId(learning.id, 'LEARNING') === foundById.id ||
+                               this.getLocalIdByRemoteId(foundById.id, 'LEARNING') === learning.id;
+              
+              if (isInCache) {
+                existingLearningById = foundById;
+                console.log(`📖 [UPDATE-LEARNING] 🔍 Registro encontrado por ID en cache: ${learning.id}`);
+              } else {
+                console.log(`📖 [UPDATE-LEARNING] ⚠️ ID coincidente ${learning.id} pero NO está en cache, tratando como nuevo...`);
+              }
+            }
           } catch (checkError: any) {
             console.log(`📖 [UPDATE-LEARNING] 🔍 No existe por ID: ${learning.id}`);
           }
 
-          // PASO 2: Si no existe por ID, buscar SOLO por identificadores únicos para detectar duplicados
-          // ⚡ IMPORTANTE: NO comparamos 'statement' ni 'active' para permitir modificaciones
+          // PASO 2: Buscar SOLO por identificadores únicos INMUTABLES
           let existingLearningByContent = null;
           if (!existingLearningById && learning.academicAsignatureId && learning.academicGradeId) {
             try {
@@ -2835,8 +3165,10 @@ export class SyncUpdateResolver {
                 academicGradeId: learning.academicGradeId
               });
               
-              // Buscar SOLO por identificadores únicos - statement y active son modificables
-              existingLearningByContent = checkByContentResult?.getAllLearning?.edges?.find((edge: any) => {
+              // ✅ Buscar SOLO por IDs únicos inmutables (NO incluir statement/active)
+              const candidates = checkByContentResult?.getAllLearning?.edges || [];
+              
+              for (const edge of candidates) {
                 const remote = edge.node;
                 const identifiersMatch = 
                   remote.academicAsignatureId === learning.academicAsignatureId &&
@@ -2846,13 +3178,19 @@ export class SyncUpdateResolver {
                   remote.schoolId === learning.schoolId &&
                   JSON.stringify(remote.academicPeriodsId?.sort()) === JSON.stringify(learning.academicPeriodsId?.sort());
                 
-                return identifiersMatch;
-              })?.node;
-              
-              if (existingLearningByContent) {
-                console.log(`📖 [UPDATE-LEARNING] 🔍 Registro encontrado por IDs únicos: Local ${learning.id} → Remote ${existingLearningByContent.id}`);
-                console.log(`📖 [UPDATE-LEARNING] 📝 Statement modificable - Local: "${learning.statement}" | Remote: "${existingLearningByContent.statement}"`);
-                console.log(`📖 [UPDATE-LEARNING] ⚡ Active modificable - Local: ${learning.active} | Remote: ${existingLearningByContent.active || 'N/A'}`);
+                if (identifiersMatch) {
+                  // 🚨 BLOQUEO ANTIDUPLICADOS: Verificar que este remoto no esté ya asignado
+                  const existingLocalId = this.getLocalIdByRemoteId(remote.id, 'LEARNING');
+                  if (existingLocalId && existingLocalId !== learning.id) {
+                    console.warn(`⚠️ [ANTIDUPLICADOS] Remote ${remote.id} ya está mapeado con Local ${existingLocalId}, omitiendo...`);
+                    continue; // Saltar este candidato
+                  }
+                  
+                  existingLearningByContent = remote;
+                  console.log(`📖 [UPDATE-LEARNING] 🔍 Registro encontrado por IDs únicos: Local ${learning.id} → Remote ${remote.id}`);
+                  console.log(` Statement modificable - Local: "${learning.statement}" | Remote: "${remote.statement}"`);
+                  break;
+                }
               }
             } catch (contentError: any) {
               console.log(`📖 [UPDATE-LEARNING] ⚠️ Error verificando por identificadores: ${contentError.message}`);
@@ -2862,8 +3200,18 @@ export class SyncUpdateResolver {
           const existingLearning = existingLearningById || existingLearningByContent;
 
           if (existingLearning) {
-            // ACTUALIZAR LEARNING EXISTENTE
-            console.log(`📖 [UPDATE-LEARNING] 🔄 Actualizando existente: Remote ID ${existingLearning.id}`);
+            // 🔄 ACTUALIZAR LEARNING EXISTENTE
+            console.log(`📖 [UPDATE-LEARNING] 🔄 Evaluando actualización: Remote ID ${existingLearning.id}`);
+            
+            // ⚡ DEEP COMPARISON
+            const hasChanges = this.hasChangesLearning(learning, existingLearning);
+            
+            if (!hasChanges) {
+              console.log(`📖 [UPDATE-LEARNING] ⏭️ SIN CAMBIOS, omitiendo actualización: ${learning.id}`);
+              this.cacheInsertedId(learning.id, existingLearning.id, 'LEARNING');
+              syncResults.skipped++;
+              continue;
+            }
             
             // Verificar conflictos de versión
             if (learning.version && existingLearning.version) {
@@ -2875,48 +3223,49 @@ export class SyncUpdateResolver {
                   localVersion: learning.version,
                   remoteVersion: existingLearning.version
                 });
-                continue; // Saltar este learning
+                continue;
               }
             }
 
-            const updateData = {
-              statement: learning.statement,
-              academicAsignatureId: learning.academicAsignatureId,
-              generalBasicLearningRightId: learning.generalBasicLearningRightId,
-              academicStandardId: learning.academicStandardId,
-              academicGradeId: learning.academicGradeId,
-              schoolId: learning.schoolId,
-              academicPeriodsId: learning.academicPeriodsId
-            };
-
-            await remoteClient.request(UPDATE_LEARNING_MUTATION, { 
-              id: existingLearning.id, // Usar el ID remoto encontrado
-              data: updateData 
-            });
+            // ⚡ ACTUALIZAR con reintentos
+            const updateResult = await this.updateRemoteLearning(
+              remoteClient,
+              existingLearning.id,
+              learning,
+              UPDATE_LEARNING_MUTATION
+            );
             
-            syncResults.updated++;
-            totalUploaded++;
-            console.log(`📖 [UPDATE-LEARNING] ⬆️ ACTUALIZADO: Local ID ${learning.id} → Remote ID ${existingLearning.id}`);
+            if (updateResult) {
+              this.cacheInsertedId(learning.id, existingLearning.id, 'LEARNING');
+              syncResults.updated++;
+              totalUploaded++;
+              console.log(`📖 [UPDATE-LEARNING] ⬆️ ACTUALIZADO CON CAMBIOS: Local ID ${learning.id} → Remote ID ${existingLearning.id}`);
+            } else {
+              syncResults.errors++;
+              totalErrors++;
+              console.error(`📖 [UPDATE-LEARNING] ❌ Falló actualización: ${learning.id}`);
+            }
 
           } else {
-            // CREAR NUEVO LEARNING
+            // ✨ CREAR NUEVO LEARNING
             console.log(`📖 [UPDATE-LEARNING] ✨ Creando nuevo: ${learning.id}`);
             
-            const createData = {
-              statement: learning.statement,
-              academicAsignatureId: learning.academicAsignatureId,
-              generalBasicLearningRightId: learning.generalBasicLearningRightId,
-              academicStandardId: learning.academicStandardId,
-              academicGradeId: learning.academicGradeId,
-              schoolId: learning.schoolId,
-              academicPeriodsId: learning.academicPeriodsId
-            };
-
-            const createResult = await remoteClient.request(CREATE_LEARNING_MUTATION, { data: createData });
+            const createResult = await this.createRemoteLearning(
+              remoteClient,
+              learning,
+              CREATE_LEARNING_MUTATION
+            );
             
-            syncResults.created++;
-            totalUploaded++;
-            console.log(`📖 [UPDATE-LEARNING] ✅ CREADO: Local ID ${learning.id} → Remote ID ${createResult.createLearning.id}`);
+            if (createResult && createResult.createLearning) {
+              this.cacheInsertedId(learning.id, createResult.createLearning.id, 'LEARNING');
+              syncResults.created++;
+              totalUploaded++;
+              console.log(`📖 [UPDATE-LEARNING] ✅ CREADO: Local ID ${learning.id} → Remote ID ${createResult.createLearning.id}`);
+            } else {
+              syncResults.errors++;
+              totalErrors++;
+              console.error(`📖 [UPDATE-LEARNING] ❌ Falló creación: ${learning.id}`);
+            }
           }
 
         } catch (error: any) {
@@ -2926,19 +3275,26 @@ export class SyncUpdateResolver {
         }
       }
 
-      // Resumen final mejorado
+      // 📊 RESUMEN FINAL CON ESTADÍSTICAS VISUALES
       console.log(`\n📖 [UPDATE-LEARNING] 🎉 SINCRONIZACIÓN COMPLETADA:`);
-      console.log(`✅ Creados en remoto: ${syncResults.created}`);
-      console.log(`🔄 Actualizados en remoto: ${syncResults.updated}`);
-      console.log(`❌ Errores: ${syncResults.errors}`);
+      console.log(`┌─────────────────────────────────────────┐`);
+      console.log(`│ 📊 ESTADÍSTICAS DE SINCRONIZACIÓN      │`);
+      console.log(`├─────────────────────────────────────────┤`);
+      console.log(`│ ✨ Creados:    ${String(syncResults.created).padStart(3)} / ${String(localLearnings.length).padStart(3)} │`);
+      console.log(`│ 🔄 Actualizados: ${String(syncResults.updated).padStart(3)} / ${String(localLearnings.length).padStart(3)} │`);
+      console.log(`│ ⏭️  Sin cambios: ${String(syncResults.skipped).padStart(3)} / ${String(localLearnings.length).padStart(3)} │`);
+      console.log(`│ ❌ Errores:     ${String(syncResults.errors).padStart(3)} / ${String(localLearnings.length).padStart(3)} │`);
       if (syncResults.conflicts.length > 0) {
-        console.log(`⚠️ Conflictos detectados: ${syncResults.conflicts.length}`);
-        syncResults.conflicts.forEach((conflict: any) => {
-          console.log(`  - Local ID: ${conflict.localId} | Remote ID: ${conflict.remoteId} | Versiones: L${conflict.localVersion} vs R${conflict.remoteVersion}`);
+        console.log(`│ ⚠️  Conflictos:  ${String(syncResults.conflicts.length).padStart(3)} / ${String(localLearnings.length).padStart(3)} │`);
+      }
+      console.log(`└─────────────────────────────────────────┘`);
+      
+      if (syncResults.conflicts.length > 0) {
+        console.log(`\n⚠️  DETALLES DE CONFLICTOS DE VERSIÓN:`);
+        syncResults.conflicts.forEach((conflict: any, index: number) => {
+          console.log(`   ${index + 1}. Local ID: ${conflict.localId} | Remote ID: ${conflict.remoteId} | Versiones: L${conflict.localVersion} vs R${conflict.remoteVersion}`);
         });
       }
-      console.log(`📊 Total procesados: ${localLearnings.length}`);
-      console.log(`📤 Total sincronizados: ${totalUploaded}`);
 
       return {
         entity: 'LEARNING',
@@ -2947,19 +3303,30 @@ export class SyncUpdateResolver {
         errors: syncResults.errors,
         created: syncResults.created,
         updated: syncResults.updated,
-        conflicts: syncResults.conflicts
+        skipped: syncResults.skipped,
+        conflicts: syncResults.conflicts,
+        summary: {
+          total: localLearnings.length,
+          processed: totalUploaded + syncResults.skipped + syncResults.errors,
+          success: totalUploaded,
+          failed: syncResults.errors,
+          noChanges: syncResults.skipped
+        }
       };
 
     } catch (error: any) {
       console.error('❌ [UPDATE-LEARNING] Error general:', error);
+      console.error('Stack trace:', error.stack);
       return {
         entity: 'LEARNING',
         offline: 0,
         online: 0,
         error: String(error),
+        errorStack: error.stack,
         errors: totalErrors,
         created: 0,
-        updated: 0
+        updated: 0,
+        skipped: 0
       };
     }
   }
